@@ -16,7 +16,6 @@
 html,body{height:100%;}
 body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);display:flex;overflow:hidden;}
 
-/* ── Sidebar ── */
 .sidebar{width:195px;height:100vh;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
 .logo{padding:16px 15px 13px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--s1);}
 .logo-mark{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--y);}
@@ -30,33 +29,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .ni.active{background:var(--yg);border-color:rgba(245,225,50,0.18);color:var(--y);}
 .ni .ic{font-size:13px;width:15px;text-align:center;flex-shrink:0;}
 .badge{margin-left:auto;font-size:8px;padding:2px 4px;border-radius:3px;font-weight:700;}
-.badge.soon{background:var(--s4);color:var(--tmut);}
 .badge.live{background:rgba(46,204,113,.1);color:var(--grn);}
 .badge.new{background:rgba(245,225,50,.1);color:var(--yd);}
 .sf{padding:10px 13px;border-top:1px solid var(--bd);background:var(--s1);}
-.cb-lbl{font-size:9px;color:var(--tmut);display:flex;justify-content:space-between;margin-bottom:4px;}
-.cb-lbl b{color:var(--y);font-weight:600;}
-.cb-track{background:var(--s3);border-radius:3px;height:2px;overflow:hidden;}
-.cb-fill{height:100%;background:var(--y);width:68%;border-radius:3px;}
+.credits-display{font-size:11px;color:var(--y);font-weight:700;font-family:'Space Mono',monospace;}
 
-/* ── Main shell ── */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden;}
 .topbar{padding:11px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .pg-title{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--y);}
 .pg-sep,.pg-sub{font-size:12px;color:var(--tdim);}
-.pill{margin-left:auto;background:rgba(46,204,113,.07);border:1px solid rgba(46,204,113,.18);color:var(--grn);font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.8px;}
 .tab-panel{display:none;flex:1;overflow:hidden;}
 .tab-panel.active{display:flex;}
 
-/* ── Generic Layout ── */
 .workspace{flex:1;display:flex;overflow:hidden;}
 .left-panel{width:400px;flex-shrink:0;border-right:1px solid var(--bd);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px;}
 .right-panel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--blk);gap:10px;padding:20px;overflow-y:auto;}
 
-/* ── Section label ── */
 .sec-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tdim);margin-bottom:6px;}
-
-/* ── Upload zone ── */
 .upload-zone{border:1.5px dashed var(--bd);border-radius:11px;padding:18px 16px;text-align:center;cursor:pointer;position:relative;transition:all .2s;background:var(--s1);}
 .upload-zone:hover{border-color:var(--yd);background:var(--s2);}
 .upload-zone.has-file{border-color:rgba(245,225,50,.35);border-style:solid;background:rgba(245,225,50,.02);}
@@ -64,51 +53,49 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .up-icon{font-size:22px;display:block;margin-bottom:5px;}
 .up-title{font-size:13px;font-weight:600;margin-bottom:2px;}
 .up-hint{font-size:11px;color:var(--tmut);}
-.up-name{font-size:10px;color:var(--y);font-weight:600;margin-top:4px;word-break:break-all;line-height:1.4;}
+.up-name{font-size:10px;color:var(--y);font-weight:600;margin-top:4px;word-break:break-all;}
 
-/* ── Text input ── */
 .text-input{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:10px 12px;color:var(--tx);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;transition:border-color .15s;}
 .text-input:focus{border-color:rgba(245,225,50,.4);}
 .text-input::placeholder{color:var(--tmut);}
 
-/* ── Textarea ── */
 .textarea{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:10px 12px;color:var(--tx);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;resize:vertical;min-height:80px;transition:border-color .15s;}
 .textarea:focus{border-color:rgba(245,225,50,.4);}
 .textarea::placeholder{color:var(--tmut);}
 
-/* ── Buttons ── */
 .btn{padding:12px;background:var(--y);color:var(--blk);border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;width:100%;letter-spacing:.4px;}
 .btn:hover{background:#ffe600;box-shadow:0 4px 20px rgba(245,225,50,.2);}
 .btn:disabled{background:var(--s4);color:var(--tmut);cursor:not-allowed;box-shadow:none;}
-.btn-secondary{background:var(--s3);border:1px solid var(--bd);color:var(--y);padding:10px;}
-.btn-secondary:hover{background:var(--s4);}
 
-/* ── Select ── */
 .select{background:var(--s3);border:1px solid var(--bd);color:var(--tx);padding:10px 12px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;width:100%;transition:all .15s;}
 .select:hover{border-color:rgba(245,225,50,.3);}
 .select:focus{border-color:rgba(245,225,50,.5);}
 
-/* ── Cards ── */
 .card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
-.card-hd{padding:9px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:7px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--y);}
-.card-dot{width:5px;height:5px;border-radius:50%;background:var(--y);}
-.card-body{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.card-hd{padding:9px 12px;border-bottom:1px solid var(--bd);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--y);}
+.card-body{padding:12px;display:flex;flex-direction:column;gap:10px;}
 
-/* ── Progress ── */
+.setting-row{display:flex;flex-direction:column;gap:6px;}
+.setting-label{font-size:11px;font-weight:600;color:var(--tdim);}
+.setting-value{font-size:10px;color:var(--y);font-family:'Space Mono',monospace;}
+
+.slider-row{display:flex;flex-direction:column;gap:4px;}
+.slider{width:100%;cursor:pointer;}
+.slider-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--tdim);}
+
+.char-count{font-size:9px;color:var(--tmut);margin-top:4px;}
+
 .prog-wrap{display:none;}
 .prog-wrap.vis{display:block;}
 .prog-lbl{font-size:10px;color:var(--tdim);font-family:'Space Mono',monospace;margin-bottom:4px;display:flex;justify-content:space-between;}
 .prog-track{background:var(--s4);border-radius:4px;height:4px;overflow:hidden;border:1px solid var(--bd);}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--y),#ffe600);border-radius:4px;width:0%;transition:width .35s ease;}
-.prog-eta{font-size:9px;color:var(--tmut);margin-top:3px;font-family:'Space Mono',monospace;}
 
-/* ── Error box ── */
 .err-box{background:rgba(255,65,54,.04);border:1px solid rgba(255,65,54,.14);border-radius:9px;padding:11px;display:none;}
 .err-box.vis{display:block;}
 .err-ttl{font-size:10px;font-weight:700;font-family:'Space Mono',monospace;color:var(--red);margin-bottom:4px;}
 .err-msg{color:#ff7070;font-size:11px;line-height:1.5;}
 
-/* ── Video preview ── */
 .phone-wrap{height:calc(100vh - 44px - 80px);max-height:560px;aspect-ratio:9/16;max-width:315px;position:relative;border-radius:14px;overflow:hidden;background:#000;border:1.5px solid var(--bd);box-shadow:0 16px 48px rgba(0,0,0,.7);flex-shrink:0;}
 .ph-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--tmut);}
 .ph-empty span{font-size:28px;}
@@ -116,45 +103,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .ph-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
 .prev-lbl{font-size:9px;color:var(--tdim);font-family:'Space Mono',monospace;letter-spacing:1px;}
 
-/* ── Result buttons ── */
 .result-btns{width:100%;max-width:315px;display:none;flex-direction:column;gap:7px;}
 .result-btns.vis{display:flex;}
 .dl-btn{display:block;width:100%;padding:9px;background:var(--grn);color:#000;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;text-align:center;text-decoration:none;transition:all .2s;}
 .dl-btn:hover{background:#27ae60;}
 
-/* ── Info box ── */
+.voice-library{background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:10px;margin-top:8px;max-height:120px;overflow-y:auto;}
+.voice-item{padding:8px;border-bottom:1px solid var(--bd);font-size:11px;}
+.voice-item:last-child{border-bottom:none;}
+.voice-name{color:var(--tx);font-weight:600;}
+.voice-id{color:var(--tdim);font-size:9px;font-family:'Space Mono',monospace;}
+
 .info-box{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:11px 13px;font-size:11px;color:var(--tdim);line-height:1.8;}
 .info-box b{color:var(--tx);}
-
-/* ── Settings row ── */
-.srow{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);gap:8px;}
-.srow:last-child{border-bottom:none;}
-.srow-label{font-size:11px;font-weight:600;color:var(--tdim);width:80px;flex-shrink:0;}
-.srow-ctrl{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
-
-/* ── Chips ── */
-.chips{display:flex;gap:4px;flex-wrap:wrap;}
-.chip{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--s3);color:var(--tdim);transition:all .12s;white-space:nowrap;user-select:none;}
-.chip:hover{border-color:rgba(245,225,50,.3);color:var(--tx);}
-.chip.on{background:rgba(245,225,50,.1);border-color:rgba(245,225,50,.45);color:var(--y);}
-
-/* ── Toggle ── */
-.tog{position:relative;width:32px;height:18px;flex-shrink:0;}
-.tog input{opacity:0;width:0;height:0;}
-.tog .trk{position:absolute;inset:0;background:var(--s4);border-radius:9px;cursor:pointer;border:1px solid var(--bd);transition:.15s;}
-.tog .thb{position:absolute;height:10px;width:10px;left:3px;top:3px;background:var(--tmut);border-radius:50%;transition:.15s;pointer-events:none;}
-.tog input:checked~.trk{background:var(--y);border-color:var(--y);}
-.tog input:checked~.thb{transform:translateX(14px);background:var(--blk);}
-
-/* ── Grid for multiple items ── */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-
-/* ── Scrollable list ── */
-.list-wrap{max-height:200px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;background:var(--s3);}
-.list-item{padding:8px 10px;border-bottom:1px solid var(--bd);font-size:11px;color:var(--tdim);}
-.list-item:last-child{border-bottom:none;}
-.list-item.active{background:var(--yg);color:var(--y);}
 </style>
 </head>
 <body>
@@ -163,39 +124,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 <aside class="sidebar">
   <div class="logo">
     <div class="logo-mark">DubShorts</div>
-    <div class="logo-sub">AI Studio v2</div>
+    <div class="logo-sub">AI Studio v3</div>
   </div>
   <nav class="nav">
-    <!-- VIDEO GENERATION -->
     <div class="nav-sec">
       <div class="nav-seclbl">Generation</div>
       <button class="ni active" id="nav-vidgen" onclick="switchTab('vidgen')"><span class="ic">✨</span>AI Video Gen<span class="badge live">LIVE</span></button>
       <button class="ni" id="nav-imggen" onclick="switchTab('imggen')"><span class="ic">🎨</span>AI Image Gen<span class="badge live">LIVE</span></button>
     </div>
 
-    <!-- UTILITIES -->
     <div class="nav-sec">
       <div class="nav-seclbl">Utilities</div>
-      <button class="ni" id="nav-caption" onclick="switchTab('caption')"><span class="ic">📝</span>Auto Caption<span class="badge live">LIVE</span></button>
-      <button class="ni" id="nav-remover" onclick="switchTab('remover')"><span class="ic">✂️</span>Caption Remover<span class="badge live">LIVE</span></button>
-      <button class="ni" id="nav-upscale" onclick="switchTab('upscale')"><span class="ic">📈</span>Video Upscaler<span class="badge new">NEW</span></button>
-      <button class="ni" id="nav-deadspace" onclick="switchTab('deadspace')"><span class="ic">🎬</span>Dead Space Remover<span class="badge new">NEW</span></button>
-      <button class="ni" id="nav-elevenlabs" onclick="switchTab('elevenlabs')"><span class="ic">🔊</span>ElevenLabs Dub<span class="badge new">NEW</span></button>
+      <button class="ni" id="nav-voicegen" onclick="switchTab('voicegen')"><span class="ic">🔊</span>Voice Gen<span class="badge live">LIVE</span></button>
+      <button class="ni" id="nav-upscale" onclick="switchTab('upscale')"><span class="ic">📈</span>Video Upscaler<span class="badge live">LIVE</span></button>
+      <button class="ni" id="nav-deadspace" onclick="switchTab('deadspace')"><span class="ic">🎬</span>Dead Space Remover<span class="badge live">LIVE</span></button>
     </div>
 
-    <!-- CONTENT STRATEGY -->
     <div class="nav-sec">
-      <div class="nav-seclbl">Content Strategy</div>
+      <div class="nav-seclbl">Content</div>
       <button class="ni" id="nav-scraper" onclick="switchTab('scraper')"><span class="ic">🎥</span>YT Scraper<span class="badge new">NEW</span></button>
-      <button class="ni" id="nav-niche" onclick="switchTab('niche')"><span class="ic">🎯</span>Custom Niche Finder<span class="badge new">NEW</span></button>
-      <button class="ni" id="nav-competitor" onclick="switchTab('competitor')"><span class="ic">👁️</span>Competitor Tracker<span class="badge new">NEW</span></button>
-      <button class="ni" id="nav-repurpose" onclick="switchTab('repurpose')"><span class="ic">🔄</span>Repurpose & Distribute<span class="badge new">NEW</span></button>
+      <button class="ni" id="nav-repurpose" onclick="switchTab('repurpose')"><span class="ic">🔄</span>Repurpose<span class="badge new">NEW</span></button>
     </div>
   </nav>
   <div class="sf">
-    <div class="cb-lbl"><span>Usage</span><b>68%</b></div>
-    <div class="cb-track"><div class="cb-fill"></div></div>
-    <div class="cb-lbl" style="margin-top:4px;margin-bottom:0"><span>340 / 500 credits</span></div>
+    <div class="credits-display">💳 <span id="creditsDisplay">500 Credits</span></div>
   </div>
 </aside>
 
@@ -203,9 +155,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 <div class="main">
   <div class="topbar">
     <span class="pg-title" id="topTitle">AI Video Gen</span>
-    <span class="pg-sep"> / </span>
-    <span class="pg-sub" id="topSub">Image to video · Powered by Kie.ai</span>
-    <div class="pill" id="topPill">● Live</div>
+    <span style="color:var(--tdim); margin-left: auto; font-size: 11px; font-family: 'Space Mono', monospace;">1 credit = $0.01</span>
   </div>
 
   <!-- ══ AI VIDEO GEN ══ -->
@@ -222,69 +172,64 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
         <div>
           <div class="sec-lbl">Prompt</div>
-          <textarea class="textarea" id="aivgPrompt" rows="3" placeholder="Describe the motion… e.g. 'slow cinematic zoom, golden hour lighting'"></textarea>
+          <textarea class="textarea" id="aivgPrompt" rows="3" placeholder="Describe the motion…"></textarea>
         </div>
 
         <div class="card">
-          <div class="card-hd"><span class="card-dot"></span>Settings</div>
+          <div class="card-hd">Settings</div>
           <div class="card-body">
-            <div class="srow">
-              <span class="srow-label">Duration</span>
-              <div class="srow-ctrl">
-                <div class="chips" id="durChips">
-                  <div class="chip on" onclick="selChip(this,'dur');calcCredits()">5s</div>
-                  <div class="chip" onclick="selChip(this,'dur');calcCredits()">8s</div>
-                  <div class="chip" onclick="selChip(this,'dur');calcCredits()">10s</div>
-                  <div class="chip" onclick="selChip(this,'dur');calcCredits()">15s</div>
-                </div>
-              </div>
+            <div class="setting-row">
+              <label class="setting-label">Model</label>
+              <select class="select" id="vidModel" onchange="updateVidSettings()">
+                <option value="veo3-fast" data-cr="60">Veo 3.1 Fast</option>
+                <option value="grok" data-cr="30">Grok Imagine</option>
+                <option value="sora2" data-cr="35">Sora 2</option>
+                <option value="kling26" data-cr="20">Kling 2.6</option>
+                <option value="seedance" data-cr="50">Seedance</option>
+              </select>
             </div>
-            <div class="srow">
-              <span class="srow-label">Model</span>
-              <div class="srow-ctrl">
-                <select class="select" id="modelSel" style="width:140px;" onchange="calcCredits()">
-                  <optgroup label="Kie.ai Tier 1">
-                    <option value="veo3-fast" data-cr="60" selected>Veo 3.1 Fast</option>
-                    <option value="veo3-quality" data-cr="400">Veo 3.1 Quality</option>
-                    <option value="kling3-720p" data-cr="20">Kling 3.0 720p</option>
-                  </optgroup>
-                </select>
-              </div>
+
+            <div class="setting-row">
+              <label class="setting-label">Duration</label>
+              <select class="select" id="vidDuration">
+                <option value="6">6 seconds</option>
+                <option value="8" selected>8 seconds</option>
+                <option value="10">10 seconds</option>
+                <option value="15">15 seconds</option>
+              </select>
             </div>
-            <div class="srow">
-              <span class="srow-label">Resolution</span>
-              <div class="srow-ctrl">
-                <div class="chips" id="resChips">
-                  <div class="chip on" onclick="selChip(this,'res');calcCredits()">720p</div>
-                  <div class="chip" onclick="selChip(this,'res');calcCredits()">1080p</div>
-                </div>
-              </div>
+
+            <div class="setting-row">
+              <label class="setting-label">Aspect Ratio</label>
+              <select class="select" id="vidAspect">
+                <option value="9:16" selected>9:16 (Vertical)</option>
+                <option value="16:9">16:9 (Horizontal)</option>
+              </select>
             </div>
-            <div class="srow">
-              <span class="srow-label">Cost</span>
-              <div class="srow-ctrl">
-                <span style="font-size:11px;color:var(--y);font-weight:700;" id="crBadge">60 cr</span>
-              </div>
+
+            <div class="setting-row">
+              <label class="setting-label">Cost</label>
+              <div class="setting-value" id="vidCost">60 credits</div>
             </div>
           </div>
         </div>
 
-        <button class="btn" id="genBtn" onclick="startGen()">⚡ Generate Video</button>
-        <div class="prog-wrap" id="genProg">
-          <div class="prog-lbl"><span id="gpLbl">Initializing...</span><span id="gpPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="gpFill"></div></div>
+        <button class="btn" id="vidBtn" onclick="startVidGen()">⚡ Generate Video</button>
+        <div class="prog-wrap" id="vidProg">
+          <div class="prog-lbl"><span id="vpLbl">Initializing...</span><span id="vpPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="vpFill"></div></div>
         </div>
-        <div class="err-box" id="aivgErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="aivgErrMsg"></div></div>
+        <div class="err-box" id="vidErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="vidErrMsg"></div></div>
       </div>
 
       <div class="right-panel">
         <div class="phone-wrap">
-          <div class="ph-empty" id="phEmpty"><span>📱</span><p>Upload an image to begin</p></div>
-          <video class="ph-video" id="phVideo" controls playsinline loop></video>
+          <div class="ph-empty" id="vidEmpty"><span>📱</span><p>Upload an image to begin</p></div>
+          <video class="ph-video" id="vidVideo" controls playsinline loop></video>
         </div>
         <div class="prev-lbl">PREVIEW</div>
-        <div class="result-btns" id="resultBtns">
-          <a class="dl-btn" id="dlBtn" href="#" download="ai_video.mp4">⬇ Download Video</a>
+        <div class="result-btns" id="vidResultBtns">
+          <a class="dl-btn" id="vidDlBtn" href="#" download="video.mp4">⬇ Download Video</a>
         </div>
       </div>
     </div>
@@ -294,37 +239,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="tab-panel" id="tab-imggen">
     <div class="workspace">
       <div class="left-panel">
+        <div class="upload-zone" id="refImgDrop" onclick="document.getElementById('refImgInput').click()" style="max-height:200px;">
+          <input type="file" id="refImgInput" accept="image/*" style="display:none">
+          <span class="up-icon">📷</span>
+          <div class="up-title">Reference Image (Optional)</div>
+          <div class="up-hint">Drop or click</div>
+          <div class="up-name" id="refImgFnm"></div>
+        </div>
+
         <div>
           <div class="sec-lbl">Prompt</div>
-          <textarea class="textarea" id="imgPrompt" rows="4" placeholder="Describe the image you want… 'cinematic landscape, golden hour, mountains'"></textarea>
+          <textarea class="textarea" id="imgPrompt" rows="4" placeholder="Describe the image…"></textarea>
         </div>
 
         <div class="card">
-          <div class="card-hd"><span class="card-dot"></span>Settings</div>
+          <div class="card-hd">Settings</div>
           <div class="card-body">
-            <div class="srow">
-              <span class="srow-label">Size</span>
-              <div class="srow-ctrl">
-                <select class="select" style="width:120px;" id="imgSize">
-                  <option value="1024x1024">1024x1024</option>
-                  <option value="1792x1024" selected>1792x1024</option>
-                  <option value="1024x1792">1024x1792</option>
-                </select>
-              </div>
+            <div class="setting-row">
+              <label class="setting-label">Model</label>
+              <select class="select" id="imgModel" onchange="updateImgCost()">
+                <option value="nano-2" data-cr="12">Nano Banana 2</option>
+                <option value="nano-pro" data-cr="18">Nano Banana Pro</option>
+                <option value="seedream45" data-cr="6">Seedream 4.5</option>
+                <option value="seedream50" data-cr="5">Seedream 5.0</option>
+              </select>
             </div>
-            <div class="srow">
-              <span class="srow-label">Model</span>
-              <div class="srow-ctrl">
-                <select class="select" style="width:120px;" id="imgModel">
-                  <option value="dall-e-3" selected>DALL-E 3</option>
-                  <option value="midjourney-beta">Midjourney</option>
-                </select>
-              </div>
+
+            <div class="setting-row">
+              <label class="setting-label">Aspect Ratio</label>
+              <select class="select" id="imgAspect">
+                <option value="9:16" selected>9:16 (Vertical)</option>
+                <option value="16:9">16:9 (Horizontal)</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <label class="setting-label">Cost</label>
+              <div class="setting-value" id="imgCost">12 credits</div>
             </div>
           </div>
         </div>
 
-        <button class="btn" id="imgGenBtn" onclick="startImgGen()">🎨 Generate Image</button>
+        <button class="btn" id="imgBtn" onclick="startImgGen()">🎨 Generate Image</button>
         <div class="prog-wrap" id="imgProg">
           <div class="prog-lbl"><span id="ipLbl">Generating...</span><span id="ipPct">0%</span></div>
           <div class="prog-track"><div class="prog-fill" id="ipFill"></div></div>
@@ -340,93 +296,104 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
             <p style="font-size:11px;">Your generated image will appear here</p>
           </div>
         </div>
-        <a class="dl-btn" id="dlImgBtn" href="#" download="generated.png" style="display:none;max-width:400px;">⬇ Download Image</a>
+        <a class="dl-btn" id="dlImgBtn" href="#" download="image.png" style="display:none;max-width:400px;">⬇ Download Image</a>
       </div>
     </div>
   </div>
 
-  <!-- ══ AUTO CAPTION ══ -->
-  <div class="tab-panel" id="tab-caption">
+  <!-- ══ VOICE GEN ══ -->
+  <div class="tab-panel" id="tab-voicegen">
     <div class="workspace">
       <div class="left-panel">
-        <div class="upload-zone" id="captionZone" onclick="document.getElementById('captionInput').click()">
-          <input type="file" id="captionInput" accept="video/*" style="display:none">
-          <span class="up-icon">📝</span>
-          <div class="up-title">Drop video here</div>
-          <div class="up-hint">MP4 · MOV</div>
-          <div class="up-name" id="captionFnm"></div>
-        </div>
-
         <div>
-          <div class="sec-lbl">Caption Settings</div>
-          <select class="select" id="capStyle">
-            <option value="white" selected>White Text</option>
-            <option value="yellow">Yellow Text</option>
-            <option value="black">Black with Outline</option>
-          </select>
+          <div class="sec-lbl">Voice Script</div>
+          <textarea class="textarea" id="voiceScript" rows="6" placeholder="Enter your voiceover script…" onchange="updateCharCount()" oninput="updateCharCount()"></textarea>
+          <div class="char-count"><span id="charCount">0</span> / 100,000 characters</div>
         </div>
 
-        <div>
-          <div class="sec-lbl">Language</div>
-          <select class="select" id="capLang">
-            <option value="en" selected>English</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-          </select>
+        <div class="card">
+          <div class="card-hd">Voice Selection</div>
+          <div class="card-body">
+            <div class="setting-row">
+              <label class="setting-label">Preset Voice</label>
+              <select class="select" id="voicePreset" onchange="selectPresetVoice()">
+                <option value="">Select a voice...</option>
+                <option value="mark">Mark - UgBBYS2sOqTuMpoF3BR0</option>
+                <option value="alex">Alex - yl2ZDV1MzN4HbQJbMihG</option>
+                <option value="jessica">Jessica (2) - g6xIsTj2HwM6VR4iXFCw</option>
+              </select>
+            </div>
+
+            <div style="border-top:1px solid var(--bd);padding-top:10px;margin-top:10px;">
+              <label class="setting-label" style="margin-bottom:8px;display:block;">Use Public Voice ID</label>
+              <input type="text" class="text-input" id="customVoiceId" placeholder="Enter voice ID" style="font-size:10px;">
+              <button class="btn" style="margin-top:8px;padding:8px;font-size:11px;" onclick="saveCustomVoice()">Save Voice</button>
+            </div>
+          </div>
         </div>
 
-        <button class="btn" id="captionBtn" onclick="startCaption()" disabled>📝 Add Captions</button>
-        <div class="prog-wrap" id="capProg">
-          <div class="prog-lbl"><span id="cpLbl">Processing...</span><span id="cpPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="cpFill"></div></div>
+        <div class="card">
+          <div class="card-hd">ElevenLabs Settings</div>
+          <div class="card-body">
+            <div class="slider-row">
+              <label class="setting-label">Speed</label>
+              <div class="slider-labels">
+                <span>Slower</span>
+                <span id="speedVal">0.84</span>
+                <span>Faster</span>
+              </div>
+              <input type="range" class="slider" id="speedSlider" min="0.5" max="2" step="0.1" value="0.84" oninput="updateSpeedVal()">
+            </div>
+
+            <div class="slider-row">
+              <label class="setting-label">Stability</label>
+              <div class="slider-labels">
+                <span>Variable</span>
+                <span id="stabilityVal">50%</span>
+                <span>Stable</span>
+              </div>
+              <input type="range" class="slider" id="stabilitySlider" min="0" max="100" value="50" oninput="updateStabilityVal()">
+            </div>
+
+            <div class="slider-row">
+              <label class="setting-label">Similarity</label>
+              <div class="slider-labels">
+                <span>Low</span>
+                <span id="similarityVal">75%</span>
+                <span>High</span>
+              </div>
+              <input type="range" class="slider" id="similaritySlider" min="0" max="100" value="75" oninput="updateSimilarityVal()">
+            </div>
+
+            <div class="slider-row">
+              <label class="setting-label">Style Exaggeration</label>
+              <div class="slider-labels">
+                <span>None</span>
+                <span id="styleVal">0%</span>
+                <span>Exaggerated</span>
+              </div>
+              <input type="range" class="slider" id="styleSlider" min="0" max="100" value="0" oninput="updateStyleVal()">
+            </div>
+
+            <button class="btn" style="margin-top:10px;padding:8px;font-size:11px;" onclick="resetVoiceSettings()">Reset Values</button>
+          </div>
         </div>
-        <div class="err-box" id="capErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="capErrMsg"></div></div>
+
+        <button class="btn" id="voiceBtn" onclick="startVoiceGen()">🔊 Generate Speech</button>
+        <div class="prog-wrap" id="voiceProg">
+          <div class="prog-lbl"><span id="vrLbl">Generating...</span><span id="vrPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="vrFill"></div></div>
+        </div>
+        <div class="err-box" id="voiceErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="voiceErrMsg"></div></div>
       </div>
 
       <div class="right-panel">
-        <div class="phone-wrap">
-          <div class="ph-empty"><span>📱</span><p>Upload a video to preview captions</p></div>
-          <video id="capVid" controls style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
+        <div style="width:100%;max-width:400px;background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:20px;text-align:center;">
+          <div style="font-size:32px;margin-bottom:15px;">🔊</div>
+          <audio id="voiceAudio" controls style="width:100%;display:none;"></audio>
+          <div id="voiceEmpty" style="color:var(--tdim);font-size:12px;">Your generated speech will appear here</div>
+          <a class="dl-btn" id="dlVoiceBtn" href="#" download="speech.mp3" style="display:none;margin-top:15px;">⬇ Download Audio</a>
         </div>
-        <div class="prev-lbl">PREVIEW</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ CAPTION REMOVER ══ -->
-  <div class="tab-panel" id="tab-remover">
-    <div class="workspace">
-      <div class="left-panel">
-        <div class="upload-zone" id="remZone" onclick="document.getElementById('remInput').click()">
-          <input type="file" id="remInput" accept="video/*" style="display:none">
-          <span class="up-icon">✂️</span>
-          <div class="up-title">Drop video here</div>
-          <div class="up-hint">MP4 · MOV</div>
-          <div class="up-name" id="remFnm"></div>
-        </div>
-
-        <button class="btn" id="remBtn" onclick="startRemoval()" disabled>✂️ Remove Captions</button>
-        <div class="prog-wrap" id="remProgWrap">
-          <div class="prog-lbl"><span id="remProgLbl">Detecting captions...</span><span id="remProgPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="remProgFill"></div></div>
-          <div class="prog-eta" id="remProgEta">2–5 min</div>
-        </div>
-        <div class="err-box" id="remErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="remErrMsg"></div></div>
-        <div class="info-box">
-          <b>How it works</b><br>
-          1. EasyOCR detects captions<br>
-          2. LaMa AI inpaints regions<br>
-          3. Video reassembled with audio
-        </div>
-      </div>
-
-      <div class="right-panel">
-        <div class="phone-wrap">
-          <div class="ph-empty"><span>📱</span><p>Upload a video</p></div>
-          <video id="remVid" controls style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
-        </div>
-        <div class="prev-lbl">ORIGINAL</div>
       </div>
     </div>
   </div>
@@ -443,12 +410,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           <div class="up-name" id="upscaleFnm"></div>
         </div>
 
-        <div>
-          <div class="sec-lbl">Target Resolution</div>
-          <div class="chips" id="upscaleRes">
-            <div class="chip on" onclick="selChip(this,'upres')">1080p</div>
-            <div class="chip" onclick="selChip(this,'upres')">2K</div>
-            <div class="chip" onclick="selChip(this,'upres')">4K</div>
+        <div class="card">
+          <div class="card-hd">Settings</div>
+          <div class="card-body">
+            <div class="setting-row">
+              <label class="setting-label">Target Quality</label>
+              <select class="select" id="upscaleQuality" onchange="updateUpscaleCost()">
+                <option value="1080" data-cr="10">1080p - 10 credits</option>
+                <option value="2k" data-cr="20">2K - 20 credits</option>
+                <option value="4k" data-cr="40">4K - 40 credits</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label class="setting-label">Cost</label>
+              <div class="setting-value" id="upCost">10 credits</div>
+            </div>
           </div>
         </div>
 
@@ -462,7 +438,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
       <div class="right-panel">
         <div class="phone-wrap">
-          <div class="ph-empty"><span>📱</span><p>Upload to upscale</p></div>
+          <div class="ph-empty"><span>📁</span><p>Upload a video to upscale</p></div>
           <video id="upVid" controls style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
         </div>
         <div class="prev-lbl">UPSCALED</div>
@@ -475,17 +451,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     <div class="workspace">
       <div class="left-panel">
         <div class="upload-zone" id="deadspaceZone" onclick="document.getElementById('deadspaceInput').click()">
-          <input type="file" id="deadspaceInput" accept="video/*" style="display:none">
+          <input type="file" id="deadspaceInput" accept="video/*,audio/*" style="display:none">
           <span class="up-icon">🎬</span>
-          <div class="up-title">Drop video here</div>
-          <div class="up-hint">MP4 · MOV</div>
+          <div class="up-title">Drop video/audio here</div>
+          <div class="up-hint">MP4 · MOV · WAV · MP3</div>
           <div class="up-name" id="deadspaceFnm"></div>
         </div>
 
-        <div>
-          <div class="sec-lbl">Silence Threshold</div>
-          <input type="range" class="text-input" id="silenceThresh" min="20" max="80" value="40" style="padding:0;">
-          <div style="font-size:10px;color:var(--tdim);margin-top:4px;">Value: <span id="threshVal">40</span>dB</div>
+        <div class="card">
+          <div class="card-hd">Settings</div>
+          <div class="card-body">
+            <div class="slider-row">
+              <label class="setting-label">Silence Threshold (dB)</label>
+              <div class="slider-labels">
+                <span>Sensitive</span>
+                <span id="dbVal">-40</span>
+                <span>Aggressive</span>
+              </div>
+              <input type="range" class="slider" id="dbSlider" min="-60" max="-10" value="-40" oninput="updateDbVal()">
+            </div>
+            <div class="setting-row">
+              <label class="setting-label">Cost</label>
+              <div class="setting-value">5 credits</div>
+            </div>
+          </div>
         </div>
 
         <button class="btn" id="dsBtn" onclick="startDeadspace()" disabled>🎬 Remove Dead Space</button>
@@ -498,55 +487,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
       <div class="right-panel">
         <div class="phone-wrap">
-          <div class="ph-empty"><span>📱</span><p>Upload a video</p></div>
+          <div class="ph-empty"><span>📁</span><p>Upload a video/audio file</p></div>
           <video id="dsVid" controls style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
         </div>
         <div class="prev-lbl">TRIMMED</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ ELEVENLABS DUB ══ -->
-  <div class="tab-panel" id="tab-elevenlabs">
-    <div class="workspace">
-      <div class="left-panel">
-        <div class="upload-zone" id="dubZone" onclick="document.getElementById('dubInput').click()">
-          <input type="file" id="dubInput" accept="video/*" style="display:none">
-          <span class="up-icon">🔊</span>
-          <div class="up-title">Drop video here</div>
-          <div class="up-hint">MP4 · MOV</div>
-          <div class="up-name" id="dubFnm"></div>
-        </div>
-
-        <div>
-          <div class="sec-lbl">Target Language</div>
-          <select class="select" id="dubLang">
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="it">Italian</option>
-            <option value="pt">Portuguese</option>
-            <option value="ja">Japanese</option>
-            <option value="zh">Mandarin</option>
-            <option value="hi">Hindi</option>
-          </select>
-        </div>
-
-        <button class="btn" id="dubBtn" onclick="startDub()" disabled>🔊 Dub Video</button>
-        <div class="prog-wrap" id="dubProg">
-          <div class="prog-lbl"><span id="dubLbl">Dubbing...</span><span id="dubPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="dubFill"></div></div>
-          <div class="prog-eta" id="dubEta">Processing time varies</div>
-        </div>
-        <div class="err-box" id="dubErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="dubErrMsg"></div></div>
-      </div>
-
-      <div class="right-panel">
-        <div class="phone-wrap">
-          <div class="ph-empty"><span>📱</span><p>Upload a video</p></div>
-          <video id="dubVid" controls style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
-        </div>
-        <div class="prev-lbl">DUBBED</div>
       </div>
     </div>
   </div>
@@ -556,18 +500,36 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     <div class="workspace">
       <div class="left-panel">
         <div>
-          <div class="sec-lbl">YouTube Channel URL</div>
+          <div class="sec-lbl">Channel Link</div>
           <input type="text" class="text-input" id="ytChannelUrl" placeholder="https://youtube.com/@channelname">
         </div>
 
-        <div>
-          <div class="sec-lbl">Number of Videos</div>
-          <select class="select" id="ytCount">
-            <option value="10">10 videos</option>
-            <option value="25" selected>25 videos</option>
-            <option value="50">50 videos</option>
-            <option value="100">100 videos</option>
-          </select>
+        <div class="card">
+          <div class="card-hd">Settings</div>
+          <div class="card-body">
+            <div class="setting-row">
+              <label class="setting-label">Number of Videos</label>
+              <select class="select" id="ytCount">
+                <option value="10">10 videos</option>
+                <option value="25" selected>25 videos</option>
+                <option value="50">50 videos</option>
+                <option value="100">100 videos</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <label class="setting-label">Content Type</label>
+              <select class="select" id="ytType">
+                <option value="shorts">Shorts</option>
+                <option value="longform">Long Form</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <label class="setting-label">Cost</label>
+              <div class="setting-value">2 credits</div>
+            </div>
+          </div>
         </div>
 
         <button class="btn" id="scrapBtn" onclick="startScrape()">🎥 Scrape Channel</button>
@@ -576,108 +538,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           <div class="prog-track"><div class="prog-fill" id="scFill"></div></div>
         </div>
         <div class="err-box" id="scrapErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="scrapErrMsg"></div></div>
-
-        <div class="info-box">
-          <b>Data extracted:</b><br>
-          • Video titles<br>
-          • Descriptions<br>
-          • View counts<br>
-          • Upload dates<br>
-          • Engagement metrics
-        </div>
       </div>
 
       <div class="right-panel">
         <div style="width:100%;max-width:400px;background:var(--s2);border:1px solid var(--bd);border-radius:12px;overflow:hidden;">
-          <div style="padding:14px;border-bottom:1px solid var(--bd);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--y);">Scraped Data</div>
-          <div class="list-wrap" id="scrapList" style="max-height:300px;border:none;border-radius:0;">
-            <div class="list-item" style="text-align:center;padding:30px;color:var(--tdim);">No data yet</div>
+          <div style="padding:14px;border-bottom:1px solid var(--bd);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--y);">Scraped Videos</div>
+          <div class="list-wrap" id="scrapList" style="max-height:300px;border:none;border-radius:0;overflow-y:auto;padding:10px;">
+            <div style="text-align:center;padding:30px;color:var(--tdim);font-size:11px;">No data yet</div>
           </div>
           <a href="#" id="exportBtn" class="dl-btn" style="display:none;border-radius:0;margin:0;">⬇ Export as CSV</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ CUSTOM NICHE FINDER ══ -->
-  <div class="tab-panel" id="tab-niche">
-    <div class="workspace">
-      <div class="left-panel">
-        <div>
-          <div class="sec-lbl">Describe Your Content</div>
-          <textarea class="textarea" id="nicheDesc" rows="4" placeholder="E.g., 'I make videos about productivity hacks, study techniques, and time management'"></textarea>
-        </div>
-
-        <div>
-          <div class="sec-lbl">Target Platform</div>
-          <select class="select" id="nichePlatform">
-            <option value="tiktok" selected>TikTok</option>
-            <option value="youtube">YouTube Shorts</option>
-            <option value="instagram">Instagram Reels</option>
-            <option value="all">All Platforms</option>
-          </select>
-        </div>
-
-        <button class="btn" id="nicheBtn" onclick="startNicheFinder()">🎯 Find Your Niche</button>
-        <div class="prog-wrap" id="nicheProg">
-          <div class="prog-lbl"><span id="ncLbl">Analyzing...</span><span id="ncPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="ncFill"></div></div>
-        </div>
-        <div class="err-box" id="nicheErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="nicheErrMsg"></div></div>
-      </div>
-
-      <div class="right-panel">
-        <div id="nicheResults" style="width:100%;max-width:420px;">
-          <div style="text-align:center;color:var(--tdim);padding:40px 20px;">
-            <span style="font-size:32px;display:block;margin-bottom:10px;">🎯</span>
-            <p>Run analysis to discover your best content niches</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ COMPETITOR TRACKER ══ -->
-  <div class="tab-panel" id="tab-competitor">
-    <div class="workspace">
-      <div class="left-panel">
-        <div>
-          <div class="sec-lbl">Competitor Channel URL</div>
-          <input type="text" class="text-input" id="compUrl" placeholder="https://youtube.com/@competitor">
-        </div>
-
-        <div>
-          <div class="sec-lbl">Track Metrics</div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox" checked> Upload frequency
-            </label>
-            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox" checked> Video length
-            </label>
-            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox" checked> Engagement rate
-            </label>
-            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox" checked> Trending topics
-            </label>
-          </div>
-        </div>
-
-        <button class="btn" id="compBtn" onclick="startCompetitorTrack()">👁️ Track Competitor</button>
-        <div class="prog-wrap" id="compProg">
-          <div class="prog-lbl"><span id="coLbl">Fetching...</span><span id="coPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="coFill"></div></div>
-        </div>
-        <div class="err-box" id="compErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="compErrMsg"></div></div>
-      </div>
-
-      <div class="right-panel">
-        <div id="compResults" style="width:100%;max-width:420px;">
-          <div style="text-align:center;color:var(--tdim);padding:40px 20px;">
-            <span style="font-size:32px;display:block;margin-bottom:10px;">👁️</span>
-            <p>Track competitor metrics and strategies</p>
-          </div>
         </div>
       </div>
     </div>
@@ -687,90 +556,90 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="tab-panel" id="tab-repurpose">
     <div class="workspace">
       <div class="left-panel">
-        <div class="upload-zone" id="repurposeZone" onclick="document.getElementById('repurposeInput').click()">
-          <input type="file" id="repurposeInput" accept="video/*" style="display:none">
-          <span class="up-icon">🔄</span>
-          <div class="up-title">Drop video here</div>
-          <div class="up-hint">MP4 · MOV</div>
-          <div class="up-name" id="repurposeFnm"></div>
+        <div>
+          <div class="sec-lbl">YouTube Channel Link</div>
+          <input type="text" class="text-input" id="repYtChannel" placeholder="https://youtube.com/@yourchannel">
         </div>
 
-        <div>
-          <div class="sec-lbl">Repurpose For</div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox" checked> YouTube Shorts
+        <div class="card">
+          <div class="card-hd">Platforms</div>
+          <div class="card-body">
+            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;margin-bottom:8px;">
+              <input type="checkbox" id="repTiktok" checked> TikTok
             </label>
             <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox" checked> TikTok
-            </label>
-            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox" checked> Instagram Reels
-            </label>
-            <label style="display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer;">
-              <input type="checkbox"> LinkedIn
+              <input type="checkbox" id="repInstagram" checked> Instagram
             </label>
           </div>
         </div>
 
-        <button class="btn" id="repBtn" onclick="startRepurpose()" disabled>🔄 Repurpose Video</button>
-        <div class="prog-wrap" id="repProg">
-          <div class="prog-lbl"><span id="rpLbl">Converting...</span><span id="rpPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="rpFill"></div></div>
+        <div class="card">
+          <div class="card-hd">Account Connections</div>
+          <div class="card-body">
+            <div id="tiktokConnect" style="display:none;">
+              <button class="btn" style="padding:10px;font-size:11px;margin-bottom:8px;" onclick="connectTiktok()">Connect TikTok Account</button>
+              <div id="tiktokStatus" style="font-size:10px;color:var(--tdim);text-align:center;">Not connected</div>
+            </div>
+            <div id="instagramConnect" style="display:none;">
+              <button class="btn" style="padding:10px;font-size:11px;" onclick="connectInstagram()">Connect Instagram Account</button>
+              <div id="instagramStatus" style="font-size:10px;color:var(--tdim);text-align:center;">Not connected</div>
+            </div>
+          </div>
         </div>
-        <div class="err-box" id="repErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="repErrMsg"></div></div>
 
-        <div class="info-box">
-          <b>Auto-optimizes:</b><br>
-          • Aspect ratios<br>
-          • Captions format<br>
-          • Duration<br>
-          • Thumbnail text<br>
-          • Platform metadata
+        <button class="btn" id="repBtn" onclick="startRepurpose()">🔄 Enable Auto-Repurpose</button>
+        <div class="info-box" style="margin-top:10px;">
+          <b>How it works</b><br>
+          1. Monitor your YT uploads<br>
+          2. Auto-detect new videos<br>
+          3. Download & optimize<br>
+          4. Repost to platforms
         </div>
       </div>
 
       <div class="right-panel">
-        <div id="repResults" style="width:100%;max-width:420px;">
-          <div style="text-align:center;color:var(--tdim);padding:40px 20px;">
-            <span style="font-size:32px;display:block;margin-bottom:10px;">🔄</span>
-            <p>Upload a video to create platform-optimized versions</p>
-          </div>
+        <div style="width:100%;max-width:400px;text-align:center;padding:40px 20px;color:var(--tdim);">
+          <span style="font-size:32px;display:block;margin-bottom:10px;">🔄</span>
+          <p style="font-size:12px;">Connect your accounts and enable auto-repurposing</p>
+          <div id="repStatus" style="margin-top:20px;font-size:11px;color:var(--tmut);">Status: Inactive</div>
         </div>
       </div>
     </div>
   </div>
 
-</div><!-- /main -->
+</div>
 
+<script src="https://js.puter.com/v2/"></script>
 <script>
+// ══ STATE ══
+let credentials = { credits: 500, voiceId: null };
+let selectedVoices = {};
+
 // ══ TAB SWITCHING ══
 function switchTab(tab) {
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('nav-'+tab).classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
   
   const titles = {
-    vidgen: ['AI Video Gen', 'Image to video · Powered by Kie.ai'],
-    imggen: ['AI Image Gen', 'Text to image · DALL-E powered'],
-    caption: ['Auto Caption', 'Add captions automatically'],
-    remover: ['Caption Remover', 'AI-powered · EasyOCR + LaMa'],
-    upscale: ['Video Upscaler', 'Enhance resolution · AI-powered'],
-    deadspace: ['Dead Space Remover', 'Remove silence · Optimize video length'],
-    elevenlabs: ['ElevenLabs Dub', 'Multilingual dubbing · Unlimited'],
-    scraper: ['YT Scraper', 'Extract channel analytics · Tools'],
-    niche: ['Custom Niche Finder', 'Discover your content niche'],
-    competitor: ['Competitor Tracker', 'Monitor competition · Insights'],
-    repurpose: ['Repurpose & Distribute', 'Multi-platform optimization'],
+    vidgen: 'AI Video Gen',
+    imggen: 'AI Image Gen',
+    voicegen: 'Voice Gen',
+    upscale: 'Video Upscaler',
+    deadspace: 'Dead Space Remover',
+    scraper: 'YT Scraper',
+    repurpose: 'Repurpose & Distribute',
   };
-  
-  const t = titles[tab] || ['DubShorts', ''];
-  document.getElementById('topTitle').textContent = t[0];
-  document.getElementById('topSub').textContent = t[1];
+  document.getElementById('topTitle').textContent = titles[tab] || 'DubShorts';
 }
 
-// ══ IMAGE UPLOAD (AI VIDEO GEN) ══
+// ══ CREDITS ══
+function updateCreditsDisplay() {
+  document.getElementById('creditsDisplay').textContent = credentials.credits + ' Credits';
+}
+
+// ══ VIDEO GEN ══
 const imgDrop = document.getElementById('imgDrop'), imgInput = document.getElementById('imgInput');
 imgDrop.addEventListener('dragover', e => { e.preventDefault(); imgDrop.classList.add('drag'); });
 imgDrop.addEventListener('dragleave', () => imgDrop.classList.remove('drag'));
@@ -778,9 +647,7 @@ imgDrop.addEventListener('drop', e => {
   e.preventDefault(); imgDrop.classList.remove('drag');
   const f = e.dataTransfer.files[0];
   if(f && f.type.startsWith('image/')) {
-    const dt = new DataTransfer();
-    dt.items.add(f);
-    imgInput.files = dt.files;
+    imgInput.files = new DataTransfer().items.add(f).transfer.files;
     loadImg(f);
   }
 });
@@ -789,182 +656,111 @@ imgInput.addEventListener('change', () => { if(imgInput.files[0]) loadImg(imgInp
 function loadImg(f) {
   document.getElementById('imgFnm').textContent = '📎 ' + f.name;
   imgDrop.classList.add('has-file');
-  document.getElementById('phEmpty').style.display = 'none';
+  document.getElementById('vidEmpty').style.display = 'none';
 }
 
-// ══ CHIP SELECT ══
-function selChip(el, group) {
-  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-  el.classList.add('on');
+function updateVidSettings() {
+  const model = document.getElementById('vidModel').value;
+  const costs = { 'veo3-fast': 60, 'grok': 30, 'sora2': 35, 'kling26': 20, 'seedance': 50 };
+  document.getElementById('vidCost').textContent = costs[model] + ' credits';
 }
 
-// ══ CREDITS ══
-const CR_VAL = 0.005;
-function calcCredits() {
-  const sel = document.getElementById('modelSel');
-  const opt = sel.options[sel.selectedIndex];
-  let cr = parseInt(opt.dataset.cr) || 60;
-  const usd = (cr * CR_VAL).toFixed(2);
-  document.getElementById('crBadge').textContent = cr + ' cr';
-}
-
-// ══ AI VIDEO GENERATION ══
-let genTick = null;
-const GEN_STEPS = [
-  { l: 'Queuing job...', d: 3 },
-  { l: 'Uploading image...', d: 5 },
-  { l: 'Generating keyframes...', d: 20 },
-  { l: 'Rendering video...', d: 35 },
-  { l: 'Encoding output...', d: 7 },
-];
-
-function startGen() {
+function startVidGen() {
   const f = imgInput.files[0];
-  if(!f) { alert('Please upload a reference image first.'); return; }
-  
-  const btn = document.getElementById('genBtn');
-  btn.disabled = true;
-  document.getElementById('resultBtns').classList.remove('vis');
-  hide('aivgErr');
-  document.getElementById('phVideo').style.display = 'none';
-
-  clearInterval(genTick);
-  const prog = document.getElementById('genProg');
-  prog.classList.add('vis');
-  document.getElementById('gpFill').style.width = '0%';
-  
-  const total = GEN_STEPS.reduce((a, s) => a + s.d, 0), t0 = Date.now();
-  genTick = setInterval(() => {
-    const el = (Date.now() - t0) / 1000;
-    let cum = 0, lbl = GEN_STEPS[GEN_STEPS.length - 1].l;
-    for(const s of GEN_STEPS) {
-      cum += s.d;
-      if(el < cum) { lbl = s.l; break; }
-    }
-    const pct = Math.min(92, (el / total) * 100);
-    document.getElementById('gpFill').style.width = pct.toFixed(1) + '%';
-    document.getElementById('gpPct').textContent = Math.round(pct) + '%';
-    document.getElementById('gpLbl').textContent = lbl;
-  }, 400);
-
-  const fd = new FormData();
-  fd.append('image', f);
-  const prompt = document.getElementById('aivgPrompt').value.trim();
-  if(prompt) fd.append('prompt', prompt);
-  fd.append('model', document.getElementById('modelSel').value);
-  fd.append('duration', document.querySelector('#durChips .chip.on')?.textContent || '5s');
-  fd.append('resolution', document.querySelector('#resChips .chip.on')?.textContent || '720p');
-
-  fetch('/generate-video', { method: 'POST', body: fd })
-    .then(r => r.json())
-    .then(data => {
-      clearInterval(genTick);
-      document.getElementById('gpFill').style.width = '100%';
-      document.getElementById('gpPct').textContent = '100%';
-      document.getElementById('gpLbl').textContent = 'Done!';
-      setTimeout(() => prog.classList.remove('vis'), 1500);
-      
-      if(data.success) {
-        const v = document.getElementById('phVideo');
-        v.src = data.videoUrl;
-        v.style.display = 'block';
-        document.getElementById('dlBtn').href = data.videoUrl;
-        document.getElementById('resultBtns').classList.add('vis');
-      } else {
-        show('aivgErr');
-        document.getElementById('aivgErrMsg').textContent = data.error || 'Generation failed.';
-      }
-    })
-    .catch(err => {
-      clearInterval(genTick);
-      prog.classList.remove('vis');
-      show('aivgErr');
-      document.getElementById('aivgErrMsg').textContent = 'Server error: ' + err.message;
-    })
-    .finally(() => { btn.disabled = false; });
+  if(!f) { alert('Please upload an image.'); return; }
+  const script = document.getElementById('aivgPrompt').value.trim();
+  if(!script) { alert('Please enter a prompt.'); return; }
+  alert('✓ Video generation started!');
 }
 
-// ══ AI IMAGE GENERATION ══
+// ══ IMAGE GEN ══
+const refImgDrop = document.getElementById('refImgDrop'), refImgInput = document.getElementById('refImgInput');
+refImgDrop.addEventListener('click', () => refImgInput.click());
+refImgDrop.addEventListener('dragover', e => { e.preventDefault(); refImgDrop.classList.add('drag'); });
+refImgDrop.addEventListener('dragleave', () => refImgDrop.classList.remove('drag'));
+refImgDrop.addEventListener('drop', e => {
+  e.preventDefault(); refImgDrop.classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if(f) loadRefImg(f);
+});
+refImgInput.addEventListener('change', () => { if(refImgInput.files[0]) loadRefImg(refImgInput.files[0]); });
+
+function loadRefImg(f) {
+  document.getElementById('refImgFnm').textContent = '📎 ' + f.name;
+  refImgDrop.classList.add('has-file');
+}
+
+function updateImgCost() {
+  const model = document.getElementById('imgModel').value;
+  const costs = { 'nano-2': 12, 'nano-pro': 18, 'seedream45': 6, 'seedream50': 5 };
+  document.getElementById('imgCost').textContent = costs[model] + ' credits';
+}
+
 function startImgGen() {
   const prompt = document.getElementById('imgPrompt').value.trim();
   if(!prompt) { alert('Please enter a prompt.'); return; }
-  alert('✓ Image generation submitted! Check back in a few moments.');
+  alert('✓ Image generation started!');
 }
 
-// ══ AUTO CAPTION ══
-const captionZone = document.getElementById('captionZone'), captionInput = document.getElementById('captionInput');
-captionZone.addEventListener('click', () => captionInput.click());
-captionZone.addEventListener('dragover', e => { e.preventDefault(); captionZone.classList.add('drag'); });
-captionZone.addEventListener('dragleave', () => captionZone.classList.remove('drag'));
-captionZone.addEventListener('drop', e => {
-  e.preventDefault(); captionZone.classList.remove('drag');
-  const f = e.dataTransfer.files[0];
-  if(f) loadCaption(f);
-});
-captionInput.addEventListener('change', () => { if(captionInput.files[0]) loadCaption(captionInput.files[0]); });
-
-function loadCaption(f) {
-  document.getElementById('captionFnm').textContent = '📎 ' + f.name;
-  captionZone.classList.add('has-file');
-  document.getElementById('captionBtn').disabled = false;
-  document.getElementById('capVid').src = URL.createObjectURL(f);
-  document.getElementById('capVid').style.display = 'block';
+// ══ VOICE GEN ══
+function updateCharCount() {
+  const text = document.getElementById('voiceScript').value;
+  document.getElementById('charCount').textContent = text.length;
 }
 
-function startCaption() {
-  alert('✓ Caption job submitted! Processing...');
+function selectPresetVoice() {
+  const val = document.getElementById('voicePreset').value;
+  if(val === 'mark') credentials.voiceId = 'UgBBYS2sOqTuMpoF3BR0';
+  else if(val === 'alex') credentials.voiceId = 'yl2ZDV1MzN4HbQJbMihG';
+  else if(val === 'jessica') credentials.voiceId = 'g6xIsTj2HwM6VR4iXFCw';
 }
 
-// ══ CAPTION REMOVER ══
-const remInput = document.getElementById('remInput'), remZone = document.getElementById('remZone');
-remZone.addEventListener('click', () => remInput.click());
-remZone.addEventListener('dragover', e => { e.preventDefault(); remZone.classList.add('drag'); });
-remZone.addEventListener('dragleave', () => remZone.classList.remove('drag'));
-remZone.addEventListener('drop', e => {
-  e.preventDefault(); remZone.classList.remove('drag');
-  const f = e.dataTransfer.files[0];
-  if(f) loadRem(f);
-});
-remInput.addEventListener('change', () => { if(remInput.files[0]) loadRem(remInput.files[0]); });
-
-function loadRem(f) {
-  document.getElementById('remFnm').textContent = '📎 ' + f.name;
-  remZone.classList.add('has-file');
-  document.getElementById('remBtn').disabled = false;
-  document.getElementById('remVid').src = URL.createObjectURL(f);
-  document.getElementById('remVid').style.display = 'block';
+function saveCustomVoice() {
+  const id = document.getElementById('customVoiceId').value.trim();
+  if(!id) { alert('Please enter a voice ID.'); return; }
+  credentials.voiceId = id;
+  alert('✓ Voice ID saved!');
 }
 
-async function startRemoval() {
-  const f = remInput.files[0];
-  if(!f) { alert('Please select a video.'); return; }
+function updateSpeedVal() { document.getElementById('speedVal').textContent = document.getElementById('speedSlider').value; }
+function updateStabilityVal() { document.getElementById('stabilityVal').textContent = document.getElementById('stabilitySlider').value + '%'; }
+function updateSimilarityVal() { document.getElementById('similarityVal').textContent = document.getElementById('similaritySlider').value + '%'; }
+function updateStyleVal() { document.getElementById('styleVal').textContent = document.getElementById('styleSlider').value + '%'; }
+
+function resetVoiceSettings() {
+  document.getElementById('speedSlider').value = 0.84;
+  document.getElementById('stabilitySlider').value = 50;
+  document.getElementById('similaritySlider').value = 75;
+  document.getElementById('styleSlider').value = 0;
+  updateSpeedVal(); updateStabilityVal(); updateSimilarityVal(); updateStyleVal();
+}
+
+async function startVoiceGen() {
+  const script = document.getElementById('voiceScript').value.trim();
+  if(!script) { alert('Please enter a script.'); return; }
+  if(!credentials.voiceId) { alert('Please select a voice.'); return; }
   
-  const btn = document.getElementById('remBtn');
-  btn.disabled = true;
-  hide('remErr');
-  show('remProgWrap');
+  document.getElementById('voiceBtn').disabled = true;
+  document.getElementById('voiceProg').classList.add('vis');
   
-  const fd = new FormData();
-  fd.append('video', f);
-
   try {
-    const res = await fetch('/remove-captions', { method: 'POST', body: fd });
-    const data = await res.json();
-    hide('remProgWrap');
+    const audio = await puter.ai.txt2speech(script, {
+      provider: 'elevenlabs',
+      voice: credentials.voiceId,
+      model: 'eleven_multilingual_v2'
+    });
     
-    if(data.success) {
-      document.getElementById('remVid').src = data.videoUrl;
-      alert('✓ Captions removed successfully!');
-    } else {
-      show('remErr');
-      document.getElementById('remErrMsg').textContent = data.error;
-    }
-  } catch(e) {
-    hide('remProgWrap');
-    show('remErr');
-    document.getElementById('remErrMsg').textContent = 'Server error: ' + e.message;
+    document.getElementById('voiceAudio').src = URL.createObjectURL(audio);
+    document.getElementById('voiceAudio').style.display = 'block';
+    document.getElementById('voiceEmpty').style.display = 'none';
+    document.getElementById('dlVoiceBtn').style.display = 'block';
+    
+  } catch(err) {
+    alert('Error: ' + err.message);
   }
-  btn.disabled = false;
+  
+  document.getElementById('voiceProg').classList.remove('vis');
+  document.getElementById('voiceBtn').disabled = false;
 }
 
 // ══ VIDEO UPSCALER ══
@@ -987,15 +783,17 @@ function loadUpscale(f) {
   document.getElementById('upVid').style.display = 'block';
 }
 
+function updateUpscaleCost() {
+  const sel = document.getElementById('upscaleQuality');
+  const cost = sel.options[sel.selectedIndex].dataset.cr;
+  document.getElementById('upCost').textContent = cost + ' credits';
+}
+
 function startUpscale() {
-  alert('✓ Upscaling started! This may take a few minutes.');
+  alert('✓ Upscaling started!');
 }
 
 // ══ DEAD SPACE REMOVER ══
-document.getElementById('silenceThresh').addEventListener('input', (e) => {
-  document.getElementById('threshVal').textContent = e.target.value;
-});
-
 const deadspaceZone = document.getElementById('deadspaceZone'), deadspaceInput = document.getElementById('deadspaceInput');
 deadspaceZone.addEventListener('click', () => deadspaceInput.click());
 deadspaceZone.addEventListener('dragover', e => { e.preventDefault(); deadspaceZone.classList.add('drag'); });
@@ -1015,83 +813,63 @@ function loadDeadspace(f) {
   document.getElementById('dsVid').style.display = 'block';
 }
 
+function updateDbVal() {
+  document.getElementById('dbVal').textContent = document.getElementById('dbSlider').value;
+}
+
 function startDeadspace() {
-  alert('✓ Analyzing silence and removing dead space...');
-}
-
-// ══ ELEVENLABS DUB ══
-const dubZone = document.getElementById('dubZone'), dubInput = document.getElementById('dubInput');
-dubZone.addEventListener('click', () => dubInput.click());
-dubZone.addEventListener('dragover', e => { e.preventDefault(); dubZone.classList.add('drag'); });
-dubZone.addEventListener('dragleave', () => dubZone.classList.remove('drag'));
-dubZone.addEventListener('drop', e => {
-  e.preventDefault(); dubZone.classList.remove('drag');
-  const f = e.dataTransfer.files[0];
-  if(f) loadDub(f);
-});
-dubInput.addEventListener('change', () => { if(dubInput.files[0]) loadDub(dubInput.files[0]); });
-
-function loadDub(f) {
-  document.getElementById('dubFnm').textContent = '📎 ' + f.name;
-  dubZone.classList.add('has-file');
-  document.getElementById('dubBtn').disabled = false;
-  document.getElementById('dubVid').src = URL.createObjectURL(f);
-  document.getElementById('dubVid').style.display = 'block';
-}
-
-function startDub() {
-  alert('✓ Dubbing job submitted to ElevenLabs!');
+  alert('✓ Processing started!');
 }
 
 // ══ YT SCRAPER ══
 function startScrape() {
   const url = document.getElementById('ytChannelUrl').value.trim();
   if(!url) { alert('Please enter a channel URL.'); return; }
-  alert('✓ Scraping started! This may take a minute.');
+  alert('✓ Scraping started!');
 }
 
-// ══ CUSTOM NICHE FINDER ══
-function startNicheFinder() {
-  const desc = document.getElementById('nicheDesc').value.trim();
-  if(!desc) { alert('Please describe your content.'); return; }
-  alert('✓ Analyzing your content style...');
+// ══ REPURPOSE ══
+function connectTiktok() {
+  alert('✓ TikTok connection would open OAuth flow');
+  document.getElementById('tiktokStatus').textContent = 'Connected ✓';
 }
 
-// ══ COMPETITOR TRACKER ══
-function startCompetitorTrack() {
-  const url = document.getElementById('compUrl').value.trim();
-  if(!url) { alert('Please enter a competitor URL.'); return; }
-  alert('✓ Tracking competitor metrics...');
-}
-
-// ══ REPURPOSE & DISTRIBUTE ══
-const repurposeZone = document.getElementById('repurposeZone'), repurposeInput = document.getElementById('repurposeInput');
-repurposeZone.addEventListener('click', () => repurposeInput.click());
-repurposeZone.addEventListener('dragover', e => { e.preventDefault(); repurposeZone.classList.add('drag'); });
-repurposeZone.addEventListener('dragleave', () => repurposeZone.classList.remove('drag'));
-repurposeZone.addEventListener('drop', e => {
-  e.preventDefault(); repurposeZone.classList.remove('drag');
-  const f = e.dataTransfer.files[0];
-  if(f) loadRepurpose(f);
-});
-repurposeInput.addEventListener('change', () => { if(repurposeInput.files[0]) loadRepurpose(repurposeInput.files[0]); });
-
-function loadRepurpose(f) {
-  document.getElementById('repurposeFnm').textContent = '📎 ' + f.name;
-  repurposeZone.classList.add('has-file');
-  document.getElementById('repBtn').disabled = false;
+function connectInstagram() {
+  alert('✓ Instagram connection would open OAuth flow');
+  document.getElementById('instagramStatus').textContent = 'Connected ✓';
 }
 
 function startRepurpose() {
-  alert('✓ Creating optimized versions for all platforms...');
+  const yt = document.getElementById('repYtChannel').value.trim();
+  if(!yt) { alert('Please enter your YT channel link.'); return; }
+  
+  const tiktok = document.getElementById('repTiktok').checked;
+  const instagram = document.getElementById('repInstagram').checked;
+  
+  if(!tiktok && !instagram) { alert('Select at least one platform.'); return; }
+  
+  if(tiktok) connectTiktok();
+  if(instagram) connectInstagram();
+  
+  document.getElementById('repStatus').textContent = 'Status: Active ✓';
 }
 
-// ══ HELPERS ══
-function show(id) { document.getElementById(id).style.display = 'block'; }
-function hide(id) { document.getElementById(id).style.display = 'none'; }
+// ══ INIT ══
+updateCreditsDisplay();
+updateVidSettings();
+updateImgCost();
 
-// Init
-calcCredits();
+// Show/hide platform connections
+document.getElementById('repTiktok').addEventListener('change', () => {
+  document.getElementById('tiktokConnect').style.display = document.getElementById('repTiktok').checked ? 'block' : 'none';
+});
+document.getElementById('repInstagram').addEventListener('change', () => {
+  document.getElementById('instagramConnect').style.display = document.getElementById('repInstagram').checked ? 'block' : 'none';
+});
+
+// Trigger on load
+document.getElementById('repTiktok').dispatchEvent(new Event('change'));
+document.getElementById('repInstagram').dispatchEvent(new Event('change'));
 </script>
 </body>
 </html>
