@@ -11,7 +11,6 @@
   --blk:#080808;--s1:#111;--s2:#161616;--s3:#1e1e1e;--s4:#252525;
   --bd:#2a2a2a;--tx:#efefef;--tdim:#888;--tmut:#444;
   --grn:#2ecc71;--red:#ff4136;--pur:#a78bfa;--purg:rgba(167,139,250,0.08);
-  /* yellow accent aliases for aivg */
   --av:#f5e132;--avg:rgba(245,225,50,0.08);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -28,7 +27,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .ni{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;font-size:12px;font-weight:500;color:var(--tdim);transition:all .15s;border:1px solid transparent;margin-bottom:1px;cursor:pointer;background:none;width:100%;text-align:left;}
 .ni:hover{background:var(--s2);color:var(--tx);}
 .ni.active{background:var(--yg);border-color:rgba(245,225,50,0.18);color:var(--y);}
-.ni.active-pur{background:var(--purg);border-color:rgba(167,139,250,0.22);color:var(--pur);}
 .ni .ic{font-size:13px;width:15px;text-align:center;flex-shrink:0;}
 .badge{margin-left:auto;font-size:8px;padding:2px 4px;border-radius:3px;font-weight:700;}
 .badge.soon{background:var(--s4);color:var(--tmut);}
@@ -44,10 +42,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden;}
 .topbar{padding:11px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .pg-title{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--y);}
-.pg-title.pur{color:var(--pur);}
 .pg-sep,.pg-sub{font-size:12px;color:var(--tdim);}
 .pill{margin-left:auto;background:rgba(46,204,113,.07);border:1px solid rgba(46,204,113,.18);color:var(--grn);font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.8px;}
-.pill.new{background:rgba(167,139,250,.07);border-color:rgba(167,139,250,.2);color:var(--pur);}
 .tab-panel{display:none;flex:1;overflow:hidden;}
 .tab-panel.active{display:flex;}
 
@@ -55,15 +51,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
    AI VIDEO GEN TAB
    ════════════════════════════════ */
 .aivg-layout{flex:1;display:flex;overflow:hidden;}
-
-/* Left column */
 .aivg-left{width:370px;flex-shrink:0;border-right:1px solid var(--bd);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:11px;}
 
 /* Image upload */
-.img-drop{border:1.5px dashed var(--bd);border-radius:11px;background:var(--s1);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
-  /* 9:16 aspect but capped */
-  aspect-ratio:9/16;max-height:260px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;}
+.img-drop{border:1.5px dashed var(--bd);border-radius:11px;background:var(--s1);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;aspect-ratio:9/16;max-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;}
 .img-drop:hover,.img-drop.drag{border-color:var(--y);background:rgba(245,225,50,.04);}
 .img-drop.has{border-color:rgba(245,225,50,.4);border-style:solid;}
 .img-drop .ico{font-size:22px;}
@@ -194,21 +185,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .auto-left{width:420px;flex-shrink:0;border-right:1px solid var(--bd);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:13px;}
 
 /* Section label */
-.auto-sec-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tdim);margin-bottom:2px;}
+.auto-sec-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tdim);margin-bottom:6px;}
 
-/* Niche selector */
-.niche-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.niche-card{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:11px 12px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:3px;}
-.niche-card:hover{border-color:rgba(245,225,50,.3);background:var(--s3);}
-.niche-card.selected{border-color:rgba(245,225,50,.5);background:var(--yg);}
-.niche-card-icon{font-size:18px;}
-.niche-card-name{font-size:12px;font-weight:600;color:var(--tx);}
-.niche-card-desc{font-size:10px;color:var(--tmut);line-height:1.4;}
-.niche-request{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:10px 12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--tdim);}
-.niche-request:hover{border-color:rgba(245,225,50,.25);color:var(--y);}
-.niche-request-icon{font-size:14px;}
+/* NICHE SELECTOR - NEW DROPDOWN STYLE */
+.niche-selector-wrap{display:flex;gap:8px;align-items:flex-end;}
+.niche-select-col{flex:1;}
+.niche-select-col .auto-sec-lbl{margin-bottom:8px;}
+.niche-select{
+  width:100%;
+  background:var(--s3);
+  border:1px solid var(--bd);
+  color:var(--tx);
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:600;
+  font-family:'DM Sans',sans-serif;
+  outline:none;
+  cursor:pointer;
+  transition:all .15s;
+}
+.niche-select:hover{border-color:rgba(245,225,50,.3);background:var(--s4);}
+.niche-select:focus{border-color:rgba(245,225,50,.5);background:var(--s3);}
+.req-niche-btn{
+  background:var(--s3);
+  border:1px solid var(--bd);
+  color:var(--y);
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .15s;
+  white-space:nowrap;
+  font-family:'Space Mono',monospace;
+  letter-spacing:.5px;
+}
+.req-niche-btn:hover{border-color:rgba(245,225,50,.4);background:rgba(245,225,50,.08);}
 
-/* YT Link input */
+/* Reference YT link */
 .yt-input-wrap{background:var(--s2);border:1px solid var(--bd);border-radius:9px;overflow:hidden;transition:border-color .15s;display:flex;align-items:center;}
 .yt-input-wrap:focus-within{border-color:rgba(245,225,50,.4);}
 .yt-prefix{padding:0 10px;font-size:11px;color:var(--tmut);font-family:'Space Mono',monospace;white-space:nowrap;border-right:1px solid var(--bd);background:var(--s3);height:100%;display:flex;align-items:center;padding:10px 10px;}
@@ -493,44 +508,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       <!-- LEFT: form -->
       <div class="auto-left">
 
-        <!-- Niche -->
+        <!-- Niche selector - NEW DROPDOWN STYLE -->
         <div>
-          <div class="auto-sec-lbl">Niche</div>
-          <div class="niche-grid" id="nicheGrid">
-            <div class="niche-card selected" data-niche="skeleton" onclick="selectNiche(this)">
-              <span class="niche-card-icon">💀</span>
-              <div class="niche-card-name">Skeleton</div>
-              <div class="niche-card-desc">Dark, faceless skeleton character shorts</div>
+          <div class="niche-selector-wrap">
+            <div class="niche-select-col">
+              <div class="auto-sec-lbl">Select Niche</div>
+              <select class="niche-select" id="nicheDropdown" onchange="handleNicheChange()">
+                <option value="skeleton">💀 Skeleton</option>
+                <option value="ronaldo">⚽ Ronaldo Adventures</option>
+                <option value="animal">🦁 Animal</option>
+                <option value="court">⚖️ Court</option>
+                <option value="history">📜 History</option>
+                <option value="animation">🎬 Animation</option>
+              </select>
             </div>
-            <div class="niche-card" data-niche="sora2" onclick="selectNiche(this)">
-              <span class="niche-card-icon">🤖</span>
-              <div class="niche-card-name">Sora 2</div>
-              <div class="niche-card-desc">AI-generated cinematic scenes</div>
-            </div>
-            <div class="niche-card" data-niche="story" onclick="selectNiche(this)">
-              <span class="niche-card-icon">📖</span>
-              <div class="niche-card-name">Story (History)</div>
-              <div class="niche-card-desc">Historical storytelling narration</div>
-            </div>
-            <div class="niche-card" data-niche="ronaldo" onclick="selectNiche(this)">
-              <span class="niche-card-icon">⚽</span>
-              <div class="niche-card-name">Ronaldo Adventures</div>
-              <div class="niche-card-desc">Ronaldo fictional story shorts</div>
-            </div>
-            <div class="niche-card" data-niche="anim1" onclick="selectNiche(this)">
-              <span class="niche-card-icon">🎬</span>
-              <div class="niche-card-name">Animation 1</div>
-              <div class="niche-card-desc">Animated character series style A</div>
-            </div>
-            <div class="niche-card" data-niche="anim2" onclick="selectNiche(this)">
-              <span class="niche-card-icon">🎭</span>
-              <div class="niche-card-name">Animation 2</div>
-              <div class="niche-card-desc">Animated character series style B</div>
-            </div>
-          </div>
-          <div class="niche-request" onclick="requestNiche()" style="margin-top:7px;">
-            <span class="niche-request-icon">＋</span>
-            Request a new niche automation
+            <button class="req-niche-btn" onclick="requestNiche()">＋ Request Niche</button>
           </div>
         </div>
 
@@ -545,14 +537,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
         <!-- Script import -->
         <div>
-          <div class="auto-sec-lbl">Their Script Import</div>
+          <div class="auto-sec-lbl">Script</div>
           <div class="script-wrap">
             <div class="script-inner-lbl">Script</div>
-            <textarea class="script-ta" id="autoScript" rows="4" placeholder="Paste the video script here… the automation will use this as the narration and story structure."></textarea>
+            <textarea class="script-ta" id="autoScript" rows="4" placeholder="Paste the video script here…"></textarea>
           </div>
         </div>
 
-        <!-- Character image upload (only for Skeleton) -->
+        <!-- Character image upload (conditional) -->
         <div id="charUploadSection">
           <div class="auto-sec-lbl">Reference Character Image</div>
           <div class="char-upload" id="charDrop" onclick="document.getElementById('charInput').click()">
@@ -623,6 +615,78 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 </div><!-- /main -->
 
 <script>
+// ══ NICHES DATA ══
+const NICHES = {
+  skeleton: {
+    icon: '💀',
+    name: 'Skeleton',
+    desc: 'Dark, faceless skeleton character shorts. Best performing format for mystery and philosophy content. Character image import enabled for consistency across clips.',
+    charUpload: true
+  },
+  ronaldo: {
+    icon: '⚽',
+    name: 'Ronaldo Adventures',
+    desc: 'Fictional Ronaldo adventure story shorts. High-energy football montage style with AI generated scenes.',
+    charUpload: false
+  },
+  animal: {
+    icon: '🦁',
+    name: 'Animal',
+    desc: 'Animal-focused storytelling. Wildlife narration with dramatic sequences.',
+    charUpload: false
+  },
+  court: {
+    icon: '⚖️',
+    name: 'Court',
+    desc: 'Legal and court-themed narrative shorts. Justice system storytelling.',
+    charUpload: false
+  },
+  history: {
+    icon: '📜',
+    name: 'History',
+    desc: 'Historical storytelling narration shorts. Archival imagery style with dramatic voice-over.',
+    charUpload: false
+  },
+  animation: {
+    icon: '🎬',
+    name: 'Animation',
+    desc: 'Animated character series. Smooth motion with consistent character design across clips.',
+    charUpload: true
+  }
+};
+
+let selectedNiche = 'skeleton';
+
+// ══ NICHE DROPDOWN HANDLER ══
+function handleNicheChange() {
+  const dropdown = document.getElementById('nicheDropdown');
+  selectedNiche = dropdown.value;
+  const n = NICHES[selectedNiche];
+  
+  // Update preview card
+  document.getElementById('npName').textContent = n.icon + ' ' + n.name;
+  document.getElementById('npDesc').textContent = n.desc;
+  document.getElementById('nichePreview').classList.add('vis');
+  
+  // Show/hide char upload
+  document.getElementById('charUploadSection').style.display = n.charUpload ? 'block' : 'none';
+  
+  // Reset char upload state when switching niches
+  if (!n.charUpload) {
+    charInput.value = '';
+    document.getElementById('charFnm').textContent = '';
+    charDrop.classList.remove('has-char');
+    document.getElementById('charPreviewWrap').style.display = 'none';
+    document.getElementById('charIco').style.display = '';
+    document.getElementById('charTtl').style.display = '';
+  }
+}
+
+function requestNiche(){
+  const name = prompt('What niche would you like to request?');
+  if(name && name.trim()) alert('Request sent for "' + name.trim() + '" — we\'ll add it soon!');
+}
+
 // ══ TAB SWITCHING ══
 function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -643,35 +707,6 @@ function switchTab(tab) {
   p.textContent='● Live';p.className='pill';
 }
 function soon(){alert('Coming soon!');}
-
-// ══ AUTOMATION NICHE ══
-const NICHES={
-  skeleton:{icon:'💀',name:'Skeleton',desc:'Dark, faceless skeleton character shorts. Best performing format for mystery and philosophy content. Character image import enabled for consistency across clips.',charUpload:true},
-  sora2:{icon:'🤖',name:'Sora 2',desc:'AI-generated cinematic scenes using Sora 2. No character reference needed — fully text-driven visual storytelling.',charUpload:false},
-  story:{icon:'📖',name:'Story (History)',desc:'Historical storytelling narration shorts. Archival imagery style with dramatic voice-over. No character reference needed.',charUpload:false},
-  ronaldo:{icon:'⚽',name:'Ronaldo Adventures',desc:'Fictional Ronaldo adventure story shorts. High-energy football montage style with AI generated scenes.',charUpload:false},
-  anim1:{icon:'🎬',name:'Animation 1',desc:'Animated character series — style A. Smooth anime-inspired motion with consistent character design across clips.',charUpload:true},
-  anim2:{icon:'🎭',name:'Animation 2',desc:'Animated character series — style B. Bold graphic novel aesthetic with high contrast colour grading.',charUpload:true},
-};
-let selectedNiche='skeleton';
-
-function selectNiche(el){
-  document.querySelectorAll('.niche-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedNiche=el.dataset.niche;
-  const n=NICHES[selectedNiche];
-  // Update preview card
-  document.getElementById('npName').textContent=n.icon+' '+n.name;
-  document.getElementById('npDesc').textContent=n.desc;
-  document.getElementById('nichePreview').classList.add('vis');
-  // Show/hide char upload
-  document.getElementById('charUploadSection').style.display=n.charUpload?'block':'none';
-}
-
-function requestNiche(){
-  const name=prompt('What niche would you like to request?');
-  if(name&&name.trim()) alert('Request sent for "'+name.trim()+'" — we\'ll add it soon!');
-}
 
 // ══ CHAR IMAGE UPLOAD ══
 const charDrop=document.getElementById('charDrop'),charInput=document.getElementById('charInput');
@@ -751,9 +786,7 @@ function onAudio(){
 }
 
 // ══ CREDITS ══
-// $5 = 1000 credits → $0.005/credit
 const CR_VAL=0.005;
-// Audio adds ~50% cost on Kling models
 const AUDIO_EXTRA={'kling3-720p':6,'kling3-1080p':9,'kling2.5t-5s':21,'kling2.5t-10s':42};
 
 function calcCredits(){
@@ -903,7 +936,6 @@ function hide(id){document.getElementById(id).style.display='none';}
 
 // Init
 calcCredits();
-// Automation: show char upload for default niche
 document.getElementById('charUploadSection').style.display='block';
 </script>
 </body>
