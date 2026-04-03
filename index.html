@@ -395,6 +395,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           <div class="card-hd">Settings</div>
           <div class="card-body">
             <div class="setting-row">
+              <label class="setting-label">Mode</label>
+              <select class="select" id="upscaleMode">
+                <option value="ffmpeg">⚡ Fast (FFmpeg + Sharpen)</option>
+                <option value="ai">🤖 AI Upscale (Real-ESRGAN)</option>
+              </select>
+            </div>
+            <div class="setting-row">
               <label class="setting-label">Target Quality</label>
               <select class="select" id="upscaleQuality" onchange="updateUpscaleCost()">
                 <option value="1080" data-cr="10">1080p — 10 credits</option>
@@ -1025,7 +1032,48 @@ upscaleZone.addEventListener('drop', e => { e.preventDefault(); upscaleZone.clas
 document.getElementById('upscaleInput').addEventListener('change', () => { if (document.getElementById('upscaleInput').files[0]) loadUpscale(document.getElementById('upscaleInput').files[0]); });
 function loadUpscale(f) { document.getElementById('upscaleFnm').textContent = '📎 ' + f.name; upscaleZone.classList.add('has-file'); document.getElementById('upscaleBtn').disabled = false; const vid = document.getElementById('upVid'); vid.src = URL.createObjectURL(f); vid.style.display = 'block'; }
 function updateUpscaleCost() { const sel = document.getElementById('upscaleQuality'); document.getElementById('upCost').textContent = sel.options[sel.selectedIndex].dataset.cr + ' credits'; }
-function startUpscale() { alert('✓ Upscaling started!'); }
+async function startUpscale() {
+  const fileInput = document.getElementById('upscaleInput');
+  const quality = document.getElementById('upscaleQuality').value;
+  const mode = document.getElementById('upscaleMode').value;
+  const btn = document.getElementById('upscaleBtn');
+  const vid = document.getElementById('upVid');
+
+  if (!fileInput.files[0]) { alert('Please select a video file first.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = mode === 'ai' ? '🤖 AI Upscaling…' : '⚙️ Processing…';
+
+  try {
+    const fd = new FormData();
+    fd.append('video', fileInput.files[0]);
+    fd.append('quality', quality);
+    fd.append('mode', mode);
+
+    const res = await fetch('/upscale-video', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Upscale failed');
+
+    vid.src = data.videoUrl;
+    vid.style.display = 'block';
+
+    let dlWrap = document.getElementById('upscaleDlWrap');
+    if (!dlWrap) {
+      dlWrap = document.createElement('div');
+      dlWrap.id = 'upscaleDlWrap';
+      dlWrap.style.cssText = 'width:100%;max-width:315px;margin-top:8px;';
+      dlWrap.innerHTML = '<a id="upscaleDlBtn" class="dl-btn" download="upscaled.mp4">⬇ Download Upscaled Video</a>';
+      vid.closest('.right-panel').appendChild(dlWrap);
+    }
+    document.getElementById('upscaleDlBtn').href = data.videoUrl;
+
+  } catch(err) {
+    alert('Error: ' + err.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '📈 Upscale Video';
+}
 
 // ══ DEAD SPACE REMOVER ══
 const deadspaceZone = document.getElementById('deadspaceZone');

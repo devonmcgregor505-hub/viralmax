@@ -417,17 +417,47 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
 app.post('/upscale-video', upload.single('video'), async (req, res) => {
   const videoPath = path.resolve(req.file.path);
   const timestamp = Date.now();
-  const { quality } = req.body;
+  const { quality, mode = 'ffmpeg' } = req.body;
+
   try {
-    await enqueue(async () => {
+    const result = await enqueue(async () => {
       const outputPath = path.resolve(`outputs/upscaled_${timestamp}.mp4`);
-      const resMap = { '1080': '1920:-1', '2k': '2560:-1', '4k': '3840:-1' };
-      runFFmpeg(['-y', '-i', videoPath, '-vf', `scale=${resMap[quality] || '1920:-1'}`, '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-c:a', 'aac', outputPath], 300000);
+
+      if (mode === 'ai') {
+        const UPSCALER_URL = process.env.UPSCALER_MODAL_URL;
+        if (!UPSCALER_URL) throw new Error('UPSCALER_MODAL_URL not set in .env');
+
+        console.log(`[upscale] AI mode quality=${quality} file=${videoPath}`);
+        const videoB64 = fs.readFileSync(videoPath).toString('base64');
+
+        const response = await axios.post(UPSCALER_URL, {
+          video_b64: videoB64,
+          target_res: quality,
+        }, { headers: { 'Content-Type': 'application/json' }, timeout: 900000 });
+
+        if (!response.data.success) throw new Error(response.data.error || 'AI upscale failed');
+        fs.writeFileSync(outputPath, Buffer.from(response.data.video_b64, 'base64'));
+
+      } else {
+        console.log(`[upscale] FFmpeg mode quality=${quality}`);
+        const resMap = { '1080': '1920:-2', '2k': '2560:-2', '4k': '3840:-2' };
+        const scale = resMap[quality] || '1920:-2';
+        runFFmpeg([
+          '-y', '-i', videoPath,
+          '-vf', `scale=${scale}:flags=lanczos,unsharp=5:5:0.8:3:3:0.4,hqdn3d=1.5:1.5:6:6`,
+          '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
+          '-c:a', 'aac', outputPath
+        ], 300000);
+      }
+
       try { fs.unlinkSync(videoPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
+      return { success: true, videoUrl: `/outputs/upscaled_${timestamp}.mp4` };
     });
-    res.json({ success: true, videoUrl: `/outputs/upscaled_${timestamp}.mp4` });
+
+    res.json(result);
   } catch(err) {
+    console.error('[upscale] error:', err.message);
     try { fs.unlinkSync(videoPath); } catch(e) {}
     res.status(500).json({ success: false, error: err.message });
   }
