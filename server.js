@@ -533,9 +533,78 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 // YT SCRAPER / REPURPOSE — stubs
 // ══════════════════════════════════════════════════════════════════════════════
 app.post('/scrape-channel', async (req, res) => {
-  const YT_API_KEY = process.env.YOUTUBE_API_KEY;
-  if (!YT_API_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not configured', data: [] });
-  res.json({ success: true, videos: [{ title: 'Video 1', views: 1000, date: '2024-01-01', engagement: '5.2%' }] });
+  const { channelUrl, count = 25, contentType = 'shorts' } = req.body;
+  if (!channelUrl) return res.json({ success: false, error: 'No channel URL provided' });
+  try {
+    const result = await enqueue(async () => {
+      const args = [
+        channelUrl, '--dump-json', '--flat-playlist',
+        '--playlist-end', String(count), '--no-warnings', '--quiet',
+      ];
+      console.log('[scraper] fetching video list...');
+      const listResult = spawnSync('yt-dlp', args, {
+        encoding: 'utf8', maxBuffer: 50 * 1024 * 1024, timeout: 60000,
+      });
+      if (listResult.error) throw new Error('yt-dlp not found: ' + listResult.error.message);
+      const lines2 = (listResult.stdout || '').trim().split('\n').filter(Boolean);
+      const videoIds = [];
+      for (const line of lines2) {
+        try { const obj = JSON.parse(line); if (obj.id) videoIds.push(obj.id); } catch(e) {}
+      }
+      if (videoIds.length === 0) throw new Error('No videos found for this channel');
+      console.log(`[scraper] found ${videoIds.length} videos, fetching metadata...`);
+      const videos = [];
+      for (const id of videoIds.slice(0, parseInt(count))) {
+        const url = `https://www.youtube.com/watch?v=${id}`;
+        const metaResult = spawnSync('yt-dlp', [
+          url, '--dump-json', '--no-warnings', '--quiet', '--skip-download', '--no-playlist',
+        ], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, timeout: 30000 });
+        let meta = {};
+        try { meta = JSON.parse(metaResult.stdout || '{}'); } catch(e) { continue; }
+        const durationSec = meta.duration || 0;
+        if (contentType === 'shorts' && durationSec > 180) continue;
+        if (contentType === 'longform' && durationSec <= 180) continue;
+        const mins = Math.floor(durationSec / 60);
+        const secs = durationSec % 60;
+        const durationHuman = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+        // Get transcript
+        let transcript = '';
+        const subResult = spawnSync('yt-dlp', [
+          url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
+          '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', `/tmp/transcript_${id}`,
+        ], { encoding: 'utf8', timeout: 20000 });
+        const vttPath = `/tmp/transcript_${id}.en.vtt`;
+        if (fs.existsSync(vttPath)) {
+          const vtt = fs.readFileSync(vttPath, 'utf8');
+          const vttLines = vtt
+            .replace(/WEBVTT[\s\S]*?\n\n/, "")
+            .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> [^\n]+/g, "")
+            .replace(/<[^>]+>/g, "")
+            .split("\n").map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
+          const seen = new Set();
+          transcript = vttLines.filter(l => { if (seen.has(l)) return false; seen.add(l); return true; }).join("\n");
+        }
+        videos.push({
+          video_id: id, url, title: meta.title || '',
+          channel: meta.channel || meta.uploader || '',
+          channel_id: meta.channel_id || '', channel_url: meta.channel_url || '',
+          view_count: meta.view_count || 0, like_count: meta.like_count || 0,
+          comment_count: meta.comment_count || 0,
+          duration_seconds: durationSec, duration_human: durationHuman,
+          publish_date: meta.upload_date ? `${meta.upload_date.slice(0,4)}-${meta.upload_date.slice(4,6)}-${meta.upload_date.slice(6,8)}T00:00:00Z` : '',
+          thumbnail: meta.thumbnail || '', description: meta.description || '',
+          tags: (meta.tags || []).join(', '), transcript,
+          is_live: meta.is_live || false,
+          category: meta.categories ? String(meta.categories[0]) : '',
+        });
+      }
+      return { success: true, videos };
+    });
+    res.json(result);
+  } catch(err) {
+    console.error('[scraper] error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.post('/enable-repurpose', async (req, res) => {
