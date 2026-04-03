@@ -487,8 +487,7 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
       const stderr = detect.stderr || '';
       const silenceStarts = [];
       const silenceEnds = [];
-      for (const line of stderr.split('
-')) {
+      for (const line of stderr.split('\n')) {
         const s = line.match(/silence_start:\s*([\d.]+)/);
         const e = line.match(/silence_end:\s*([\d.]+)/);
         if (s) silenceStarts.push(parseFloat(s[1]));
