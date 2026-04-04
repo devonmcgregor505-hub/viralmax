@@ -1168,7 +1168,6 @@ async function startScrape() {
     const res = await fetch('/scrape-channel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ channelUrl: url, count, contentType })
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Scrape failed');
