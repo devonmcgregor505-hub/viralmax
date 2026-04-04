@@ -535,7 +535,6 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 app.post('/scrape-channel', express.json(), async (req, res) => {
   const { channelUrl, count = 25, sort = 'newest' } = req.body;
   if (!channelUrl) return res.json({ success: false, error: 'No channel URL provided' });
-
   try {
     const args = [
       '--flat-playlist',
@@ -543,7 +542,6 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
       '--no-warnings',
       '--quiet',
     ];
-
     if (sort === 'newest') {
       args.push('--playlist-end', String(count));
       args.push(channelUrl + '/shorts');
@@ -558,97 +556,23 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
       args.push('--playlist-end', String(Math.min(parseInt(count) * 6, 400)));
       args.push(channelUrl + '/shorts');
     }
-
     console.log(`[scraper] sort=${sort} count=${count} url=${channelUrl}`);
     const result = spawnSync('yt-dlp', args, { encoding: 'utf8', timeout: 120000, maxBuffer: 50 * 1024 * 1024 });
-
     if (result.error) throw new Error('yt-dlp not found: ' + result.error.message);
     if (result.status !== 0 && !result.stdout) throw new Error('yt-dlp failed: ' + (result.stderr || '').slice(0, 300));
-
     const lines2 = (result.stdout || '').trim().split('\n').filter(Boolean);
     let videos = lines2.map(line => {
       const [id, title, views, likes, date, duration, thumbnail] = line.split('\t');
       const uploadDate = date ? `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}` : '';
-      return {
-        id, title: title || 'Untitled',
-        views: parseInt(views) || 0, likes: parseInt(likes) || 0,
-        date: uploadDate, duration, thumbnail,
-        url: `https://youtube.com/shorts/${id}`,
-      };
+      return { id, title: title || 'Untitled', views: parseInt(views) || 0, likes: parseInt(likes) || 0, date: uploadDate, duration, thumbnail, url: `https://youtube.com/shorts/${id}` };
     }).filter(v => v.id);
-
-    if (sort === 'popular' || sort === 'trending') {
-      videos.sort((a, b) => b.views - a.views);
-    }
-
+    if (sort === 'popular' || sort === 'trending') videos.sort((a, b) => b.views - a.views);
     videos = videos.slice(0, parseInt(count));
     console.log(`[scraper] returning ${videos.length} videos`);
     res.json({ success: true, videos });
-
   } catch(err) {
     console.error('[scraper] error:', err.message);
     res.json({ success: false, error: err.message });
-  }
-});
-      if (listResult.error) throw new Error('yt-dlp not found: ' + listResult.error.message);
-      const lines2 = (listResult.stdout || '').trim().split('\n').filter(Boolean);
-      const videoIds = [];
-      for (const line of lines2) {
-        try { const obj = JSON.parse(line); if (obj.id) videoIds.push(obj.id); } catch(e) {}
-      }
-      if (videoIds.length === 0) throw new Error('No videos found for this channel');
-      console.log(`[scraper] found ${videoIds.length} videos, fetching metadata...`);
-      const videos = [];
-      for (const id of videoIds.slice(0, parseInt(count))) {
-        const url = `https://www.youtube.com/watch?v=${id}`;
-        const metaResult = spawnSync('yt-dlp', [
-          url, '--dump-json', '--no-warnings', '--quiet', '--skip-download', '--no-playlist',
-        ], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, timeout: 30000 });
-        let meta = {};
-        try { meta = JSON.parse(metaResult.stdout || '{}'); } catch(e) { continue; }
-        const durationSec = meta.duration || 0;
-        if (contentType === 'shorts' && durationSec > 180) continue;
-        if (contentType === 'longform' && durationSec <= 180) continue;
-        const mins = Math.floor(durationSec / 60);
-        const secs = durationSec % 60;
-        const durationHuman = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-        // Get transcript
-        let transcript = '';
-        const subResult = spawnSync('yt-dlp', [
-          url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
-          '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', `/tmp/transcript_${id}`,
-        ], { encoding: 'utf8', timeout: 20000 });
-        const vttPath = `/tmp/transcript_${id}.en.vtt`;
-        if (fs.existsSync(vttPath)) {
-          const vtt = fs.readFileSync(vttPath, 'utf8');
-          const vttLines = vtt
-            .replace(/WEBVTT[\s\S]*?\n\n/, "")
-            .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> [^\n]+/g, "")
-            .replace(/<[^>]+>/g, "")
-            .split("\n").map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
-          const seen = new Set();
-          transcript = vttLines.filter(l => { if (seen.has(l)) return false; seen.add(l); return true; }).join("\n").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
-        }
-        videos.push({
-          video_id: id, url, title: meta.title || '',
-          channel: meta.channel || meta.uploader || '',
-          channel_id: meta.channel_id || '', channel_url: meta.channel_url || '',
-          view_count: meta.view_count || 0, like_count: meta.like_count || 0,
-          comment_count: meta.comment_count || 0,
-          duration_seconds: durationSec, duration_human: durationHuman,
-          publish_date: meta.upload_date ? `${meta.upload_date.slice(0,4)}-${meta.upload_date.slice(4,6)}-${meta.upload_date.slice(6,8)}T00:00:00Z` : '',
-          thumbnail: meta.thumbnail || '', description: meta.description || '',
-          tags: (meta.tags || []).join(', '), transcript,
-          is_live: meta.is_live || false,
-          category: meta.categories ? String(meta.categories[0]) : '',
-        });
-      }
-      return { success: true, videos };
-    });
-    res.json(result);
-  } catch(err) {
-    console.error('[scraper] error:', err.message);
-    res.status(500).json({ success: false, error: err.message });
   }
 });
 
