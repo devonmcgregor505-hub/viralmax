@@ -532,19 +532,65 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 });
 // YT SCRAPER / REPURPOSE — stubs
 // ══════════════════════════════════════════════════════════════════════════════
-app.post('/scrape-channel', async (req, res) => {
-  const { channelUrl, count = 25, contentType = 'shorts' } = req.body;
+app.post('/scrape-channel', express.json(), async (req, res) => {
+  const { channelUrl, count = 25, sort = 'newest' } = req.body;
   if (!channelUrl) return res.json({ success: false, error: 'No channel URL provided' });
+
   try {
-    const result = await enqueue(async () => {
-      const args = [
-        channelUrl, '--dump-json', '--flat-playlist',
-        '--playlist-end', String(count), '--no-warnings', '--quiet',
-      ];
-      console.log('[scraper] fetching video list...');
-      const listResult = spawnSync('yt-dlp', args, {
-        encoding: 'utf8', maxBuffer: 50 * 1024 * 1024, timeout: 60000,
-      });
+    const args = [
+      '--flat-playlist',
+      '--match-filter', 'duration <= 60',
+      '--print', '%(id)s\t%(title)s\t%(view_count)s\t%(like_count)s\t%(upload_date)s\t%(duration_string)s\t%(thumbnail)s',
+      '--no-warnings',
+      '--quiet',
+    ];
+
+    if (sort === 'newest') {
+      args.push('--playlist-end', String(count));
+      args.push(channelUrl + '/shorts');
+    } else if (sort === 'popular') {
+      args.push('--playlist-end', String(Math.min(parseInt(count) * 4, 200)));
+      args.push(channelUrl + '/shorts');
+    } else if (sort === 'trending') {
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 90);
+      const dateStr = cutoff.toISOString().slice(0, 10).replace(/-/g, '');
+      args.push('--dateafter', dateStr);
+      args.push('--playlist-end', String(Math.min(parseInt(count) * 6, 400)));
+      args.push(channelUrl + '/shorts');
+    }
+
+    console.log(`[scraper] sort=${sort} count=${count} url=${channelUrl}`);
+    const result = spawnSync('yt-dlp', args, { encoding: 'utf8', timeout: 120000, maxBuffer: 50 * 1024 * 1024 });
+
+    if (result.error) throw new Error('yt-dlp not found: ' + result.error.message);
+    if (result.status !== 0 && !result.stdout) throw new Error('yt-dlp failed: ' + (result.stderr || '').slice(0, 300));
+
+    const lines2 = (result.stdout || '').trim().split('\n').filter(Boolean);
+    let videos = lines2.map(line => {
+      const [id, title, views, likes, date, duration, thumbnail] = line.split('\t');
+      const uploadDate = date ? `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}` : '';
+      return {
+        id, title: title || 'Untitled',
+        views: parseInt(views) || 0, likes: parseInt(likes) || 0,
+        date: uploadDate, duration, thumbnail,
+        url: `https://youtube.com/shorts/${id}`,
+      };
+    }).filter(v => v.id);
+
+    if (sort === 'popular' || sort === 'trending') {
+      videos.sort((a, b) => b.views - a.views);
+    }
+
+    videos = videos.slice(0, parseInt(count));
+    console.log(`[scraper] returning ${videos.length} videos`);
+    res.json({ success: true, videos });
+
+  } catch(err) {
+    console.error('[scraper] error:', err.message);
+    res.json({ success: false, error: err.message });
+  }
+});
       if (listResult.error) throw new Error('yt-dlp not found: ' + listResult.error.message);
       const lines2 = (listResult.stdout || '').trim().split('\n').filter(Boolean);
       const videoIds = [];
