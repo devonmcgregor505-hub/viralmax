@@ -1007,8 +1007,6 @@ function renderVoiceOutputs() {
   list.querySelectorAll('.vo-card').forEach(el => el.remove());
   if (outputs.length === 0) {
     if (empty) empty.style.display = 'block';
-    return;
-  }
   if (empty) empty.style.display = 'none';
   outputs.forEach(o => {
     const card = document.createElement('div');
@@ -1103,8 +1101,6 @@ async function startDeadspace() {
   const fileInput = document.getElementById('deadspaceInput');
   if (!fileInput.files[0]) { alert('Please upload a video first.'); return; }
   const file = fileInput.files[0];
-    return;
-  }
   const btn = document.getElementById('dsBtn');
   btn.disabled = true; btn.textContent = '⬆ Uploading…';
   try {
@@ -1189,8 +1185,6 @@ function renderScrapedVideos(videos) {
   const list = document.getElementById('scrapList');
   if (!videos || videos.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--tdim);font-size:11px;">No videos found</div>';
-    return;
-  }
   list.innerHTML = videos.map((v, i) => `
     <div style="padding:10px;border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:flex-start;">
       <div style="font-size:10px;color:var(--tmut);font-family:'Space Mono',monospace;width:16px;flex-shrink:0;padding-top:2px;">${i+1}</div>
