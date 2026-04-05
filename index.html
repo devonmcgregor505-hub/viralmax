@@ -1007,6 +1007,8 @@ function renderVoiceOutputs() {
   list.querySelectorAll('.vo-card').forEach(el => el.remove());
   if (outputs.length === 0) {
     if (empty) empty.style.display = 'block';
+    return;
+  }
   if (empty) empty.style.display = 'none';
   outputs.forEach(o => {
     const card = document.createElement('div');
