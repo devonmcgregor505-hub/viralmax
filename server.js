@@ -462,11 +462,43 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
   try {
     await enqueue(async () => {
       const outputPath = path.resolve(`outputs/trimmed_${timestamp}.mp4`);
-      runFFmpeg([
-        '-y', '-i', videoPath,
-        '-af', `silenceremove=start_periods=1:start_duration=${p.duration}:start_threshold=${p.db}dB:stop_periods=-1:stop_duration=${p.stop_duration}:stop_threshold=${p.db}dB,speechnorm`,
-        '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', outputPath
-      ], 300000);
+      // Step 1: detect silence intervals
+      const detectResult = spawnSync(FFMPEG_PATH, [
+        '-i', videoPath,
+        '-af', `silencedetect=noise=${p.db}dB:duration=${p.duration}`,
+        '-f', 'null', '-'
+      ], { encoding: 'utf8', timeout: 60000, maxBuffer: 10 * 1024 * 1024 });
+
+      const stderr = (detectResult.stderr || '') + (detectResult.stdout || '');
+      const silenceStarts = [...stderr.matchAll(/silence_start: ([\d.]+)/g)].map(m => parseFloat(m[1]));
+      const silenceEnds = [...stderr.matchAll(/silence_end: ([\d.]+)/g)].map(m => parseFloat(m[1]));
+
+      // Build keep intervals (non-silent segments)
+      const keepIntervals = [];
+      let cursor = 0;
+      for (let i = 0; i < silenceStarts.length; i++) {
+        if (silenceStarts[i] > cursor + 0.05) {
+          keepIntervals.push([cursor, silenceStarts[i]]);
+        }
+        cursor = silenceEnds[i] || silenceStarts[i];
+      }
+      // Add final segment
+      keepIntervals.push([cursor, 999999]);
+
+      if (keepIntervals.length === 0) {
+        // No silence found, just copy
+        runFFmpeg(['-y', '-i', videoPath, '-c', 'copy', outputPath], 60000);
+      } else {
+        // Step 2: build select filter for video + audio keeping non-silent parts
+        const selectExpr = keepIntervals.map(([s, e]) => `between(t,${s.toFixed(3)},${e.toFixed(3)})`).join('+');
+        runFFmpeg([
+          '-y', '-i', videoPath,
+          '-vf', `select='${selectExpr}',setpts=N/FRAME_RATE/TB`,
+          '-af', `aselect='${selectExpr}',asetpts=N/SR/TB`,
+          '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
+          '-c:a', 'aac', outputPath
+        ], 300000);
+      }
       try { fs.unlinkSync(videoPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
     });
