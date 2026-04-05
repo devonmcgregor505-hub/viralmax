@@ -1185,6 +1185,8 @@ function renderScrapedVideos(videos) {
   const list = document.getElementById('scrapList');
   if (!videos || videos.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--tdim);font-size:11px;">No videos found</div>';
+    return;
+  }
   list.innerHTML = videos.map((v, i) => `
     <div style="padding:10px;border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:flex-start;">
       <div style="font-size:10px;color:var(--tmut);font-family:'Space Mono',monospace;width:16px;flex-shrink:0;padding-top:2px;">${i+1}</div>
