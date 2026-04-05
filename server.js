@@ -452,170 +452,91 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
   const videoPath = path.resolve(req.file.path);
   const timestamp = Date.now();
   const { strength = 'medium' } = req.body;
-  // Presets tuned for voice: only remove genuine dead air, not word gaps
+
+  // Voice-tuned presets: db = noise floor, duration = min silence length to cut
   const presets = {
-    light:  { db: '-45', duration: '1.5', stop_duration: '0.8' },
-    medium: { db: '-38', duration: '0.8', stop_duration: '0.4' },
-    strong: { db: '-30', duration: '0.4', stop_duration: '0.2' },
+    light:  { db: '-45', duration: '1.2' },
+    medium: { db: '-38', duration: '0.6' },
+    strong: { db: '-32', duration: '0.25' },
   };
   const p = presets[strength] || presets.medium;
+
   try {
     await enqueue(async () => {
+      let inputPath = videoPath;
       const outputPath = path.resolve(`outputs/trimmed_${timestamp}.mp4`);
-      // Step 1: detect silence intervals
-      // Use highpass filter to focus on voice frequencies before detecting silence
+      const compressedPath = path.resolve(`outputs/compressed_${timestamp}.mp4`);
+
+      // Step 0: auto-compress if over 100MB
+      const fileSizeMB = require('fs').statSync(videoPath).size / (1024 * 1024);
+      if (fileSizeMB > 100) {
+        console.log(`[deadspace] compressing ${fileSizeMB.toFixed(0)}MB file first...`);
+        runFFmpeg([
+          '-y', '-i', videoPath,
+          '-c:v', 'libx264', '-crf', '28', '-preset', 'fast',
+          '-c:a', 'aac', '-b:a', '128k',
+          '-vf', 'scale=1280:-2',
+          compressedPath
+        ], 300000);
+        inputPath = compressedPath;
+        console.log(`[deadspace] compressed to ${(fs.statSync(compressedPath).size/1024/1024).toFixed(0)}MB`);
+      }
+
+      // Step 1: detect silence using voice frequency range
+      console.log(`[deadspace] detecting silence: db=${p.db} duration=${p.duration}s`);
       const detectResult = spawnSync(FFMPEG_PATH, [
-        '-i', videoPath,
-        '-af', `highpass=f=80,lowpass=f=8000,silencedetect=noise=${p.db}dB:duration=${p.duration}`,
+        '-i', inputPath,
+        '-af', `highpass=f=100,lowpass=f=6000,afftdn=nf=-25,silencedetect=noise=${p.db}dB:duration=${p.duration}`,
         '-f', 'null', '-'
-      ], { encoding: 'utf8', timeout: 60000, maxBuffer: 10 * 1024 * 1024 });
+      ], { encoding: 'utf8', timeout: 120000, maxBuffer: 10 * 1024 * 1024 });
 
       const stderr = (detectResult.stderr || '') + (detectResult.stdout || '');
       const silenceStarts = [...stderr.matchAll(/silence_start: ([\d.]+)/g)].map(m => parseFloat(m[1]));
       const silenceEnds = [...stderr.matchAll(/silence_end: ([\d.]+)/g)].map(m => parseFloat(m[1]));
 
-      // Build keep intervals (non-silent segments)
-      const keepIntervals = [];
-      let cursor = 0;
-      for (let i = 0; i < silenceStarts.length; i++) {
-        if (silenceStarts[i] > cursor + 0.05) {
-          keepIntervals.push([cursor, silenceStarts[i]]);
-        }
-        cursor = silenceEnds[i] || silenceStarts[i];
-      }
-      // Add final segment
-      keepIntervals.push([cursor, 999999]);
+      console.log(`[deadspace] found ${silenceStarts.length} silence intervals`);
 
-      if (keepIntervals.length === 0) {
-        // No silence found, just copy
-        runFFmpeg(['-y', '-i', videoPath, '-c', 'copy', outputPath], 60000);
+      if (silenceStarts.length === 0) {
+        // No silence detected — just re-encode
+        console.log('[deadspace] no silence found, copying...');
+        runFFmpeg(['-y', '-i', inputPath, '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', outputPath], 120000);
       } else {
-        // Step 2: build select filter for video + audio keeping non-silent parts
-        const selectExpr = keepIntervals.map(([s, e]) => `between(t,${s.toFixed(3)},${e.toFixed(3)})`).join('+');
+        // Step 2: build keep intervals
+        const keepIntervals = [];
+        let cursor = 0;
+        for (let i = 0; i < silenceStarts.length; i++) {
+          if (silenceStarts[i] > cursor + 0.05) {
+            keepIntervals.push([cursor, silenceStarts[i]]);
+          }
+          cursor = silenceEnds[i] !== undefined ? silenceEnds[i] : silenceStarts[i] + parseFloat(p.duration);
+        }
+        keepIntervals.push([cursor, 999999]);
+
+        console.log(`[deadspace] keeping ${keepIntervals.length} segments`);
+
+        // Step 3: cut video + audio in sync
+        const selectExpr = keepIntervals
+          .map(([s, e]) => `between(t,${s.toFixed(3)},${e.toFixed(3)})`)
+          .join('+');
+
         runFFmpeg([
-          '-y', '-i', videoPath,
+          '-y', '-i', inputPath,
           '-vf', `select='${selectExpr}',setpts=N/FRAME_RATE/TB`,
           '-af', `aselect='${selectExpr}',asetpts=N/SR/TB`,
           '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
-          '-c:a', 'aac', outputPath
+          '-c:a', 'aac', '-vsync', 'vfr', outputPath
         ], 300000);
       }
+
       try { fs.unlinkSync(videoPath); } catch(e) {}
+      if (inputPath !== videoPath) try { fs.unlinkSync(inputPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
     });
     res.json({ success: true, videoUrl: `/outputs/trimmed_${timestamp}.mp4` });
   } catch(err) {
+    console.error('[deadspace] error:', err.message);
     try { fs.unlinkSync(videoPath); } catch(e) {}
     res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// ══════════════════════════════════════════════════════════════════════════════
-// YT SCRAPER  —  POST /scrape-channel  (YouTube Data API v3)
-// ══════════════════════════════════════════════════════════════════════════════
-app.post('/scrape-channel', express.json(), async (req, res) => {
-  const { channelUrl, count = 25, sort = 'newest' } = req.body;
-  if (!channelUrl) return res.json({ success: false, error: 'No channel URL provided' });
-
-  const YT_KEY = process.env.YOUTUBE_API_KEY;
-  if (!YT_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not set' });
-
-  try {
-    // Step 1: resolve channel handle to channel ID
-    const handle = channelUrl.replace(/\/$/, '').split('/').pop().replace('@', '');
-    console.log(`[scraper] resolving handle=${handle} sort=${sort} count=${count}`);
-
-    const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
-      params: { part: 'snippet', q: handle, type: 'channel', maxResults: 1, key: YT_KEY },
-      timeout: 10000,
-    });
-    const channelId = searchRes.data.items?.[0]?.id?.channelId;
-    if (!channelId) throw new Error('Could not find channel: ' + handle);
-    console.log(`[scraper] channelId=${channelId}`);
-
-    // Step 2: get uploads playlist ID
-    const chanRes = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
-      params: { part: 'contentDetails', id: channelId, key: YT_KEY },
-      timeout: 10000,
-    });
-    const uploadsPlaylistId = chanRes.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-    if (!uploadsPlaylistId) throw new Error('Could not get uploads playlist');
-
-    // Step 3: fetch video IDs (fetch more for popular/trending so we can sort)
-    const fetchCount = Math.min(parseInt(count) * (sort === 'newest' ? 1 : 4), 200);
-    let videoIds = [];
-    let pageToken = '';
-    while (videoIds.length < fetchCount) {
-      const plRes = await axios.get('https://www.googleapis.com/youtube/v3/playlistItems', {
-        params: { part: 'contentDetails', playlistId: uploadsPlaylistId, maxResults: 50, pageToken, key: YT_KEY },
-        timeout: 10000,
-      });
-      videoIds.push(...plRes.data.items.map(i => i.contentDetails.videoId));
-      if (!plRes.data.nextPageToken || videoIds.length >= fetchCount) break;
-      pageToken = plRes.data.nextPageToken;
-    }
-    videoIds = videoIds.slice(0, fetchCount);
-    console.log(`[scraper] got ${videoIds.length} video IDs`);
-
-    // Step 4: fetch metadata in batches of 50
-    let videos = [];
-    for (let i = 0; i < videoIds.length; i += 50) {
-      const batch = videoIds.slice(i, i + 50);
-      const vRes = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
-        params: { part: 'snippet,statistics,contentDetails', id: batch.join(','), key: YT_KEY },
-        timeout: 15000,
-      });
-      for (const item of vRes.data.items) {
-        // Parse ISO 8601 duration
-        const dur = item.contentDetails.duration || '';
-        const mMatch = dur.match(/(\d+)M/);
-        const sMatch = dur.match(/(\d+)S/);
-        const hMatch = dur.match(/(\d+)H/);
-        const durSec = (hMatch ? parseInt(hMatch[1]) * 3600 : 0) +
-                       (mMatch ? parseInt(mMatch[1]) * 60 : 0) +
-                       (sMatch ? parseInt(sMatch[1]) : 0);
-        // Only keep shorts (≤3 min)
-        if (durSec > 180) continue;
-        const mins = Math.floor(durSec / 60);
-        const secs = durSec % 60;
-        videos.push({
-          video_id: item.id,
-          url: `https://www.youtube.com/watch?v=${item.id}`,
-          title: item.snippet.title,
-          channel: item.snippet.channelTitle,
-          channel_id: item.snippet.channelId,
-          channel_url: channelUrl,
-          view_count: parseInt(item.statistics.viewCount || 0),
-          like_count: parseInt(item.statistics.likeCount || 0),
-          comment_count: parseInt(item.statistics.commentCount || 0),
-          duration_seconds: durSec,
-          duration_human: mins > 0 ? `${mins}m ${secs}s` : `${secs}s`,
-          publish_date: item.snippet.publishedAt,
-          thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url || '',
-          description: item.snippet.description || '',
-          tags: (item.snippet.tags || []).join(', '),
-          transcript: (() => { try { const r = spawnSync('python3', ['get_transcript.py', item.id], { encoding: 'utf8', timeout: 8000, cwd: __dirname }); return (r.stdout || '').trim(); } catch(e) { return ''; } })(),
-          is_live: false,
-          category: item.snippet.categoryId || '',
-        });
-      }
-    }
-
-    // Step 5: sort and trim
-    if (sort === 'popular') {
-      videos.sort((a, b) => b.view_count - a.view_count);
-    } else if (sort === 'trending') {
-      const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
-      videos = videos.filter(v => new Date(v.publish_date).getTime() > cutoff);
-      videos.sort((a, b) => b.view_count - a.view_count);
-    }
-    videos = videos.slice(0, parseInt(count));
-    console.log(`[scraper] returning ${videos.length} videos`);
-    res.json({ success: true, videos });
-
-  } catch(err) {
-    console.error('[scraper] error:', err.message);
-    res.json({ success: false, error: err.message });
   }
 });
 
