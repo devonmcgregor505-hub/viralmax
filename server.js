@@ -64,6 +64,24 @@ app.get('/queue', (req, res) => {
   res.json({ active: activeJobs, waiting: queue.length, max: MAX_CONCURRENT });
 });
 
+// ── Chatterbox warmup — keep Modal GPU warm every 4 minutes ──
+function warmupChatterbox() {
+  const CHATTERBOX_URL = process.env.CHATTERBOX_MODAL_URL;
+  if (!CHATTERBOX_URL) return;
+  axios.post(CHATTERBOX_URL, {
+    text: 'warm',
+    exaggeration: 0.5,
+    cfg_weight: 0.5,
+    temperature: 0.8,
+    audio_prompt_b64: null,
+  }, { timeout: 30000 }).then(() => {
+    console.log('[warmup] Chatterbox pinged OK');
+  }).catch(e => {
+    console.log('[warmup] Chatterbox ping failed:', e.message);
+  });
+}
+setInterval(warmupChatterbox, 4 * 60 * 1000);
+
 // ══════════════════════════════════════════════════════════════════════════════
 // MODELSLAB HELPER
 // ══════════════════════════════════════════════════════════════════════════════
@@ -107,7 +125,7 @@ async function kieAiPoll(taskId, apiKey, maxAttempts = 120, intervalMs = 5000) {
       return url;
     }
     if (state === 'failed' || state === 'error' || state === 'fail') {
-      throw new Error('Kie.ai task failed. resultJson: ' + taskData.resultJson);
+      throw new Error('Kie.ai task failed. failMsg: ' + (taskData.failMsg || taskData.resultJson || 'unknown'));
     }
   }
   throw new Error('Kie.ai task timed out after 10 minutes');
@@ -169,7 +187,6 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
         };
         const modelId = modelIdMap[model] || 'veo-3.1-lite-t2v';
 
-        // Sora 2 requires pixel dimensions, not ratio strings
         const soraAspectMap = { '9:16': '720x1280', '16:9': '1280x720' };
         const soraAspect = model === 'sora2' ? (soraAspectMap[aspectRatio] || '720x1280') : aspectRatio;
 
@@ -185,12 +202,10 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
           track_id: null,
         };
 
-        // Audio only supported by Veo 3.1 Lite
         if (model === 'veo3-lite' || model === 'veo3lite') {
           body.generate_audio = true;
         }
 
-        // Veo 3.1 Lite supports optional reference image
         if (imagePath && fs.existsSync(imagePath) && (model === 'veo3-lite' || model === 'veo3lite')) {
           const mimeType = req.file.mimetype || 'image/jpeg';
           body.init_image = `data:${mimeType};base64,${fs.readFileSync(imagePath).toString('base64')}`;
@@ -294,10 +309,7 @@ app.post('/generate-image', upload.single('refImage'), async (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// VOICE GEN  —  POST /generate-voice
-//
-//  Clone mode  (voiceSample file attached) → Chatterbox on Modal
-//  Preset mode (no file)                   → Kie.ai ElevenLabs
+// VOICE GEN  —  POST /generate-voice  (Chatterbox on Modal, 10min timeout)
 // ══════════════════════════════════════════════════════════════════════════════
 app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
   const voiceSamplePath = req.file ? path.resolve(req.file.path) : null;
@@ -327,7 +339,7 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
       if (isCloneMode) {
         // ── Chatterbox voice cloning via Modal ──
         const CHATTERBOX_URL = process.env.CHATTERBOX_MODAL_URL;
-        if (!CHATTERBOX_URL) throw new Error('CHATTERBOX_MODAL_URL not set — run: modal deploy modal_chatterbox.py');
+        if (!CHATTERBOX_URL) throw new Error('CHATTERBOX_MODAL_URL not set');
 
         console.log(`[generate-voice] CLONE mode chars=${text.length} file=${voiceSamplePath}`);
 
@@ -346,12 +358,11 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
             cfg_weight: parseFloat(cfgWeight),
             temperature: parseFloat(temperature),
             audio_prompt_b64: audioB64,
-          }, { headers: { 'Content-Type': 'application/json' }, timeout: 300000 });
+          }, { headers: { 'Content-Type': 'application/json' }, timeout: 600000 }); // 10 minutes
         } catch(e) {
           throw new Error('Chatterbox request failed: ' + e.message + (e.response ? ' — ' + JSON.stringify(e.response.data).slice(0, 200) : ''));
         }
 
-        console.log('[chatterbox] response keys:', Object.keys(response.data));
         console.log('[chatterbox] success:', response.data.success, 'has audio:', !!response.data.audio_b64);
 
         if (!response.data.audio_b64) {
@@ -455,106 +466,104 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// YT SCRAPER  —  POST /scrape-channel
+// YT SCRAPER  —  POST /scrape-channel  (YouTube Data API v3)
 // ══════════════════════════════════════════════════════════════════════════════
 app.post('/scrape-channel', express.json(), async (req, res) => {
   const { channelUrl, count = 25, sort = 'newest' } = req.body;
   if (!channelUrl) return res.json({ success: false, error: 'No channel URL provided' });
 
+  const YT_KEY = process.env.YOUTUBE_API_KEY;
+  if (!YT_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not set' });
+
   try {
-    // ── Step 1: get video IDs fast via flat-playlist ──
-    const pool = Math.min(parseInt(count) * (sort === 'trending' ? 6 : sort === 'popular' ? 4 : 1), 400);
-    const listArgs = ['--flat-playlist', '--print', '%(id)s', '--no-warnings', '--quiet'];
+    // Step 1: resolve channel handle to channel ID
+    const handle = channelUrl.replace(/\/$/, '').split('/').pop().replace('@', '');
+    console.log(`[scraper] resolving handle=${handle} sort=${sort} count=${count}`);
 
-    if (sort === 'trending') {
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 90);
-      listArgs.push('--dateafter', cutoff.toISOString().slice(0, 10).replace(/-/g, ''));
+    const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+      params: { part: 'snippet', q: handle, type: 'channel', maxResults: 1, key: YT_KEY },
+      timeout: 10000,
+    });
+    const channelId = searchRes.data.items?.[0]?.id?.channelId;
+    if (!channelId) throw new Error('Could not find channel: ' + handle);
+    console.log(`[scraper] channelId=${channelId}`);
+
+    // Step 2: get uploads playlist ID
+    const chanRes = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
+      params: { part: 'contentDetails', id: channelId, key: YT_KEY },
+      timeout: 10000,
+    });
+    const uploadsPlaylistId = chanRes.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (!uploadsPlaylistId) throw new Error('Could not get uploads playlist');
+
+    // Step 3: fetch video IDs (fetch more for popular/trending so we can sort)
+    const fetchCount = Math.min(parseInt(count) * (sort === 'newest' ? 1 : 4), 200);
+    let videoIds = [];
+    let pageToken = '';
+    while (videoIds.length < fetchCount) {
+      const plRes = await axios.get('https://www.googleapis.com/youtube/v3/playlistItems', {
+        params: { part: 'contentDetails', playlistId: uploadsPlaylistId, maxResults: 50, pageToken, key: YT_KEY },
+        timeout: 10000,
+      });
+      videoIds.push(...plRes.data.items.map(i => i.contentDetails.videoId));
+      if (!plRes.data.nextPageToken || videoIds.length >= fetchCount) break;
+      pageToken = plRes.data.nextPageToken;
     }
-    listArgs.push('--playlist-end', String(pool));
-    listArgs.push(channelUrl + '/shorts');
+    videoIds = videoIds.slice(0, fetchCount);
+    console.log(`[scraper] got ${videoIds.length} video IDs`);
 
-    console.log(`[scraper] sort=${sort} pool=${pool} url=${channelUrl}`);
-    const listResult = spawnSync('yt-dlp', listArgs, { encoding: 'utf8', timeout: 60000, maxBuffer: 10 * 1024 * 1024 });
-    if (listResult.error) throw new Error('yt-dlp not found: ' + listResult.error.message);
-
-    let ids = (listResult.stdout || '').trim().split('\n').filter(Boolean);
-    if (ids.length === 0) throw new Error('No videos found for this channel');
-    console.log(`[scraper] got ${ids.length} IDs, fetching metadata in parallel...`);
-
-    // ── Step 2: parallel metadata + transcript fetch (8 at a time) ──
-    const CONCURRENCY = 8;
-    const results = [];
-    for (let i = 0; i < ids.length; i += CONCURRENCY) {
-      const batch = ids.slice(i, i + CONCURRENCY);
-      const batchResults = await Promise.all(batch.map(async (id) => {
-        const url = `https://www.youtube.com/watch?v=${id}`;
-
-        // Metadata
-        const metaResult = spawnSync('yt-dlp', [
-          url, '--dump-json', '--no-warnings', '--quiet', '--skip-download', '--no-playlist',
-        ], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, timeout: 30000 });
-        let meta = {};
-        try { meta = JSON.parse(metaResult.stdout || '{}'); } catch(e) { return null; }
-        const durationSec = meta.duration || 0;
-        if (durationSec > 180) return null; // shorts only
-        const mins = Math.floor(durationSec / 60);
-        const secs = durationSec % 60;
-        const durationHuman = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-
-        // Transcript
-        let transcript = '';
-        const tmpBase = `/tmp/transcript_${id}`;
-        spawnSync('yt-dlp', [
-          url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
-          '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
-        ], { encoding: 'utf8', timeout: 20000 });
-        const vttPath = `${tmpBase}.en.vtt`;
-        if (fs.existsSync(vttPath)) {
-          try {
-            const vtt = fs.readFileSync(vttPath, 'utf8');
-            const vttLines = vtt
-              .replace(/WEBVTT[\s\S]*?\n\n/, '')
-              .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> [^\n]+/g, '')
-              .replace(/<[^>]+>/g, '')
-              .split('\n').map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
-            const seen = new Set();
-            transcript = vttLines
-              .filter(l => { if (seen.has(l)) return false; seen.add(l); return true; })
-              .join('\n').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
-            fs.unlinkSync(vttPath);
-          } catch(e) {}
-        }
-
-        return {
-          video_id: id,
-          url: `https://www.youtube.com/watch?v=${id}`,
-          title: meta.title || '',
-          channel: meta.channel || meta.uploader || '',
-          channel_id: meta.channel_id || '',
-          channel_url: meta.channel_url || '',
-          view_count: meta.view_count || 0,
-          like_count: meta.like_count || 0,
-          comment_count: meta.comment_count || 0,
-          duration_seconds: durationSec,
-          duration_human: durationHuman,
-          publish_date: meta.upload_date
-            ? `${meta.upload_date.slice(0,4)}-${meta.upload_date.slice(4,6)}-${meta.upload_date.slice(6,8)}T00:00:00Z`
-            : '',
-          thumbnail: meta.thumbnail || '',
-          description: meta.description || '',
-          tags: (meta.tags || []).join(', '),
-          transcript,
-          is_live: meta.is_live || false,
-          category: meta.categories ? String(meta.categories[0]) : '',
-        };
-      }));
-      results.push(...batchResults.filter(Boolean));
+    // Step 4: fetch metadata in batches of 50
+    let videos = [];
+    for (let i = 0; i < videoIds.length; i += 50) {
+      const batch = videoIds.slice(i, i + 50);
+      const vRes = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+        params: { part: 'snippet,statistics,contentDetails', id: batch.join(','), key: YT_KEY },
+        timeout: 15000,
+      });
+      for (const item of vRes.data.items) {
+        // Parse ISO 8601 duration
+        const dur = item.contentDetails.duration || '';
+        const mMatch = dur.match(/(\d+)M/);
+        const sMatch = dur.match(/(\d+)S/);
+        const hMatch = dur.match(/(\d+)H/);
+        const durSec = (hMatch ? parseInt(hMatch[1]) * 3600 : 0) +
+                       (mMatch ? parseInt(mMatch[1]) * 60 : 0) +
+                       (sMatch ? parseInt(sMatch[1]) : 0);
+        // Only keep shorts (≤3 min)
+        if (durSec > 180) continue;
+        const mins = Math.floor(durSec / 60);
+        const secs = durSec % 60;
+        videos.push({
+          video_id: item.id,
+          url: `https://www.youtube.com/watch?v=${item.id}`,
+          title: item.snippet.title,
+          channel: item.snippet.channelTitle,
+          channel_id: item.snippet.channelId,
+          channel_url: channelUrl,
+          view_count: parseInt(item.statistics.viewCount || 0),
+          like_count: parseInt(item.statistics.likeCount || 0),
+          comment_count: parseInt(item.statistics.commentCount || 0),
+          duration_seconds: durSec,
+          duration_human: mins > 0 ? `${mins}m ${secs}s` : `${secs}s`,
+          publish_date: item.snippet.publishedAt,
+          thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url || '',
+          description: item.snippet.description || '',
+          tags: (item.snippet.tags || []).join(', '),
+          transcript: '',
+          is_live: false,
+          category: item.snippet.categoryId || '',
+        });
+      }
     }
 
-    // ── Step 3: sort and trim ──
-    let videos = results;
-    if (sort === 'popular' || sort === 'trending') videos.sort((a, b) => b.view_count - a.view_count);
+    // Step 5: sort and trim
+    if (sort === 'popular') {
+      videos.sort((a, b) => b.view_count - a.view_count);
+    } else if (sort === 'trending') {
+      const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+      videos = videos.filter(v => new Date(v.publish_date).getTime() > cutoff);
+      videos.sort((a, b) => b.view_count - a.view_count);
+    }
     videos = videos.slice(0, parseInt(count));
     console.log(`[scraper] returning ${videos.length} videos`);
     res.json({ success: true, videos });
