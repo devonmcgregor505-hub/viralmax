@@ -694,18 +694,9 @@ refImgDrop.addEventListener('drop', e => { e.preventDefault(); refImgDrop.classL
 refImgInput.addEventListener('change', () => { if (refImgInput.files[0]) { selectedRefImg = refImgInput.files[0]; document.getElementById('refImgFnm').textContent = '📎 ' + selectedRefImg.name; refImgDrop.classList.add('has-file'); } });
 
 function onImgModelChange() {
-  const model = document.getElementById('imgModel').value;
-  const cfg = IMG_MODEL_CONFIG[model];
-  const resSel = document.getElementById('imgResolution');
-  resSel.innerHTML = '';
-  cfg.resolutions.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r + ' — ' + cfg.credits[r] + ' credits'; if (r === cfg.defaultRes) o.selected = true; resSel.appendChild(o); });
-  onImgResChange();
+  document.getElementById('imgCost').textContent = '18 credits';
 }
-function onImgResChange() {
-  const model = document.getElementById('imgModel').value;
-  const res = document.getElementById('imgResolution').value;
-  document.getElementById('imgCost').textContent = (IMG_MODEL_CONFIG[model].credits[res] || 0) + ' credits';
-}
+function onImgResChange() {}
 function onImgAspectChange() {
   const map = {'9:16':'9/16','16:9':'16/9','1:1':'1/1'};
   document.getElementById('imgPreviewWrap').style.aspectRatio = map[document.getElementById('imgAspect').value] || '1/1';
@@ -716,8 +707,8 @@ async function startImgGen() {
   if (!prompt) { alert('Please enter a prompt.'); return; }
   const model = document.getElementById('imgModel').value;
   const aspect = document.getElementById('imgAspect').value;
-  const resolution = document.getElementById('imgResolution').value;
-  const format = document.getElementById('imgFormat').value;
+  const resolution = '1K';
+  const format = 'PNG';
   const cfg = IMG_MODEL_CONFIG[model];
   const btn = document.getElementById('imgBtn');
   btn.disabled = true; btn.textContent = '⏳ Generating…';
