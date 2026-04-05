@@ -1099,14 +1099,53 @@ function setDsStrength(btn, val) {
   btn.style.color = 'var(--y)';
   document.getElementById('dsStrength').value = val;
 }
+async function compressVideo(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement('video');
+    video.src = url; video.muted = true;
+    video.onloadedmetadata = () => {
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1, 720 / video.videoHeight, 1280 / video.videoWidth);
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
+      const ctx = canvas.getContext('2d');
+      const stream = canvas.captureStream(30);
+      const chunks = [];
+      const rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 1500000 });
+      rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      rec.onstop = () => { URL.revokeObjectURL(url); resolve(new Blob(chunks, { type: 'video/webm' })); };
+      rec.onerror = reject;
+      video.play();
+      rec.start(100);
+      video.ontimeupdate = () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        if (onProgress) onProgress(video.currentTime / video.duration);
+      };
+      video.onended = () => rec.stop();
+    };
+    video.onerror = reject;
+  });
+}
+
 async function startDeadspace() {
   const fileInput = document.getElementById('deadspaceInput');
   if (!fileInput.files[0]) { alert('Please upload a video first.'); return; }
+  const file = fileInput.files[0];
   const btn = document.getElementById('dsBtn');
-  btn.disabled = true; btn.textContent = '⏳ Processing…';
+  btn.disabled = true;
   try {
+    let uploadFile = file;
+    if (file.size > 20 * 1024 * 1024) {
+      btn.textContent = '🗜 Compressing 0%…';
+      uploadFile = await compressVideo(file, (pct) => {
+        btn.textContent = '🗜 Compressing ' + Math.round(pct * 100) + '%…';
+      });
+      console.log('[compress] ' + (file.size/1024/1024).toFixed(1) + 'MB to ' + (uploadFile.size/1024/1024).toFixed(1) + 'MB');
+    }
+    btn.textContent = '⬆ Uploading…';
     const fd = new FormData();
-    fd.append('video', fileInput.files[0]);
+    fd.append('video', uploadFile, 'video.webm');
     fd.append('strength', document.getElementById('dsStrength').value);
     const res = await fetch('/remove-deadspace', { method: 'POST', body: fd });
     const data = await res.json();
@@ -1121,8 +1160,6 @@ async function startDeadspace() {
   }
   btn.disabled = false; btn.textContent = '🎬 Remove Dead Space';
 }
-
-// ══ YT SCRAPER ══
 async function startScrape() {
   const url = document.getElementById('ytChannelUrl').value.trim();
   if (!url) { alert('Please enter a channel URL.'); return; }
