@@ -463,9 +463,10 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
     await enqueue(async () => {
       const outputPath = path.resolve(`outputs/trimmed_${timestamp}.mp4`);
       // Step 1: detect silence intervals
+      // Use highpass filter to focus on voice frequencies before detecting silence
       const detectResult = spawnSync(FFMPEG_PATH, [
         '-i', videoPath,
-        '-af', `silencedetect=noise=${p.db}dB:duration=${p.duration}`,
+        '-af', `highpass=f=80,lowpass=f=8000,silencedetect=noise=${p.db}dB:duration=${p.duration}`,
         '-f', 'null', '-'
       ], { encoding: 'utf8', timeout: 60000, maxBuffer: 10 * 1024 * 1024 });
 
