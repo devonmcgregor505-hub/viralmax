@@ -607,6 +607,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 </div>
 
 <script>
+// ─── Global State ───────────────────────────────────────────────────────
+const aState = { channelData: [], selectedIdea: null, script: null, scenes: [], sceneImgPrompts: [], sceneVideoPrompts: [], sceneImages: [], clips: [], completedSteps: new Set() };
+let aPromptModalIdx = -1, aPromptModalType = 'img';
+let scraperData = [];
+
 // ─── Tab Navigation ───────────────────────────────────────────────────────
 function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -620,9 +625,6 @@ function switchTab(tab) {
 }
 
 // ─── Automation Functions ────────────────────────────────────────────────
-const aState = { channelData: [], selectedIdea: null, script: null, scenes: [], sceneImgPrompts: [], sceneVideoPrompts: [], sceneImages: [], clips: [], completedSteps: new Set() };
-let aPromptModalIdx = -1, aPromptModalType = 'img';
-
 function autoGotoStep(n) {
   document.querySelectorAll('.auto-step-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.auto-step-btn').forEach(b => b.classList.remove('active'));
@@ -940,17 +942,214 @@ async function aGenSingleClip(i) {
   } catch(err) { if (statusEl) statusEl.innerHTML = `<span style="color:var(--red);">✗ ${err.message}</span>`; }
 }
 
-// ─── Other stubs ────────────────────────────────────────────────────────
-function startVidGen() { alert('Video generation via UI coming soon'); }
-function startImgGen() { alert('Image generation via UI coming soon'); }
-function startVoiceGen() { alert('Voice generation via UI coming soon'); }
-function startDeadspace() { alert('Dead space removal via UI coming soon'); }
-function startScraper() { alert('Scraper via UI coming soon'); }
-function downloadScraperJSON() { alert('No data to download'); }
-function handleDSFile(files) { if (files[0]) document.getElementById('dsFileName').textContent = files[0].name; }
+// ─── VIDEO GEN ────────────────────────────────────────────────────────
+async function startVidGen() {
+  const prompt = document.getElementById('aivgPrompt').value.trim();
+  if (!prompt) { alert('Please enter a prompt'); return; }
+  const model = document.getElementById('vidModel').value;
+  const duration = document.getElementById('vidDuration').value;
+  const aspect = document.getElementById('vidAspect').value;
+  
+  const btn = document.getElementById('vidBtn');
+  btn.disabled = true;
+  const prog = document.getElementById('vidProg');
+  prog.classList.add('vis');
+  const err = document.getElementById('vidErr');
+  err.classList.remove('vis');
+  
+  try {
+    const fd = new FormData();
+    fd.append('model', model);
+    fd.append('prompt', prompt);
+    fd.append('duration', duration);
+    fd.append('aspectRatio', aspect);
+    const r = await fetch('/generate-video', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) {
+      const video = document.getElementById('vidVideo');
+      video.src = d.videoUrl;
+      video.style.display = 'block';
+      document.getElementById('vidEmpty').style.display = 'none';
+      const dlBtn = document.getElementById('vidDlBtn');
+      dlBtn.href = d.videoUrl;
+      document.getElementById('vidResultBtns').classList.add('vis');
+    } else throw new Error(d.error);
+  } catch(err) {
+    err.classList.add('vis');
+    document.getElementById('vidErrMsg').textContent = err.message;
+  }
+  btn.disabled = false;
+  prog.classList.remove('vis');
+}
+
+// ─── IMAGE GEN ────────────────────────────────────────────────────────
+async function startImgGen() {
+  const prompt = document.getElementById('imgPrompt').value.trim();
+  if (!prompt) { alert('Please enter a prompt'); return; }
+  const model = document.getElementById('imgModel').value;
+  const aspect = document.getElementById('imgAspect').value;
+  const res = document.getElementById('imgResolution').value;
+  
+  const btn = document.getElementById('imgBtn');
+  btn.disabled = true;
+  const prog = document.getElementById('imgProg');
+  prog.classList.add('vis');
+  const err = document.getElementById('imgErr');
+  err.classList.remove('vis');
+  
+  try {
+    const fd = new FormData();
+    fd.append('model', model);
+    fd.append('prompt', prompt);
+    fd.append('aspectRatio', aspect);
+    fd.append('resolution', res);
+    const r = await fetch('/generate-image', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) {
+      const img = document.getElementById('genImgPrev');
+      img.src = d.imageUrl;
+      img.style.display = 'block';
+      document.getElementById('imgEmpty').style.display = 'none';
+      const dlBtn = document.getElementById('dlImgBtn');
+      dlBtn.href = d.imageUrl;
+      dlBtn.style.display = 'block';
+    } else throw new Error(d.error);
+  } catch(err) {
+    err.classList.add('vis');
+    document.getElementById('imgErrMsg').textContent = err.message;
+  }
+  btn.disabled = false;
+  prog.classList.remove('vis');
+}
+
+// ─── VOICE GEN ────────────────────────────────────────────────────────
+async function startVoiceGen() {
+  const text = document.getElementById('voiceText').value.trim();
+  if (!text) { alert('Please enter text'); return; }
+  const voiceId = document.getElementById('voiceId').value;
+  const stability = document.getElementById('voiceStability').value;
+  const speed = document.getElementById('voiceSpeed').value;
+  
+  const btn = document.getElementById('voiceBtn');
+  btn.disabled = true;
+  const prog = document.getElementById('voiceProg');
+  prog.classList.add('vis');
+  const err = document.getElementById('voiceErr');
+  err.classList.remove('vis');
+  
+  try {
+    const fd = new FormData();
+    fd.append('text', text);
+    fd.append('voiceId', voiceId);
+    fd.append('stability', stability);
+    fd.append('speed', speed);
+    const r = await fetch('/generate-voice', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) {
+      const audio = document.getElementById('voiceAudio');
+      audio.src = d.audioUrl;
+      const dlBtn = document.getElementById('voiceDlBtn');
+      dlBtn.href = d.audioUrl;
+      document.getElementById('voiceResultBtns').classList.add('vis');
+    } else throw new Error(d.error);
+  } catch(err) {
+    err.classList.add('vis');
+    document.getElementById('voiceErrMsg').textContent = err.message;
+  }
+  btn.disabled = false;
+  prog.classList.remove('vis');
+}
+
+// ─── DEAD SPACE ────────────────────────────────────────────────────────
+function handleDSFile(files) {
+  if (files[0]) {
+    document.getElementById('dsFileName').textContent = files[0].name;
+    document.getElementById('dsUploadZone').classList.add('has-file');
+  }
+}
+
+async function startDeadspace() {
+  const fileInput = document.getElementById('dsFileInput');
+  if (!fileInput.files[0]) { alert('Please upload a video'); return; }
+  
+  const loading = document.getElementById('dsLoading');
+  loading.classList.add('vis');
+  const err = document.getElementById('deadspaceErr');
+  if (err) err.classList.remove('vis');
+  
+  try {
+    const fd = new FormData();
+    fd.append('video', fileInput.files[0]);
+    fd.append('strength', document.getElementById('dsStrength').value);
+    const r = await fetch('/remove-deadspace', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) {
+      const video = document.getElementById('dsPreview');
+      video.src = d.videoUrl;
+      video.style.display = 'block';
+      const dlBtn = document.getElementById('dsDownloadBtn');
+      dlBtn.href = d.videoUrl;
+      document.getElementById('dsResultBtns').classList.add('vis');
+    } else throw new Error(d.error);
+  } catch(err) {
+    if (err) err.classList.add('vis');
+  }
+  loading.classList.remove('vis');
+}
+
+// ─── SCRAPER ────────────────────────────────────────────────────────
+async function startScraper() {
+  const url = document.getElementById('channelUrl').value.trim();
+  if (!url) { alert('Enter channel URL'); return; }
+  
+  const loading = document.getElementById('scraperLoading');
+  loading.classList.add('vis');
+  
+  try {
+    const r = await fetch('/scrape-channel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        channelUrl: url,
+        count: document.getElementById('videoCount').value,
+        sort: document.getElementById('sortBy').value
+      })
+    });
+    const d = await r.json();
+    if (d.success) {
+      scraperData = d.videos;
+      renderScraperResults(d.videos);
+    } else throw new Error(d.error);
+  } catch(err) { alert('Error: ' + err.message); }
+  loading.classList.remove('vis');
+}
+
+function renderScraperResults(videos) {
+  const results = document.getElementById('scraperResults');
+  results.innerHTML = '';
+  videos.slice(0, 10).forEach(v => {
+    const item = document.createElement('div');
+    item.style.cssText = 'padding:10px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;font-size:11px;';
+    item.innerHTML = `<div style="color:var(--y);font-weight:600;margin-bottom:4px;">${v.title}</div><div style="color:var(--tdim);">${v.view_count.toLocaleString()} views · ${v.duration_human}</div>`;
+    results.appendChild(item);
+  });
+}
+
+function downloadScraperJSON() {
+  if (scraperData.length === 0) { alert('No data to export'); return; }
+  const blob = new Blob([JSON.stringify(scraperData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'channel-data.json';
+  a.click();
+}
 
 // ─── Initialize ─────────────────────────────────────────────────────────
 switchTab('vidgen');
+document.getElementById('voiceText').addEventListener('input', e => document.getElementById('voiceCharCount').textContent = e.target.value.length);
+document.getElementById('imgInput').addEventListener('change', e => { if (e.target.files[0]) { document.getElementById('imgFnm').textContent = e.target.files[0].name; document.getElementById('imgDrop').classList.add('has-file'); } });
+document.getElementById('refImgInput').addEventListener('change', e => { if (e.target.files[0]) { document.getElementById('refImgFnm').textContent = e.target.files[0].name; document.getElementById('refImgDrop').classList.add('has-file'); } });
 </script>
 
 </body>

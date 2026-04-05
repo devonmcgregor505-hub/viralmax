@@ -155,7 +155,7 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
       let videoUrl;
 
       // ── GROK via Kie.ai ──
-      if (model === 'grok') {
+      if (model === 'grok' || model.startsWith('grok-')) {
         if (!KIE_KEY) throw new Error('KIE_API_KEY not configured in .env');
 
         // Build Grok input — switch model based on whether image is provided
@@ -679,6 +679,41 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
 });
 
 
+// ══════════════════════════════════════════════════════════════════════════════
+// CLAUDE API PROXY  —  POST /api/claude
+// ══════════════════════════════════════════════════════════════════════════════
+app.post('/api/claude', express.json(), async (req, res) => {
+  const { prompt, max_tokens = 1000 } = req.body;
+  if (!prompt) return res.json({ success: false, error: 'No prompt provided' });
+  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
+  if (!ANTHROPIC_KEY) return res.status(500).json({ success: false, error: 'ANTHROPIC_API_KEY not set' });
+  try {
+    const response = await axios.post('https://api.anthropic.com/v1/messages', {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens,
+      messages: [{ role: 'user', content: prompt }],
+    }, {
+      headers: {
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      timeout: 60000,
+    });
+    res.json(response.data);
+  } catch(err) {
+    console.error('[claude-api] error:', err.message);
+    const detail = err.response?.data || err.message;
+    console.error('[claude-api] detail:', JSON.stringify(detail));
+    res.status(500).json({ success: false, error: err.message, detail });
+  }
+});
+
+app.post('/enable-repurpose', async (req, res) => {
+  const { ytChannel, platforms } = req.body;
+  res.json({ success: true, status: 'active', monitoring: ytChannel, platforms });
+});
+
 // ── Legal pages ──
 app.get('/terms', (req, res) => {
   res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Terms of Service - DubShorts</title>
@@ -725,62 +760,21 @@ app.get('/privacy', (req, res) => {
   </body></html>`);
 });
 
-
 // ── TikTok domain verification ──
 app.get('/tiktokmbOjActDa5ANJmRCnS6hvkmXi09O0Nt7.txt', (req, res) => {
   res.type('text/plain').send('tiktok-developers-site-verification=mbOjActDa5ANJmRCnS6hvkmXi09O0Nt7');
-});
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// CLAUDE API PROXY  —  POST /api/claude
-// ══════════════════════════════════════════════════════════════════════════════
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// CLAUDE API PROXY  —  POST /api/claude
-// ══════════════════════════════════════════════════════════════════════════════
-app.post('/api/claude', express.json(), async (req, res) => {
-  const { prompt, max_tokens = 1000 } = req.body;
-  if (!prompt) return res.json({ success: false, error: 'No prompt provided' });
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-  if (!ANTHROPIC_KEY) return res.status(500).json({ success: false, error: 'ANTHROPIC_API_KEY not set' });
-  try {
-    const response = await axios.post('https://api.anthropic.com/v1/messages', {
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens,
-      messages: [{ role: 'user', content: prompt }],
-    }, {
-      headers: {
-        'x-api-key': ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
-      },
-      timeout: 60000,
-    });
-    res.json(response.data);
-  } catch(err) {
-    console.error('[claude-api] error:', err.message);
-    const detail = err.response?.data || err.message;
-    console.error('[claude-api] detail:', JSON.stringify(detail));
-    res.status(500).json({ success: false, error: err.message, detail });
-  }
-});
-
-app.post('/enable-repurpose', async (req, res) => {
-  const { ytChannel, platforms } = req.body;
-  res.json({ success: true, status: 'active', monitoring: ytChannel, platforms });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
 // START
 // ══════════════════════════════════════════════════════════════════════════════
 app.listen(PORT, () => {
-  console.log('\n✅ DubShorts v3 running at http://localhost:' + PORT);
+  console.log('\n✅ DubShorts v3 (Full Integration) running at http://localhost:' + PORT);
   console.log('   MODELSLAB_API_KEY :', process.env.MODELSLAB_API_KEY   ? '✓ set' : '✗ not set');
   console.log('   KIE_API_KEY       :', process.env.KIE_API_KEY         ? '✓ set' : '✗ not set');
   console.log('   CHATTERBOX_URL    :', process.env.CHATTERBOX_MODAL_URL ? '✓ set' : '✗ not set (voice cloning disabled)');
   console.log('   YOUTUBE_API_KEY   :', process.env.YOUTUBE_API_KEY     ? '✓ set' : '✗ not set');
+  console.log('   ANTHROPIC_API_KEY :', process.env.ANTHROPIC_API_KEY   ? '✓ set' : '✗ not set (automation disabled)');
   console.log('');
 });
 
