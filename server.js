@@ -293,8 +293,17 @@ app.post('/generate-image', upload.single('refImage'), async (req, res) => {
         input: { prompt, aspect_ratio: aspectRatio, resolution: kieResolution, output_format: 'png' },
       };
       if (refImagePath && fs.existsSync(refImagePath)) {
-        body.input.image_input = fs.readFileSync(refImagePath).toString('base64');
-        body.input.image_mime_type = req.file.mimetype || 'image/jpeg';
+        // Serve image temporarily via public URL (Kie.ai needs a URL, not base64)
+        const tempImgName = `temp_ref_${timestamp}.jpg`;
+        const tempImgPublic = path.resolve(`outputs/${tempImgName}`);
+        fs.copyFileSync(refImagePath, tempImgPublic);
+        const baseUrl = process.env.RAILWAY_PUBLIC_DOMAIN
+          ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+          : `http://localhost:${PORT}`;
+        const refImageUrl = `${baseUrl}/outputs/${tempImgName}`;
+        console.log(`[generate-image] refImageUrl=${refImageUrl}`);
+        body.input.image_input = [refImageUrl];
+        setTimeout(() => { try { fs.unlinkSync(tempImgPublic); } catch(e) {} }, 600000);
       }
 
       const submitRes = await axios.post('https://api.kie.ai/api/v1/jobs/createTask', body, {
