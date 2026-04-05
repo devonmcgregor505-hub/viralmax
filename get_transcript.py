@@ -1,7 +1,8 @@
-import sys, json
+import sys
 from youtube_transcript_api import YouTubeTranscriptApi
 try:
-    t = YouTubeTranscriptApi.get_transcript(sys.argv[1], languages=['en','en-US','en-GB'])
-    print(' '.join([x['text'] for x in t]))
+    api = YouTubeTranscriptApi()
+    t = api.fetch(sys.argv[1])
+    print(" ".join([x.text for x in t]))
 except Exception as e:
-    print('')
+    print("", end="")
