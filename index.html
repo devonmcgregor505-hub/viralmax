@@ -438,10 +438,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="card">
           <div class="card-hd">Settings</div>
           <div class="card-body">
-            <div class="slider-row">
-              <div class="setting-label">Silence Threshold (dB)</div>
-              <div class="slider-labels"><span>Sensitive</span><span id="dbVal">-40</span><span>Aggressive</span></div>
-              <input type="range" class="slider" id="dbSlider" min="-60" max="-10" value="-40" oninput="updateDbVal()">
+            <div class="setting-row">
+              <div class="setting-label">Strength</div>
+              <div style="display:flex;gap:6px;margin-top:4px;">
+                <button onclick="setDsStrength(this,'light')" class="ds-strength-btn" style="flex:1;padding:8px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--tdim);font-size:11px;font-weight:700;cursor:pointer;">🟢 Light</button>
+                <button onclick="setDsStrength(this,'medium')" class="ds-strength-btn active-strength" style="flex:1;padding:8px;background:var(--yg);border:1px solid rgba(245,225,50,.4);border-radius:7px;color:var(--y);font-size:11px;font-weight:700;cursor:pointer;">🟡 Medium</button>
+                <button onclick="setDsStrength(this,'strong')" class="ds-strength-btn" style="flex:1;padding:8px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--tdim);font-size:11px;font-weight:700;cursor:pointer;">🔴 Strong</button>
+              </div>
+              <input type="hidden" id="dsStrength" value="medium">
+              <div style="font-size:9px;color:var(--tmut);margin-top:4px;">Light = remove long pauses · Medium = balanced · Strong = remove all gaps</div>
             </div>
             <div class="setting-row">
               <label class="setting-label">Cost</label>
@@ -1091,7 +1096,7 @@ async function startDeadspace() {
   try {
     const fd = new FormData();
     fd.append('video', fileInput.files[0]);
-    fd.append('dbThreshold', document.getElementById('dbSlider').value);
+    fd.append('strength', document.getElementById('dsStrength').value);
     const res = await fetch('/remove-deadspace', { method: 'POST', body: fd });
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Processing failed');
