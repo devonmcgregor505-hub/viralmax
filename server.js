@@ -678,6 +678,59 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
   }
 });
 
+
+// ── Legal pages ──
+app.get('/terms', (req, res) => {
+  res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Terms of Service - DubShorts</title>
+  <style>body{font-family:sans-serif;max-width:800px;margin:60px auto;padding:0 20px;line-height:1.7;color:#222;}h1{color:#000;}a{color:#0066cc;}</style></head>
+  <body>
+  <h1>Terms of Service</h1>
+  <p><strong>Last updated: April 2026</strong></p>
+  <p>By using DubShorts AI Studio ("the Service"), you agree to these terms.</p>
+  <h2>1. Use of Service</h2>
+  <p>DubShorts provides AI-powered tools for content creation. You are responsible for all content you create and publish using the Service.</p>
+  <h2>2. TikTok Integration</h2>
+  <p>When you connect your TikTok account, you authorize DubShorts to upload content on your behalf. You may revoke access at any time through TikTok's settings.</p>
+  <h2>3. Content</h2>
+  <p>You retain ownership of all content you create. You grant DubShorts a limited license to process your content solely to provide the Service.</p>
+  <h2>4. Prohibited Use</h2>
+  <p>You may not use the Service to create content that violates TikTok's Community Guidelines or any applicable laws.</p>
+  <h2>5. Disclaimer</h2>
+  <p>The Service is provided "as is" without warranties of any kind. DubShorts is not responsible for any content published to third-party platforms.</p>
+  <h2>6. Contact</h2>
+  <p>For questions, contact us at support@dubshorts.ai</p>
+  </body></html>`);
+});
+
+app.get('/privacy', (req, res) => {
+  res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Privacy Policy - DubShorts</title>
+  <style>body{font-family:sans-serif;max-width:800px;margin:60px auto;padding:0 20px;line-height:1.7;color:#222;}h1{color:#000;}a{color:#0066cc;}</style></head>
+  <body>
+  <h1>Privacy Policy</h1>
+  <p><strong>Last updated: April 2026</strong></p>
+  <h2>1. Information We Collect</h2>
+  <p>We collect information you provide when using DubShorts, including prompts, uploaded media, and account connection tokens.</p>
+  <h2>2. TikTok Data</h2>
+  <p>When you connect your TikTok account via OAuth, we store only the access token required to upload content on your behalf. We do not store your TikTok password. You can revoke access at any time.</p>
+  <h2>3. How We Use Your Data</h2>
+  <p>We use your data solely to provide the Service. We do not sell your data to third parties.</p>
+  <h2>4. Data Storage</h2>
+  <p>Generated content is temporarily stored on our servers and automatically deleted after 10 minutes. Access tokens are encrypted at rest.</p>
+  <h2>5. Third-Party Services</h2>
+  <p>DubShorts uses the following third-party services: TikTok (content posting), Kie.ai (AI generation), Modal (voice processing), Railway (hosting).</p>
+  <h2>6. Your Rights</h2>
+  <p>You may request deletion of your data at any time by contacting support@dubshorts.ai</p>
+  <h2>7. Contact</h2>
+  <p>For privacy questions, contact support@dubshorts.ai</p>
+  </body></html>`);
+});
+
+
+// ── TikTok domain verification ──
+app.get('/tiktokmbOjActDa5ANJmRCnS6hvkmXi09O0Nt7.txt', (req, res) => {
+  res.type('text/plain').send('tiktok-developers-site-verification=mbOjActDa5ANJmRCnS6hvkmXi09O0Nt7');
+});
+
 app.post('/enable-repurpose', async (req, res) => {
   const { ytChannel, platforms } = req.body;
   res.json({ success: true, status: 'active', monitoring: ytChannel, platforms });
