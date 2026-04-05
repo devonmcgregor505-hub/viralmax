@@ -448,13 +448,24 @@ app.post('/upscale-video', upload.single('video'), async (req, res) => {
 // DEAD SPACE REMOVER  —  POST /remove-deadspace
 // ══════════════════════════════════════════════════════════════════════════════
 app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ success: false, error: 'No file uploaded' });
   const videoPath = path.resolve(req.file.path);
   const timestamp = Date.now();
-  const { dbThreshold = '-40' } = req.body;
+  const { strength = 'medium' } = req.body;
+  const presets = {
+    light:  { db: '-50', duration: '0.5' },
+    medium: { db: '-40', duration: '0.3' },
+    strong: { db: '-30', duration: '0.1' },
+  };
+  const p = presets[strength] || presets.medium;
   try {
     await enqueue(async () => {
       const outputPath = path.resolve(`outputs/trimmed_${timestamp}.mp4`);
-      runFFmpeg(['-y', '-i', videoPath, '-af', `silenceremove=1:0:0.1:${dbThreshold}dB:1:0.1:${dbThreshold}dB`, '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', outputPath], 300000);
+      runFFmpeg([
+        '-y', '-i', videoPath,
+        '-af', `silenceremove=start_periods=1:start_duration=${p.duration}:start_threshold=${p.db}dB:stop_periods=-1:stop_duration=${p.duration}:stop_threshold=${p.db}dB`,
+        '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', outputPath
+      ], 300000);
       try { fs.unlinkSync(videoPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
     });

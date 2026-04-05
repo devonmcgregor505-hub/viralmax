@@ -1087,7 +1087,18 @@ deadspaceZone.addEventListener('dragleave', () => deadspaceZone.classList.remove
 deadspaceZone.addEventListener('drop', e => { e.preventDefault(); deadspaceZone.classList.remove('drag'); if (e.dataTransfer.files[0]) loadDeadspace(e.dataTransfer.files[0]); });
 document.getElementById('deadspaceInput').addEventListener('change', () => { if (document.getElementById('deadspaceInput').files[0]) loadDeadspace(document.getElementById('deadspaceInput').files[0]); });
 function loadDeadspace(f) { document.getElementById('deadspaceFnm').textContent = '📎 ' + f.name; deadspaceZone.classList.add('has-file'); document.getElementById('dsBtn').disabled = false; const vid = document.getElementById('dsVid'); vid.src = URL.createObjectURL(f); vid.style.display = 'block'; }
-function updateDbVal() { document.getElementById('dbVal').textContent = document.getElementById('dbSlider').value; }
+function updateDbVal() {}
+function setDsStrength(btn, val) {
+  document.querySelectorAll('.ds-strength-btn').forEach(b => {
+    b.style.background = 'var(--s3)';
+    b.style.borderColor = 'var(--bd)';
+    b.style.color = 'var(--tdim)';
+  });
+  btn.style.background = 'var(--yg)';
+  btn.style.borderColor = 'rgba(245,225,50,.4)';
+  btn.style.color = 'var(--y)';
+  document.getElementById('dsStrength').value = val;
+}
 async function startDeadspace() {
   const fileInput = document.getElementById('deadspaceInput');
   if (!fileInput.files[0]) { alert('Please upload a video first.'); return; }
