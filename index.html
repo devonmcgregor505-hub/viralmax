@@ -1103,8 +1103,6 @@ async function startDeadspace() {
   const fileInput = document.getElementById('deadspaceInput');
   if (!fileInput.files[0]) { alert('Please upload a video first.'); return; }
   const file = fileInput.files[0];
-  if (file.size > 100 * 1024 * 1024) {
-    alert('File too large (' + (file.size/1024/1024).toFixed(0) + 'MB). Please compress your video to under 100MB first.\n\nTip: Use HandBrake (free) to compress, or export at a lower quality from your editor.');
     return;
   }
   const btn = document.getElementById('dsBtn');
