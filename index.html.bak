@@ -510,86 +510,84 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 -->
 
 <!-- TAB PANEL -->
-
-
-
-
-
-
-</div>
-
-
-
-<!-- ══ AUTOMATION TAB PANEL ══ -->
 <div class="tab-panel" id="tab-automation">
   <div style="display:flex;height:100%;overflow:hidden;">
 
     <!-- STEPS SIDEBAR -->
     <div style="width:200px;flex-shrink:0;border-right:1px solid var(--bd);background:var(--s1);padding:12px 8px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;">
       <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tmut);padding:0 8px;margin-bottom:8px;">Pipeline</div>
-      <button class="auto-step-btn active" onclick="autoGotoStep(1)" id="astep-btn-1"><span class="astep-num">1</span><span class="astep-label">Ideation</span><span class="astep-check" id="astep-check-1"></span></button>
-      <button class="auto-step-btn" onclick="autoGotoStep(2)" id="astep-btn-2"><span class="astep-num">2</span><span class="astep-label">Script</span><span class="astep-check" id="astep-check-2"></span></button>
-      <button class="auto-step-btn" onclick="autoGotoStep(3)" id="astep-btn-3"><span class="astep-num">3</span><span class="astep-label">Scenes</span><span class="astep-check" id="astep-check-3"></span></button>
-      <button class="auto-step-btn" onclick="autoGotoStep(4)" id="astep-btn-4"><span class="astep-num">4</span><span class="astep-label">Scene Images</span><span class="astep-check" id="astep-check-4"></span></button>
-      <button class="auto-step-btn" onclick="autoGotoStep(5)" id="astep-btn-5"><span class="astep-num">5</span><span class="astep-label">Generate Clips</span><span class="astep-check" id="astep-check-5"></span></button>
+      <button class="auto-step-btn active" onclick="gotoStep(1)" id="step-btn-1">
+        <span class="step-num">1</span><span class="step-label">Ideation</span><span class="step-check" id="step-check-1"></span>
+      </button>
+      <button class="auto-step-btn" onclick="gotoStep(2)" id="step-btn-2">
+        <span class="step-num">2</span><span class="step-label">Script</span><span class="step-check" id="step-check-2"></span>
+      </button>
+      <button class="auto-step-btn" onclick="gotoStep(3)" id="step-btn-3">
+        <span class="step-num">3</span><span class="step-label">Reference Video</span><span class="step-check" id="step-check-3"></span>
+      </button>
+      <button class="auto-step-btn" onclick="gotoStep(4)" id="step-btn-4">
+        <span class="step-num">4</span><span class="step-label">Reference Image</span><span class="step-check" id="step-check-4"></span>
+      </button>
+      <button class="auto-step-btn" onclick="gotoStep(5)" id="step-btn-5">
+        <span class="step-num">5</span><span class="step-label">Scenes</span><span class="step-check" id="step-check-5"></span>
+      </button>
+      <button class="auto-step-btn" onclick="gotoStep(6)" id="step-btn-6">
+        <span class="step-num">6</span><span class="step-label">Scene Images</span><span class="step-check" id="step-check-6"></span>
+      </button>
+      <button class="auto-step-btn" onclick="gotoStep(7)" id="step-btn-7">
+        <span class="step-num">7</span><span class="step-label">Generate Clips</span><span class="step-check" id="step-check-7"></span>
+      </button>
+
+      <!-- Progress -->
       <div style="margin-top:auto;padding:10px 8px 0;">
         <div style="font-size:9px;color:var(--tmut);margin-bottom:4px;">Progress</div>
         <div style="background:var(--s4);border-radius:4px;height:4px;overflow:hidden;">
-          <div id="aPipelineProgress" style="height:100%;background:linear-gradient(90deg,var(--y),#ffe600);border-radius:4px;width:0%;transition:width .4s ease;"></div>
+          <div id="pipelineProgress" style="height:100%;background:linear-gradient(90deg,var(--y),#ffe600);border-radius:4px;width:0%;transition:width .4s ease;"></div>
         </div>
-        <div style="font-size:9px;color:var(--tdim);margin-top:4px;font-family:'Space Mono',monospace;" id="aProgressLabel">0 / 5 steps</div>
+        <div style="font-size:9px;color:var(--tdim);margin-top:4px;font-family:'Space Mono',monospace;" id="progressLabel">0 / 7 steps</div>
       </div>
     </div>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN CONTENT AREA -->
     <div style="flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;">
 
       <!-- ══ STEP 1: IDEATION ══ -->
       <div class="auto-step-panel active" id="auto-step-1">
         <div class="auto-step-header">
           <div class="auto-step-title">💡 Step 1 — Ideation</div>
-          <div class="auto-step-desc">Upload up to 10 competitor channel JSON files from the YT Scraper tab. Claude generates 5 viral ideas using proven formats with fresh twists. Channel data is required.</div>
+          <div class="auto-step-desc">Paste your competitor's scraped data or type your own idea. Claude will suggest 5 viral content ideas.</div>
         </div>
 
-        <!-- File upload zone -->
-        <div>
-          <div class="sec-lbl" style="margin-bottom:6px;">Competitor Channel Data <span style="color:var(--red);">*Required</span></div>
-          <div id="aChannelFilesZone"
-               style="border:1.5px dashed var(--bd);border-radius:11px;padding:20px;text-align:center;cursor:pointer;background:var(--s1);transition:all .2s;"
-               onclick="document.getElementById('aChannelFilesInput').click()"
-               ondragover="event.preventDefault();this.style.borderColor='var(--y)'"
-               ondragleave="this.style.borderColor='var(--bd)'"
-               ondrop="event.preventDefault();this.style.borderColor='var(--bd)';aLoadChannelFiles(event.dataTransfer.files)">
-            <input type="file" id="aChannelFilesInput" accept=".json" multiple style="display:none" onchange="aLoadChannelFiles(this.files)">
-            <span style="font-size:24px;display:block;margin-bottom:6px;">📁</span>
-            <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Drop up to 10 channel JSON files</div>
-            <div style="font-size:11px;color:var(--tmut);">Export from YT Scraper tab · Max 10 files</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div class="sec-lbl" style="margin-bottom:6px;">Competitor Data (JSON from Scraper)</div>
+            <textarea class="textarea" id="autoCompetitorData" rows="8" placeholder='Paste scraped channel JSON here, or leave empty to type your own idea…'></textarea>
+            <div style="font-size:9px;color:var(--tmut);margin-top:4px;">Tip: Use the YT Scraper tab to get channel data, then paste it here</div>
           </div>
-          <div id="aChannelFilesList" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"></div>
-        </div>
-
-        <!-- Own idea -->
-        <div>
-          <div class="sec-lbl" style="margin-bottom:6px;">Or Type Your Own Idea</div>
-          <div style="display:flex;gap:8px;">
-            <input type="text" class="text-input" id="aOwnIdea"
-                   placeholder="e.g. What if you brought an iPhone to Ancient Egypt…"
-                   style="flex:1;"
-                   onkeydown="if(event.key==='Enter')aUseOwnIdea()">
-            <button onclick="aUseOwnIdea()" style="padding:10px 16px;background:var(--s3);border:1px solid var(--bd);border-radius:9px;color:var(--tdim);font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;">↵ Use</button>
+          <div>
+            <div class="sec-lbl" style="margin-bottom:6px;">Your Niche / Topic (optional)</div>
+            <textarea class="textarea" id="autoNiche" rows="4" placeholder="e.g. dark psychology, court cases, finance tips for Gen Z…"></textarea>
+            <div style="margin-top:8px;">
+              <div class="sec-lbl" style="margin-bottom:6px;">Or Type Your Own Idea</div>
+              <textarea class="textarea" id="autoOwnIdea" rows="3" placeholder="Skip AI suggestions and use your own concept…"></textarea>
+            </div>
           </div>
-          <div style="font-size:9px;color:var(--tmut);margin-top:4px;">Channel data must still be uploaded even when using your own idea</div>
         </div>
 
-        <button class="btn" id="aIdeationBtn" onclick="aRunIdeation()" style="max-width:300px;">💡 Generate 5 Viral Ideas</button>
-        <div class="auto-loading" id="aIdeationLoading"><div class="auto-spinner"></div><span>Claude is analysing your competitor data…</span></div>
+        <button class="btn" id="ideationBtn" onclick="runIdeation()" style="max-width:300px;">💡 Generate 5 Viral Ideas</button>
 
-        <div id="aIdeasOutput" style="display:none;">
+        <div class="auto-loading" id="ideationLoading">
+          <div class="auto-spinner"></div>
+          <span>Claude is analysing your competitor data…</span>
+        </div>
+
+        <!-- Ideas output -->
+        <div id="ideasOutput" style="display:none;">
           <div class="sec-lbl" style="margin-bottom:8px;">Choose Your Idea</div>
-          <div id="aIdeasList" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div id="ideasList" style="display:flex;flex-direction:column;gap:8px;"></div>
           <div style="margin-top:12px;display:flex;gap:8px;">
-            <button class="btn" onclick="aConfirmIdea()" style="max-width:200px;">✓ Use Selected Idea</button>
-            <button onclick="aRunIdeation()" style="padding:12px 16px;background:var(--s3);border:1px solid var(--bd);border-radius:9px;color:var(--tdim);font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;">↺ Regenerate</button>
+            <button class="btn" onclick="confirmIdea()" style="max-width:200px;">✓ Use Selected Idea</button>
+            <button onclick="runIdeation()" style="padding:12px 16px;background:var(--s3);border:1px solid var(--bd);border-radius:9px;color:var(--tdim);font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;">↺ Regenerate</button>
           </div>
         </div>
       </div>
@@ -598,138 +596,777 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       <div class="auto-step-panel" id="auto-step-2">
         <div class="auto-step-header">
           <div class="auto-step-title">📝 Step 2 — Script</div>
-          <div class="auto-step-desc">Claude generates a viral script matched to the style and length of your competitors' most viral videos.</div>
+          <div class="auto-step-desc">Claude generates a viral script based on your idea, matched to the length of your competitors' best videos.</div>
         </div>
-        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;">
+
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:12px;">
           <div style="font-size:10px;color:var(--tdim);margin-bottom:4px;">Selected Idea</div>
-          <div id="aSelectedIdeaDisplay" style="font-size:13px;font-weight:600;color:var(--y);"></div>
+          <div id="selectedIdeaDisplay" style="font-size:13px;font-weight:600;color:var(--y);"></div>
         </div>
-        <button class="btn" id="aScriptBtn" onclick="aGenerateScript()" style="max-width:250px;">✍️ Generate Script</button>
-        <div class="auto-loading" id="aScriptLoading"><div class="auto-spinner"></div><span>Writing your viral script…</span></div>
-        <div id="aScriptOutput" style="display:none;">
+
+        <div>
+          <div class="sec-lbl" style="margin-bottom:6px;">Additional Direction (optional)</div>
+          <textarea class="textarea" id="scriptPrompt" rows="2" placeholder="e.g. Make it more emotional, add a shocking statistic at the start, keep it under 60 seconds…"></textarea>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="scriptBtn" onclick="generateScript()" style="max-width:250px;">✍️ Generate Script</button>
+        </div>
+
+        <div class="auto-loading" id="scriptLoading">
+          <div class="auto-spinner"></div>
+          <span>Writing your viral script…</span>
+        </div>
+
+        <div id="scriptOutput" style="display:none;">
           <div class="sec-lbl" style="margin-bottom:6px;">Your Script <span style="color:var(--tmut);font-weight:400;">(editable)</span></div>
-          <textarea class="textarea" id="aFinalScript" rows="14"></textarea>
+          <textarea class="textarea" id="finalScript" rows="12" placeholder="Script will appear here…"></textarea>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-            <div style="font-size:9px;color:var(--tmut);font-family:'Space Mono',monospace;" id="aScriptWordCount"></div>
+            <div style="font-size:9px;color:var(--tmut);font-family:'Space Mono',monospace;" id="scriptWordCount"></div>
             <div style="display:flex;gap:8px;">
-              <button onclick="aGenerateScript()" style="padding:8px 12px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--tdim);font-size:11px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;">↺ Regenerate</button>
-              <button class="btn" onclick="aConfirmScript()" style="max-width:160px;padding:8px 12px;">✓ Use Script</button>
+              <button onclick="generateScript()" style="padding:8px 12px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--tdim);font-size:11px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;">↺ Regenerate</button>
+              <button class="btn" onclick="confirmScript()" style="max-width:160px;padding:8px 12px;">✓ Use Script</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ══ STEP 3: SCENES ══ -->
+      <!-- ══ STEP 3: REFERENCE VIDEO ══ -->
       <div class="auto-step-panel" id="auto-step-3">
         <div class="auto-step-header">
-          <div class="auto-step-title">🎭 Step 3 — Scenes</div>
-          <div class="auto-step-desc">Optionally add a reference video URL for pacing context. Claude splits your script into scenes. Image and video prompts are generated automatically after you confirm scenes.</div>
+          <div class="auto-step-title">🎬 Step 3 — Reference Video</div>
+          <div class="auto-step-desc">Add a reference video link. AI will analyse the scene structure and pacing to match your video's style.</div>
         </div>
 
-        <!-- Reference video (optional) -->
-        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;">
-          <div style="font-size:10px;font-weight:700;color:var(--tdim);margin-bottom:8px;">Reference Video <span style="color:var(--tmut);font-weight:400;">(optional — used for pacing)</span></div>
+        <div>
+          <div class="sec-lbl" style="margin-bottom:6px;">Reference Video URL</div>
           <div style="display:flex;gap:8px;">
-            <input type="text" class="text-input" id="aRefVideoUrl" placeholder="YouTube URL to match scene pacing…" style="flex:1;">
-            <button onclick="aAnalyseRefVideo()" style="padding:10px 14px;background:var(--s3);border:1px solid var(--bd);border-radius:9px;color:var(--tdim);font-size:11px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;">🔍 Analyse</button>
-          </div>
-          <div id="aRefVideoResult" style="margin-top:6px;font-size:10px;color:var(--grn);display:none;">✓ Scene pacing detected — will be used when splitting</div>
-        </div>
-
-        <button class="btn" id="aScenesBtn" onclick="aGenerateScenes()" style="max-width:280px;">🎭 Auto-Split into Scenes</button>
-        <div class="auto-loading" id="aScenesLoading"><div class="auto-spinner"></div><span>Splitting script into scenes…</span></div>
-
-        <div id="aScenesOutput" style="display:none;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <div class="sec-lbl">Scenes <span id="aSceneCount" style="color:var(--y);"></span></div>
-            <button onclick="aAddScene()" style="padding:6px 12px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--tdim);font-size:11px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;">+ Add Scene</button>
-          </div>
-          <div id="aScenesList" style="display:flex;flex-direction:column;gap:8px;"></div>
-          <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-            <button class="btn" onclick="aConfirmScenes()" style="max-width:260px;">✓ Confirm Scenes &amp; Generate Prompts</button>
-            <div style="font-size:10px;color:var(--tdim);">This will generate all image &amp; video prompts</div>
+            <input type="text" class="text-input" id="refVideoUrl" placeholder="https://www.youtube.com/watch?v=... or TikTok URL" style="flex:1;">
+            <button onclick="analyseRefVideo()" style="padding:10px 16px;background:var(--s3);border:1px solid var(--bd);border-radius:9px;color:var(--tdim);font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;">🔍 Analyse</button>
           </div>
         </div>
 
-        <!-- Prompt generation loading (separate from scenes split) -->
-        <div class="auto-loading" id="aPromptsLoading" style="margin-top:8px;"><div class="auto-spinner"></div><span id="aPromptsLoadingTxt">Generating image &amp; video prompts…</span></div>
+        <div class="auto-loading" id="refVideoLoading">
+          <div class="auto-spinner"></div>
+          <span>Analysing video structure and scenes…</span>
+        </div>
+
+        <div id="refVideoOutput" style="display:none;">
+          <div class="sec-lbl" style="margin-bottom:8px;">Detected Scene Structure</div>
+          <div id="refVideoScenes" style="display:flex;flex-direction:column;gap:6px;"></div>
+          <button class="btn" onclick="confirmRefVideo()" style="max-width:200px;margin-top:12px;">✓ Use This Structure</button>
+        </div>
+
+        <button onclick="skipStep(3)" style="margin-top:8px;padding:8px 12px;background:none;border:1px solid var(--bd);border-radius:7px;color:var(--tmut);font-size:11px;cursor:pointer;">Skip this step →</button>
       </div>
 
-      <!-- ══ STEP 4: SCENE IMAGES ══ -->
+      <!-- ══ STEP 4: REFERENCE IMAGE ══ -->
       <div class="auto-step-panel" id="auto-step-4">
         <div class="auto-step-header">
-          <div class="auto-step-title">🎨 Step 4 — Scene Images</div>
-          <div class="auto-step-desc">Generate reference images for each scene. Click any prompt to read and edit it. Generate individually or all at once.</div>
+          <div class="auto-step-title">🖼 Step 4 — Skeleton Reference Image</div>
+          <div class="auto-step-desc">Upload your skeleton/character reference image. This will be used to maintain consistent character appearance across all scenes.</div>
         </div>
 
-        <!-- Top controls bar -->
-        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;">
-          <!-- Ref image -->
-          <div>
-            <div style="font-size:10px;color:var(--tdim);margin-bottom:4px;">Reference Image <span style="color:var(--tmut);">(optional)</span></div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div style="width:44px;height:44px;border-radius:6px;background:var(--s3);border:1px solid var(--bd);overflow:hidden;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;" onclick="document.getElementById('aSceneRefImgInput').click()" id="aSceneRefImgThumb">🦴</div>
-              <input type="file" id="aSceneRefImgInput" accept="image/*" style="display:none" onchange="aLoadSceneRefImg(this.files[0])">
-              <div style="font-size:10px;color:var(--tdim);" id="aSceneRefImgName">Click to upload</div>
-            </div>
-          </div>
-          <!-- Global model -->
-          <div style="flex:1;min-width:140px;">
-            <div style="font-size:10px;color:var(--tdim);margin-bottom:4px;">Model (All)</div>
-            <select class="select" id="aSceneImgModelAll" style="font-size:11px;padding:8px;">
-              <option value="nano-banana-pro" selected>Nano Banana Pro</option>
-              <option value="nano-banana-2">Nano Banana 2</option>
-            </select>
-          </div>
-          <button class="btn" id="aGenAllImgsBtn" onclick="aGenerateAllSceneImages()" style="max-width:180px;padding:10px;">🎨 Generate All</button>
+        <div class="upload-zone" id="refImgDropAuto" onclick="document.getElementById('refImgInputAuto').click()" style="max-width:400px;">
+          <input type="file" id="refImgInputAuto" accept="image/*" style="display:none">
+          <span class="up-icon">🦴</span>
+          <div class="up-title">Drop skeleton reference image</div>
+          <div class="up-hint">PNG · JPG · WEBP</div>
+          <div class="up-name" id="refImgAutoFnm"></div>
         </div>
 
-        <!-- 4-per-row image grid -->
-        <div id="aSceneImgsGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;"></div>
+        <div id="refImgAutoPreview" style="display:none;margin-top:12px;">
+          <img id="refImgAutoImg" style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid var(--bd);">
+        </div>
 
-        <button class="btn" onclick="aConfirmSceneImages()" style="max-width:200px;">✓ Confirm &amp; Continue</button>
-
-        <!-- Prompt edit modal -->
-        <div id="aPromptModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:center;justify-content:center;">
-          <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px;width:600px;max-width:95vw;display:flex;flex-direction:column;gap:12px;">
-            <div style="font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--y);" id="aPromptModalTitle">Prompt</div>
-            <textarea class="textarea" id="aPromptModalText" rows="12"></textarea>
-            <div style="display:flex;gap:8px;justify-content:flex-end;">
-              <button onclick="aClosePromptModal()" style="padding:10px 16px;background:var(--s4);border:1px solid var(--bd);border-radius:8px;color:var(--tdim);font-size:12px;font-weight:700;font-family:'Space Mono',monospace;cursor:pointer;">Cancel</button>
-              <button onclick="aSavePromptModal()" style="padding:10px 16px;background:var(--y);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:700;font-family:'Space Mono',monospace;cursor:pointer;">Save</button>
-            </div>
-          </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn" onclick="confirmRefImg()" id="confirmRefImgBtn" style="max-width:200px;" disabled>✓ Use This Image</button>
+          <button onclick="skipStep(4)" style="padding:8px 12px;background:none;border:1px solid var(--bd);border-radius:7px;color:var(--tmut);font-size:11px;cursor:pointer;">Skip this step →</button>
         </div>
       </div>
 
-      <!-- ══ STEP 5: GENERATE CLIPS ══ -->
+      <!-- ══ STEP 5: SCENES ══ -->
       <div class="auto-step-panel" id="auto-step-5">
         <div class="auto-step-header">
-          <div class="auto-step-title">⚡ Step 5 — Generate Clips</div>
-          <div class="auto-step-desc">Generate video clips for each scene. Aspect ratio is fixed at 9:16. Click any prompt to read and edit before generating.</div>
+          <div class="auto-step-title">🎭 Step 5 — Scenes</div>
+          <div class="auto-step-desc">Claude splits your script into scenes and writes optimised Kie.ai image prompts for each one. Edit, add or delete as needed.</div>
         </div>
 
-        <!-- Top controls -->
-        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;">
-          <div style="flex:1;min-width:160px;">
-            <div style="font-size:10px;color:var(--tdim);margin-bottom:4px;">Model (All Clips)</div>
-            <select class="select" id="aClipModelAll" style="font-size:11px;padding:8px;" onchange="aSyncClipModels()">
-              <option value="grok-480p">Grok 480p — 15cr</option>
-              <option value="grok-720p" selected>Grok 720p — 30cr</option>
-              <option value="veo3-lite">Veo 3.1 Lite — 20cr</option>
-              <option value="sora2">Sora 2 — 20cr</option>
-            </select>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="btn" id="scenesBtn" onclick="generateScenes()" style="max-width:250px;">🎭 Auto-Split into Scenes</button>
+        </div>
+
+        <div class="auto-loading" id="scenesLoading">
+          <div class="auto-spinner"></div>
+          <span>Claude is splitting your script into scenes…</span>
+        </div>
+
+        <div id="scenesOutput" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div class="sec-lbl">Scenes <span id="sceneCount" style="color:var(--y);"></span></div>
+            <button onclick="addScene()" style="padding:6px 12px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--tdim);font-size:11px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;">+ Add Scene</button>
           </div>
-          <div style="padding:8px 12px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;font-size:10px;color:var(--tdim);font-family:'Space Mono',monospace;flex-shrink:0;">📐 9:16 Fixed</div>
-          <button class="btn" id="aGenAllClipsBtn" onclick="aGenerateAllClips()" style="max-width:200px;padding:10px;">⚡ Generate All Clips</button>
+          <div id="scenesList" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <button class="btn" onclick="confirmScenes()" style="max-width:200px;margin-top:12px;">✓ Confirm Scenes</button>
         </div>
-
-        <div id="aClipsGrid" style="display:flex;flex-direction:column;gap:10px;"></div>
       </div>
 
-    </div><!-- end main content -->
-  </div><!-- end flex row -->
-</div><!-- end tab-automation -->
+      <!-- ══ STEP 6: SCENE IMAGES ══ -->
+      <div class="auto-step-panel" id="auto-step-6">
+        <div class="auto-step-header">
+          <div class="auto-step-title">🎨 Step 6 — Generate Scene Images</div>
+          <div class="auto-step-desc">Kie.ai generates a reference image for each scene using Nano Banana Pro, incorporating your skeleton reference.</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="btn" id="sceneImgsBtn" onclick="generateSceneImages()" style="max-width:280px;">🎨 Generate All Scene Images</button>
+        </div>
+
+        <div class="auto-loading" id="sceneImgsLoading">
+          <div class="auto-spinner"></div>
+          <span id="sceneImgsLoadingTxt">Generating scene images…</span>
+        </div>
+
+        <div id="sceneImgsOutput" style="display:none;">
+          <div id="sceneImgsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;"></div>
+          <button class="btn" onclick="confirmSceneImages()" style="max-width:200px;margin-top:12px;">✓ Confirm Images</button>
+        </div>
+      </div>
+
+      <!-- ══ STEP 7: GENERATE CLIPS ══ -->
+      <div class="auto-step-panel" id="auto-step-7">
+        <div class="auto-step-header">
+          <div class="auto-step-title">⚡ Step 7 — Generate Video Clips</div>
+          <div class="auto-step-desc">Generate each scene as a video clip using your chosen AI model. Clips are generated one by one.</div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-hd">Settings</div>
+          <div class="card-body">
+            <div class="setting-row">
+              <label class="setting-label">Video Model</label>
+              <select class="select" id="autoVideoModel">
+                <option value="grok">Grok Imagine — 30cr (Best for character consistency)</option>
+                <option value="veo3-lite">Veo 3.1 Lite — 20cr (Best quality)</option>
+                <option value="sora2">Sora 2 — 20cr (Cinematic)</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label class="setting-label">Aspect Ratio</label>
+              <select class="select" id="autoAspect">
+                <option value="9:16" selected>9:16 (Portrait — TikTok)</option>
+                <option value="16:9">16:9 (Landscape)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn" id="clipsBtn" onclick="generateAllClips()" style="max-width:280px;">⚡ Generate All Clips</button>
+
+        <div id="clipsOutput" style="display:none;margin-top:16px;">
+          <div class="sec-lbl" style="margin-bottom:8px;">Generated Clips</div>
+          <div id="clipsList" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+/* ══ AUTOMATION STYLES ══ */
+.auto-step-btn {
+  display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;
+  font-size:11px;font-weight:600;color:var(--tdim);border:1px solid transparent;
+  cursor:pointer;background:none;width:100%;text-align:left;transition:all .15s;
+}
+.auto-step-btn:hover { background:var(--s2);color:var(--tx); }
+.auto-step-btn.active { background:var(--yg);border-color:rgba(245,225,50,.18);color:var(--y); }
+.auto-step-btn.done { color:var(--grn); }
+.auto-step-btn.done .step-num { background:var(--grn);color:#000; }
+.step-num {
+  width:18px;height:18px;border-radius:50%;background:var(--s4);
+  font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-family:'Space Mono',monospace;
+}
+.step-label { flex:1; }
+.step-check { font-size:10px; }
+
+.auto-step-panel { display:none;flex-direction:column;gap:14px; }
+.auto-step-panel.active { display:flex; }
+
+.auto-step-header { border-bottom:1px solid var(--bd);padding-bottom:12px; }
+.auto-step-title { font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--y);margin-bottom:4px; }
+.auto-step-desc { font-size:11px;color:var(--tdim);line-height:1.6; }
+
+.auto-loading {
+  display:none;align-items:center;gap:10px;padding:12px;
+  background:var(--s2);border:1px solid var(--bd);border-radius:9px;
+  font-size:11px;color:var(--tdim);
+}
+.auto-loading.vis { display:flex; }
+.auto-spinner {
+  width:16px;height:16px;border:2px solid var(--bd);border-top-color:var(--y);
+  border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.idea-card {
+  padding:12px;background:var(--s2);border:1px solid var(--bd);border-radius:9px;
+  cursor:pointer;transition:all .15s;
+}
+.idea-card:hover { border-color:rgba(245,225,50,.3); }
+.idea-card.selected { border-color:rgba(245,225,50,.5);background:rgba(245,225,50,.04); }
+.idea-title { font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px; }
+.idea-why { font-size:10px;color:var(--tdim);line-height:1.5; }
+
+.scene-card {
+  background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.scene-card-header { display:flex;justify-content:space-between;align-items:center; }
+.scene-num { font-size:9px;font-weight:700;color:var(--y);font-family:'Space Mono',monospace; }
+.scene-del-btn {
+  background:none;border:none;color:var(--tmut);cursor:pointer;font-size:12px;
+  padding:2px 6px;border-radius:4px;
+}
+.scene-del-btn:hover { color:var(--red);background:rgba(255,65,54,.08); }
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// AUTOMATION PIPELINE STATE
+// ══════════════════════════════════════════════════════════════════
+const autoState = {
+  currentStep: 1,
+  completedSteps: new Set(),
+  selectedIdea: null,
+  script: null,
+  refVideoStructure: null,
+  refImageFile: null,
+  refImageB64: null,
+  scenes: [],
+  sceneImages: [],
+  clips: [],
+};
+
+function gotoStep(n) {
+  document.querySelectorAll('.auto-step-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.auto-step-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('auto-step-' + n).classList.add('active');
+  document.getElementById('step-btn-' + n).classList.add('active');
+  autoState.currentStep = n;
+}
+
+function markStepDone(n) {
+  autoState.completedSteps.add(n);
+  const btn = document.getElementById('step-btn-' + n);
+  btn.classList.add('done');
+  document.getElementById('step-check-' + n).textContent = '✓';
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = autoState.completedSteps.size;
+  const pct = (done / 7) * 100;
+  document.getElementById('pipelineProgress').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done + ' / 7 steps';
+}
+
+function skipStep(n) {
+  markStepDone(n);
+  gotoStep(n + 1);
+}
+
+// ══ STEP 1: IDEATION ══
+async function runIdeation() {
+  const competitorData = document.getElementById('autoCompetitorData').value.trim();
+  const niche = document.getElementById('autoNiche').value.trim();
+  const ownIdea = document.getElementById('autoOwnIdea').value.trim();
+
+  if (ownIdea) {
+    autoState.selectedIdea = ownIdea;
+    document.getElementById('selectedIdeaDisplay').textContent = ownIdea;
+    markStepDone(1);
+    gotoStep(2);
+    return;
+  }
+
+  if (!competitorData && !niche) {
+    alert('Please paste competitor data or enter your niche/topic.');
+    return;
+  }
+
+  document.getElementById('ideationBtn').disabled = true;
+  document.getElementById('ideationLoading').classList.add('vis');
+  document.getElementById('ideasOutput').style.display = 'none';
+
+  try {
+    let prompt = `You are a viral short-form video content strategist.\n\n`;
+    if (competitorData) {
+      let parsed;
+      try { parsed = JSON.parse(competitorData); } catch(e) { parsed = null; }
+      if (parsed && Array.isArray(parsed)) {
+        const top = parsed.slice(0, 10).map(v => `- "${v.title}" (${(v.view_count/1000).toFixed(0)}K views)${v.transcript ? '\n  Transcript: ' + v.transcript.slice(0, 200) : ''}`).join('\n');
+        prompt += `Here are the top performing videos from a competitor channel:\n${top}\n\n`;
+      } else {
+        prompt += `Competitor data: ${competitorData.slice(0, 1000)}\n\n`;
+      }
+    }
+    if (niche) prompt += `Niche/Topic: ${niche}\n\n`;
+    prompt += `Based on this data, suggest exactly 5 viral short-form video ideas (under 90 seconds each). For each idea provide:
+1. A punchy title/hook (max 10 words)
+2. Why it will go viral (1-2 sentences)
+3. The emotional trigger it uses
+
+Respond in JSON only, no markdown, like this:
+[{"title":"...","why":"...","emotion":"..."},...]`;
+
+    const response = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await response.json();
+    let ideas;
+    try {
+      const text = data.content?.[0]?.text || '';
+      const clean = text.replace(/```json|```/g, '').trim();
+      ideas = JSON.parse(clean);
+    } catch(e) {
+      throw new Error('Could not parse ideas from Claude');
+    }
+
+    renderIdeas(ideas);
+  } catch(err) {
+    alert('Error: ' + err.message);
+  }
+
+  document.getElementById('ideationBtn').disabled = false;
+  document.getElementById('ideationLoading').classList.remove('vis');
+}
+
+function renderIdeas(ideas) {
+  const list = document.getElementById('ideasList');
+  list.innerHTML = '';
+  ideas.forEach((idea, i) => {
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+    card.innerHTML = `
+      <div class="idea-title">${i+1}. ${idea.title}</div>
+      <div class="idea-why">${idea.why}</div>
+      <div style="font-size:9px;color:var(--pur);margin-top:4px;">💫 ${idea.emotion}</div>
+    `;
+    card.onclick = () => {
+      document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      autoState.selectedIdea = idea.title;
+    };
+    list.appendChild(card);
+  });
+  document.getElementById('ideasOutput').style.display = 'block';
+}
+
+function confirmIdea() {
+  if (!autoState.selectedIdea) { alert('Please select an idea first.'); return; }
+  document.getElementById('selectedIdeaDisplay').textContent = autoState.selectedIdea;
+  markStepDone(1);
+  gotoStep(2);
+}
+
+// ══ STEP 2: SCRIPT ══
+async function generateScript() {
+  if (!autoState.selectedIdea) { alert('Please complete Step 1 first.'); return; }
+
+  document.getElementById('scriptBtn').disabled = true;
+  document.getElementById('scriptLoading').classList.add('vis');
+  document.getElementById('scriptOutput').style.display = 'none';
+
+  try {
+    const direction = document.getElementById('scriptPrompt').value.trim();
+    const competitorData = document.getElementById('autoCompetitorData').value.trim();
+
+    let avgDuration = 60;
+    try {
+      const parsed = JSON.parse(competitorData);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        avgDuration = Math.round(parsed.slice(0, 5).reduce((a, v) => a + (v.duration_seconds || 60), 0) / Math.min(5, parsed.length));
+      }
+    } catch(e) {}
+
+    const prompt = `You are a viral short-form video scriptwriter.
+
+Video concept: "${autoState.selectedIdea}"
+Target duration: ${avgDuration} seconds
+${direction ? 'Additional direction: ' + direction : ''}
+
+Write a complete, punchy viral script for this video. Include:
+- A hook in the first 3 seconds that stops the scroll
+- Natural spoken dialogue (no stage directions, just the words to say)
+- A strong ending/call to action
+
+The script should be exactly right for ${avgDuration} seconds of speech. Write ONLY the script text, nothing else.`;
+
+    const response = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, max_tokens: 1000 })
+    });
+    const data = await response.json();
+    const script = data.content?.[0]?.text || '';
+
+    document.getElementById('finalScript').value = script;
+    const words = script.split(/\s+/).length;
+    document.getElementById('scriptWordCount').textContent = `~${words} words · ~${Math.round(words/2.5)} seconds`;
+    document.getElementById('scriptOutput').style.display = 'block';
+    autoState.script = script;
+
+  } catch(err) {
+    alert('Error: ' + err.message);
+  }
+
+  document.getElementById('scriptBtn').disabled = false;
+  document.getElementById('scriptLoading').classList.remove('vis');
+}
+
+function confirmScript() {
+  autoState.script = document.getElementById('finalScript').value.trim();
+  if (!autoState.script) { alert('Script is empty.'); return; }
+  markStepDone(2);
+  gotoStep(3);
+}
+
+// ══ STEP 3: REFERENCE VIDEO ══
+async function analyseRefVideo() {
+  const url = document.getElementById('refVideoUrl').value.trim();
+  if (!url) { alert('Please enter a video URL.'); return; }
+
+  document.getElementById('refVideoLoading').classList.add('vis');
+  document.getElementById('refVideoOutput').style.display = 'none';
+
+  try {
+    const prompt = `You are a video editor analysing a video's structure.
+
+Video URL: ${url}
+
+Based on typical viral short-form videos of this type, describe how this video would likely be structured into scenes. Assume it's a ${autoState.selectedIdea || 'viral short'} style video.
+
+Return JSON only:
+[{"scene":1,"duration":"0-5s","description":"...","type":"hook|main|cta"},...]
+
+Give 4-8 scenes.`;
+
+    const response = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await response.json();
+    let scenes;
+    try {
+      const text = data.content?.[0]?.text || '';
+      scenes = JSON.parse(text.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      throw new Error('Could not parse scene structure');
+    }
+
+    autoState.refVideoStructure = scenes;
+    const container = document.getElementById('refVideoScenes');
+    container.innerHTML = scenes.map(s => `
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;background:var(--s2);border:1px solid var(--bd);border-radius:7px;">
+        <div style="font-size:9px;color:var(--y);font-family:'Space Mono',monospace;white-space:nowrap;padding-top:2px;">Scene ${s.scene}<br>${s.duration}</div>
+        <div style="font-size:11px;color:var(--tx);">${s.description}</div>
+        <div style="font-size:8px;padding:2px 5px;border-radius:3px;background:var(--s4);color:var(--tdim);white-space:nowrap;">${s.type}</div>
+      </div>
+    `).join('');
+    document.getElementById('refVideoOutput').style.display = 'block';
+
+  } catch(err) {
+    alert('Error: ' + err.message);
+  }
+
+  document.getElementById('refVideoLoading').classList.remove('vis');
+}
+
+function confirmRefVideo() {
+  markStepDone(3);
+  gotoStep(4);
+}
+
+// ══ STEP 4: REFERENCE IMAGE ══
+const refImgDropAuto = document.getElementById('refImgDropAuto');
+const refImgInputAuto = document.getElementById('refImgInputAuto');
+refImgDropAuto.addEventListener('dragover', e => { e.preventDefault(); refImgDropAuto.classList.add('drag'); });
+refImgDropAuto.addEventListener('dragleave', () => refImgDropAuto.classList.remove('drag'));
+refImgDropAuto.addEventListener('drop', e => {
+  e.preventDefault(); refImgDropAuto.classList.remove('drag');
+  if (e.dataTransfer.files[0]) loadRefImgAuto(e.dataTransfer.files[0]);
+});
+refImgInputAuto.addEventListener('change', () => {
+  if (refImgInputAuto.files[0]) loadRefImgAuto(refImgInputAuto.files[0]);
+});
+
+function loadRefImgAuto(f) {
+  autoState.refImageFile = f;
+  document.getElementById('refImgAutoFnm').textContent = '📎 ' + f.name;
+  refImgDropAuto.classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload = () => {
+    autoState.refImageB64 = reader.result.split(',')[1];
+    document.getElementById('refImgAutoImg').src = reader.result;
+    document.getElementById('refImgAutoPreview').style.display = 'block';
+    document.getElementById('confirmRefImgBtn').disabled = false;
+  };
+  reader.readAsDataURL(f);
+}
+
+function confirmRefImg() {
+  markStepDone(4);
+  gotoStep(5);
+}
+
+// ══ STEP 5: SCENES ══
+async function generateScenes() {
+  if (!autoState.script) { alert('Please complete Step 2 first.'); return; }
+
+  document.getElementById('scenesBtn').disabled = true;
+  document.getElementById('scenesLoading').classList.add('vis');
+  document.getElementById('scenesOutput').style.display = 'none';
+
+  try {
+    const prompt = `You are a video director and AI image prompt expert.
+
+Script:
+"${autoState.script}"
+
+Split this script into 4-8 scenes for a short-form vertical video (9:16). For each scene:
+1. Extract the exact script lines for that scene
+2. Write an optimised Kie.ai/Nano Banana Pro image generation prompt that will create the perfect reference image for that scene
+
+The image prompts should be cinematic, detailed, and specify: subject, action, environment, lighting, style, camera angle.
+
+Return JSON only:
+[{"scene":1,"script_lines":"...","image_prompt":"...","duration_seconds":5},...]`;
+
+    const response = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, max_tokens: 2000 })
+    });
+    const data = await response.json();
+    let scenes;
+    try {
+      const text = data.content?.[0]?.text || '';
+      scenes = JSON.parse(text.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      throw new Error('Could not parse scenes from Claude');
+    }
+
+    autoState.scenes = scenes;
+    renderScenes();
+    document.getElementById('scenesOutput').style.display = 'block';
+
+  } catch(err) {
+    alert('Error: ' + err.message);
+  }
+
+  document.getElementById('scenesBtn').disabled = false;
+  document.getElementById('scenesLoading').classList.remove('vis');
+}
+
+function renderScenes() {
+  const list = document.getElementById('scenesList');
+  list.innerHTML = '';
+  document.getElementById('sceneCount').textContent = `(${autoState.scenes.length})`;
+  autoState.scenes.forEach((scene, i) => {
+    const card = document.createElement('div');
+    card.className = 'scene-card';
+    card.id = 'scene-card-' + i;
+    card.innerHTML = `
+      <div class="scene-card-header">
+        <div class="scene-num">SCENE ${scene.scene} · ~${scene.duration_seconds}s</div>
+        <button class="scene-del-btn" onclick="deleteScene(${i})">✕</button>
+      </div>
+      <div>
+        <div class="sec-lbl" style="margin-bottom:4px;">Script Lines</div>
+        <textarea class="textarea" rows="2" style="font-size:11px;" onchange="autoState.scenes[${i}].script_lines=this.value">${scene.script_lines}</textarea>
+      </div>
+      <div>
+        <div class="sec-lbl" style="margin-bottom:4px;">Image Prompt</div>
+        <textarea class="textarea" rows="3" style="font-size:11px;" onchange="autoState.scenes[${i}].image_prompt=this.value">${scene.image_prompt}</textarea>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function deleteScene(i) {
+  autoState.scenes.splice(i, 1);
+  autoState.scenes.forEach((s, idx) => s.scene = idx + 1);
+  renderScenes();
+}
+
+function addScene() {
+  autoState.scenes.push({
+    scene: autoState.scenes.length + 1,
+    script_lines: '',
+    image_prompt: '',
+    duration_seconds: 5
+  });
+  renderScenes();
+}
+
+function confirmScenes() {
+  if (autoState.scenes.length === 0) { alert('Add at least one scene.'); return; }
+  markStepDone(5);
+  gotoStep(6);
+}
+
+// ══ STEP 6: SCENE IMAGES ══
+async function generateSceneImages() {
+  if (autoState.scenes.length === 0) { alert('Please complete Step 5 first.'); return; }
+
+  document.getElementById('sceneImgsBtn').disabled = true;
+  document.getElementById('sceneImgsLoading').classList.add('vis');
+  document.getElementById('sceneImgsOutput').style.display = 'none';
+  autoState.sceneImages = [];
+
+  const grid = document.getElementById('sceneImgsGrid');
+  grid.innerHTML = '';
+
+  for (let i = 0; i < autoState.scenes.length; i++) {
+    const scene = autoState.scenes[i];
+    document.getElementById('sceneImgsLoadingTxt').textContent = `Generating scene ${i+1} of ${autoState.scenes.length}…`;
+
+    // Placeholder card
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--s2);border:1px solid var(--bd);border-radius:8px;overflow:hidden;aspect-ratio:9/16;display:flex;flex-direction:column;';
+    card.innerHTML = `
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--tdim);font-size:10px;" id="scene-img-placeholder-${i}">
+        <div class="auto-spinner" style="width:20px;height:20px;border-width:2px;"></div>
+      </div>
+      <div style="padding:6px;font-size:9px;color:var(--tdim);font-family:'Space Mono',monospace;">Scene ${scene.scene}</div>
+    `;
+    grid.appendChild(card);
+
+    try {
+      let prompt = scene.image_prompt;
+      if (autoState.refImageB64) {
+        prompt += ', consistent character design, reference character style';
+      }
+
+      const fd = new FormData();
+      fd.append('model', 'nano-banana-pro');
+      fd.append('prompt', prompt);
+      fd.append('aspectRatio', '9:16');
+      fd.append('resolution', '1K');
+      fd.append('format', 'PNG');
+
+      if (autoState.refImageFile) {
+        fd.append('refImage', autoState.refImageFile);
+      }
+
+      const res = await fetch('/generate-image', { method: 'POST', body: fd });
+      const data = await res.json();
+
+      if (data.success) {
+        autoState.sceneImages[i] = data.imageUrl;
+        const placeholder = document.getElementById('scene-img-placeholder-' + i);
+        if (placeholder) {
+          placeholder.innerHTML = `<img src="${data.imageUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+      } else {
+        throw new Error(data.error);
+      }
+    } catch(err) {
+      const placeholder = document.getElementById('scene-img-placeholder-' + i);
+      if (placeholder) placeholder.innerHTML = `<span style="font-size:9px;color:var(--red);padding:8px;text-align:center;">Error: ${err.message}</span>`;
+    }
+  }
+
+  document.getElementById('sceneImgsBtn').disabled = false;
+  document.getElementById('sceneImgsLoading').classList.remove('vis');
+  document.getElementById('sceneImgsOutput').style.display = 'block';
+}
+
+function confirmSceneImages() {
+  markStepDone(6);
+  gotoStep(7);
+}
+
+// ══ STEP 7: GENERATE CLIPS ══
+async function generateAllClips() {
+  if (autoState.scenes.length === 0) { alert('Please complete the previous steps first.'); return; }
+
+  document.getElementById('clipsBtn').disabled = true;
+  document.getElementById('clipsOutput').style.display = 'block';
+  const clipsList = document.getElementById('clipsList');
+  clipsList.innerHTML = '';
+
+  const model = document.getElementById('autoVideoModel').value;
+  const aspectRatio = document.getElementById('autoAspect').value;
+
+  for (let i = 0; i < autoState.scenes.length; i++) {
+    const scene = autoState.scenes[i];
+    const sceneImg = autoState.sceneImages[i];
+
+    // Add clip card
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px;display:flex;gap:12px;align-items:flex-start;';
+    card.innerHTML = `
+      <div style="flex-shrink:0;width:60px;">
+        ${sceneImg ? `<img src="${sceneImg}" style="width:60px;height:107px;object-fit:cover;border-radius:5px;border:1px solid var(--bd);">` : '<div style="width:60px;height:107px;background:var(--s3);border-radius:5px;border:1px solid var(--bd);"></div>'}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:10px;font-weight:700;color:var(--y);font-family:\'Space Mono\',monospace;margin-bottom:4px;">Scene ${scene.scene}</div>
+        <div style="font-size:10px;color:var(--tdim);margin-bottom:8px;line-height:1.4;">${scene.script_lines}</div>
+        <div id="clip-status-${i}" style="font-size:10px;color:var(--tdim);font-family:\'Space Mono\',monospace;">⏳ Generating…</div>
+        <div id="clip-video-${i}"></div>
+      </div>
+    `;
+    clipsList.appendChild(card);
+
+    try {
+      const fd = new FormData();
+      fd.append('model', model);
+      fd.append('prompt', scene.image_prompt + ', cinematic motion, smooth camera movement');
+      fd.append('duration', String(Math.max(5, scene.duration_seconds || 5)));
+      fd.append('aspectRatio', aspectRatio);
+      fd.append('quality', '720p');
+
+      // Use scene image as reference if available
+      if (sceneImg) {
+        try {
+          const imgRes = await fetch(sceneImg);
+          const blob = await imgRes.blob();
+          fd.append('image', blob, 'scene.jpg');
+        } catch(e) {}
+      }
+
+      const res = await fetch('/generate-video', { method: 'POST', body: fd });
+      const data = await res.json();
+
+      if (data.success) {
+        autoState.clips[i] = data.videoUrl;
+        document.getElementById('clip-status-' + i).innerHTML = `<span style="color:var(--grn);">✓ Done</span>`;
+        document.getElementById('clip-video-' + i).innerHTML = `
+          <video controls src="${data.videoUrl}" style="width:100%;max-width:200px;border-radius:6px;margin-top:6px;"></video>
+          <a href="${data.videoUrl}" download="scene_${scene.scene}.mp4" style="display:inline-block;margin-top:4px;font-size:9px;color:var(--yd);font-family:\'Space Mono\',monospace;">⬇ Download</a>
+        `;
+      } else {
+        throw new Error(data.error);
+      }
+    } catch(err) {
+      document.getElementById('clip-status-' + i).innerHTML = `<span style="color:var(--red);">✗ ${err.message}</span>`;
+    }
+  }
+
+  document.getElementById('clipsBtn').disabled = false;
+  markStepDone(7);
+}
+</script>
+
+</div>
 
 <!-- ══ ADD VOICE MODAL ══ -->
 <div class="modal-overlay" id="addVoiceModal" style="display:none;">
@@ -1381,638 +2018,5 @@ function exportScrapeJSON() {
 }
 
 </script>
-
-
-<style>
-<style>
-/* Scoped step button styles — prefixed a- to avoid conflicts */
-.auto-step-btn{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;font-size:11px;font-weight:600;color:var(--tdim);border:1px solid transparent;cursor:pointer;background:none;width:100%;text-align:left;transition:all .15s;}
-.auto-step-btn:hover{background:var(--s2);color:var(--tx);}
-.auto-step-btn.active{background:var(--yg);border-color:rgba(245,225,50,.18);color:var(--y);}
-.auto-step-btn.done .astep-num{background:var(--grn);color:#000;}
-.auto-step-btn.done{color:var(--grn);}
-.astep-num{width:18px;height:18px;border-radius:50%;background:var(--s4);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Space Mono',monospace;}
-.astep-label{flex:1;}
-.astep-check{font-size:10px;}
-
-.auto-step-panel{display:none;flex-direction:column;gap:14px;}
-.auto-step-panel.active{display:flex;}
-.auto-step-header{border-bottom:1px solid var(--bd);padding-bottom:12px;}
-.auto-step-title{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--y);margin-bottom:4px;}
-.auto-step-desc{font-size:11px;color:var(--tdim);line-height:1.6;}
-
-.auto-loading{display:none;align-items:center;gap:10px;padding:12px;background:var(--s2);border:1px solid var(--bd);border-radius:9px;font-size:11px;color:var(--tdim);}
-.auto-loading.vis{display:flex;}
-.auto-spinner{width:16px;height:16px;border:2px solid var(--bd);border-top-color:var(--y);border-radius:50%;animation:autoSpin .7s linear infinite;flex-shrink:0;}
-@keyframes autoSpin{to{transform:rotate(360deg);}}
-
-.idea-card{padding:12px;background:var(--s2);border:1px solid var(--bd);border-radius:9px;cursor:pointer;transition:all .15s;}
-.idea-card:hover{border-color:rgba(245,225,50,.3);}
-.idea-card.selected{border-color:rgba(245,225,50,.5);background:rgba(245,225,50,.04);}
-.idea-title{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px;}
-.idea-why{font-size:10px;color:var(--tdim);line-height:1.5;margin-bottom:4px;}
-
-.aSceneImgCol{display:flex;flex-direction:column;gap:6px;}
-.aSceneImgBox{aspect-ratio:9/16;background:var(--s3);border:1px solid var(--bd);border-radius:8px;overflow:hidden;position:relative;cursor:pointer;}
-.aSceneImgBox img{width:100%;height:100%;object-fit:cover;}
-.aSceneImgEmpty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--tmut);font-size:28px;}
-
-.aPromptBtn{font-size:9px;color:var(--tdim);background:var(--s3);border:1px solid var(--bd);border-radius:5px;padding:4px 8px;cursor:pointer;font-family:'Space Mono',monospace;width:100%;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .15s;}
-.aPromptBtn:hover{border-color:rgba(245,225,50,.3);color:var(--y);}
-
-.aClipRow{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;display:flex;gap:12px;align-items:flex-start;}
-
-/* copy link style */
-.aCopyLink{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--yd);font-family:'Space Mono',monospace;cursor:pointer;border:none;background:none;padding:2px 0;transition:opacity .15s;}
-.aCopyLink:hover{opacity:.7;}
-</style>
-
-<script>
-<script>
-// ─── State ───────────────────────────────────────────────────────
-const aState = {
-  channelData: [],          // [{name, videos:[]}]
-  selectedIdea: null,
-  script: null,
-  refVideoStructure: null,
-  scenes: [],               // [{scene, script_lines, duration_seconds}]
-  sceneImgPrompts: [],      // parallel arrays to scenes
-  sceneVideoPrompts: [],
-  sceneImages: [],
-  sceneRefImageFile: null,
-  sceneRefImageB64: null,
-  clips: [],
-  completedSteps: new Set(),
-};
-let aPromptModalIdx = -1, aPromptModalType = 'img';
-
-// ─── Navigation ──────────────────────────────────────────────────
-function autoGotoStep(n) {
-  document.querySelectorAll('.auto-step-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.auto-step-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('auto-step-' + n).classList.add('active');
-  document.getElementById('astep-btn-' + n).classList.add('active');
-}
-
-function aMarkStepDone(n) {
-  aState.completedSteps.add(n);
-  const btn = document.getElementById('astep-btn-' + n);
-  btn.classList.add('done');
-  document.getElementById('astep-check-' + n).textContent = '✓';
-  const d = aState.completedSteps.size;
-  document.getElementById('aPipelineProgress').style.width = (d / 5 * 100) + '%';
-  document.getElementById('aProgressLabel').textContent = d + ' / 5 steps';
-}
-
-// ─── STEP 1: IDEATION ─────────────────────────────────────────────
-function aLoadChannelFiles(files) {
-  const list = document.getElementById('aChannelFilesList');
-  const zone = document.getElementById('aChannelFilesZone');
-  const remaining = 10 - aState.channelData.length;
-  Array.from(files).slice(0, remaining).forEach(f => {
-    const r = new FileReader();
-    r.onload = e => {
-      try {
-        const data = JSON.parse(e.target.result);
-        const videos = Array.isArray(data) ? data : (data.videos || []);
-        aState.channelData.push({ name: f.name, videos });
-        const el = document.createElement('div');
-        el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:7px;font-size:11px;';
-        el.innerHTML = `<span style="color:var(--grn);">✓</span><span style="flex:1;color:var(--tx);">${f.name}</span><span style="color:var(--tdim);">${videos.length} videos</span>`;
-        list.appendChild(el);
-        if (aState.channelData.length >= 1) zone.style.borderColor = 'rgba(46,204,113,.4)';
-      } catch(e) { alert('Invalid JSON: ' + f.name); }
-    };
-    r.readAsText(f);
-  });
-}
-
-function aUseOwnIdea() {
-  const idea = document.getElementById('aOwnIdea').value.trim();
-  if (!idea) { alert('Please enter your idea.'); return; }
-  if (aState.channelData.length === 0) { alert('Please upload at least one channel JSON file first — this is required.'); return; }
-  aState.selectedIdea = idea;
-  document.getElementById('aSelectedIdeaDisplay').textContent = idea;
-  aMarkStepDone(1);
-  autoGotoStep(2);
-}
-
-async function aRunIdeation() {
-  if (aState.channelData.length === 0) { alert('Please upload at least one competitor channel JSON file first.'); return; }
-
-  document.getElementById('aIdeationBtn').disabled = true;
-  document.getElementById('aIdeationLoading').classList.add('vis');
-  document.getElementById('aIdeasOutput').style.display = 'none';
-
-  try {
-    const allVids = aState.channelData.flatMap(c => c.videos);
-    const top20 = [...allVids].sort((a, b) => (b.view_count || 0) - (a.view_count || 0)).slice(0, 20);
-    const dataStr = top20.map(v =>
-      `- "${v.title}" (${((v.view_count || 0) / 1e6).toFixed(1)}M views, ${v.duration_human || ''})`
-    ).join('\n');
-
-    const prompt = `You are a viral short-form video content strategist.
-
-Top performing competitor videos:
-${dataStr}
-
-Generate exactly 5 viral ideas that could blow up RIGHT NOW.
-
-CRITICAL — use proven formats but SWAP the key elements:
-- "What if you brought a PS5 to Ancient Rome" → swap PS5 to iPhone, swap Ancient Rome to Ancient Egypt
-- "Could Socrates survive Poppy's Playtime" → swap Poppy's Playtime to Minecraft  
-- "Modern Doctor vs Ancient Egypt" → swap Doctor to Athlete, swap Ancient Egypt to Ancient Greece
-- Keep the FORMAT identical, change the SUBJECTS
-
-Return ONLY valid JSON, no markdown, no extra text:
-[{"title":"...","format":"proven format used","twist":"what you swapped","why":"why it will go viral now","emotion":"core emotion triggered"}]`;
-
-    const r = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, max_tokens: 1500 }) });
-    const d = await r.json();
-    const text = d.content?.[0]?.text || '';
-    const ideas = JSON.parse(text.replace(/```json|```/g, '').trim());
-    aRenderIdeas(ideas);
-  } catch(err) { alert('Error: ' + err.message); }
-
-  document.getElementById('aIdeationBtn').disabled = false;
-  document.getElementById('aIdeationLoading').classList.remove('vis');
-}
-
-function aRenderIdeas(ideas) {
-  const list = document.getElementById('aIdeasList');
-  list.innerHTML = '';
-  ideas.forEach((idea, i) => {
-    const card = document.createElement('div');
-    card.className = 'idea-card';
-    card.innerHTML = `<div class="idea-title">${i + 1}. ${idea.title}</div>
-      <div class="idea-why">${idea.why}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
-        <span style="font-size:9px;padding:2px 6px;background:var(--s4);border-radius:3px;color:var(--tdim);">📋 ${idea.format}</span>
-        <span style="font-size:9px;padding:2px 6px;background:rgba(167,139,250,.1);border-radius:3px;color:var(--pur);">✨ ${idea.twist}</span>
-        <span style="font-size:9px;padding:2px 6px;background:rgba(46,204,113,.08);border-radius:3px;color:var(--grn);">💫 ${idea.emotion}</span>
-      </div>`;
-    card.onclick = () => {
-      document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      aState.selectedIdea = idea.title;
-    };
-    list.appendChild(card);
-  });
-  document.getElementById('aIdeasOutput').style.display = 'block';
-}
-
-function aConfirmIdea() {
-  if (!aState.selectedIdea) { alert('Please select an idea.'); return; }
-  document.getElementById('aSelectedIdeaDisplay').textContent = aState.selectedIdea;
-  aMarkStepDone(1);
-  autoGotoStep(2);
-}
-
-// ─── STEP 2: SCRIPT ───────────────────────────────────────────────
-async function aGenerateScript() {
-  if (!aState.selectedIdea) { alert('Complete Step 1 first.'); return; }
-
-  document.getElementById('aScriptBtn').disabled = true;
-  document.getElementById('aScriptLoading').classList.add('vis');
-  document.getElementById('aScriptOutput').style.display = 'none';
-
-  try {
-    const allVids = aState.channelData.flatMap(c => c.videos);
-    const top10 = [...allVids].sort((a, b) => (b.view_count || 0) - (a.view_count || 0)).slice(0, 10);
-    const avgDur = Math.round(top10.reduce((a, v) => a + (v.duration_seconds || 60), 0) / Math.max(top10.length, 1));
-    const examples = top10.filter(v => v.transcript).slice(0, 3)
-      .map(v => `"${v.title}" (${((v.view_count || 0) / 1e6).toFixed(1)}M views):\n${v.transcript.slice(0, 400)}`).join('\n\n---\n\n');
-
-    const prompt = `Based on the channel data attached and also the idea, make me a viral script similar to their most viral scripts and make it similar length to their viral scripts.
-
-IDEA: "${aState.selectedIdea}"
-TARGET LENGTH: ~${avgDur} seconds spoken
-
-MOST VIRAL SCRIPTS FOR STYLE REFERENCE:
-${examples || 'Write in an engaging, punchy style with a strong hook.'}
-
-RULES:
-- Start with a scroll-stopping hook in the first 3 seconds
-- ONLY the words to be spoken — no stage directions, no scene numbers, no labels
-- Match the energy and pacing of the examples
-- Natural conversational language, great when spoken aloud
-- End with a satisfying payoff
-
-Write the script now:`;
-
-    const r = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, max_tokens: 1200 }) });
-    const d = await r.json();
-    const script = d.content?.[0]?.text || '';
-    document.getElementById('aFinalScript').value = script;
-    const words = script.split(/\s+/).length;
-    document.getElementById('aScriptWordCount').textContent = `~${words} words · ~${Math.round(words / 2.5)} seconds`;
-    document.getElementById('aScriptOutput').style.display = 'block';
-    aState.script = script;
-  } catch(err) { alert('Error: ' + err.message); }
-
-  document.getElementById('aScriptBtn').disabled = false;
-  document.getElementById('aScriptLoading').classList.remove('vis');
-}
-
-function aConfirmScript() {
-  aState.script = document.getElementById('aFinalScript').value.trim();
-  if (!aState.script) { alert('Script is empty.'); return; }
-  aMarkStepDone(2);
-  autoGotoStep(3);
-}
-
-// ─── STEP 3: SCENES ───────────────────────────────────────────────
-async function aAnalyseRefVideo() {
-  const url = document.getElementById('aRefVideoUrl').value.trim();
-  if (!url) return;
-  try {
-    const r = await fetch('/api/claude', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: `Analyse this video URL for scene pacing in a viral short-form video: ${url}\nIdea: ${aState.selectedIdea}\nReturn JSON only: [{"scene":1,"duration_seconds":5,"description":"brief description"}]`, max_tokens: 600 })
-    });
-    const d = await r.json();
-    aState.refVideoStructure = JSON.parse((d.content?.[0]?.text || '').replace(/```json|```/g, '').trim());
-    document.getElementById('aRefVideoResult').style.display = 'block';
-  } catch(e) { document.getElementById('aRefVideoResult').style.display = 'none'; }
-}
-
-async function aGenerateScenes() {
-  if (!aState.script) { alert('Complete Step 2 first.'); return; }
-
-  document.getElementById('aScenesBtn').disabled = true;
-  document.getElementById('aScenesLoading').classList.add('vis');
-  document.getElementById('aScenesOutput').style.display = 'none';
-
-  try {
-    const refInfo = aState.refVideoStructure
-      ? '\n\nReference video pacing structure:\n' + JSON.stringify(aState.refVideoStructure)
-      : '';
-
-    const prompt = `Split this script into scenes for a vertical YouTube Short (9:16).
-
-Script:
-"${aState.script}"
-${refInfo}
-
-Rules:
-- 8-14 scenes total
-- Each scene = one distinct visual moment (split logically: "your skin clears" is one scene, "your brain fog clears" is a SEPARATE scene — never combine two distinct visuals into one scene)
-- Extract the EXACT spoken words for each scene
-- Skip the very first sentence (the hook/question — do NOT include it as scene 1)
-- Estimate duration in seconds for each scene
-
-Return ONLY valid JSON:
-[{"scene":1,"script_lines":"exact spoken words for this scene","duration_seconds":5}]`;
-
-    const r = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, max_tokens: 2500 }) });
-    const d = await r.json();
-    aState.scenes = JSON.parse((d.content?.[0]?.text || '').replace(/```json|```/g, '').trim());
-    aState.sceneImgPrompts = aState.scenes.map(() => '');
-    aState.sceneVideoPrompts = aState.scenes.map(() => '');
-    aRenderScenesList();
-    document.getElementById('aScenesOutput').style.display = 'block';
-  } catch(err) { alert('Error: ' + err.message); }
-
-  document.getElementById('aScenesBtn').disabled = false;
-  document.getElementById('aScenesLoading').classList.remove('vis');
-}
-
-function aRenderScenesList() {
-  const list = document.getElementById('aScenesList');
-  list.innerHTML = '';
-  document.getElementById('aSceneCount').textContent = `(${aState.scenes.length})`;
-  aState.scenes.forEach((s, i) => {
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:8px;';
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:9px;color:var(--y);font-family:'Space Mono',monospace;">SCENE ${s.scene} · ~${s.duration_seconds}s</div>
-        <button onclick="aDeleteScene(${i})" style="background:none;border:none;color:var(--tmut);cursor:pointer;font-size:12px;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--tmut)'">✕</button>
-      </div>
-      <textarea class="textarea" rows="2" style="font-size:11px;" onchange="aState.scenes[${i}].script_lines=this.value">${s.script_lines}</textarea>`;
-    list.appendChild(card);
-  });
-}
-
-function aDeleteScene(i) {
-  aState.scenes.splice(i, 1);
-  aState.sceneImgPrompts.splice(i, 1);
-  aState.sceneVideoPrompts.splice(i, 1);
-  aState.scenes.forEach((s, idx) => s.scene = idx + 1);
-  aRenderScenesList();
-}
-
-function aAddScene() {
-  const n = aState.scenes.length + 1;
-  aState.scenes.push({ scene: n, script_lines: '', duration_seconds: 5 });
-  aState.sceneImgPrompts.push('');
-  aState.sceneVideoPrompts.push('');
-  aRenderScenesList();
-}
-
-async function aConfirmScenes() {
-  if (aState.scenes.length === 0) { alert('Add at least one scene.'); return; }
-
-  // Sync any edits from textareas
-  document.querySelectorAll('#aScenesList textarea').forEach((ta, i) => {
-    if (aState.scenes[i]) aState.scenes[i].script_lines = ta.value;
-  });
-
-  const btn = document.querySelector('#auto-step-3 .btn');
-  btn.disabled = true;
-  document.getElementById('aPromptsLoading').classList.add('vis');
-  document.getElementById('aPromptsLoadingTxt').textContent = 'Generating image prompts…';
-
-  try {
-    const sceneList = aState.scenes.map(s => `Scene ${s.scene} (~${s.duration_seconds}s): "${s.script_lines}"`).join('\n');
-    const refChar = 'the reference character, a skeleton (white body, clear skin)';
-
-    // ── Image prompts ──
-    document.getElementById('aPromptsLoadingTxt').textContent = 'Generating image prompts…';
-    const imgR = await fetch('/api/claude', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: `You are an expert AI image prompt writer for vertical short-form videos.
-
-Full script: "${aState.script}"
-
-Scenes:
-${sceneList}
-
-Based on the scene structure, generate a cinematic image prompt for EACH scene.
-
-CRITICAL RULES:
-- Start EVERY prompt with EXACTLY: "Keep the skeleton the exact same as the reference image (with the white body and clear skin) make the skeleton the size of a normal human compared to the environment, and make the skeleton naturally apart of the environment. Make the skeleton naturally a part of the environment. Not just forward, facing the camera strangely"
-- Always use "${refChar}" as the main subject
-- I want to see the skeleton's face and eyes in EVERY image — skeleton is always facing the camera, NEVER away from it
-- No long shots far from the skeleton — medium shots, not uncomfortably close-up
-- Skeleton stands naturally in the environment, not awkwardly facing camera with full body
-- Backgrounds slightly blurred, specific and cinematic
-- Camera angle, lighting, mood — describe in full detail
-- Optimise for YouTube Shorts (vertical, 9:16)
-
-Here are 3 example prompts to match in style and detail:
-EXAMPLE 1: "Keep the skeleton the exact same as the reference image (with the white body and clear skin) make the skeleton the size of a normal human compared to the environment, and make the skeleton naturally apart of the environment. Make the skeleton naturally a part of the environment. Not just forward, facing the camera strangely. An expansive African savanna at sunrise, with dry, golden-brown grasses and scattered acacia trees. The compacted reddish-brown earth floor shows subtle texture under the first light. The reference character, a baby skeleton, lies curled on the ground, seemingly abandoned amidst the golden-yellow and light green grasses. In the mid-ground, a herd of majestic giraffes approaches slowly, their forms silhouetted by the warm, dramatic sunrise, casting long shadows across the vast, open plains. Sparse termite mounds dot the wild landscape."
-EXAMPLE 2: "Keep the skeleton the exact same as the reference image (with the white body and clear skin) make the skeleton the size of a normal human compared to the environment, and make the skeleton naturally apart of the environment. Make the skeleton naturally a part of the environment. Not just forward, facing the camera strangely. A warm, sun-drenched African savanna with golden-brown grasses and rich red-brown sandy soil. The reference character, a baby skeleton, curls up safely beneath the long, protective legs of a large female giraffe, nestled deeply into the golden-yellow and light green savanna grass. The giraffe's textured hide is visible, grounding the scene in a natural, wild setting. Scattered acacia trees and termite mounds are softly blurred in the vast, open background under clear sunlight."
-EXAMPLE 3: "Keep the skeleton the exact same as the reference image (with the white body and clear skin) make the skeleton the size of a normal human compared to the environment, and make the skeleton naturally apart of the environment. Make the skeleton naturally a part of the environment. Not just forward, facing the camera strangely. A bright, open African savanna under clear white sunlight, featuring a prominent, gnarled acacia tree. The reference character, a young skeleton, actively climbs the textured bark of the acacia tree, demonstrating agility. Its slender arm stretches upwards towards the high branches, fingers reaching to grasp fresh leaves. Dry, golden-brown savanna grass and compacted reddish-brown earth are visible below, with scattered rocks and distant termite mounds suggesting the vast, wild landscape."
-
-Return ONLY valid JSON:
-[{"scene":1,"image_prompt":"..."}]`,
-        max_tokens: 6000
-      })
-    });
-    const imgD = await imgR.json();
-    const imgPrompts = JSON.parse((imgD.content?.[0]?.text || '').replace(/```json|```/g, '').trim());
-    imgPrompts.forEach((p, i) => { if (aState.sceneImgPrompts[i] !== undefined) aState.sceneImgPrompts[i] = p.image_prompt; });
-
-    // ── Video prompts ──
-    document.getElementById('aPromptsLoadingTxt').textContent = 'Generating video prompts…';
-    const vidR = await fetch('/api/claude', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: `Based on the image prompts and the script below, write a simple video prompt for each scene.
-
-Full script: "${aState.script}"
-
-Image prompts (for context):
-${imgPrompts.map(p => `Scene ${p.scene}: ${p.image_prompt}`).join('\n\n')}
-
-RULES:
-- Add this EXACTLY to the start of EVERY prompt: "Keep the bone character the exact same (with white body and clear skin), and no dialogue, no music. Don't make the bone character walk with its hips shaking. Keep the bone characters' eyes the same throughout."
-- Replace "skeleton" with "bone character" everywhere
-- Keep prompts SIMPLE — not too much happening at once
-- Include: camera movement, character's specific action, environment motion, sound effects at end
-- NO cuts within a prompt (e.g. never "cuts to face")
-- Do NOT describe eyes differently (no "wide eyes", no eye changes)
-- Do NOT write "The reference character, a bone character, is visible through..." or similar phrasing that could affect appearance
-- Include sound effects at the end of each prompt
-
-Example of good video prompt structure:
-"Keep the bone character the exact same (with white body and clear skin), and no dialogue, no music. Don't make the bone character walk with its hips shaking. Keep the bone characters' eyes the same throughout. A static, intimate camera holds on the bone character as it gently interacts with the environment. [character action]. [environment details and motion]. Sound effects: [list sound effects]."
-
-Return ONLY valid JSON:
-[{"scene":1,"video_prompt":"..."}]`,
-        max_tokens: 5000
-      })
-    });
-    const vidD = await vidR.json();
-    const vidPrompts = JSON.parse((vidD.content?.[0]?.text || '').replace(/```json|```/g, '').trim());
-    vidPrompts.forEach((p, i) => { if (aState.sceneVideoPrompts[i] !== undefined) aState.sceneVideoPrompts[i] = p.video_prompt; });
-
-  } catch(e) { console.error('Prompt gen error:', e); alert('Error generating prompts: ' + e.message); }
-
-  document.getElementById('aPromptsLoading').classList.remove('vis');
-  btn.disabled = false;
-  aMarkStepDone(3);
-  autoGotoStep(4);
-  aRenderSceneImgsGrid();
-}
-
-// ─── STEP 4: SCENE IMAGES ─────────────────────────────────────────
-function aLoadSceneRefImg(f) {
-  if (!f) return;
-  aState.sceneRefImageFile = f;
-  const r = new FileReader();
-  r.onload = e => {
-    aState.sceneRefImageB64 = e.target.result.split(',')[1];
-    const thumb = document.getElementById('aSceneRefImgThumb');
-    thumb.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-    document.getElementById('aSceneRefImgName').textContent = f.name;
-  };
-  r.readAsDataURL(f);
-}
-
-function aRenderSceneImgsGrid() {
-  const grid = document.getElementById('aSceneImgsGrid');
-  grid.innerHTML = '';
-  aState.scenes.forEach((scene, i) => {
-    const col = document.createElement('div');
-    col.className = 'aSceneImgCol';
-    col.id = 'aImgCol-' + i;
-    const prompt = aState.sceneImgPrompts[i] || '';
-    const imgSrc = aState.sceneImages[i];
-    col.innerHTML = `
-      <div class="aSceneImgBox" id="aImgBox-${i}">
-        ${imgSrc
-          ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;">`
-          : '<div class="aSceneImgEmpty">📷</div>'}
-      </div>
-      <div style="font-size:9px;color:var(--y);font-family:'Space Mono',monospace;text-align:center;">Scene ${scene.scene}</div>
-      <button class="aPromptBtn" onclick="aOpenPromptModal(${i},'img')" id="aImgPromptBtn-${i}">${prompt ? prompt.slice(0, 40) + '…' : '📝 Edit image prompt'}</button>
-      <div style="display:flex;gap:4px;">
-        <select class="select" id="aImgModel-${i}" style="font-size:10px;padding:5px;flex:1;">
-          <option value="nano-banana-pro" selected>Pro</option>
-          <option value="nano-banana-2">Nano 2</option>
-        </select>
-        <button onclick="aGenSingleImage(${i})" style="padding:5px 8px;background:var(--y);border:none;border-radius:6px;color:#000;font-size:10px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;">Gen</button>
-      </div>`;
-    grid.appendChild(col);
-  });
-}
-
-function aOpenPromptModal(idx, type) {
-  aPromptModalIdx = idx;
-  aPromptModalType = type;
-  const p = type === 'img' ? aState.sceneImgPrompts[idx] : aState.sceneVideoPrompts[idx];
-  document.getElementById('aPromptModalTitle').textContent = (type === 'img' ? '🎨 Image' : '🎬 Video') + ' Prompt — Scene ' + (idx + 1);
-  document.getElementById('aPromptModalText').value = p || '';
-  document.getElementById('aPromptModal').style.display = 'flex';
-}
-function aClosePromptModal() { document.getElementById('aPromptModal').style.display = 'none'; }
-function aSavePromptModal() {
-  const val = document.getElementById('aPromptModalText').value;
-  if (aPromptModalType === 'img') {
-    aState.sceneImgPrompts[aPromptModalIdx] = val;
-    const btn = document.getElementById('aImgPromptBtn-' + aPromptModalIdx);
-    if (btn) btn.textContent = val.slice(0, 40) + '…';
-  } else {
-    aState.sceneVideoPrompts[aPromptModalIdx] = val;
-    const btn = document.getElementById('aVidPromptBtn-' + aPromptModalIdx);
-    if (btn) btn.textContent = val.slice(0, 60) + '…';
-  }
-  aClosePromptModal();
-}
-
-async function aGenSingleImage(i) {
-  const model = document.getElementById('aImgModel-' + i)?.value || document.getElementById('aSceneImgModelAll').value;
-  const prompt = aState.sceneImgPrompts[i];
-  if (!prompt) { alert('No prompt for scene ' + (i + 1) + '. Click the prompt button to add one.'); return; }
-  await _aGenSceneImg(i, model, prompt);
-}
-
-async function aGenerateAllSceneImages() {
-  const model = document.getElementById('aSceneImgModelAll').value;
-  const btn = document.getElementById('aGenAllImgsBtn');
-  btn.disabled = true;
-  for (let i = 0; i < aState.scenes.length; i++) {
-    btn.textContent = `⏳ Scene ${i + 1}/${aState.scenes.length}…`;
-    await _aGenSceneImg(i, model, aState.sceneImgPrompts[i]);
-  }
-  btn.disabled = false;
-  btn.textContent = '🎨 Generate All';
-}
-
-async function _aGenSceneImg(i, model, prompt) {
-  const box = document.getElementById('aImgBox-' + i);
-  if (!box) return;
-  box.innerHTML = '<div class="aSceneImgEmpty"><div class="auto-spinner" style="width:24px;height:24px;border-width:3px;"></div></div>';
-  try {
-    const fd = new FormData();
-    fd.append('model', model);
-    fd.append('prompt', prompt + (aState.sceneRefImageFile ? ', maintain consistent character design' : ''));
-    fd.append('aspectRatio', '9:16');
-    fd.append('resolution', '1K');
-    fd.append('format', 'PNG');
-    if (aState.sceneRefImageFile) fd.append('refImage', aState.sceneRefImageFile);
-    const r = await fetch('/generate-image', { method: 'POST', body: fd });
-    const d = await r.json();
-    if (d.success) {
-      aState.sceneImages[i] = d.imageUrl;
-      box.innerHTML = `<img src="${d.imageUrl}" style="width:100%;height:100%;object-fit:cover;">`;
-      // update clip row image too if already rendered
-      const clipImg = document.getElementById('aClipImg-' + i);
-      if (clipImg) clipImg.src = d.imageUrl;
-    } else {
-      box.innerHTML = `<div class="aSceneImgEmpty" style="font-size:9px;color:var(--red);padding:8px;text-align:center;">✗ ${d.error}</div>`;
-    }
-  } catch(e) { box.innerHTML = '<div class="aSceneImgEmpty" style="font-size:9px;color:var(--red);">Error</div>'; }
-}
-
-function aConfirmSceneImages() {
-  aMarkStepDone(4);
-  autoGotoStep(5);
-  aRenderClipsGrid();
-}
-
-// ─── STEP 5: CLIPS ────────────────────────────────────────────────
-function aSyncClipModels() {
-  const model = document.getElementById('aClipModelAll').value;
-  aState.scenes.forEach((_, i) => { const s = document.getElementById('aClipModel-' + i); if (s) s.value = model; });
-}
-
-function aRenderClipsGrid() {
-  const grid = document.getElementById('aClipsGrid');
-  grid.innerHTML = '';
-  aState.scenes.forEach((scene, i) => {
-    const imgSrc = aState.sceneImages[i];
-    const vp = aState.sceneVideoPrompts[i] || '';
-    const row = document.createElement('div');
-    row.className = 'aClipRow';
-    row.id = 'aClipRow-' + i;
-    row.innerHTML = `
-      <div style="flex-shrink:0;width:72px;">
-        ${imgSrc
-          ? `<img id="aClipImg-${i}" src="${imgSrc}" style="width:72px;height:128px;object-fit:cover;border-radius:6px;border:1px solid var(--bd);">`
-          : `<div style="width:72px;height:128px;background:var(--s3);border-radius:6px;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--tmut);font-size:20px;">📷</div>`}
-      </div>
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">
-        <div style="font-size:10px;font-weight:700;color:var(--y);font-family:'Space Mono',monospace;">Scene ${scene.scene} · ~${scene.duration_seconds}s</div>
-        <div style="font-size:10px;color:var(--tdim);line-height:1.4;">${scene.script_lines}</div>
-        <button class="aPromptBtn" onclick="aOpenPromptModal(${i},'vid')" id="aVidPromptBtn-${i}">${vp ? vp.slice(0, 60) + '…' : '🎬 Edit video prompt'}</button>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <select class="select" id="aClipModel-${i}" style="font-size:10px;padding:6px;flex:1;min-width:120px;">
-            <option value="grok-480p">Grok 480p — 15cr</option>
-            <option value="grok-720p" selected>Grok 720p — 30cr</option>
-            <option value="veo3-lite">Veo 3.1 Lite — 20cr</option>
-            <option value="sora2">Sora 2 — 20cr</option>
-          </select>
-          <button onclick="aGenSingleClip(${i})" style="padding:6px 14px;background:var(--y);border:none;border-radius:6px;color:#000;font-size:10px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;">⚡ Gen</button>
-        </div>
-        <div id="aClipStatus-${i}" style="font-size:10px;color:var(--tdim);font-family:'Space Mono',monospace;"></div>
-        <div id="aClipVideo-${i}"></div>
-      </div>`;
-    grid.appendChild(row);
-  });
-}
-
-async function aGenerateAllClips() {
-  const btn = document.getElementById('aGenAllClipsBtn');
-  btn.disabled = true;
-  for (let i = 0; i < aState.scenes.length; i++) {
-    btn.textContent = `⏳ Scene ${i + 1}/${aState.scenes.length}…`;
-    await aGenSingleClip(i);
-  }
-  btn.disabled = false;
-  btn.textContent = '⚡ Generate All Clips';
-  aMarkStepDone(5);
-}
-
-async function aGenSingleClip(i) {
-  const modelRaw = document.getElementById('aClipModel-' + i)?.value || 'grok-720p';
-  const model = modelRaw.startsWith('grok') ? 'grok' : modelRaw;
-  const quality = modelRaw === 'grok-480p' ? '480p' : '720p';
-  const prompt = aState.sceneVideoPrompts[i] || aState.sceneImgPrompts[i] || 'Cinematic vertical motion';
-  const scene = aState.scenes[i];
-  const imgUrl = aState.sceneImages[i];
-  const statusEl = document.getElementById('aClipStatus-' + i);
-  const videoEl = document.getElementById('aClipVideo-' + i);
-  if (statusEl) statusEl.innerHTML = '<span style="color:var(--tdim);">⏳ Generating…</span>';
-  try {
-    const fd = new FormData();
-    fd.append('model', model);
-    fd.append('prompt', prompt);
-    fd.append('duration', String(Math.max(5, scene.duration_seconds || 5)));
-    fd.append('aspectRatio', '9:16');
-    fd.append('quality', quality);
-    if (imgUrl) {
-      try {
-        const ir = await fetch(imgUrl);
-        const b = await ir.blob();
-        fd.append('image', b, 'scene.jpg');
-      } catch(e) {}
-    }
-    const r = await fetch('/generate-video', { method: 'POST', body: fd });
-    const d = await r.json();
-    if (d.success) {
-      aState.clips[i] = d.videoUrl;
-      if (statusEl) statusEl.innerHTML = '<span style="color:var(--grn);">✓ Done</span>';
-      if (videoEl) videoEl.innerHTML = `<video controls src="${d.videoUrl}" style="width:100%;max-width:180px;border-radius:6px;margin-top:4px;"></video><br><a href="${d.videoUrl}" download="scene_${scene.scene}.mp4" style="font-size:9px;color:var(--yd);font-family:'Space Mono',monospace;">⬇ Download</a>`;
-    } else { throw new Error(d.error); }
-  } catch(err) {
-    if (statusEl) statusEl.innerHTML = `<span style="color:var(--red);">✗ ${err.message}</span>`;
-  }
-}
-</script>
-
 </body>
 </html>

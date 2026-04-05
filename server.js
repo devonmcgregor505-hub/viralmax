@@ -735,32 +735,7 @@ app.get('/tiktokmbOjActDa5ANJmRCnS6hvkmXi09O0Nt7.txt', (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 // CLAUDE API PROXY  —  POST /api/claude
 // ══════════════════════════════════════════════════════════════════════════════
-app.post('/api/claude', express.json(), async (req, res) => {
-  const { prompt, max_tokens = 1000 } = req.body;
-  if (!prompt) return res.json({ success: false, error: 'No prompt provided' });
-
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-  if (!ANTHROPIC_KEY) return res.json({ success: false, error: 'ANTHROPIC_API_KEY not set' });
-
-  try {
-    const response = await axios.post('https://api.anthropic.com/v1/messages', {
-      model: 'claude-sonnet-4-20250514',
-      max_tokens,
-      messages: [{ role: 'user', content: prompt }],
-    }, {
-      headers: {
-        'x-api-key': ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
-      },
-      timeout: 60000,
-    });
-    res.json(response.data);
-  } catch(err) {
-    console.error('[claude-api] error:', err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
+res.json(response.data);
 
 
 // ══════════════════════════════════════════════════════════════════════════════

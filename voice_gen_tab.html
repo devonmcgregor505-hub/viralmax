@@ -1,0 +1,138 @@
+  <!-- ══ VOICE GEN ══ -->
+  <div class="tab-panel" id="tab-voicegen">
+    <div class="workspace">
+      <div class="left-panel">
+
+        <!-- Voice Mode Toggle -->
+        <div class="card">
+          <div class="card-hd">Voice Mode</div>
+          <div class="card-body">
+            <div style="display:flex;gap:8px;">
+              <button class="voice-mode-btn active" id="modePreset" onclick="setVoiceMode('preset')"
+                style="flex:1;padding:8px;background:var(--yg);border:1px solid rgba(245,225,50,.3);border-radius:7px;color:var(--y);font-size:11px;font-weight:700;font-family:'Space Mono',monospace;cursor:pointer;">
+                🎙 Preset Voice
+              </button>
+              <button class="voice-mode-btn" id="modeClone" onclick="setVoiceMode('clone')"
+                style="flex:1;padding:8px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--tdim);font-size:11px;font-weight:700;font-family:'Space Mono',monospace;cursor:pointer;">
+                🔬 Clone Voice
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRESET MODE: Kie.ai ElevenLabs voices -->
+        <div id="presetPanel">
+          <div class="card">
+            <div class="card-hd">ElevenLabs Voice (via Kie.ai)</div>
+            <div class="card-body">
+              <div class="setting-row">
+                <label class="setting-label">Preset Voice</label>
+                <select class="select" id="voicePreset" onchange="selectPresetVoice()">
+                  <option value="">Select a voice...</option>
+                  <option value="UgBBYS2sOqTuMpoF3BR0">Mark</option>
+                  <option value="yl2ZDV1MzN4HbQJbMihG">Alex</option>
+                  <option value="g6xIsTj2HwM6VR4iXFCw">Jessica</option>
+                </select>
+              </div>
+              <div style="border-top:1px solid var(--bd);padding-top:10px;margin-top:2px;">
+                <label class="setting-label" style="margin-bottom:6px;display:block;">Custom Voice ID</label>
+                <input type="text" class="text-input" id="customVoiceId" placeholder="ElevenLabs voice ID">
+                <button class="btn" style="margin-top:6px;padding:8px;font-size:11px;" onclick="saveCustomVoice()">Save Voice</button>
+              </div>
+              <div class="setting-row" style="margin-top:6px;">
+                <label class="setting-label">Model</label>
+                <select class="select" id="kieModel">
+                  <option value="elevenlabs/text-to-speech-turbo-2-5" selected>Turbo 2.5 — Fastest · ~$0.015/gen</option>
+                  <option value="elevenlabs/text-to-speech-multilingual-v2">Multilingual v2 — Best quality · ~$0.06/gen</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <label class="setting-label">Speed</label>
+                <div class="slider-labels"><span>Slow</span><span id="speedVal">1.0</span><span>Fast</span></div>
+                <input type="range" class="slider" id="speedSlider" min="0.7" max="1.2" step="0.05" value="1.0" oninput="updateSpeedVal()">
+              </div>
+              <div class="setting-row">
+                <label class="setting-label">Stability</label>
+                <div class="slider-labels"><span>Variable</span><span id="stabilityVal">50%</span><span>Stable</span></div>
+                <input type="range" class="slider" id="stabilitySlider" min="0" max="100" value="50" oninput="updateStabilityVal()">
+              </div>
+              <div class="setting-row">
+                <label class="setting-label">Similarity</label>
+                <div class="slider-labels"><span>Low</span><span id="similarityVal">75%</span><span>High</span></div>
+                <input type="range" class="slider" id="similaritySlider" min="0" max="100" value="75" oninput="updateSimilarityVal()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLONE MODE: Chatterbox voice cloning -->
+        <div id="clonePanel" style="display:none;">
+          <div class="upload-zone" id="voiceSampleDrop" onclick="document.getElementById('voiceSampleInput').click()">
+            <input type="file" id="voiceSampleInput" accept="audio/*" style="display:none">
+            <span class="up-icon">🎤</span>
+            <div class="up-title">Upload Voice Sample</div>
+            <div class="up-hint">WAV · MP3 · M4A · 5–30 seconds of your voice</div>
+            <div class="up-name" id="voiceSampleFnm"></div>
+          </div>
+          <div class="info-box" style="margin-top:0;">
+            <b>Tips for best cloning:</b><br>
+            · Record 10–30 seconds of clear speech<br>
+            · No background music or noise<br>
+            · Speak naturally at normal pace<br>
+            · Only use your own voice
+          </div>
+          <div class="card">
+            <div class="card-hd">Chatterbox Settings</div>
+            <div class="card-body">
+              <div class="slider-row">
+                <div class="setting-label">Emotion Exaggeration</div>
+                <div class="slider-labels"><span>Neutral</span><span id="exagVal">0.5</span><span>Expressive</span></div>
+                <input type="range" class="slider" id="exagSlider" min="0" max="1" step="0.05" value="0.5" oninput="updateExagVal()">
+              </div>
+              <div class="slider-row">
+                <div class="setting-label">CFG Weight</div>
+                <div class="slider-labels"><span>Free</span><span id="cfgVal">0.5</span><span>Guided</span></div>
+                <input type="range" class="slider" id="cfgSlider" min="0" max="1" step="0.05" value="0.5" oninput="updateCfgVal()">
+              </div>
+              <div class="slider-row">
+                <div class="setting-label">Temperature</div>
+                <div class="slider-labels"><span>Stable</span><span id="tempVal">0.8</span><span>Creative</span></div>
+                <input type="range" class="slider" id="tempSlider" min="0.1" max="1.0" step="0.05" value="0.8" oninput="updateTempVal()">
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(245,225,50,.04);border:1px solid rgba(245,225,50,.15);border-radius:8px;padding:10px 12px;font-size:10px;color:var(--tdim);">
+            ✅ I confirm this is my own voice and I have rights to clone it
+          </div>
+        </div>
+
+        <!-- Script -->
+        <div>
+          <div class="sec-lbl">Script</div>
+          <textarea class="textarea" id="voiceScript" rows="5" placeholder="Enter your voiceover script…" oninput="updateCharCount()"></textarea>
+          <div class="char-count"><span id="charCount">0</span> characters</div>
+        </div>
+
+        <button class="btn" id="voiceBtn" onclick="startVoiceGen()">🔊 Generate Speech</button>
+        <div class="prog-wrap" id="voiceProg">
+          <div class="prog-lbl"><span id="voiceProgLbl">Generating...</span><span id="voiceProgPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="vrFill"></div></div>
+        </div>
+        <div class="err-box" id="voiceErr"><div class="err-ttl">// ERROR</div><div class="err-msg" id="voiceErrMsg"></div></div>
+      </div>
+
+      <!-- Preview -->
+      <div class="right-panel">
+        <div style="width:100%;max-width:400px;background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:24px;text-align:center;">
+          <div style="font-size:36px;margin-bottom:16px;" id="voiceEmptyIcon">🔊</div>
+          <audio id="voiceAudio" controls style="width:100%;display:none;"></audio>
+          <div id="voiceEmpty" style="color:var(--tdim);font-size:12px;">Your generated speech will appear here</div>
+          <div id="voiceMode" style="margin-top:12px;font-size:10px;color:var(--tmut);font-family:'Space Mono',monospace;"></div>
+        </div>
+        <div class="prev-lbl">PREVIEW</div>
+        <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:6px;" id="voiceResultBtns" style="display:none;">
+          <a class="dl-btn" id="dlVoiceBtn" href="#" download="speech.wav" style="display:none;">⬇ Download Audio</a>
+        </div>
+      </div>
+    </div>
+  </div>
