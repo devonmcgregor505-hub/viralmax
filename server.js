@@ -194,25 +194,15 @@ app.post('/pipeline/ideate', upload.array('channelFiles', 10), async (req, res) 
       return `Channel ${i + 1}:\n${topVideos}`;
     }).join('\n\n');
 
-    const prompt = `You are a viral YouTube Shorts content strategist specializing in the skeleton niche (educational/entertainment shorts about what would happen if a human skeleton experienced different scenarios).
+    const prompt = `Based on all the data from the channels above, could you give me 5 viral worthy ideas for yt shorts (in viral worthy title format)
 
-Here is competitor channel data showing their most viral videos:
-
+Channel data:
 ${channelSummary}
-
-Based on this data, generate exactly 5 viral video ideas that could go viral RIGHT NOW.
-
-CRITICAL RULES:
-- Use PROVEN formats from the competitor data but with a fresh twist. For example, if someone did "What if you were raised by monkeys" you could change monkeys to dinosaurs. If someone did "What if you brought a PS5 to ancient Rome" you could change PS5 to iPhone or ancient Rome to ancient Egypt.
-- Each idea must follow the format: "What would happen if [skeleton/human] [specific scenario]"
-- Make the scenarios specific, visual, and emotionally engaging
-- Focus on transformation over time (age progression works great)
-- Tap into universal curiosity: survival, body transformation, extreme environments, historical scenarios
 
 Return ONLY a JSON array of exactly 5 strings, no other text:
 ["idea 1", "idea 2", "idea 3", "idea 4", "idea 5"]`;
 
-    const response = await callClaude([{ role: 'user', content: prompt }], '', 1000);
+        const response = await callClaude([{ role: 'user', content: prompt }], '', 1000);
 
     let ideas;
     try {
@@ -251,26 +241,14 @@ app.post('/pipeline/script', express.json(), async (req, res) => {
       channelContext = `\n\nHere are the competitor's most viral videos for reference on style, length, and pacing:\n\n${topScripts}`;
     }
 
-    const prompt = `You are an expert YouTube Shorts scriptwriter specializing in viral educational content in the skeleton niche.
+    const prompt = `With the idea we just got, and based on channels attached and their success, make me a similar length viral script for the idea above (put it in 1 big paragraph).
 
-The idea for this video is: "${idea}"
-${customPrompt ? `\nAdditional direction: ${customPrompt}` : ''}
+Idea: ${idea}
 ${channelContext}
-
-Write a viral YouTube Short script for this idea. 
-
-REQUIREMENTS:
-- Match the length and pacing of the competitor's viral scripts (typically 60-120 seconds when read aloud)
-- Start with a HOOK in the first sentence that creates immediate curiosity (do NOT start with "What would happen if...")
-- Use age progression format (Age 2, Age 5, Age 10, etc.) — this is proven to perform extremely well
-- Each age/scene should be 1-2 short punchy sentences
-- End with a surprising or emotional payoff
-- Write in second person ("you") to make it immersive
-- NO intro, NO outro, NO hashtags — just the raw script
 
 Return ONLY the script text, nothing else.`;
 
-    const script = await callClaude([{ role: 'user', content: prompt }], '', 2000);
+        const script = await callClaude([{ role: 'user', content: prompt }], '', 2000);
 
     res.json({ success: true, script: script.trim() });
   } catch(err) {
