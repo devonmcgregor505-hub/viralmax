@@ -708,7 +708,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           <div class="s-row" id="durRow"><label class="s-lbl">Duration</label><select class="sel" id="vidDur"></select></div>
           <div class="s-row" id="aspRow"><label class="s-lbl">Aspect</label><select class="sel" id="vidAsp"></select></div>
           <div class="s-row" id="qualRow" style="display:none;"><label class="s-lbl">Quality</label><select class="sel" id="vidQual" onchange="onQualityChange()"></select></div>
-          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="vidCost">35 cr</div></div>
+          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="vidCost">15 cr</div></div>
         </div></div>
         <button class="btn-y" id="vidBtn" onclick="startVidGen()">⚡ Generate Video</button>
         <div class="prog" id="vidProg"><div class="prog-top"><span class="prog-lbl" id="vpLbl">Submitting…</span><span class="prog-pct" id="vpPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="vpFill"></div></div></div>
@@ -738,8 +738,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
           <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="imgModel" onchange="onImgModelChange()"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
           <div class="s-row"><label class="s-lbl">Aspect Ratio</label><select class="sel" id="imgAsp"><option value="9:16" selected>9:16 Portrait</option><option value="16:9">16:9 Landscape</option><option value="1:1">1:1 Square</option></select></div>
-          <div class="s-row"><label class="s-lbl">Resolution</label><select class="sel" id="imgRes" onchange="onImgResChange()"><option value="1K" selected>1K</option><option value="2K">2K</option><option value="4K">4K</option></select></div>
-          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="imgCost">23 cr</div></div>
+          
+          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="imgCost">15 cr</div></div>
         </div></div>
         <button class="btn-y" id="imgBtn" onclick="startImgGen()">🎨 Generate Image</button>
         <div class="prog" id="imgProg"><div class="prog-top"><span class="prog-lbl" id="ipLbl">Generating…</span><span class="prog-pct" id="ipPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="ipFill"></div></div></div>
@@ -776,7 +776,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="voice-script-area">
           <label class="fl">Script</label>
           <textarea class="ta" id="voiceScript" rows="5" placeholder="Enter your script…" oninput="updateCharCount()" style="width:100%;"></textarea>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;"><span class="char-count"><span id="charCount">0</span> / 10,000</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;"><span class="char-count"><span id="charCount">0</span> / 10,000</span><span class="char-count">Cost: <span id="voiceCostDisplay">1</span></span></div>
         </div>
         <div class="voice-output-area">
           <label class="fl">Generated Voiceovers</label>
@@ -797,7 +797,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         </div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
           <div class="slider-grp"><label class="s-lbl">Silence Threshold</label><div class="slider-labels"><span class="slider-end">Sensitive</span><span class="slider-val" id="dbVal">-40 dB</span><span class="slider-end">Aggressive</span></div><input type="range" class="slider" id="dbSlider" min="-60" max="-10" value="-40" oninput="document.getElementById('dbVal').textContent=this.value+' dB'"></div>
-          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val">10 cr</div></div>
+          
         </div></div>
         <button class="btn-y" id="dsBtn" onclick="startDeadspace()" disabled>✂️ Remove Silence</button>
       </div>
@@ -820,7 +820,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
           <div class="s-row"><label class="s-lbl">Number of Videos</label><select class="sel" id="ytCount"><option value="10">10 videos</option><option value="25" selected>25 videos</option><option value="50">50 videos</option><option value="100">100 videos</option></select></div>
           <div class="s-row"><label class="s-lbl">Sort By</label><select class="sel" id="ytSort"><option value="newest" selected>📅 Newest</option><option value="popular">🔥 Most Popular</option><option value="trending">📈 Trending</option></select></div>
-          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val">7 cr</div></div>
+          
         </div></div>
         <button class="btn-y" id="scrapBtn" onclick="startScrape()">📊 Scrape Channel</button>
         <div class="err" id="scrapErr"><div class="err-title">ERROR</div><div class="err-msg" id="scrapErrMsg"></div></div>
@@ -862,13 +862,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 <script>
 // ── MODEL CONFIG ──
 const MODEL_CFG = {
-  'veo3-lite':{credits:25,durations:[8],defaultDur:8,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
-  'sora2':{credits:25,durations:[12],defaultDur:12,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
-  'grok':{credits:35,durations:[6,10],defaultDur:6,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'},{v:'1:1',l:'1:1 Square'}],defaultAsp:'9:16',qualities:[{v:'720p',l:'720p'},{v:'480p',l:'480p'}],defaultQ:'720p',creditsByQ:{'720p':35,'480p':20}},
+  'veo3-lite':{credits:15,durations:[8],defaultDur:8,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
+  'sora2':{credits:20,durations:[12],defaultDur:12,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
+  'grok':{credits:15,durations:[6,10],defaultDur:6,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'},{v:'1:1',l:'1:1 Square'}],defaultAsp:'9:16',qualities:[{v:'720p',l:'720p'},{v:'480p',l:'480p'}],defaultQ:'720p',creditsByQ:{'720p':15,'480p':10}},
 };
 const IMG_CFG = {
-  'nano-banana-pro':{credits:{'1K':23,'2K':23,'4K':29}},
-  'nano-banana-2':{credits:{'1K':13,'2K':17,'4K':23}},
+  'nano-banana-pro':{credits:15},
+  'nano-banana-2':{credits:10},
 };
 
 // ── STATE ──
@@ -1270,12 +1270,12 @@ document.getElementById('refDrop').addEventListener('dragleave',()=>document.get
 document.getElementById('refDrop').addEventListener('drop',e=>{e.preventDefault();document.getElementById('refDrop').classList.remove('drag');if(e.dataTransfer.files[0]){selRefImg=e.dataTransfer.files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has')}});
 document.getElementById('refInp').addEventListener('change',()=>{if(document.getElementById('refInp').files[0]){selRefImg=document.getElementById('refInp').files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has')}});
 
-function onImgModelChange(){const m=document.getElementById('imgModel').value,cfg=IMG_CFG[m];onImgResChange()}
-function onImgResChange(){const m=document.getElementById('imgModel').value,r=document.getElementById('imgRes').value;document.getElementById('imgCost').textContent=(IMG_CFG[m]?.credits[r]||0)+' cr'}
+function onImgModelChange(){onImgResChange()}
+function onImgResChange(){const m=document.getElementById('imgModel').value;document.getElementById('imgCost').textContent=(IMG_CFG[m]?.credits||0)+' cr'}
 
 async function startImgGen(){
   const prompt=document.getElementById('imgPrompt').value.trim();if(!prompt){alert('Enter a prompt');return}
-  const model=document.getElementById('imgModel').value,asp=document.getElementById('imgAsp').value,res=document.getElementById('imgRes').value;
+  const model=document.getElementById('imgModel').value,asp=document.getElementById('imgAsp').value,res='2K';
   const btn=document.getElementById('imgBtn');btn.disabled=true;btn.textContent='⏳ Generating…';
   document.getElementById('imgProg').classList.add('vis');document.getElementById('imgErr').classList.remove('vis');
   document.getElementById('dlImgBtn').style.display='none';
@@ -1288,7 +1288,7 @@ async function startImgGen(){
     if(!data.success)throw new Error(data.error||'Unknown error');
     const prev=document.getElementById('genImgEl');prev.src=data.imageUrl;prev.style.display='block';document.getElementById('imgEmpty').style.display='none';
     const dl=document.getElementById('dlImgBtn');dl.href=data.imageUrl;dl.style.display='block';
-    creds-=IMG_CFG[model]?.credits[res]||0;updCreds();
+    creds-=IMG_CFG[model]?.credits||0;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('imgErr').classList.add('vis');document.getElementById('imgErrMsg').textContent=err.message}
   btn.disabled=false;btn.textContent='🎨 Generate Image';setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
 }
@@ -1360,7 +1360,7 @@ function renderVoiceOutputs(){
     list.appendChild(card);
   });
 }
-function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>9000?'var(--red)':n>7000?'var(--y)':'var(--t3)'}
+function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>9000?'var(--red)':n>7000?'var(--y)':'var(--t3)';const cr=Math.ceil(n/1000)||1;const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent=cr+' cr';}
 
 // ── SILENCE REMOVER ──
 const dsZone=document.getElementById('dsZone');
