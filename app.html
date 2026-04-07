@@ -678,7 +678,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="workspace">
           <div class="left-col">
             <div class="strip"><b>Step 7 — Videos.</b> Generate a 9:16 clip for each scene.</div>
-            <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok 480p — 20cr</option><option value="grok720">Grok 720p — 35cr</option><option value="veo3">Veo 3 Lite — 25cr</option><option value="sora2">Sora 2 — 25cr</option></select></div>
+            <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok 480p</option><option value="grok720">Grok 720p</option><option value="veo3">Veo 3 Lite</option><option value="sora2">Sora 2</option></select></div>
             <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">🎬 Generate All Clips</button>
             <div class="prog" id="clipAllProg"><div class="prog-top"><span class="prog-lbl" id="clipAllProgLbl">Generating…</span><span class="prog-pct" id="clipAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="clipAllProgFill"></div></div></div>
             <div class="err" id="clipsErr"><div class="err-title">ERROR</div><div class="err-msg" id="clipsErrMsg"></div></div>
@@ -704,7 +704,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         </div>
         <div><label class="fl">Prompt</label><textarea class="ta" id="vgPrompt" rows="3" placeholder="Describe the motion…"></textarea></div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="vidModel" onchange="onModelChange()"><option value="veo3-lite">Veo 3.1 Lite — 25cr</option><option value="sora2">Sora 2 — 25cr</option><option value="grok" selected>Grok — 35cr</option></select></div>
+          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="vidModel" onchange="onModelChange()"><option value="veo3-lite">Veo 3.1 Lite</option><option value="sora2">Sora 2</option><option value="grok" selected>Grok</option></select></div>
           <div class="s-row" id="durRow"><label class="s-lbl">Duration</label><select class="sel" id="vidDur"></select></div>
           <div class="s-row" id="aspRow"><label class="s-lbl">Aspect</label><select class="sel" id="vidAsp"></select></div>
           <div class="s-row" id="qualRow" style="display:none;"><label class="s-lbl">Quality</label><select class="sel" id="vidQual" onchange="onQualityChange()"></select></div>
@@ -738,7 +738,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
           <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="imgModel" onchange="onImgModelChange()"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
           <div class="s-row"><label class="s-lbl">Aspect Ratio</label><select class="sel" id="imgAsp"><option value="9:16" selected>9:16 Portrait</option><option value="16:9">16:9 Landscape</option><option value="1:1">1:1 Square</option></select></div>
-          <div class="s-row"><label class="s-lbl">Resolution</label><select class="sel" id="imgRes" onchange="onImgResChange()"><option value="1K" selected>1K — 23cr</option><option value="2K">2K — 23cr</option><option value="4K">4K — 29cr</option></select></div>
+          <div class="s-row"><label class="s-lbl">Resolution</label><select class="sel" id="imgRes" onchange="onImgResChange()"><option value="1K" selected>1K</option><option value="2K">2K</option><option value="4K">4K</option></select></div>
           <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="imgCost">23 cr</div></div>
         </div></div>
         <button class="btn-y" id="imgBtn" onclick="startImgGen()">🎨 Generate Image</button>
@@ -864,7 +864,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 const MODEL_CFG = {
   'veo3-lite':{credits:25,durations:[8],defaultDur:8,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
   'sora2':{credits:25,durations:[12],defaultDur:12,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
-  'grok':{credits:35,durations:[6,10],defaultDur:6,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'},{v:'1:1',l:'1:1 Square'}],defaultAsp:'9:16',qualities:[{v:'720p',l:'720p — 35cr'},{v:'480p',l:'480p — 20cr'}],defaultQ:'720p',creditsByQ:{'720p':35,'480p':20}},
+  'grok':{credits:35,durations:[6,10],defaultDur:6,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'},{v:'1:1',l:'1:1 Square'}],defaultAsp:'9:16',qualities:[{v:'720p',l:'720p'},{v:'480p',l:'480p'}],defaultQ:'720p',creditsByQ:{'720p':35,'480p':20}},
 };
 const IMG_CFG = {
   'nano-banana-pro':{credits:{'1K':23,'2K':23,'4K':29}},
