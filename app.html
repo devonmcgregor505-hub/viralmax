@@ -426,7 +426,7 @@ body{font-family:'Manrope',sans-serif;background:var(--blk);color:var(--tx);disp
   </div>
 
   <nav class="nav">
-    <span class="nav-sec-lbl">Automation</span>
+    
     <button class="nav-item active" id="nav-pipeline" onclick="switchTab('pipeline')">
       <span class="nav-icon">⚡</span>Automation<span class="nav-badge b-hot">HOT</span>
     </button>
@@ -470,6 +470,34 @@ body{font-family:'Manrope',sans-serif;background:var(--blk);color:var(--tx);disp
 
   <!-- ═══ PIPELINE ═══ -->
   <div class="tab-panel active" id="tab-pipeline">
+  <div id="niche-picker" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:40px;background:var(--blk);">
+    <div style="text-align:center;">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:12px;">Step 0</div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--tx);margin-bottom:8px;">Choose your niche</div>
+      <div style="font-size:14px;color:var(--t2);">Select a content type to start the automation pipeline</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:700px;width:100%;">
+      <div onclick="selectNichePick('Skeleton')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s2)'">
+        <div style="font-size:40px;margin-bottom:12px;">💀</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Skeleton</div>
+        <div style="font-size:11px;color:var(--t3);line-height:1.5;">Full 7-step pipeline for skeleton content</div>
+        <div style="margin-top:14px;display:inline-block;background:var(--y);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'Space Mono',monospace;">LIVE</div>
+      </div>
+      <div onclick="selectNichePick('Ronaldo')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;opacity:0.6;" onmouseover="this.style.borderColor='var(--bd2)'" onmouseout="this.style.borderColor='var(--bd)'">
+        <div style="font-size:40px;margin-bottom:12px;">⚽</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Ronaldo Adventures</div>
+        <div style="font-size:11px;color:var(--t3);line-height:1.5;">Automated Ronaldo content pipeline</div>
+        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'Space Mono',monospace;">COMING SOON</div>
+      </div>
+      <div onclick="suggestNiche()" style="background:var(--s2);border:1.5px dashed var(--bd2);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.background='var(--s2)'">
+        <div style="font-size:40px;margin-bottom:12px;">💡</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--t2);margin-bottom:6px;">Suggest a Niche</div>
+        <div style="font-size:11px;color:var(--t3);line-height:1.5;">Tell us what you want next</div>
+        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'Space Mono',monospace;">REQUEST</div>
+      </div>
+    </div>
+  </div>
+  <div id="pipeline-content" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
     <div class="pipe-wrap">
       <div class="step-nav">
         <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Idea</button>
@@ -662,6 +690,7 @@ body{font-family:'Manrope',sans-serif;background:var(--blk);color:var(--tx);disp
         </div>
       </div>
     </div>
+  </div><!-- /pipeline-content -->
   </div>
 
   <!-- ═══ VID GEN ═══ -->
@@ -879,7 +908,7 @@ function switchTab(tab){
   const t=tabMeta[tab]||['Viralmax',''];
   document.getElementById('topTitle').textContent=t[0];
   document.getElementById('topSub').textContent=t[1];
-  document.getElementById('pipe-sub').style.display=tab==='pipeline'?'block':'none';
+  
   document.querySelectorAll('.nav-sub-item').forEach((el,i)=>el.classList.toggle('active',tab==='pipeline'&&i===pipe.step));
 }
 
@@ -1381,10 +1410,22 @@ function renderScraped(videos){
   list.innerHTML=videos.map(v=>`<div class="scraper-item"><img class="scraper-thumb" src="${v.thumbnail}" onerror="this.style.display='none'" alt=""><div class="scraper-info"><div class="scraper-title">${v.title}</div><div class="scraper-meta">${(v.view_count||0).toLocaleString()} views · ${v.duration_human}</div><a class="scraper-link" href="${v.url}" target="_blank">↗ Open</a></div></div>`).join('');
 }
 
-function selectNiche(btn,niche){document.querySelectorAll(".niche-btn").forEach(b=>{b.style.background="var(--s3)";b.style.borderColor="var(--bd)";b.style.color="var(--t2)"});btn.style.background="var(--yd)";btn.style.borderColor="rgba(255,230,0,0.3)";btn.style.color="var(--y)";window.selectedNiche=niche;console.log("Niche selected:",niche)}
+function selectNiche(btn,niche){document.querySelectorAll(".niche-btn").forEach(b=>{b.style.background="var(--s3)";b.style.borderColor="var(--bd)";b.style.color="var(--t2)"});btn.style.background="var(--yd)";btn.style.borderColor="rgba(255,230,0,0.3)";btn.style.color="var(--y)";window.selectedNiche=niche;}
+function selectNichePick(niche){
+  if(niche==='Ronaldo'){alert('Ronaldo Adventures pipeline coming soon!');return;}
+  if(niche==='suggest'){suggestNiche();return;}
+  window.selectedNiche=niche;
+  document.getElementById('niche-picker').style.display='none';
+  document.getElementById('pipeline-content').style.display='flex';
+  document.getElementById('pipe-sub').style.display='block';
+}
+function suggestNiche(){
+  const n=prompt('What niche would you like to see? We\'ll add it soon!');
+  if(n&&n.trim())alert('Thanks! We\'ll add "'+n.trim()+'" soon.');
+}
 // ── INIT ──
 onModelChange();updCreds();onImgModelChange();renderVoiceSel();renderVoiceOutputs();
-document.getElementById('pipe-sub').style.display='block';
+
 
 // Handle hash routing from homepage
 const hash=window.location.hash.replace('#','');
