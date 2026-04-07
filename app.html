@@ -1429,7 +1429,7 @@ async function startVoiceGen() {
     clearInterval(tick); fill.style.width = '100%'; pctLbl.textContent = '100%';
     if (!data.success) throw new Error(data.error || 'Failed');
     const charCount = script.length;
-    const cr = Math.ceil(charCount / 1000) || 1;
+    const cr = Math.ceil(charCount / 1000) * 10;
     creds -= cr; updCreds();
     addVoiceOutput(data.audioUrl, script.slice(0, 60) + (script.length > 60 ? '…' : ''), 'Voice');
   } catch(err) {
@@ -1492,7 +1492,7 @@ function renderVoiceOutputs(){
     list.appendChild(card);
   });
 }
-function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>9000?'var(--red)':n>7000?'var(--y)':'var(--t3)';const cr=Math.ceil(n/1000)||1;const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent=cr+' cr';}
+function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>9000?'var(--red)':n>7000?'var(--y)':'var(--t3)';const cr=(Math.ceil(n/1000)||1)*10;const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent=cr+' cr';}
 
 // ── SILENCE REMOVER ──
 const dsZone=document.getElementById('dsZone');

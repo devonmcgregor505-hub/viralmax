@@ -573,6 +573,46 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 // START
 // ══════════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WAVESPEED VOICE GEN  —  POST /generate-voice-elevenlabs
+// ══════════════════════════════════════════════════════════════════════════════
+app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
+  const { text, voiceId, stability = 0.5, similarity = 1.0 } = req.body;
+  if (!text || !text.trim()) return res.json({ success: false, error: 'No text provided' });
+  if (!voiceId) return res.json({ success: false, error: 'No voiceId provided' });
+  const WAVESPEED_KEY = process.env.WAVESPEED_API_KEY || 'E8f88aee1fd28a10e860e20a2c07bbe224cc79d80506beab6ba4f2e47cf5ab4a';
+  const timestamp = Date.now();
+  try {
+    const submitRes = await axios.post(
+      'https://api.wavespeed.ai/api/v3/elevenlabs/turbo-v2.5',
+      { text: text.trim(), voice_id: voiceId, stability: parseFloat(stability), similarity: parseFloat(similarity), use_speaker_boost: true },
+      { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 30000 }
+    );
+    const requestId = submitRes.data?.id;
+    if (!requestId) throw new Error('No request ID: ' + JSON.stringify(submitRes.data).slice(0, 200));
+    console.log('[wavespeed] requestId=' + requestId);
+    let audioUrl = null;
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 3000));
+      const pollRes = await axios.get('https://api.wavespeed.ai/api/v3/predictions/' + requestId, { headers: { 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 15000 });
+      const status = pollRes.data?.status;
+      console.log('[wavespeed] poll ' + (i+1) + ' status=' + status);
+      if (status === 'completed') { audioUrl = pollRes.data?.outputs?.[0]; break; }
+      if (status === 'failed') throw new Error('Wavespeed failed: ' + (pollRes.data?.error || 'unknown'));
+    }
+    if (!audioUrl) throw new Error('Wavespeed timed out');
+    const dlRes = await axios.get(audioUrl, { responseType: 'arraybuffer', timeout: 60000 });
+    const outputPath = path.resolve('outputs/voice_ws_' + timestamp + '.mp3');
+    fs.writeFileSync(outputPath, Buffer.from(dlRes.data));
+    setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
+    res.json({ success: true, audioUrl: '/outputs/voice_ws_' + timestamp + '.mp3' });
+  } catch(err) {
+    console.error('[wavespeed] error:', err.message);
+    res.json({ success: false, error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log('\n✅ Viralmax running at http://localhost:' + PORT);
   console.log('   Routes: / (home)  /app (tools)  /login  /signup  /legal  /checkout');
