@@ -428,7 +428,7 @@ body{font-family:'Manrope',sans-serif;background:var(--blk);color:var(--tx);disp
   <nav class="nav">
     <span class="nav-sec-lbl">Automation</span>
     <button class="nav-item active" id="nav-pipeline" onclick="switchTab('pipeline')">
-      <span class="nav-icon">⚡</span>Skeleton Pipeline<span class="nav-badge b-hot">HOT</span>
+      <span class="nav-icon">⚡</span>Automation<span class="nav-badge b-hot">HOT</span>
     </button>
     <div class="nav-sub" id="pipe-sub">
       <button class="nav-sub-item active" onclick="goPipeStep(0);switchTab('pipeline')"><span class="sub-dot"></span>Idea</button>
@@ -460,7 +460,7 @@ body{font-family:'Manrope',sans-serif;background:var(--blk);color:var(--tx);disp
 <!-- ═══ MAIN ═══ -->
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title" id="topTitle">Skeleton Pipeline</div>
+    <div class="topbar-title" id="topTitle">Automation</div>
     <span class="topbar-sep" id="topSep">—</span>
     <div class="topbar-sub" id="topSub">Idea → Script → Voice → Scenes → Images → Clips</div>
     <div class="topbar-right">
@@ -491,7 +491,7 @@ body{font-family:'Manrope',sans-serif;background:var(--blk);color:var(--tx);disp
       <div class="step-panel active" id="pcontent-0">
         <div class="workspace">
           <div class="left-col">
-            <div class="strip"><b>Step 1 — Idea.</b> Upload competitor JSONs from YT Scraper and Claude generates 5 viral titles. Or type your own.</div>
+            <div style="margin-bottom:12px;"><label class="fl">Niche</label><div style="display:flex;gap:6px;flex-wrap:wrap;" id="nicheSelector"><button class="niche-btn active" onclick="selectNiche(this,'Skeleton')" style="padding:6px 14px;border-radius:6px;border:1px solid rgba(255,230,0,0.3);background:var(--yd);color:var(--y);font-size:11px;font-weight:700;cursor:pointer;font-family:Manrope,sans-serif;">💀 Skeleton</button><button class="niche-btn" onclick="selectNiche(this,'Ronaldo Adventures')" style="padding:6px 14px;border-radius:6px;border:1px solid var(--bd);background:var(--s3);color:var(--t2);font-size:11px;font-weight:700;cursor:pointer;font-family:Manrope,sans-serif;">⚽ Ronaldo Adventures</button></div></div><div class="strip"><b>Step 1 — Idea.</b> Upload competitor JSONs from YT Scraper and Claude generates 5 viral titles. Or type your own.</div>
             <div>
               <label class="fl">Competitor Channel Data <span style="color:var(--t4);font-weight:400;">(up to 10 JSONs)</span></label>
               <div class="zone" id="chFileDrop" onclick="document.getElementById('chFileInput').click()">
@@ -863,7 +863,7 @@ setInterval(async()=>{
 
 // ── TAB SWITCHING ──
 const tabMeta={
-  pipeline:['Skeleton Pipeline','Idea → Script → Voice → Scenes → Images → Clips'],
+  pipeline:['Automation','Idea → Script → Voice → Scenes → Images → Clips'],
   vidgen:['Video Gen','AI video generation'],
   imggen:['Image Gen','AI image generation'],
   voicegen:['Voice Gen','Clone and generate voiceovers'],
@@ -1381,6 +1381,7 @@ function renderScraped(videos){
   list.innerHTML=videos.map(v=>`<div class="scraper-item"><img class="scraper-thumb" src="${v.thumbnail}" onerror="this.style.display='none'" alt=""><div class="scraper-info"><div class="scraper-title">${v.title}</div><div class="scraper-meta">${(v.view_count||0).toLocaleString()} views · ${v.duration_human}</div><a class="scraper-link" href="${v.url}" target="_blank">↗ Open</a></div></div>`).join('');
 }
 
+function selectNiche(btn,niche){document.querySelectorAll(".niche-btn").forEach(b=>{b.style.background="var(--s3)";b.style.borderColor="var(--bd)";b.style.color="var(--t2)"});btn.style.background="var(--yd)";btn.style.borderColor="rgba(255,230,0,0.3)";btn.style.color="var(--y)";window.selectedNiche=niche;console.log("Niche selected:",niche)}
 // ── INIT ──
 onModelChange();updCreds();onImgModelChange();renderVoiceSel();renderVoiceOutputs();
 document.getElementById('pipe-sub').style.display='block';
