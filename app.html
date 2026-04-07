@@ -499,7 +499,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   </div>
   <div id="pipeline-content" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
     <div class="pipe-wrap">
-      <div class="step-nav" style="position:relative;">
+      <div class="step-nav" style="position:relative;"><button onclick="changeNiche()" style="margin-right:8px;padding:6px 14px;background:var(--s3);border:1px solid var(--bd2);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.color='var(--y)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t2)'">← Change Niche</button>
         <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Idea</button>
         <span class="step-div">›</span>
         <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1)"><span class="step-num">2</span>Script</button>
