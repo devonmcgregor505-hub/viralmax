@@ -760,15 +760,57 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="tab-panel" id="tab-voicegen">
     <div class="voice-layout">
       <div class="left-col">
-        <div class="card"><div class="card-head">Voice</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Selected Voice</label><div style="display:flex;gap:5px;"><select class="sel" id="voiceSel" onchange="onVoiceChange()" style="flex:1;"></select><button id="delVoiceBtn" onclick="deleteVoice()" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t3);font-size:11px;padding:8px 9px;cursor:pointer;flex-shrink:0;display:none;">✕</button></div></div>
-          <button class="add-voice-btn" onclick="openAddVoiceModal()">+ Add Voice</button>
-        </div></div>
-        <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="slider-grp"><label class="s-lbl">Speed</label><div class="slider-labels"><span class="slider-end">Slow</span><span class="slider-val" id="speedVal">1.0</span><span class="slider-end">Fast</span></div><input type="range" class="slider" id="speedSlider" min="0.7" max="1.2" step="0.05" value="1.0" oninput="document.getElementById('speedVal').textContent=this.value"></div>
-          <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="exagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="exagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('exagVal').textContent=this.value"></div>
-        </div></div>
-        <button class="btn-y" id="voiceBtn" onclick="startVoiceGen()">🎙 Generate Speech</button>
+        <!-- Voice Mode Toggle -->
+        <div style="display:flex;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:3px;gap:3px;">
+          <button id="modeVoiceBtn" onclick="setVoiceMode('voice')" style="flex:1;padding:8px;border-radius:6px;border:none;background:var(--y);color:#000;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;">Voice</button>
+          <button id="modeCloneBtn" onclick="setVoiceMode('clone')" style="flex:1;padding:8px;border-radius:6px;border:none;background:transparent;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;">Clone</button>
+        </div>
+
+        <!-- VOICE MODE -->
+        <div id="voiceModePanel">
+          <div class="card"><div class="card-head">Voice</div><div class="card-body">
+            <div class="s-row"><label class="s-lbl">Selected Voice</label>
+              <select class="sel" id="voiceSel" onchange="onVoiceChange()" style="width:100%;">
+                <option value="21m00Tcm4TlvDq8ikWAM">Rachel</option>
+                <option value="AZnzlk1XvdvUeBnXmlld">Domi</option>
+                <option value="EXAVITQu4vr4xnSDxMaL">Bella</option>
+                <option value="ErXwobaYiN019PkySvjV">Antoni</option>
+                <option value="MF3mGyEYCl7XYWbV9V6O">Elli</option>
+                <option value="TxGEqnHWrfWFTfGW9XjX">Josh</option>
+                <option value="VR6AewLTigWG4xSOukaG">Arnold</option>
+                <option value="pNInz6obpgDQGcFmaJgB">Adam</option>
+                <option value="yoZ06aMxZJJ28mfd3POQ">Sam</option>
+              </select>
+            </div>
+            <div style="height:1px;background:var(--bd);margin:4px 0;"></div>
+            <div class="s-row"><label class="s-lbl">Custom Voice ID</label>
+              <div style="display:flex;gap:6px;">
+                <input class="inp" id="customVoiceIdInp" placeholder="ElevenLabs Voice ID" style="flex:1;">
+                <button class="btn-sm" onclick="saveCustomVoiceId()">Save</button>
+              </div>
+            </div>
+          </div></div>
+          <div class="card"><div class="card-head">Settings</div><div class="card-body">
+            <div class="slider-grp"><label class="s-lbl">Speed</label><div class="slider-labels"><span class="slider-end">Slow</span><span class="slider-val" id="speedVal">1.0</span><span class="slider-end">Fast</span></div><input type="range" class="slider" id="speedSlider" min="0.7" max="1.2" step="0.05" value="1.0" oninput="document.getElementById('speedVal').textContent=this.value"></div>
+            <div class="slider-grp"><label class="s-lbl">Stability</label><div class="slider-labels"><span class="slider-end">Variable</span><span class="slider-val" id="stabilityVal">50%</span><span class="slider-end">Stable</span></div><input type="range" class="slider" id="stabilitySlider" min="0" max="100" value="50" oninput="document.getElementById('stabilityVal').textContent=this.value+'%'"></div>
+            <div class="slider-grp"><label class="s-lbl">Similarity</label><div class="slider-labels"><span class="slider-end">Low</span><span class="slider-val" id="similarityVal">75%</span><span class="slider-end">High</span></div><input type="range" class="slider" id="similaritySlider" min="0" max="100" value="75" oninput="document.getElementById('similarityVal').textContent=this.value+'%'"></div>
+            <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="exagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="exagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('exagVal').textContent=this.value"></div>
+          </div></div>
+          <button class="btn-y" id="voiceBtn" onclick="startVoiceGen()">🎙 Generate Speech</button>
+        </div>
+
+        <!-- CLONE MODE -->
+        <div id="cloneModePanel" style="display:none;">
+          <div class="card"><div class="card-head">Voice</div><div class="card-body">
+            <div class="s-row"><label class="s-lbl">Selected Voice</label><div style="display:flex;gap:5px;"><select class="sel" id="cloneVoiceSel" onchange="onCloneVoiceChange()" style="flex:1;"></select><button id="delVoiceBtn" onclick="deleteVoice()" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t3);font-size:11px;padding:8px 9px;cursor:pointer;flex-shrink:0;display:none;">✕</button></div></div>
+            <button class="add-voice-btn" onclick="openAddVoiceModal()">+ Add Voice</button>
+          </div></div>
+          <div class="card"><div class="card-head">Settings</div><div class="card-body">
+            <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="cloneExagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="cloneExagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('cloneExagVal').textContent=this.value"></div>
+          </div></div>
+          <button class="btn-y" id="cloneVoiceBtn" onclick="startCloneGen()">🎙 Generate Speech</button>
+        </div>
+
         <div class="prog" id="voiceProg"><div class="prog-top"><span class="prog-lbl" id="voiceProgLbl">Generating…</span><span class="prog-pct" id="voiceProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="vrFill"></div></div></div>
         <div class="err" id="voiceErr"><div class="err-title">ERROR</div><div class="err-msg" id="voiceErrMsg"></div></div>
       </div>
@@ -1298,7 +1340,7 @@ function loadVoices(){try{return JSON.parse(localStorage.getItem('viralmax_voice
 function saveVoices(v){localStorage.setItem('viralmax_voices',JSON.stringify(v))}
 
 function renderVoiceSel(){
-  const sel=document.getElementById('voiceSel');const voices=loadVoices();
+  const sel=document.getElementById('cloneVoiceSel');const voices=loadVoices();
   sel.innerHTML=voices.length?'':'<option value="">No voices added</option>';
   voices.forEach(v=>{const o=document.createElement('option');o.value=v.id;o.textContent=v.name;sel.appendChild(o)});
   sel.value=selVoiceId||'';updateDelBtn();
@@ -1324,22 +1366,112 @@ function saveVoice(){
   };reader.readAsDataURL(modalAudioFile2);
 }
 
-async function startVoiceGen(){
-  const script=document.getElementById('voiceScript').value.trim();if(!script){alert('Enter a script');return}if(!selVoiceId){alert('Select a voice first');return}
-  const btn=document.getElementById('voiceBtn');btn.disabled=true;btn.textContent='⏳ Generating…';
-  document.getElementById('voiceProg').classList.add('vis');document.getElementById('voiceErr').classList.remove('vis');
-  let pct=0;const fill=document.getElementById('vrFill'),pctLbl=document.getElementById('voiceProgPct'),lbl=document.getElementById('voiceProgLbl');
-  const tick=setInterval(()=>{if(pct<95){const inc=pct<30?2:pct<60?.8:.2;pct+=Math.random()*inc;if(pct>95)pct=95;fill.style.width=pct+'%';pctLbl.textContent=Math.round(pct)+'%';if(pct>15)lbl.textContent='Waiting for GPU…';if(pct>40)lbl.textContent='Generating audio…';if(pct>75)lbl.textContent='Almost done…'}},800);
-  try{
-    const voices=loadVoices();const v=voices.find(x=>x.id===selVoiceId);if(!v)throw new Error('Voice not found');
-    const byteStr=atob(v.audioB64),ab=new ArrayBuffer(byteStr.length),ia=new Uint8Array(ab);for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
-    const blob=new Blob([ab],{type:v.mimeType||'audio/wav'});
-    const fd=new FormData();fd.append('text',script);fd.append('exaggeration',document.getElementById('exagSlider').value);fd.append('cfgWeight','0.5');fd.append('temperature','0.8');fd.append('voiceSample',blob,'voice.wav');
-    const res=await fetch('/generate-voice',{method:'POST',body:fd});const data=await res.json();
-    clearInterval(tick);fill.style.width='100%';pctLbl.textContent='100%';if(!data.success)throw new Error(data.error||'Failed');
-    addVoiceOutput(data.audioUrl,script.slice(0,60)+(script.length>60?'…':''),selVoiceName);
-  }catch(err){clearInterval(tick);document.getElementById('voiceErr').classList.add('vis');document.getElementById('voiceErrMsg').textContent=err.message}
-  btn.disabled=false;btn.textContent='🎙 Generate Speech';setTimeout(()=>document.getElementById('voiceProg').classList.remove('vis'),2000);
+// ── VOICE MODE ──
+let currentVoiceMode = 'voice';
+
+function setVoiceMode(mode) {
+  currentVoiceMode = mode;
+  document.getElementById('voiceModePanel').style.display = mode === 'voice' ? 'flex' : 'none';
+  document.getElementById('cloneModePanel').style.display = mode === 'clone' ? 'flex' : 'none';
+  document.getElementById('voiceModePanel').style.flexDirection = 'column';
+  document.getElementById('voiceModePanel').style.gap = '12px';
+  document.getElementById('cloneModePanel').style.flexDirection = 'column';
+  document.getElementById('cloneModePanel').style.gap = '12px';
+  document.getElementById('modeVoiceBtn').style.background = mode === 'voice' ? 'var(--y)' : 'transparent';
+  document.getElementById('modeVoiceBtn').style.color = mode === 'voice' ? '#000' : 'var(--t2)';
+  document.getElementById('modeCloneBtn').style.background = mode === 'clone' ? 'var(--y)' : 'transparent';
+  document.getElementById('modeCloneBtn').style.color = mode === 'clone' ? '#000' : 'var(--t2)';
+}
+
+function saveCustomVoiceId() {
+  const id = document.getElementById('customVoiceIdInp').value.trim();
+  if (!id) { alert('Enter a voice ID'); return; }
+  const sel = document.getElementById('voiceSel');
+  const existing = Array.from(sel.options).find(o => o.value === id);
+  if (!existing) {
+    const o = document.createElement('option');
+    o.value = id; o.textContent = 'Custom: ' + id.slice(0, 12) + '…';
+    sel.appendChild(o);
+  }
+  sel.value = id;
+  selVoiceId = id;
+  document.getElementById('customVoiceIdInp').value = '';
+}
+
+function onCloneVoiceChange() { selVoiceId = document.getElementById('cloneVoiceSel').value; const v = loadVoices().find(x => x.id === selVoiceId); selVoiceName = v ? v.name : 'Clone'; updateDelBtn(); }
+
+async function startVoiceGen() {
+  const script = document.getElementById('voiceScript').value.trim();
+  if (!script) { alert('Enter a script'); return; }
+  const voiceId = document.getElementById('voiceSel').value;
+  if (!voiceId) { alert('Select a voice'); return; }
+  const btn = document.getElementById('voiceBtn');
+  btn.disabled = true; btn.textContent = '⏳ Generating…';
+  document.getElementById('voiceProg').classList.add('vis');
+  document.getElementById('voiceErr').classList.remove('vis');
+  let pct = 0;
+  const fill = document.getElementById('vrFill'), pctLbl = document.getElementById('voiceProgPct'), lbl = document.getElementById('voiceProgLbl');
+  const tick = setInterval(() => { if (pct < 90) { pct += Math.random() * 3; if (pct > 90) pct = 90; fill.style.width = pct + '%'; pctLbl.textContent = Math.round(pct) + '%'; if (pct > 20) lbl.textContent = 'Generating…'; } }, 600);
+  try {
+    const res = await fetch('/generate-voice-elevenlabs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: script,
+        voiceId,
+        speed: parseFloat(document.getElementById('speedSlider').value),
+        stability: parseFloat(document.getElementById('stabilitySlider').value) / 100,
+        similarity: parseFloat(document.getElementById('similaritySlider').value) / 100,
+        exaggeration: parseFloat(document.getElementById('exagSlider').value),
+      })
+    });
+    const data = await res.json();
+    clearInterval(tick); fill.style.width = '100%'; pctLbl.textContent = '100%';
+    if (!data.success) throw new Error(data.error || 'Failed');
+    const charCount = script.length;
+    const cr = Math.ceil(charCount / 1000) || 1;
+    creds -= cr; updCreds();
+    addVoiceOutput(data.audioUrl, script.slice(0, 60) + (script.length > 60 ? '…' : ''), 'Voice');
+  } catch(err) {
+    clearInterval(tick);
+    document.getElementById('voiceErr').classList.add('vis');
+    document.getElementById('voiceErrMsg').textContent = err.message;
+  }
+  btn.disabled = false; btn.textContent = '🎙 Generate Speech';
+  setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
+}
+
+async function startCloneGen() {
+  const script = document.getElementById('voiceScript').value.trim();
+  if (!script) { alert('Enter a script'); return; }
+  if (!selVoiceId) { alert('Select a voice first'); return; }
+  const btn = document.getElementById('cloneVoiceBtn');
+  btn.disabled = true; btn.textContent = '⏳ Generating…';
+  document.getElementById('voiceProg').classList.add('vis');
+  document.getElementById('voiceErr').classList.remove('vis');
+  let pct = 0;
+  const fill = document.getElementById('vrFill'), pctLbl = document.getElementById('voiceProgPct'), lbl = document.getElementById('voiceProgLbl');
+  const tick = setInterval(() => { if (pct < 95) { const inc = pct < 30 ? 2 : pct < 60 ? .8 : .2; pct += Math.random() * inc; if (pct > 95) pct = 95; fill.style.width = pct + '%'; pctLbl.textContent = Math.round(pct) + '%'; if (pct > 15) lbl.textContent = 'Waiting for GPU…'; if (pct > 40) lbl.textContent = 'Generating audio…'; } }, 800);
+  try {
+    const voices = loadVoices(); const v = voices.find(x => x.id === selVoiceId); if (!v) throw new Error('Voice not found');
+    const byteStr = atob(v.audioB64), ab = new ArrayBuffer(byteStr.length), ia = new Uint8Array(ab);
+    for (let i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
+    const blob = new Blob([ab], { type: v.mimeType || 'audio/wav' });
+    const fd = new FormData();
+    fd.append('text', script); fd.append('exaggeration', document.getElementById('cloneExagSlider').value);
+    fd.append('cfgWeight', '0.5'); fd.append('temperature', '0.8'); fd.append('voiceSample', blob, 'voice.wav');
+    const res = await fetch('/generate-voice', { method: 'POST', body: fd });
+    const data = await res.json();
+    clearInterval(tick); fill.style.width = '100%'; pctLbl.textContent = '100%';
+    if (!data.success) throw new Error(data.error || 'Failed');
+    addVoiceOutput(data.audioUrl, script.slice(0, 60) + (script.length > 60 ? '…' : ''), selVoiceName);
+  } catch(err) {
+    clearInterval(tick);
+    document.getElementById('voiceErr').classList.add('vis');
+    document.getElementById('voiceErrMsg').textContent = err.message;
+  }
+  btn.disabled = false; btn.textContent = '🎙 Generate Speech';
+  setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
 }
 
 function loadVoiceOutputs(){try{return JSON.parse(localStorage.getItem('viralmax_vo_outputs')||'[]')}catch{return[]}}
