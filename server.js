@@ -581,7 +581,7 @@ app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
   const { text, voiceId, stability = 0.5, similarity = 1.0 } = req.body;
   if (!text || !text.trim()) return res.json({ success: false, error: 'No text provided' });
   if (!voiceId) return res.json({ success: false, error: 'No voiceId provided' });
-  const WAVESPEED_KEY = process.env.WAVESPEED_API_KEY || 'E8f88aee1fd28a10e860e20a2c07bbe224cc79d80506beab6ba4f2e47cf5ab4a';
+  const WAVESPEED_KEY = process.env.WAVESPEED_API_KEY || 'c9db06b18ee6bb7fe0e5d442981848c86a60ee56265ee2fad567e53d59f1ed04';
   const timestamp = Date.now();
   try {
     const submitRes = await axios.post(
