@@ -584,7 +584,7 @@ app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
     let audioUrl = null;
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 3000));
-      const pollRes = await axios.get('https://api.wavespeed.ai/api/v3/predictions/' + requestId, { headers: { 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 15000 });
+      const pollRes = await axios.get('https://api.wavespeed.ai/api/v3/predictions/' + requestId + '/result', { headers: { 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 15000 });
       const pollData = pollRes.data?.data || pollRes.data;
       const status = pollData?.status;
       console.log('[wavespeed] poll ' + (i+1) + ' status=' + status + ' outputs=' + JSON.stringify(pollData?.outputs));
