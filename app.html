@@ -1436,7 +1436,7 @@ let showFavoritesOnly = false;
 let pendingCustomVoiceId = null;
 let selectedVoiceId = '21m00Tcm4TlvDq8ikWAM';
 
-function openVoicePicker() {
+async function openVoicePicker() {
   document.getElementById('voicePickerModal').style.display = 'flex';
   document.getElementById('voiceSearch').value = '';
   document.getElementById('filterGender').value = '';
@@ -1445,6 +1445,22 @@ function openVoicePicker() {
   showFavoritesOnly = false;
   document.getElementById('favFilterBtn').style.background = 'var(--s3)';
   document.getElementById('favFilterBtn').style.color = 'var(--t2)';
+  // Fetch real preview URLs if not already loaded
+  if (!window.voicesLoaded) {
+    document.getElementById('voicePickerList').innerHTML = '<div class="empty" style="padding:40px;"><span class="empty-icon">⏳</span><div class="empty-txt">Loading voices...</div></div>';
+    try {
+      const r = await fetch('/elevenlabs-voices');
+      const data = await r.json();
+      if (data.success && data.voices.length) {
+        // Merge preview URLs into ALL_VOICES
+        data.voices.forEach(sv => {
+          const local = ALL_VOICES.find(v => v.id === sv.id);
+          if (local && sv.preview) local.preview = sv.preview;
+        });
+        window.voicesLoaded = true;
+      }
+    } catch(e) { console.log('Could not fetch voice previews:', e.message); }
+  }
   renderVoicePickerList(ALL_VOICES);
 }
 

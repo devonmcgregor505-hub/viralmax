@@ -603,6 +603,32 @@ app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
   }
 });
 
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ELEVENLABS VOICES LIST  —  GET /elevenlabs-voices
+// ══════════════════════════════════════════════════════════════════════════════
+app.get('/elevenlabs-voices', async (req, res) => {
+  try {
+    const response = await axios.get('https://api.elevenlabs.io/v1/voices', {
+      headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY || '' },
+      timeout: 10000,
+    });
+    const voices = response.data.voices.map(v => ({
+      id: v.voice_id,
+      name: v.name,
+      preview: v.preview_url,
+      gender: v.labels?.gender || '',
+      accent: v.labels?.accent || '',
+      age: v.labels?.age || '',
+      desc: v.labels?.description || v.description || '',
+    }));
+    res.json({ success: true, voices });
+  } catch(err) {
+    console.error('[elevenlabs-voices] error:', err.message);
+    res.json({ success: false, error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log('\n✅ Viralmax running at http://localhost:' + PORT);
   console.log('   Routes: / (home)  /app (tools)  /login  /signup  /legal  /checkout');
