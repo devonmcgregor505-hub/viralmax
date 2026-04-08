@@ -1558,7 +1558,11 @@ function previewVoice(id) {
     document.querySelectorAll('[id^="prev-"]').forEach(b => b.textContent = '▶');
     if (btn && btn.dataset.playing === 'true') { btn.dataset.playing = 'false'; return; }
   }
-  const url = 'https://storage.googleapis.com/eleven-public-prod/premade/voices/' + id + '/preview.mp3';
+  const src = (window.LIVE_VOICES && window.LIVE_VOICES.length) ? window.LIVE_VOICES : ALL_VOICES;
+  const v = src.find(x => x.id === id);
+  const url = v?.preview;
+  console.log('previewVoice:', id, url, 'live count:', window.LIVE_VOICES?.length);
+  if (!url) { if (btn) { btn.textContent = '✕'; setTimeout(() => { if(btn) btn.textContent = '▶'; }, 1500); } return; }
   currentPreviewAudio = new Audio(url);
   if (btn) { btn.textContent = '■'; btn.dataset.playing = 'true'; }
   currentPreviewAudio.play().catch(() => {
