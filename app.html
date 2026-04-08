@@ -1725,7 +1725,6 @@ async function startDeadspace(){
     const res=await fetch('/remove-deadspace',{method:'POST',body:fd});const data=await res.json();
     if(!data.success)throw new Error(data.error||'Failed');
     document.getElementById('dsVid').src=data.videoUrl;document.getElementById('dsDlBtn').href=data.videoUrl;document.getElementById('dsDlWrap').style.display='block';
-    creds-=10;updCreds();
   }catch(err){alert('Error: '+err.message)}
   btn.disabled=false;btn.textContent='✂️ Remove Silence';
 }
@@ -1741,7 +1740,6 @@ async function startScrape(){
     const res=await fetch('/scrape-channel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelUrl:url,count:document.getElementById('ytCount').value,sort:document.getElementById('ytSort').value})});
     const data=await res.json();if(!data.success)throw new Error(data.error||'Failed');
     lastScrapeData=data.videos;renderScraped(data.videos);document.getElementById('exportBtn').style.display='block';
-    creds-=7;updCreds();
   }catch(err){document.getElementById('scrapErr').classList.add('vis');document.getElementById('scrapErrMsg').textContent=err.message;document.getElementById('scrapList').innerHTML='<div class="empty" style="padding:36px;"><span class="empty-icon">❌</span><div class="empty-txt">Scrape failed</div></div>'}
   btn.disabled=false;btn.textContent='📊 Scrape Channel';
 }
