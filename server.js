@@ -76,18 +76,7 @@ app.get('/queue', (req, res) => {
 });
 
 // ── Chatterbox warmup ──
-function warmupChatterbox() {
-  const CHATTERBOX_URL = process.env.CHATTERBOX_MODAL_URL;
-  if (!CHATTERBOX_URL) return;
-  axios.post(CHATTERBOX_URL, {
-    text: 'warm', exaggeration: 0.5, cfg_weight: 0.5, temperature: 0.8, audio_prompt_b64: null,
-  }, { timeout: 30000 }).then(() => {
-    console.log('[warmup] Chatterbox pinged OK');
-  }).catch(e => {
-    console.log('[warmup] Chatterbox ping failed:', e.message);
-  });
-}
-setInterval(warmupChatterbox, 4 * 60 * 1000);
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CLAUDE API HELPER
@@ -581,7 +570,7 @@ app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
   const { text, voiceId, stability = 0.5, similarity = 1.0 } = req.body;
   if (!text || !text.trim()) return res.json({ success: false, error: 'No text provided' });
   if (!voiceId) return res.json({ success: false, error: 'No voiceId provided' });
-  const WAVESPEED_KEY = process.env.WAVESPEED_API_KEY || 'c9db06b18ee6bb7fe0e5d442981848c86a60ee56265ee2fad567e53d59f1ed04';
+  const WAVESPEED_KEY = process.env.WAVESPEED_API_KEY || 'paste_fresh_key_here';
   const timestamp = Date.now();
   try {
     const submitRes = await axios.post(
