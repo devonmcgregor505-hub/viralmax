@@ -6,6 +6,7 @@ const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { YoutubeTranscript } = require('youtube-transcript');
 const ffmpegStatic = require('ffmpeg-static');
 
 // ── FFmpeg ──
@@ -553,6 +554,21 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
       videos.sort((a, b) => b.view_count - a.view_count);
     }
     videos = videos.slice(0, parseInt(count));
+
+    // Fetch transcripts in parallel batches of 8
+    const BATCH = 8;
+    for (let i = 0; i < videos.length; i += BATCH) {
+      const batch = videos.slice(i, i + BATCH);
+      await Promise.all(batch.map(async (video) => {
+        try {
+          const segments = await YoutubeTranscript.fetchTranscript(video.video_id, { lang: 'en' });
+          video.transcript = segments.map(s => s.text).join(' ').replace(/\s+/g, ' ').trim();
+        } catch(e) {
+          video.transcript = '';
+        }
+      }));
+    }
+
     res.json({ success: true, videos });
   } catch(err) {
     console.error('[scraper] error:', err.message);
