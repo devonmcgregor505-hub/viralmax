@@ -499,7 +499,8 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
   const YT_KEY = process.env.YOUTUBE_API_KEY;
   if (!YT_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not set' });
   try {
-    const handle = channelUrl.replace(/\/$/, '').split('/').pop().replace('@', '');
+    const cleanUrl = channelUrl.replace(/\/shorts.*$/, '').replace(/\/videos.*$/, '').replace(/\/featured.*$/, '').replace(/\/$/, '');
+    const handle = cleanUrl.split('/').pop().replace('@', '');
     const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
       params: { part: 'snippet', q: handle, type: 'channel', maxResults: 1, key: YT_KEY }, timeout: 10000,
     });
