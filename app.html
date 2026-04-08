@@ -822,12 +822,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
             <div class="slider-grp"><label class="s-lbl">Similarity</label><div class="slider-labels"><span class="slider-end">Low</span><span class="slider-val" id="similarityVal">75%</span><span class="slider-end">High</span></div><input type="range" class="slider" id="similaritySlider" min="0" max="100" value="75" oninput="document.getElementById('similarityVal').textContent=this.value+'%'"></div>
             <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="exagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="exagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('exagVal').textContent=this.value"></div>
           </div></div>
-          <div class="card"><div class="card-head">Cost</div><div class="card-body">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div style="font-size:13px;color:var(--t2);">This generation</div>
-              <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--y);"><span id="voiceCostDisplay">0</span></div>
+          <div class="card"><div class="card-body">
+            <div class="s-row">
+              <label class="s-lbl">Cost</label>
+              <div class="s-val" id="voiceCostDisplay">0 cr</div>
             </div>
-            <div style="font-size:10px;color:var(--t3);">10 credits per 1,000 characters · flat rate</div>
           </div></div>
           <button class="btn-y" id="voiceBtn" onclick="startVoiceGen()">🎙 Generate Speech</button>
         </div>

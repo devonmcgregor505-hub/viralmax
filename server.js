@@ -578,7 +578,7 @@ app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
       { text: text.trim(), voice_id: voiceId, stability: parseFloat(stability), similarity: parseFloat(similarity), use_speaker_boost: true },
       { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 30000 }
     );
-    const requestId = submitRes.data?.id;
+    const requestId = submitRes.data?.data?.id || submitRes.data?.id;
     if (!requestId) throw new Error('No request ID: ' + JSON.stringify(submitRes.data).slice(0, 200));
     console.log('[wavespeed] requestId=' + requestId);
     let audioUrl = null;
