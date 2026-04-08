@@ -610,7 +610,7 @@ app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
 app.get('/elevenlabs-voices', async (req, res) => {
   try {
     const response = await axios.get('https://api.elevenlabs.io/v1/voices', {
-      headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY || 'Ed4c64ec161e19b166e707e39e216c052e2f8a7bba9381cd6fe59433956c6798' },
+      headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY || 'sk_6eb53410b24cd509aa1d7a0ead7d7fd28a9015591e042c2b' },
       timeout: 10000,
     });
     const voices = response.data.voices.map(v => ({
