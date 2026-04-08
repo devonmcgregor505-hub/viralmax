@@ -1489,6 +1489,7 @@ function renderVoicePickerList(voices) {
         <div style="font-size:13px;font-weight:700;color:var(--tx);">${v.name} ${isSelected?'<span style="color:var(--y);font-size:10px;">✓ Selected</span>':''}</div>
         <div style="font-size:11px;color:var(--t3);margin-top:1px;">${v.desc} · ${v.accent} · ${v.age}</div>
       </div>
+      <button onclick="event.stopPropagation();previewVoice('${v.id}')" id="prev-${v.id}" style="background:var(--s4);border:1px solid var(--bd);border-radius:6px;color:var(--t2);font-size:11px;padding:5px 9px;cursor:pointer;flex-shrink:0;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.color='var(--y)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--t2)'">▶</button>
       <button onclick="event.stopPropagation();toggleFavorite('${v.id}')" style="background:none;border:none;font-size:16px;cursor:pointer;color:${isFav?'var(--y)':'var(--t3)'};padding:4px;" id="fav-${v.id}">${isFav?'★':'☆'}</button>
     </div>`;
   }).join('');
@@ -1530,6 +1531,29 @@ function confirmSaveCustomVoice() {
   renderCustomVoicesList();
 }
 
+
+let currentPreviewAudio = null;
+
+function previewVoice(id) {
+  const btn = document.getElementById('prev-' + id);
+  if (currentPreviewAudio) {
+    currentPreviewAudio.pause();
+    currentPreviewAudio = null;
+    document.querySelectorAll('[id^="prev-"]').forEach(b => b.textContent = '▶');
+    if (btn && btn.dataset.playing === 'true') { btn.dataset.playing = 'false'; return; }
+  }
+  const url = 'https://storage.googleapis.com/eleven-public-prod/premade/voices/' + id + '/preview.mp3';
+  currentPreviewAudio = new Audio(url);
+  if (btn) { btn.textContent = '■'; btn.dataset.playing = 'true'; }
+  currentPreviewAudio.play().catch(() => {
+    if (btn) { btn.textContent = '▶'; btn.dataset.playing = 'false'; }
+    alert('No preview available for this voice');
+  });
+  currentPreviewAudio.onended = () => {
+    if (btn) { btn.textContent = '▶'; btn.dataset.playing = 'false'; }
+    currentPreviewAudio = null;
+  };
+}
 function loadCustomVoicesV2() { try { return JSON.parse(localStorage.getItem('viralmax_custom_voices_v2') || '[]'); } catch { return []; } }
 function saveCustomVoicesV2(v) { localStorage.setItem('viralmax_custom_voices_v2', JSON.stringify(v)); }
 
