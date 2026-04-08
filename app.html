@@ -415,13 +415,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     <div class="logo-text">Viralmax</div>
   </div>
 
-  <div class="credits-bar">
+  <div class="credits-bar" style="cursor:pointer;" onclick="openTopUp()">
     <div>
       <div class="credits-num" id="creditsDisplay">500</div>
       <div class="credits-lbl">Credits</div>
     </div>
     <div style="text-align:right;">
-      <div style="font-size:9px;color:var(--t3);">1cr = $0.01</div>
+      <div style="font-size:10px;font-weight:700;color:var(--y);background:rgba(255,230,0,0.15);border:1px solid rgba(255,230,0,0.25);border-radius:5px;padding:3px 8px;">Top Up</div>
     </div>
   </div>
 
@@ -760,12 +760,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="tab-panel" id="tab-voicegen">
     <div class="voice-layout">
       <div class="left-col">
-        <!-- Voice Mode Toggle -->
-        <div style="display:flex;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:3px;gap:3px;">
-          <button id="modeVoiceBtn" onclick="setVoiceMode('voice')" style="flex:1;padding:8px;border-radius:6px;border:none;background:var(--y);color:#000;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;">Voice</button>
-          <button id="modeCloneBtn" onclick="setVoiceMode('clone')" style="flex:1;padding:8px;border-radius:6px;border:none;background:transparent;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;">Clone</button>
-        </div>
-
         <!-- VOICE MODE -->
         <div id="voiceModePanel">
           <div class="card"><div class="card-head">Voice</div><div class="card-body">
@@ -797,18 +791,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
             <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="exagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="exagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('exagVal').textContent=this.value"></div>
           </div></div>
           <button class="btn-y" id="voiceBtn" onclick="startVoiceGen()">🎙 Generate Speech</button>
-        </div>
-
-        <!-- CLONE MODE -->
-        <div id="cloneModePanel" style="display:none;">
-          <div class="card"><div class="card-head">Voice</div><div class="card-body">
-            <div class="s-row"><label class="s-lbl">Selected Voice</label><div style="display:flex;gap:5px;"><select class="sel" id="cloneVoiceSel" onchange="onCloneVoiceChange()" style="flex:1;"></select><button id="delVoiceBtn" onclick="deleteVoice()" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t3);font-size:11px;padding:8px 9px;cursor:pointer;flex-shrink:0;display:none;">✕</button></div></div>
-            <button class="add-voice-btn" onclick="openAddVoiceModal()">+ Add Voice</button>
-          </div></div>
-          <div class="card"><div class="card-head">Settings</div><div class="card-body">
-            <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="cloneExagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="cloneExagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('cloneExagVal').textContent=this.value"></div>
-          </div></div>
-          <button class="btn-y" id="cloneVoiceBtn" onclick="startCloneGen()">🎙 Generate Speech</button>
         </div>
 
         <div class="prog" id="voiceProg"><div class="prog-top"><span class="prog-lbl" id="voiceProgLbl">Generating…</span><span class="prog-pct" id="voiceProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="vrFill"></div></div></div>
@@ -925,7 +907,20 @@ let pipe = {
   refImageFile:null, voiceUrl:null, silencedUrl:null,
 };
 
-function updCreds(){document.getElementById('creditsDisplay').textContent=creds}
+function updCreds(){
+  document.getElementById('creditsDisplay').textContent=creds;
+  localStorage.setItem('viralmax_credits', creds);
+}
+function openTopUp(){
+  document.getElementById('topUpBalance').textContent=creds;
+  document.getElementById('topUpModal').style.display='flex';
+}
+function closeTopUp(e){if(e.target===document.getElementById('topUpModal'))document.getElementById('topUpModal').style.display='none';}
+function buyCredits(amount, price){
+  // TODO: wire to Stripe checkout
+  alert('Stripe checkout coming soon!\nYou selected: ' + amount + ' credits for $' + price);
+  document.getElementById('topUpModal').style.display='none';
+}
 
 // ── QUEUE POLL ──
 setInterval(async()=>{
@@ -1429,8 +1424,7 @@ async function startVoiceGen() {
     clearInterval(tick); fill.style.width = '100%'; pctLbl.textContent = '100%';
     if (!data.success) throw new Error(data.error || 'Failed');
     const charCount = script.length;
-    const cr = Math.ceil(charCount / 1000) * 10;
-    creds -= cr; updCreds();
+    creds -= 10; updCreds();
     addVoiceOutput(data.audioUrl, script.slice(0, 60) + (script.length > 60 ? '…' : ''), 'Voice');
   } catch(err) {
     clearInterval(tick);
@@ -1492,7 +1486,7 @@ function renderVoiceOutputs(){
     list.appendChild(card);
   });
 }
-function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>9000?'var(--red)':n>7000?'var(--y)':'var(--t3)';const cr=(Math.ceil(n/1000)||1)*10;const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent=cr+' cr';}
+function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>9000?'var(--red)':n>7000?'var(--y)':'var(--t3)';const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent='10 cr';}
 
 // ── SILENCE REMOVER ──
 const dsZone=document.getElementById('dsZone');
@@ -1561,6 +1555,7 @@ function suggestNiche(){
   if(n&&n.trim())alert('Thanks! We\'ll add "'+n.trim()+'" soon.');
 }
 // ── INIT ──
+creds = parseInt(localStorage.getItem('viralmax_credits')) || 500;
 onModelChange();updCreds();onImgModelChange();renderVoiceSel();renderVoiceOutputs();
 
 
@@ -1568,5 +1563,37 @@ onModelChange();updCreds();onImgModelChange();renderVoiceSel();renderVoiceOutput
 const hash=window.location.hash.replace('#','');
 if(hash&&document.getElementById('tab-'+hash))switchTab(hash);
 </script>
+
+<!-- TOP UP MODAL -->
+<div class="overlay" id="topUpModal" style="display:none;" onclick="closeTopUp(event)">
+  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:18px;padding:32px;width:480px;max-width:95vw;display:flex;flex-direction:column;gap:24px;box-shadow:0 24px 60px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:var(--y);letter-spacing:-0.5px;">Top Up Credits</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:3px;">Current balance: <span id="topUpBalance" style="color:var(--y);font-weight:700;">500</span> credits</div>
+      </div>
+      <button onclick="document.getElementById('topUpModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:14px;padding:6px 10px;cursor:pointer;">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+      <div onclick="buyCredits(500,5)" style="background:var(--s3);border:1px solid var(--bd);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s3)'">
+        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'DM Sans',sans-serif;letter-spacing:-1px;">500</div>
+        <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'DM Sans',sans-serif;">$5.00</div>
+      </div>
+      <div onclick="buyCredits(1500,12)" style="background:var(--s3);border:2px solid rgba(255,230,0,0.35);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;" onmouseover="this.style.borderColor='rgba(255,230,0,0.6)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='rgba(255,230,0,0.35)';this.style.background='var(--s3)'">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;font-size:8px;font-weight:800;padding:2px 8px;border-radius:4px;font-family:'DM Sans',sans-serif;white-space:nowrap;">BEST VALUE</div>
+        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'DM Sans',sans-serif;letter-spacing:-1px;">1500</div>
+        <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'DM Sans',sans-serif;">$12.00</div>
+      </div>
+      <div onclick="buyCredits(3000,20)" style="background:var(--s3);border:1px solid var(--bd);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s3)'">
+        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'DM Sans',sans-serif;letter-spacing:-1px;">3000</div>
+        <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'DM Sans',sans-serif;">$20.00</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--t3);text-align:center;">Payments processed securely by Stripe · Credits never expire</div>
+  </div>
+</div>
 </body>
 </html>
