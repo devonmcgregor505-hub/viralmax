@@ -585,10 +585,11 @@ app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 3000));
       const pollRes = await axios.get('https://api.wavespeed.ai/api/v3/predictions/' + requestId, { headers: { 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 15000 });
-      const status = pollRes.data?.status;
-      console.log('[wavespeed] poll ' + (i+1) + ' status=' + status);
-      if (status === 'completed') { audioUrl = pollRes.data?.outputs?.[0]; break; }
-      if (status === 'failed') throw new Error('Wavespeed failed: ' + (pollRes.data?.error || 'unknown'));
+      const pollData = pollRes.data?.data || pollRes.data;
+      const status = pollData?.status;
+      console.log('[wavespeed] poll ' + (i+1) + ' status=' + status + ' outputs=' + JSON.stringify(pollData?.outputs));
+      if (status === 'completed') { audioUrl = pollData?.outputs?.[0]; break; }
+      if (status === 'failed') throw new Error('Wavespeed failed: ' + (pollData?.error || 'unknown'));
     }
     if (!audioUrl) throw new Error('Wavespeed timed out');
     const dlRes = await axios.get(audioUrl, { responseType: 'arraybuffer', timeout: 60000 });
