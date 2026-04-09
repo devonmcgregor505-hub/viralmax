@@ -448,12 +448,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     <span class="nav-sec-lbl">Tools</span>
     <button class="nav-item" id="nav-deadspace" onclick="switchTab('deadspace')"><span class="nav-icon">✂️</span>Silence Remover<span class="nav-badge b-live">LIVE</span></button>
     <button class="nav-item" id="nav-scraper" onclick="switchTab('scraper')"><span class="nav-icon">📊</span>YT Scraper<span class="nav-badge b-live">LIVE</span></button>
-    <button class="nav-item" id="nav-clipfinder" onclick="switchTab('clipfinder')"><span class="nav-icon">🎯</span>Clip Finder<span class="nav-badge b-hot">NEW</span></button>
-
-    <span class="nav-sec-lbl">Research</span>
-    <button class="nav-item" id="nav-viralvideo" onclick="switchTab('viralvideo')"><span class="nav-icon">🔥</span>Viral Video</button>
-    <button class="nav-item" id="nav-nichesniper" onclick="switchTab('nichesniper')"><span class="nav-icon">🎯</span>Niche Sniper</button>
-    <button class="nav-item" id="nav-competitor" onclick="switchTab('competitor')"><span class="nav-icon">👁</span>Competitor Tracker</button>
   </nav>
 
   <div class="sidebar-footer">
@@ -871,88 +865,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       </div>
     </div>
   </div>
-
-  <!-- CLIP FINDER -->
-  <div class="tab-panel" id="tab-clipfinder">
-    <div class="workspace">
-      <div class="left-col">
-        <div><label class="fl">Video URL</label><input type="text" class="inp" id="cfUrl" placeholder="https://youtube.com/watch?v=…"></div>
-        <div><label class="fl">What to find</label><textarea class="ta" id="cfPrompt" rows="3" placeholder="e.g. Find the most emotional moments…"></textarea></div>
-        <button class="btn-y" id="cfBtn" onclick="startClipFinder()">🎯 Find Clips</button>
-        <div class="err" id="cfErr"><div class="err-title">ERROR</div><div class="err-msg" id="cfErrMsg"></div></div>
-      </div>
-      <div class="right-col">
-        <div class="empty" id="cfEmpty"><span class="empty-icon">🎯</span><div class="empty-txt">Enter a video URL and describe what clips to find</div></div>
-        <div id="cfResults" style="display:none;width:100%;max-width:560px;flex-direction:column;gap:10px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIRAL VIDEO -->
-  <div class="tab-panel" id="tab-viralvideo">
-    <div class="workspace">
-      <div class="left-col">
-        <div><label class="fl">Topic or Keyword</label><input type="text" class="inp" id="vvKeyword" placeholder="e.g. AI, finance, cooking…"></div>
-        <div class="card"><div class="card-head">Filters</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Sort By</label><select class="sel" id="vvSort"><option value="popular" selected>Most Popular</option><option value="trending">Trending</option><option value="newest">Newest</option></select></div>
-        </div></div>
-        <button class="btn-y" id="vvBtn" onclick="startViralSearch()">🔥 Find Viral Videos</button>
-        <div class="err" id="vvErr"><div class="err-title">ERROR</div><div class="err-msg" id="vvErrMsg"></div></div>
-      </div>
-      <div class="right-col">
-        <div class="empty" id="vvEmpty"><span class="empty-icon">🔥</span><div class="empty-txt">Search for viral videos in any niche</div></div>
-        <div id="vvResults" style="display:none;width:100%;max-width:560px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NICHE SNIPER -->
-  <div class="tab-panel" id="tab-nichesniper">
-    <div class="workspace">
-      <div class="left-col">
-        <div class="strip"><b>Niche Sniper.</b> Pick a niche and get deep insights — top formats, hooks, posting patterns, and content gaps.</div>
-        <div><label class="fl">Select Niche</label>
-          <div style="display:flex;flex-direction:column;gap:6px;" id="nicheGrid">
-            <div class="niche-opt" onclick="selectNicheOpt(this,'commentary')" style="background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;">
-              <span style="font-size:20px;">🎤</span><div><div style="font-size:13px;font-weight:700;color:var(--tx);">Commentary</div><div style="font-size:10px;color:var(--t3);">React, opine, break down trending topics</div></div>
-            </div>
-            <div class="niche-opt" onclick="selectNicheOpt(this,'ranking')" style="background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;">
-              <span style="font-size:20px;">🏆</span><div><div style="font-size:13px;font-weight:700;color:var(--tx);">Ranking</div><div style="font-size:10px;color:var(--t3);">Top 10s, tier lists, countdowns</div></div>
-            </div>
-            <div class="niche-opt" onclick="selectNicheOpt(this,'ai')" style="background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;">
-              <span style="font-size:20px;">🤖</span><div><div style="font-size:13px;font-weight:700;color:var(--tx);">AI</div><div style="font-size:10px;color:var(--t3);">AI tools, news, tutorials, comparisons</div></div>
-            </div>
-            <div class="niche-opt" onclick="selectNicheOpt(this,'crime')" style="background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;">
-              <span style="font-size:20px;">🔍</span><div><div style="font-size:13px;font-weight:700;color:var(--tx);">Crime</div><div style="font-size:10px;color:var(--t3);">True crime, mysteries, unsolved cases</div></div>
-            </div>
-          </div>
-        </div>
-        <button class="btn-y" id="nsBtn" onclick="startNicheSniper()" disabled>🎯 Snipe This Niche</button>
-        <div class="err" id="nsErr"><div class="err-title">ERROR</div><div class="err-msg" id="nsErrMsg"></div></div>
-      </div>
-      <div class="right-col">
-        <div class="empty" id="nsEmpty"><span class="empty-icon">🎯</span><div class="empty-txt">Select a niche to get deep content insights</div></div>
-        <div id="nsResults" style="display:none;width:100%;max-width:600px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- COMPETITOR TRACKER -->
-  <div class="tab-panel" id="tab-competitor">
-    <div class="workspace">
-      <div class="left-col">
-        <div><label class="fl">Channel URL</label><input type="text" class="inp" id="ctUrl" placeholder="https://youtube.com/@channelname"></div>
-        <button class="btn-y" onclick="addCompetitor()">+ Track Channel</button>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;" id="ctList"></div>
-        <div class="err" id="ctErr"><div class="err-title">ERROR</div><div class="err-msg" id="ctErrMsg"></div></div>
-      </div>
-      <div class="right-col">
-        <div class="empty" id="ctEmpty"><span class="empty-icon">👁</span><div class="empty-txt">Add competitor channels to track their top content</div></div>
-        <div id="ctResults" style="display:none;width:100%;max-width:560px;flex-direction:column;gap:14px;"></div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <!-- ADD VOICE MODAL -->
@@ -1031,10 +943,6 @@ const tabMeta={
   voicegen:['Voice Gen','Clone and generate voiceovers'],
   deadspace:['Silence Remover','Remove dead air from audio/video'],
   scraper:['YT Scraper','Scrape channel data for analysis'],
-  clipfinder:['Clip Finder','Find viral clip moments from any video'],
-  viralvideo:['Viral Video','Discover trending viral videos'],
-  nichesniper:['Niche Sniper','Analyse top niches for content opportunities'],
-  competitor:['Competitor Tracker','Track and monitor competitor channels'],
 };
 
 function switchTab(tab){
@@ -1870,108 +1778,10 @@ function suggestNiche(){
   const n=prompt('What niche would you like to see? We\'ll add it soon!');
   if(n&&n.trim())alert('Thanks! We\'ll add "'+n.trim()+'" soon.');
 }
-
-// ── CLIP FINDER ──
-async function startClipFinder(){
-  const url=document.getElementById('cfUrl').value.trim();
-  if(!url){alert('Enter a video URL');return}
-  const btn=document.getElementById('cfBtn');btn.disabled=true;btn.textContent='Finding…';
-  document.getElementById('cfErr').classList.remove('vis');
-  document.getElementById('cfEmpty').style.display='none';
-  const res=document.getElementById('cfResults');res.style.display='flex';
-  res.innerHTML='<div class="empty"><span class="empty-icon">⏳</span><div class="empty-txt">Analysing…</div></div>';
-  await new Promise(r=>setTimeout(r,800));
-  res.innerHTML='<div class="strip"><b>Coming Soon.</b> Clip finder will detect the best moments automatically from transcripts.</div>';
-  btn.disabled=false;btn.textContent='🎯 Find Clips';
-}
-
-// ── VIRAL VIDEO ──
-async function startViralSearch(){
-  const kw=document.getElementById('vvKeyword').value.trim();
-  if(!kw){alert('Enter a keyword');return}
-  const sort=document.getElementById('vvSort').value;
-  const btn=document.getElementById('vvBtn');btn.disabled=true;btn.textContent='Searching…';
-  document.getElementById('vvErr').classList.remove('vis');
-  document.getElementById('vvEmpty').style.display='none';
-  const resEl=document.getElementById('vvResults');resEl.style.display='block';
-  resEl.innerHTML='<div class="empty"><span class="empty-icon">⏳</span><div class="empty-txt">Finding viral videos…</div></div>';
-  try{
-    const res=await fetch('/scrape-channel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelUrl:'https://youtube.com/@'+kw,count:15,sort})});
-    const data=await res.json();
-    if(!data.success)throw new Error(data.error);
-    if(!data.videos.length){resEl.innerHTML='<div class="empty"><span class="empty-icon">📭</span><div class="empty-txt">No results found</div></div>';return;}
-    let html='<div class="scraper-results" style="width:100%"><div class="scraper-head"><div class="scraper-head-title">Viral — '+kw+'</div></div><div class="scraper-list">';
-    data.videos.forEach(function(v){
-      html+='<div class="scraper-item"><img class="scraper-thumb" src="'+v.thumbnail+'" onerror="this.style.display='none'" alt=""><div class="scraper-info"><div class="scraper-title">'+v.title+'</div><div class="scraper-meta">'+((v.view_count||0).toLocaleString())+' views · '+v.duration_human+'</div><a class="scraper-link" href="'+v.url+'" target="_blank">↗ Open</a></div></div>';
-    });
-    html+='</div></div>';
-    resEl.innerHTML=html;
-  }catch(err){document.getElementById('vvErr').classList.add('vis');document.getElementById('vvErrMsg').textContent=err.message;resEl.innerHTML='';}
-  btn.disabled=false;btn.textContent='🔥 Find Viral Videos';
-}
-
-// ── NICHE SNIPER ──
-let selectedNicheOpt=null;
-function selectNicheOpt(el,niche){
-  document.querySelectorAll('.niche-opt').forEach(function(n){n.classList.remove('sel');n.style.borderColor='var(--bd)';n.style.background='var(--s2)';});
-  el.classList.add('sel');el.style.borderColor='var(--y)';el.style.background='rgba(255,230,0,0.03)';
-  selectedNicheOpt=niche;document.getElementById('nsBtn').disabled=false;
-}
-async function startNicheSniper(){
-  if(!selectedNicheOpt)return;
-  const btn=document.getElementById('nsBtn');btn.disabled=true;btn.textContent='Sniping…';
-  document.getElementById('nsErr').classList.remove('vis');
-  document.getElementById('nsEmpty').style.display='none';
-  const resEl=document.getElementById('nsResults');resEl.style.display='block';
-  resEl.innerHTML='<div class="empty"><span class="empty-icon">⏳</span><div class="empty-txt">Analysing niche…</div></div>';
-  try{
-    const idea='Give me a deep YouTube Shorts content strategy for the '+selectedNicheOpt+' niche. Include: 5 viral title formulas, the best hooks, content gaps to exploit, posting patterns, and 3 specific video ideas. Be detailed and actionable.';
-    const res=await fetch('/pipeline/script',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idea,channelData:[]})});
-    const data=await res.json();
-    if(!data.success)throw new Error(data.error);
-    resEl.innerHTML='<div class="card"><div class="card-head">🎯 '+selectedNicheOpt.toUpperCase()+' NICHE ANALYSIS</div><div class="card-body"><div style="font-size:12.5px;color:var(--tx);line-height:1.8;white-space:pre-wrap;">'+data.script+'</div></div></div>';
-  }catch(err){document.getElementById('nsErr').classList.add('vis');document.getElementById('nsErrMsg').textContent=err.message;}
-  btn.disabled=false;btn.textContent='🎯 Snipe This Niche';
-}
-
-// ── COMPETITOR TRACKER ──
-var trackedCompetitors=JSON.parse(localStorage.getItem('viralmax_competitors')||'[]');
-function renderCtList(){
-  const list=document.getElementById('ctList');if(!list)return;
-  list.innerHTML=trackedCompetitors.map(function(c,i){
-    return '<div style="display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;"><span style="font-size:11px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📺 '+c+'</span><button onclick="removeCompetitor('+i+')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:11px;padding:2px 5px;border-radius:4px;">✕</button><button onclick="trackCompetitor(''+c+'')" class="btn-sm">Track</button></div>';
-  }).join('');
-}
-function addCompetitor(){
-  const url=document.getElementById('ctUrl').value.trim();if(!url)return;
-  if(!trackedCompetitors.includes(url))trackedCompetitors.push(url);
-  localStorage.setItem('viralmax_competitors',JSON.stringify(trackedCompetitors));
-  document.getElementById('ctUrl').value='';renderCtList();trackCompetitor(url);
-}
-function removeCompetitor(i){trackedCompetitors.splice(i,1);localStorage.setItem('viralmax_competitors',JSON.stringify(trackedCompetitors));renderCtList();}
-async function trackCompetitor(url){
-  document.getElementById('ctEmpty').style.display='none';
-  const resEl=document.getElementById('ctResults');resEl.style.display='flex';
-  const card=document.createElement('div');card.className='card';
-  card.innerHTML='<div class="card-head">⏳ Loading '+url+'…</div>';
-  resEl.prepend(card);
-  try{
-    const res=await fetch('/scrape-channel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelUrl:url,count:10,sort:'popular'})});
-    const data=await res.json();if(!data.success)throw new Error(data.error);
-    const handle=url.split('/').pop();
-    let rows='';
-    data.videos.slice(0,5).forEach(function(v){
-      rows+='<div class="scraper-item"><img class="scraper-thumb" src="'+v.thumbnail+'" onerror="this.style.display='none'" alt=""><div class="scraper-info"><div class="scraper-title">'+v.title+'</div><div class="scraper-meta">'+((v.view_count||0).toLocaleString())+' views · '+v.duration_human+'</div><a class="scraper-link" href="'+v.url+'" target="_blank">↗ Open</a></div></div>';
-    });
-    card.innerHTML='<div class="card-head">📺 '+handle+' <span style="color:var(--t3);font-weight:400;font-size:9px;">'+data.videos.length+' videos</span></div><div class="card-body" style="padding:0;">'+rows+'</div>';
-  }catch(err){card.innerHTML='<div class="card-head" style="color:var(--red);">❌ '+url+'</div><div class="card-body"><div style="font-size:11px;color:var(--red);">'+err.message+'</div></div>';}
-}
-
 // ── INIT ──
 creds = parseInt(localStorage.getItem('viralmax_credits')) || 500;
 renderCustomVoicesList();
 renderCustomVoicesList();
-renderCtList();
 onModelChange();updCreds();onImgModelChange();renderVoiceSel();renderVoiceOutputs();
 
 
@@ -1981,9 +1791,63 @@ if(hash&&document.getElementById('tab-'+hash))switchTab(hash);
 </script>
 
 
+<!-- VOICE PICKER MODAL -->
+<div class="overlay" id="voicePickerModal" style="display:none;" onclick="closeVoicePicker(event)">
+  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:18px;padding:0;width:680px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.7);overflow:hidden;" onclick="event.stopPropagation()">
+    <!-- Header -->
+    <div style="padding:22px 24px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
+        <button onclick="document.getElementById('voicePickerModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:13px;padding:5px 10px;cursor:pointer;">✕</button>
+      </div>
+      <!-- Search -->
+      <input class="inp" id="voiceSearch" placeholder="Search voices..." oninput="filterVoices()" style="margin-bottom:12px;">
+      <!-- Filters -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div>
+          <select class="sel" id="filterGender" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
+            <option value="">Any Gender</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="neutral">Neutral</option>
+          </select>
+        </div>
+        <div>
+          <select class="sel" id="filterAccent" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
+            <option value="">Any Accent</option>
+            <option value="american">American</option>
+            <option value="british">British</option>
+            <option value="australian">Australian</option>
+            <option value="irish">Irish</option>
+          </select>
+        </div>
+        <div>
+          <select class="sel" id="filterAge" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
+            <option value="">Any Age</option>
+            <option value="young">Young</option>
+            <option value="middle aged">Middle Aged</option>
+            <option value="old">Old</option>
+          </select>
+        </div>
+        <button onclick="toggleFavoritesFilter()" id="favFilterBtn" style="padding:6px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--s3);color:var(--t2);font-size:11px;cursor:pointer;transition:all 0.15s;">★ Favorites</button>
+      </div>
+    </div>
+    <!-- Voice list -->
+    <div id="voicePickerList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
+  </div>
+</div>
 
-
-
+<!-- CUSTOM VOICE NAME MODAL -->
+<div class="overlay" id="customVoiceNameModal" style="display:none;" onclick="event.stopPropagation()">
+  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+    <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
+    <div><label class="fl">Voice Name</label><input class="inp" id="customVoiceNameInp" placeholder="e.g. My Deep Voice"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="document.getElementById('customVoiceNameModal').style.display='none'">Cancel</button>
+      <button class="modal-save" onclick="confirmSaveCustomVoice()">Save Voice</button>
+    </div>
+  </div>
+</div>
 
 <!-- VOICE PICKER MODAL -->
 <div class="overlay" id="voicePickerModal" style="display:none;" onclick="closeVoicePicker(event)">
