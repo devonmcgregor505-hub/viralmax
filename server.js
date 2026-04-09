@@ -545,18 +545,36 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
       }
 
       const videoSelect = keepSegments.map(s => `between(t,${s.start.toFixed(3)},${s.end.toFixed(3)})`).join('+');
-      const filterComplex = [
-        `[0:v]select='${videoSelect}',setpts=N/FRAME_RATE/TB[v]`,
-        `[0:a]aselect='${videoSelect}',asetpts=N/SR/TB[a]`
-      ].join(';');
 
-      runFFmpeg([
-        '-y', '-i', videoPath,
-        '-filter_complex', filterComplex,
-        '-map', '[v]', '-map', '[a]',
-        '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
-        '-c:a', 'aac', outputPath
-      ], 300000);
+      // Check if audio stream exists
+      const { stderr: audioProbe } = runFFmpegGetStderr(['-i', videoPath, '-f', 'null', '-'], 30000);
+      const hasAudio = audioProbe.includes('Audio:');
+
+      let ffmpegArgs;
+      if (hasAudio) {
+        const filterComplex = [
+          `[0:v]select='${videoSelect}',setpts=N/FRAME_RATE/TB[v]`,
+          `[0:a]aselect='${videoSelect}',asetpts=N/SR/TB[a]`
+        ].join(';');
+        ffmpegArgs = [
+          '-y', '-i', videoPath,
+          '-filter_complex', filterComplex,
+          '-map', '[v]', '-map', '[a]',
+          '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
+          '-c:a', 'aac', outputPath
+        ];
+      } else {
+        const filterComplex = `[0:v]select='${videoSelect}',setpts=N/FRAME_RATE/TB[v]`;
+        ffmpegArgs = [
+          '-y', '-i', videoPath,
+          '-filter_complex', filterComplex,
+          '-map', '[v]',
+          '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
+          outputPath
+        ];
+      }
+
+      runFFmpeg(ffmpegArgs, 300000);
 
       try { fs.unlinkSync(videoPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
