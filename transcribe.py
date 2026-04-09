@@ -19,6 +19,7 @@ def transcribe(video_id):
             '--extractor-args', 'youtube:skip=dash,hls',
             '-o', audio_path,
         ]
+        print(f'[cookies] path={cookies_path} exists={os.path.exists(cookies_path)}', file=sys.stderr)
         if os.path.exists(cookies_path):
             cmd += ['--cookies', cookies_path]
         cmd.append(f'https://www.youtube.com/watch?v={video_id}')
