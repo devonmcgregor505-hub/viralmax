@@ -564,12 +564,49 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
         segmentFiles.push(segPath);
       }
 
-      const concatList = path.resolve(`outputs/concat_${timestamp}.txt`);
-      fs.writeFileSync(concatList, segmentFiles.map(f => `file '${f}'`).join('\n'));
-      runFFmpeg(['-y', '-f', 'concat', '-safe', '0', '-i', concatList, '-c', 'copy', outputPath], 300000);
+      if (segmentFiles.length === 1) {
+        // Only one segment — just copy it
+        fs.copyFileSync(segmentFiles[0], outputPath);
+      } else if (!hasAudio || segmentFiles.length > 12) {
+        // No audio or too many segments for acrossfade chain — use concat copy
+        const concatList = path.resolve(`outputs/concat_${timestamp}.txt`);
+        fs.writeFileSync(concatList, segmentFiles.map(f => `file '${f}'`).join('\n'));
+        runFFmpeg(['-y', '-f', 'concat', '-safe', '0', '-i', concatList, '-c', 'copy', outputPath], 300000);
+        try { fs.unlinkSync(concatList); } catch(e) {}
+      } else {
+        // Acrossfade chain — blends audio at every join so cuts are inaudible
+        const fadeMs = 0.06; // 60ms crossfade at each join
+        const inputs = segmentFiles.flatMap(f => ['-i', f]);
+        // Build filter_complex: chain acrossfade between each pair
+        // Video: concat all segments
+        // Audio: acrossfade each pair progressively
+        const n = segmentFiles.length;
+        let filterParts = [];
+        // Video concat
+        const vInputs = segmentFiles.map((_, i) => `[${i}:v]`).join('');
+        filterParts.push(`${vInputs}concat=n=${n}:v=1:a=0[vout]`);
+        // Audio acrossfade chain
+        if (n === 2) {
+          filterParts.push(`[0:a][1:a]acrossfade=d=${fadeMs}:c1=tri:c2=tri[aout]`);
+        } else {
+          // Chain: fade 0+1 -> tmp1, fade tmp1+2 -> tmp2, etc.
+          filterParts.push(`[0:a][1:a]acrossfade=d=${fadeMs}:c1=tri:c2=tri[a1]`);
+          for (let i = 2; i < n; i++) {
+            const inLabel = `a${i - 1}`;
+            const outLabel = i === n - 1 ? 'aout' : `a${i}`;
+            filterParts.push(`[${inLabel}][${i}:a]acrossfade=d=${fadeMs}:c1=tri:c2=tri[${outLabel}]`);
+          }
+        }
+        runFFmpeg([
+          '-y', ...inputs,
+          '-filter_complex', filterParts.join(';'),
+          '-map', '[vout]', '-map', '[aout]',
+          '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
+          '-c:a', 'aac', outputPath
+        ], 300000);
+      }
 
       for (const f of segmentFiles) try { fs.unlinkSync(f); } catch(e) {}
-      try { fs.unlinkSync(concatList); } catch(e) {}
       try { fs.unlinkSync(videoPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
       return { success: true, videoUrl: `/outputs/trimmed_${timestamp}.mp4`, silencesRemoved: silences.length, segmentsKept: keepSegments.length };
