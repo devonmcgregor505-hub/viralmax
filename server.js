@@ -622,6 +622,33 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 // YT SCRAPER
 // ══════════════════════════════════════════════════════════════════════════════
+
+// ── TRANSCRIPT FETCHER (no yt-dlp, works on Railway) ──
+async function fetchTranscript(videoId) {
+  try {
+    const pageRes = await axios.get(`https://www.youtube.com/watch?v=${videoId}`, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36', 'Accept-Language': 'en-US,en;q=0.9' },
+      timeout: 10000
+    });
+    const html = pageRes.data;
+    const match = html.match(/"captionTracks":s*([.*?])/);
+    if (!match) return '';
+    const tracks = JSON.parse(match[1]);
+    const en = tracks.find(t => t.languageCode === 'en' && t.kind !== 'asr')
+            || tracks.find(t => t.languageCode === 'en')
+            || tracks[0];
+    if (!en?.baseUrl) return '';
+    const xmlRes = await axios.get(en.baseUrl, { timeout: 8000 });
+    const text = xmlRes.data
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')
+      .replace(/s+/g,' ').trim();
+    return text;
+  } catch(e) {
+    return '';
+  }
+}
+
 app.post('/scrape-channel', express.json(), async (req, res) => {
   const { channelUrl, count = 25, sort = 'newest' } = req.body;
   if (!channelUrl) return res.json({ success: false, error: 'No channel URL provided' });
@@ -674,6 +701,13 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
         });
       }
     }
+    // Fetch transcripts in batches of 5
+    for (let i = 0; i < videos.length; i += 5) {
+      const batch = videos.slice(i, i + 5);
+      const transcripts = await Promise.all(batch.map(v => fetchTranscript(v.video_id)));
+      transcripts.forEach((t, idx) => { videos[i + idx].transcript = t; });
+    }
+
     if (sort === 'popular') videos.sort((a, b) => b.view_count - a.view_count);
     else if (sort === 'trending') {
       const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
