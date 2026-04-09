@@ -575,6 +575,7 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
         const matches = [...xml.matchAll(/<text[^>]*>([^<]*)<\/text>/g)];
         return matches.map(m => m[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')).join(' ').replace(/\s+/g,' ').trim();
       } catch(e) {
+        console.log('[transcript] failed for', videoId, ':', e.message);
         return '';
       }
     }
