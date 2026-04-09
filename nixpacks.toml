@@ -1,2 +1,5 @@
 [phases.setup]
-nixPkgs = ["yt-dlp", "ffmpeg"]
+nixPkgs = ["yt-dlp", "ffmpeg", "python3"]
+
+[phases.install]
+cmds = ["pip install youtube-transcript-api --break-system-packages || pip3 install youtube-transcript-api --break-system-packages"]

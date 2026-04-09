@@ -623,27 +623,11 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 // YT SCRAPER
 // ══════════════════════════════════════════════════════════════════════════════
 
-// ── TRANSCRIPT FETCHER (no yt-dlp, works on Railway) ──
-async function fetchTranscript(videoId) {
+// ── TRANSCRIPT FETCHER (python youtube_transcript_api) ──
+function fetchTranscript(videoId) {
   try {
-    const pageRes = await axios.get(`https://www.youtube.com/watch?v=${videoId}`, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36', 'Accept-Language': 'en-US,en;q=0.9' },
-      timeout: 10000
-    });
-    const html = pageRes.data;
-    const match = html.match(/"captionTracks":\s*(\[.*?\])/s);
-    if (!match) return '';
-    const tracks = JSON.parse(match[1]);
-    const en = tracks.find(t => t.languageCode === 'en' && t.kind !== 'asr')
-            || tracks.find(t => t.languageCode === 'en')
-            || tracks[0];
-    if (!en?.baseUrl) return '';
-    const xmlRes = await axios.get(en.baseUrl, { timeout: 8000 });
-    const text = xmlRes.data
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')
-      .replace(/\s+/g,' ').trim();
-    return text;
+    const r = spawnSync('python3', ['get_transcript.py', videoId], { timeout: 30000, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
+    return (r.stdout || '').trim();
   } catch(e) {
     return '';
   }
@@ -701,11 +685,9 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
         });
       }
     }
-    // Fetch transcripts in batches of 5
-    for (let i = 0; i < videos.length; i += 5) {
-      const batch = videos.slice(i, i + 5);
-      const transcripts = await Promise.all(batch.map(v => fetchTranscript(v.video_id)));
-      transcripts.forEach((t, idx) => { videos[i + idx].transcript = t; });
+    // Fetch transcripts
+    for (const video of videos) {
+      video.transcript = fetchTranscript(video.video_id);
     }
 
     if (sort === 'popular') videos.sort((a, b) => b.view_count - a.view_count);
