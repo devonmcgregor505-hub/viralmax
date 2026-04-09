@@ -554,32 +554,37 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
     }
     videos = videos.slice(0, parseInt(count));
 
-    // Fetch transcripts in parallel batches of 8
+    // Fetch transcripts using yt-dlp + faster-whisper, batched 4 at a time
     async function fetchTranscript(videoId) {
-      try {
-        const url = `https://www.youtube.com/api/timedtext?v=${videoId}&lang=en&fmt=json3`;
-        const res = await axios.get(url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept-Language': 'en-US,en;q=0.9',
-          },
-          timeout: 10000,
+      return new Promise((resolve) => {
+        const { spawn } = require('child_process');
+        const py = spawn('python3', ['transcribe.py', videoId], { timeout: 180000 });
+        let out = '';
+        let err = '';
+        py.stdout.on('data', d => out += d.toString());
+        py.stderr.on('data', d => err += d.toString());
+        py.on('close', (code) => {
+          try {
+            const parsed = JSON.parse(out.trim());
+            if (parsed.transcript) {
+              console.log('[transcript] ok:', videoId, parsed.transcript.slice(0, 60));
+              resolve(parsed.transcript);
+            } else {
+              console.log('[transcript] error:', videoId, parsed.error);
+              resolve('');
+            }
+          } catch(e) {
+            console.log('[transcript] parse failed:', videoId, out.slice(0, 100), err.slice(0, 100));
+            resolve('');
+          }
         });
-        console.log('[transcript]', videoId, 'status:', res.status, 'type:', typeof res.data, 'keys:', Object.keys(res.data || {}).join(','));
-        const events = res.data?.events;
-        if (!events || events.length === 0) return '';
-        return events
-          .filter(e => e.segs)
-          .flatMap(e => e.segs.map(s => s.utf8 || ''))
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-      } catch(e) {
-        console.log('[transcript] failed for', videoId, ':', e.message);
-        return '';
-      }
+        py.on('error', (e) => {
+          console.log('[transcript] spawn error:', videoId, e.message);
+          resolve('');
+        });
+      });
     }
-    const BATCH = 8;
+    const BATCH = 4;
     for (let i = 0; i < videos.length; i += BATCH) {
       const batch = videos.slice(i, i + BATCH);
       await Promise.all(batch.map(async (video) => {
