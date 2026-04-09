@@ -496,57 +496,90 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 app.post('/scrape-channel', express.json(), async (req, res) => {
   const { channelUrl, count = 25, sort = 'newest' } = req.body;
   if (!channelUrl) return res.json({ success: false, error: 'No channel URL provided' });
-
+  const YT_KEY = process.env.YOUTUBE_API_KEY;
+  if (!YT_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not set' });
   try {
-    // Step 1: get video IDs via yt-dlp flat-playlist
-    const pool = Math.min(parseInt(count) * (sort === 'trending' ? 6 : sort === 'popular' ? 4 : 1), 400);
-    const listArgs = ['--flat-playlist', '--print', '%(id)s', '--no-warnings', '--quiet'];
+    // Step 1: get channel ID and uploads playlist via YouTube Data API
+    const cleanUrl = channelUrl.replace(/\/shorts.*$/, '').replace(/\/videos.*$/, '').replace(/\/featured.*$/, '').replace(/\/$/, '');
+    const handle = cleanUrl.split('/').pop().replace('@', '');
+    const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+      params: { part: 'snippet', q: handle, type: 'channel', maxResults: 1, key: YT_KEY }, timeout: 10000,
+    });
+    const channelId = searchRes.data.items?.[0]?.id?.channelId;
+    if (!channelId) throw new Error('Could not find channel: ' + handle);
+    const chanRes = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
+      params: { part: 'contentDetails', id: channelId, key: YT_KEY }, timeout: 10000,
+    });
+    const uploadsPlaylistId = chanRes.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+    if (!uploadsPlaylistId) throw new Error('Could not get uploads playlist');
 
-    if (sort === 'trending') {
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 90);
-      listArgs.push('--dateafter', cutoff.toISOString().slice(0, 10).replace(/-/g, ''));
+    // Step 2: get video IDs from playlist
+    const fetchCount = Math.min(parseInt(count) * (sort === 'newest' ? 1 : 4), 200);
+    let videoIds = [];
+    let pageToken = '';
+    while (videoIds.length < fetchCount) {
+      const plRes = await axios.get('https://www.googleapis.com/youtube/v3/playlistItems', {
+        params: { part: 'contentDetails', playlistId: uploadsPlaylistId, maxResults: 50, pageToken, key: YT_KEY }, timeout: 10000,
+      });
+      videoIds.push(...plRes.data.items.map(i => i.contentDetails.videoId));
+      if (!plRes.data.nextPageToken || videoIds.length >= fetchCount) break;
+      pageToken = plRes.data.nextPageToken;
     }
-    listArgs.push('--playlist-end', String(pool));
-    listArgs.push(channelUrl.replace(/\/$/, '').replace(/\/(shorts|videos|featured).*$/, '') + '/shorts');
+    videoIds = videoIds.slice(0, fetchCount);
 
-    console.log(`[scraper] sort=${sort} pool=${pool}`);
-    const listResult = spawnSync('yt-dlp', listArgs, { encoding: 'utf8', timeout: 60000, maxBuffer: 10 * 1024 * 1024 });
-    if (listResult.error) throw new Error('yt-dlp not found: ' + listResult.error.message);
+    // Step 3: get metadata via YouTube Data API
+    let videos = [];
+    for (let i = 0; i < videoIds.length; i += 50) {
+      const batch = videoIds.slice(i, i + 50);
+      const vRes = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+        params: { part: 'snippet,statistics,contentDetails', id: batch.join(','), key: YT_KEY }, timeout: 15000,
+      });
+      for (const item of vRes.data.items) {
+        const dur = item.contentDetails.duration || '';
+        const mMatch = dur.match(/(\d+)M/); const sMatch = dur.match(/(\d+)S/); const hMatch = dur.match(/(\d+)H/);
+        const durSec = (hMatch ? parseInt(hMatch[1]) * 3600 : 0) + (mMatch ? parseInt(mMatch[1]) * 60 : 0) + (sMatch ? parseInt(sMatch[1]) : 0);
+        if (durSec > 180) continue;
+        const mins = Math.floor(durSec / 60); const secs = durSec % 60;
+        videos.push({
+          video_id: item.id, url: `https://www.youtube.com/watch?v=${item.id}`, title: item.snippet.title,
+          channel: item.snippet.channelTitle, channel_id: item.snippet.channelId, channel_url: channelUrl,
+          view_count: parseInt(item.statistics.viewCount || 0), like_count: parseInt(item.statistics.likeCount || 0),
+          comment_count: parseInt(item.statistics.commentCount || 0), duration_seconds: durSec,
+          duration_human: mins > 0 ? `${mins}m ${secs}s` : `${secs}s`, publish_date: item.snippet.publishedAt,
+          thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url || '',
+          description: item.snippet.description || '', tags: (item.snippet.tags || []).join(', '), transcript: '',
+        });
+      }
+    }
 
-    let ids = (listResult.stdout || '').trim().split('\n').filter(Boolean);
-    if (ids.length === 0) throw new Error('No videos found for this channel');
-    console.log(`[scraper] got ${ids.length} IDs`);
+    // Step 4: sort
+    if (sort === 'popular') videos.sort((a, b) => b.view_count - a.view_count);
+    else if (sort === 'trending') {
+      const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+      videos = videos.filter(v => new Date(v.publish_date).getTime() > cutoff);
+      videos.sort((a, b) => b.view_count - a.view_count);
+    }
+    videos = videos.slice(0, parseInt(count));
 
-    // Step 2: parallel metadata + transcript fetch (8 at a time)
-    const CONCURRENCY = 8;
-    const results = [];
-    for (let i = 0; i < ids.length; i += CONCURRENCY) {
-      const batch = ids.slice(i, i + CONCURRENCY);
-      const batchResults = await Promise.all(batch.map(async (id) => {
-        const url = `https://www.youtube.com/watch?v=${id}`;
-
-        // Metadata
-        const metaResult = spawnSync('yt-dlp', [
-          url, '--dump-json', '--no-warnings', '--quiet', '--skip-download', '--no-playlist',
-        ], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, timeout: 30000 });
-        let meta = {};
-        try { meta = JSON.parse(metaResult.stdout || '{}'); } catch(e) { return null; }
-        const durationSec = meta.duration || 0;
-        if (durationSec > 180) return null;
-        const mins = Math.floor(durationSec / 60);
-        const secs = durationSec % 60;
-
-        // Transcript via VTT subtitles
-        let transcript = '';
-        const tmpBase = `/tmp/transcript_${id}`;
-        spawnSync('yt-dlp', [
-          url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
-          '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
-        ], { encoding: 'utf8', timeout: 20000 });
-        const vttPath = `${tmpBase}.en.vtt`;
-        if (fs.existsSync(vttPath)) {
-          try {
+    // Step 5: fetch transcripts via yt-dlp --write-auto-sub (VTT), batched 8 at a time
+    const BATCH = 8;
+    for (let i = 0; i < videos.length; i += BATCH) {
+      const batch = videos.slice(i, i + BATCH);
+      await Promise.all(batch.map(async (video) => {
+        try {
+          const url = `https://www.youtube.com/watch?v=${video.video_id}`;
+          const tmpBase = `/tmp/transcript_${video.video_id}`;
+          await new Promise(resolve => {
+            const { spawn } = require('child_process');
+            const proc = spawn('yt-dlp', [
+              url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
+              '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
+            ], { timeout: 20000 });
+            proc.on('close', resolve);
+            proc.on('error', resolve);
+          });
+          const vttPath = `${tmpBase}.en.vtt`;
+          if (fs.existsSync(vttPath)) {
             const vtt = fs.readFileSync(vttPath, 'utf8');
             const vttLines = vtt
               .replace(/WEBVTT[\s\S]*?\n\n/, '')
@@ -554,42 +587,20 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
               .replace(/<[^>]+>/g, '')
               .split('\n').map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
             const seen = new Set();
-            transcript = vttLines
+            video.transcript = vttLines
               .filter(l => { if (seen.has(l)) return false; seen.add(l); return true; })
               .join(' ').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
             fs.unlinkSync(vttPath);
-          } catch(e) {}
+            console.log('[transcript] ok:', video.video_id, video.transcript.slice(0, 50));
+          } else {
+            console.log('[transcript] no vtt:', video.video_id);
+          }
+        } catch(e) {
+          console.log('[transcript] error:', video.video_id, e.message);
         }
-
-        return {
-          video_id: id,
-          url,
-          title: meta.title || '',
-          channel: meta.channel || meta.uploader || '',
-          channel_id: meta.channel_id || '',
-          channel_url: meta.channel_url || channelUrl,
-          view_count: meta.view_count || 0,
-          like_count: meta.like_count || 0,
-          comment_count: meta.comment_count || 0,
-          duration_seconds: durationSec,
-          duration_human: mins > 0 ? `${mins}m ${secs}s` : `${secs}s`,
-          publish_date: meta.upload_date
-            ? `${meta.upload_date.slice(0,4)}-${meta.upload_date.slice(4,6)}-${meta.upload_date.slice(6,8)}T00:00:00Z`
-            : '',
-          thumbnail: meta.thumbnail || '',
-          description: meta.description || '',
-          tags: (meta.tags || []).join(', '),
-          transcript,
-        };
       }));
-      results.push(...batchResults.filter(Boolean));
     }
 
-    // Step 3: sort and trim
-    let videos = results;
-    if (sort === 'popular' || sort === 'trending') videos.sort((a, b) => b.view_count - a.view_count);
-    videos = videos.slice(0, parseInt(count));
-    console.log(`[scraper] returning ${videos.length} videos`);
     res.json({ success: true, videos });
   } catch(err) {
     console.error('[scraper] error:', err.message);
