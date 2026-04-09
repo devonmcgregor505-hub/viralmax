@@ -623,12 +623,41 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 // YT SCRAPER
 // ══════════════════════════════════════════════════════════════════════════════
 
-// ── TRANSCRIPT FETCHER (python youtube_transcript_api) ──
-function fetchTranscript(videoId) {
+// ── TRANSCRIPT FETCHER (yt-dlp VTT subtitles) ──
+async function fetchTranscriptVTT(videoId) {
   try {
-    const r = spawnSync('python3', ['get_transcript.py', videoId], { timeout: 30000, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
-    return (r.stdout || '').trim();
+    const url = `https://www.youtube.com/watch?v=${videoId}`;
+    const tmpBase = `/tmp/transcript_${videoId}`;
+    await new Promise(resolve => {
+      const { spawn } = require('child_process');
+      const proc = spawn('yt-dlp', [
+        url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
+        '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
+      ], { timeout: 20000 });
+      proc.on('close', resolve);
+      proc.on('error', resolve);
+    });
+    const vttPath = `${tmpBase}.en.vtt`;
+    if (!fs.existsSync(vttPath)) return '';
+    const vtt = fs.readFileSync(vttPath, 'utf8');
+    const vttLines = vtt
+      .replace(/WEBVTT[\s\S]*?
+
+/, '')
+      .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> [^
+]+/g, '')
+      .replace(/<[^>]+>/g, '')
+      .split('
+').map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
+    const seen = new Set();
+    const transcript = vttLines
+      .filter(l => { if (seen.has(l)) return false; seen.add(l); return true; })
+      .join(' ').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
+    fs.unlinkSync(vttPath);
+    console.log('[transcript] ok:', videoId, transcript.slice(0, 50));
+    return transcript;
   } catch(e) {
+    console.log('[transcript] error:', videoId, e.message);
     return '';
   }
 }
@@ -685,9 +714,12 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
         });
       }
     }
-    // Fetch transcripts
-    for (const video of videos) {
-      video.transcript = fetchTranscript(video.video_id);
+    // Fetch transcripts via yt-dlp VTT, batched 8 at a time
+    const BATCH = 8;
+    for (let i = 0; i < videos.length; i += BATCH) {
+      await Promise.all(videos.slice(i, i + BATCH).map(async (video) => {
+        video.transcript = await fetchTranscriptVTT(video.video_id);
+      }));
     }
 
     if (sort === 'popular') videos.sort((a, b) => b.view_count - a.view_count);
