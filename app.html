@@ -70,7 +70,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   padding:2px 5px;border-radius:4px;text-transform:uppercase;
   font-family:'Space Mono',monospace;
 }
-.b-live{background:rgba(0,230,118,0.1);color:var(--grn)}
+.b-live{background:rgba(0,230,118,0.1);color:var(--grn)}.b-soon{background:rgba(255,230,0,0.12);color:var(--y)}.b-hot{background:rgba(255,80,0,0.12);color:#ff8c42}
 .b-hot{background:var(--yd);color:var(--y)}
 
 .nav-sub{padding-left:6px;border-left:1px solid var(--bd);margin:2px 0 2px 20px}
@@ -448,6 +448,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     <span class="nav-sec-lbl">Tools</span>
     <button class="nav-item" id="nav-deadspace" onclick="switchTab('deadspace')"><span class="nav-icon">✂️</span>Silence Remover<span class="nav-badge b-live">LIVE</span></button>
     <button class="nav-item" id="nav-scraper" onclick="switchTab('scraper')"><span class="nav-icon">📊</span>YT Scraper<span class="nav-badge b-live">LIVE</span></button>
+    <button class="nav-item" id="nav-clipfinder" onclick="switchTab('clipfinder')"><span class="nav-icon">🎯</span>Clip Finder<span class="nav-badge b-soon">SOON</span></button>
+  </div>
+  <div class="sidebar-section-label">RESEARCH</div>
+  <div class="sidebar-group">
+    <button class="nav-item" id="nav-viral" onclick="switchTab('viral')"><span class="nav-icon">🔥</span>Viral Video<span class="nav-badge b-soon">SOON</span></button>
+    <button class="nav-item" id="nav-niche" onclick="switchTab('niche')"><span class="nav-icon">🎯</span>Niche Sniper<span class="nav-badge b-soon">SOON</span></button>
+    <button class="nav-item" id="nav-competitor" onclick="switchTab('competitor')"><span class="nav-icon">👁</span>Competitor Tracker<span class="nav-badge b-soon">SOON</span></button>
   </nav>
 
   <div class="sidebar-footer">
@@ -943,6 +950,10 @@ const tabMeta={
   voicegen:['Voice Gen','Clone and generate voiceovers'],
   deadspace:['Silence Remover','Remove dead air from audio/video'],
   scraper:['YT Scraper','Scrape channel data for analysis'],
+  clipfinder:['Clip Finder','Find the best clips from your videos'],
+  viral:['Viral Video','Discover trending viral content'],
+  niche:['Niche Sniper','Analyse and dominate your niche'],
+  competitor:['Competitor Tracker','Track competitor channels'],
 };
 
 function switchTab(tab){
