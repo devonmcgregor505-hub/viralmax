@@ -6,7 +6,6 @@ const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { YoutubeTranscript } = require('youtube-transcript');
 const ffmpegStatic = require('ffmpeg-static');
 
 // ── FFmpeg ──
@@ -556,16 +555,34 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
     videos = videos.slice(0, parseInt(count));
 
     // Fetch transcripts in parallel batches of 8
+    async function fetchTranscript(videoId) {
+      try {
+        const playerRes = await axios.post('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
+          context: { client: { clientName: 'ANDROID', clientVersion: '20.10.38' } },
+          videoId,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'com.google.android.youtube/20.10.38 (Linux; U; Android 14)',
+          },
+          timeout: 10000,
+        });
+        const tracks = playerRes.data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+        if (!tracks || tracks.length === 0) return '';
+        const track = tracks.find(t => t.languageCode === 'en') || tracks[0];
+        const xmlRes = await axios.get(track.baseUrl, { timeout: 10000 });
+        const xml = xmlRes.data;
+        const matches = [...xml.matchAll(/<text[^>]*>([^<]*)<\/text>/g)];
+        return matches.map(m => m[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')).join(' ').replace(/\s+/g,' ').trim();
+      } catch(e) {
+        return '';
+      }
+    }
     const BATCH = 8;
     for (let i = 0; i < videos.length; i += BATCH) {
       const batch = videos.slice(i, i + BATCH);
       await Promise.all(batch.map(async (video) => {
-        try {
-          const segments = await YoutubeTranscript.fetchTranscript(video.video_id, { lang: 'en' });
-          video.transcript = segments.map(s => s.text).join(' ').replace(/\s+/g, ' ').trim();
-        } catch(e) {
-          video.transcript = '';
-        }
+        video.transcript = await fetchTranscript(video.video_id);
       }));
     }
 
