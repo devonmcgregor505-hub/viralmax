@@ -711,6 +711,7 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
       }
     }
     // Fetch transcripts via yt-dlp VTT, batched 8 at a time
+    console.log('[transcript] starting for', videos.length, 'videos');
     const BATCH = 8;
     for (let i = 0; i < videos.length; i += BATCH) {
       await Promise.all(videos.slice(i, i + BATCH).map(async (video) => {
