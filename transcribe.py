@@ -9,14 +9,18 @@ def transcribe(video_id):
         audio_path = os.path.join(tmpdir, 'audio.mp3')
         
         # Download audio only
-        result = subprocess.run([
+        cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cookies.txt')
+        cmd = [
             'yt-dlp',
             '-x', '--audio-format', 'mp3',
             '--audio-quality', '5',
             '--no-playlist',
             '-o', audio_path,
-            f'https://www.youtube.com/watch?v={video_id}'
-        ], capture_output=True, text=True, timeout=120)
+        ]
+        if os.path.exists(cookies_path):
+            cmd += ['--cookies', cookies_path]
+        cmd.append(f'https://www.youtube.com/watch?v={video_id}')
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
         
         if result.returncode != 0:
             print(json.dumps({'error': 'yt-dlp failed: ' + result.stderr[-200:]}))
