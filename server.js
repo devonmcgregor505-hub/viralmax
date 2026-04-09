@@ -20,7 +20,16 @@ try {
 
 function runFFmpeg(args, timeout = 180000) {
   const result = spawnSync(FFMPEG_PATH, args, { timeout, maxBuffer: 100 * 1024 * 1024 });
-  if (result.status !== 0) throw new Error('FFmpeg failed: ' + (result.stderr || '').toString().slice(0, 200));
+  if (result.status !== 0) {
+    const stderr = (result.stderr || '').toString();
+    const errorLine = stderr.split('\n').filter(l => l.toLowerCase().includes('error') || l.toLowerCase().includes('invalid') || l.toLowerCase().includes('no such')).join(' ') || stderr.slice(-300);
+    throw new Error('FFmpeg failed: ' + errorLine);
+  }
+}
+
+function runFFmpegGetStderr(args, timeout = 180000) {
+  const result = spawnSync(FFMPEG_PATH, args, { timeout, maxBuffer: 100 * 1024 * 1024 });
+  return { status: result.status, stderr: (result.stderr || '').toString() };
 }
 
 // ── App ──
@@ -76,7 +85,18 @@ app.get('/queue', (req, res) => {
 });
 
 // ── Chatterbox warmup ──
-
+function warmupChatterbox() {
+  const CHATTERBOX_URL = process.env.CHATTERBOX_MODAL_URL;
+  if (!CHATTERBOX_URL) return;
+  axios.post(CHATTERBOX_URL, {
+    text: 'warm', exaggeration: 0.5, cfg_weight: 0.5, temperature: 0.8, audio_prompt_b64: null,
+  }, { timeout: 30000 }).then(() => {
+    console.log('[warmup] Chatterbox pinged OK');
+  }).catch(e => {
+    console.log('[warmup] Chatterbox ping failed:', e.message);
+  });
+}
+setInterval(warmupChatterbox, 4 * 60 * 1000);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CLAUDE API HELPER
@@ -473,18 +493,78 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
 // DEAD SPACE REMOVER
 // ══════════════════════════════════════════════════════════════════════════════
 app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ success: false, error: 'No video uploaded' });
   const videoPath = path.resolve(req.file.path);
   const timestamp = Date.now();
-  const { dbThreshold = '-40' } = req.body;
+  const { dbThreshold = '-35', minDuration = '0.4', padding = '0.1' } = req.body;
   try {
-    await enqueue(async () => {
+    const result = await enqueue(async () => {
       const outputPath = path.resolve(`outputs/trimmed_${timestamp}.mp4`);
-      runFFmpeg(['-y', '-i', videoPath, '-af', `silenceremove=1:0:0.1:${dbThreshold}dB:1:0.1:${dbThreshold}dB`, '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', outputPath], 300000);
+
+      const { stderr } = runFFmpegGetStderr([
+        '-y', '-i', videoPath,
+        '-af', `silencedetect=noise=${dbThreshold}dB:d=${minDuration}`,
+        '-f', 'null', '-'
+      ], 120000);
+
+      const silences = [];
+      const startMatches = [...stderr.matchAll(/silence_start:\s*([\d.]+)/g)];
+      const endMatches   = [...stderr.matchAll(/silence_end:\s*([\d.]+)/g)];
+      for (let i = 0; i < startMatches.length; i++) {
+        const start = parseFloat(startMatches[i][1]);
+        const end   = endMatches[i] ? parseFloat(endMatches[i][1]) : null;
+        if (end !== null) silences.push({ start, end });
+      }
+
+      const { stderr: probeStderr } = runFFmpegGetStderr(['-i', videoPath, '-f', 'null', '-'], 30000);
+      const durMatch = probeStderr.match(/Duration:\s*(\d+):(\d+):([\d.]+)/);
+      const totalDuration = durMatch
+        ? parseInt(durMatch[1]) * 3600 + parseInt(durMatch[2]) * 60 + parseFloat(durMatch[3])
+        : null;
+
+      if (silences.length === 0) {
+        runFFmpeg(['-y', '-i', videoPath, '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', outputPath], 300000);
+        try { fs.unlinkSync(videoPath); } catch(e) {}
+        setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
+        return { success: true, videoUrl: `/outputs/trimmed_${timestamp}.mp4`, silencesRemoved: 0 };
+      }
+
+      const pad = parseFloat(padding);
+      const keepSegments = [];
+      let cursor = 0;
+      for (const { start, end } of silences) {
+        const keepEnd = Math.max(cursor, start - pad);
+        if (keepEnd - cursor > 0.05) keepSegments.push({ start: cursor, end: keepEnd });
+        cursor = end + pad;
+      }
+      if (totalDuration && cursor < totalDuration - 0.05) keepSegments.push({ start: cursor, end: totalDuration });
+
+      if (keepSegments.length === 0) {
+        try { fs.unlinkSync(videoPath); } catch(e) {}
+        throw new Error('All audio detected as silence — try a lower dB threshold');
+      }
+
+      const videoSelect = keepSegments.map(s => `between(t,${s.start.toFixed(3)},${s.end.toFixed(3)})`).join('+');
+      const filterComplex = [
+        `[0:v]select='${videoSelect}',setpts=N/FRAME_RATE/TB[v]`,
+        `[0:a]aselect='${videoSelect}',asetpts=N/SR/TB[a]`
+      ].join(';');
+
+      runFFmpeg([
+        '-y', '-i', videoPath,
+        '-filter_complex', filterComplex,
+        '-map', '[v]', '-map', '[a]',
+        '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
+        '-c:a', 'aac', outputPath
+      ], 300000);
+
       try { fs.unlinkSync(videoPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
+      return { success: true, videoUrl: `/outputs/trimmed_${timestamp}.mp4`, silencesRemoved: silences.length, segmentsKept: keepSegments.length };
     });
-    res.json({ success: true, videoUrl: `/outputs/trimmed_${timestamp}.mp4` });
+    res.json(result);
   } catch(err) {
+    console.error('[remove-deadspace] error:', err.message);
     try { fs.unlinkSync(videoPath); } catch(e) {}
     res.status(500).json({ success: false, error: err.message });
   }
@@ -499,9 +579,7 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
   const YT_KEY = process.env.YOUTUBE_API_KEY;
   if (!YT_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not set' });
   try {
-    // Step 1: get channel ID and uploads playlist via YouTube Data API
-    const cleanUrl = channelUrl.replace(/\/shorts.*$/, '').replace(/\/videos.*$/, '').replace(/\/featured.*$/, '').replace(/\/$/, '');
-    const handle = cleanUrl.split('/').pop().replace('@', '');
+    const handle = channelUrl.replace(/\/$/, '').split('/').pop().replace('@', '');
     const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
       params: { part: 'snippet', q: handle, type: 'channel', maxResults: 1, key: YT_KEY }, timeout: 10000,
     });
@@ -512,8 +590,6 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
     });
     const uploadsPlaylistId = chanRes.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
     if (!uploadsPlaylistId) throw new Error('Could not get uploads playlist');
-
-    // Step 2: get video IDs from playlist
     const fetchCount = Math.min(parseInt(count) * (sort === 'newest' ? 1 : 4), 200);
     let videoIds = [];
     let pageToken = '';
@@ -526,8 +602,6 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
       pageToken = plRes.data.nextPageToken;
     }
     videoIds = videoIds.slice(0, fetchCount);
-
-    // Step 3: get metadata via YouTube Data API
     let videos = [];
     for (let i = 0; i < videoIds.length; i += 50) {
       const batch = videoIds.slice(i, i + 50);
@@ -551,8 +625,6 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
         });
       }
     }
-
-    // Step 4: sort
     if (sort === 'popular') videos.sort((a, b) => b.view_count - a.view_count);
     else if (sort === 'trending') {
       const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
@@ -560,47 +632,6 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
       videos.sort((a, b) => b.view_count - a.view_count);
     }
     videos = videos.slice(0, parseInt(count));
-
-    // Step 5: fetch transcripts via yt-dlp --write-auto-sub (VTT), batched 8 at a time
-    const BATCH = 8;
-    for (let i = 0; i < videos.length; i += BATCH) {
-      const batch = videos.slice(i, i + BATCH);
-      await Promise.all(batch.map(async (video) => {
-        try {
-          const url = `https://www.youtube.com/watch?v=${video.video_id}`;
-          const tmpBase = `/tmp/transcript_${video.video_id}`;
-          await new Promise(resolve => {
-            const { spawn } = require('child_process');
-            const proc = spawn('yt-dlp', [
-              url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
-              '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
-            ], { timeout: 20000 });
-            proc.on('close', resolve);
-            proc.on('error', resolve);
-          });
-          const vttPath = `${tmpBase}.en.vtt`;
-          if (fs.existsSync(vttPath)) {
-            const vtt = fs.readFileSync(vttPath, 'utf8');
-            const vttLines = vtt
-              .replace(/WEBVTT[\s\S]*?\n\n/, '')
-              .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> [^\n]+/g, '')
-              .replace(/<[^>]+>/g, '')
-              .split('\n').map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
-            const seen = new Set();
-            video.transcript = vttLines
-              .filter(l => { if (seen.has(l)) return false; seen.add(l); return true; })
-              .join(' ').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
-            fs.unlinkSync(vttPath);
-            console.log('[transcript] ok:', video.video_id, video.transcript.slice(0, 50));
-          } else {
-            console.log('[transcript] no vtt:', video.video_id);
-          }
-        } catch(e) {
-          console.log('[transcript] error:', video.video_id, e.message);
-        }
-      }));
-    }
-
     res.json({ success: true, videos });
   } catch(err) {
     console.error('[scraper] error:', err.message);
@@ -611,73 +642,6 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 // START
 // ══════════════════════════════════════════════════════════════════════════════
-
-// ══════════════════════════════════════════════════════════════════════════════
-// WAVESPEED VOICE GEN  —  POST /generate-voice-elevenlabs
-// ══════════════════════════════════════════════════════════════════════════════
-app.post('/generate-voice-elevenlabs', express.json(), async (req, res) => {
-  const { text, voiceId, stability = 0.5, similarity = 1.0 } = req.body;
-  if (!text || !text.trim()) return res.json({ success: false, error: 'No text provided' });
-  if (!voiceId) return res.json({ success: false, error: 'No voiceId provided' });
-  const WAVESPEED_KEY = process.env.WAVESPEED_API_KEY || 'paste_fresh_key_here';
-  const timestamp = Date.now();
-  try {
-    const submitRes = await axios.post(
-      'https://api.wavespeed.ai/api/v3/elevenlabs/turbo-v2.5',
-      { text: text.trim(), voice_id: voiceId, stability: parseFloat(stability), similarity: parseFloat(similarity), use_speaker_boost: true },
-      { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 30000 }
-    );
-    const requestId = submitRes.data?.data?.id || submitRes.data?.id;
-    if (!requestId) throw new Error('No request ID: ' + JSON.stringify(submitRes.data).slice(0, 200));
-    console.log('[wavespeed] requestId=' + requestId);
-    let audioUrl = null;
-    for (let i = 0; i < 60; i++) {
-      await new Promise(r => setTimeout(r, 3000));
-      const pollRes = await axios.get('https://api.wavespeed.ai/api/v3/predictions/' + requestId + '/result', { headers: { 'Authorization': 'Bearer ' + WAVESPEED_KEY }, timeout: 15000 });
-      const pollData = pollRes.data?.data || pollRes.data;
-      const status = pollData?.status;
-      console.log('[wavespeed] poll ' + (i+1) + ' status=' + status + ' outputs=' + JSON.stringify(pollData?.outputs));
-      if (status === 'completed') { audioUrl = pollData?.outputs?.[0]; break; }
-      if (status === 'failed') throw new Error('Wavespeed failed: ' + (pollData?.error || 'unknown'));
-    }
-    if (!audioUrl) throw new Error('Wavespeed timed out');
-    const dlRes = await axios.get(audioUrl, { responseType: 'arraybuffer', timeout: 60000 });
-    const outputPath = path.resolve('outputs/voice_ws_' + timestamp + '.mp3');
-    fs.writeFileSync(outputPath, Buffer.from(dlRes.data));
-    setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
-    res.json({ success: true, audioUrl: '/outputs/voice_ws_' + timestamp + '.mp3' });
-  } catch(err) {
-    console.error('[wavespeed] error:', err.message);
-    res.json({ success: false, error: err.message });
-  }
-});
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// ELEVENLABS VOICES LIST  —  GET /elevenlabs-voices
-// ══════════════════════════════════════════════════════════════════════════════
-app.get('/elevenlabs-voices', async (req, res) => {
-  try {
-    const response = await axios.get('https://api.elevenlabs.io/v1/voices', {
-      headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY || 'sk_6eb53410b24cd509aa1d7a0ead7d7fd28a9015591e042c2b' },
-      timeout: 10000,
-    });
-    const voices = response.data.voices.map(v => ({
-      id: v.voice_id,
-      name: v.name,
-      preview: v.preview_url,
-      gender: v.labels?.gender || '',
-      accent: v.labels?.accent || '',
-      age: v.labels?.age || '',
-      desc: v.labels?.description || v.description || '',
-    }));
-    res.json({ success: true, voices });
-  } catch(err) {
-    console.error('[elevenlabs-voices] error:', err.message);
-    res.json({ success: false, error: err.message });
-  }
-});
-
 app.listen(PORT, () => {
   console.log('\n✅ Viralmax running at http://localhost:' + PORT);
   console.log('   Routes: / (home)  /app (tools)  /login  /signup  /legal  /checkout');
