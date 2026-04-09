@@ -620,6 +620,42 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
+// NICHE SNIPER
+// ══════════════════════════════════════════════════════════════════════════════
+app.post('/pipeline/niche-sniper', express.json(), async (req, res) => {
+  const { niche } = req.body;
+  if (!niche) return res.json({ success: false, error: 'No niche provided' });
+  try {
+    const prompt = `You are a YouTube Shorts content strategist. Analyse the "${niche}" niche for a creator wanting to go viral.
+
+Provide a structured analysis covering:
+1. Why this niche works (engagement psychology)
+2. Top 5 content angles that are currently winning
+3. What hooks are performing best
+4. Common mistakes to avoid
+5. 5 specific video title ideas ready to use
+
+Format your response as clean HTML using only inline styles. Use this color scheme: background sections use background:#161616, borders #262626, yellow accent #FFE600, text #f0f0ee, muted text #888. Use border-radius:10px, padding:14px, margin-bottom:12px for sections. Make it visually structured with clear headings.`;
+
+    const response = await callClaude([{ role: 'user', content: prompt }], '', 3000);
+    
+    // Wrap in a container if not already HTML
+    let html = response.trim();
+    if (!html.startsWith('<')) {
+      // Convert plain text to styled HTML
+      html = '<div style="font-size:13px;color:#f0f0ee;line-height:1.8;">' + 
+        html.replace(/\n\n/g, '</p><p style="margin-bottom:12px;">').replace(/\n/g, '<br>') + 
+        '</div>';
+    }
+    
+    res.json({ success: true, html });
+  } catch(err) {
+    console.error('[niche-sniper] error:', err.message);
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
 // YT SCRAPER
 // ══════════════════════════════════════════════════════════════════════════════
 app.post('/scrape-channel', express.json(), async (req, res) => {
@@ -628,6 +664,28 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
   const YT_KEY = process.env.YOUTUBE_API_KEY;
   if (!YT_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not set' });
   try {
+    // Keyword search mode (for Viral Video tab)
+    const { keyword } = req.body;
+    if (keyword || channelUrl.includes('results?search_query')) {
+      const searchQuery = keyword || new URL(channelUrl).searchParams.get('search_query') || channelUrl;
+      const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+        params: { part: 'snippet', q: searchQuery, type: 'video', videoDuration: 'short', maxResults: parseInt(count), order: sort === 'newest' ? 'date' : 'viewCount', key: YT_KEY }, timeout: 15000,
+      });
+      const videoIds = searchRes.data.items.map(i => i.id.videoId).filter(Boolean);
+      if (!videoIds.length) return res.json({ success: true, videos: [] });
+      const vRes = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+        params: { part: 'snippet,statistics,contentDetails', id: videoIds.join(','), key: YT_KEY }, timeout: 15000,
+      });
+      const videos = vRes.data.items.map(item => {
+        const dur = item.contentDetails.duration || '';
+        const mMatch = dur.match(/(\d+)M/); const sMatch = dur.match(/(\d+)S/); const hMatch = dur.match(/(\d+)H/);
+        const durSec = (hMatch ? parseInt(hMatch[1]) * 3600 : 0) + (mMatch ? parseInt(mMatch[1]) * 60 : 0) + (sMatch ? parseInt(sMatch[1]) : 0);
+        const mins = Math.floor(durSec / 60); const secs = durSec % 60;
+        return { video_id: item.id, url: `https://www.youtube.com/watch?v=${item.id}`, title: item.snippet.title, channel: item.snippet.channelTitle, view_count: parseInt(item.statistics.viewCount || 0), like_count: parseInt(item.statistics.likeCount || 0), duration_seconds: durSec, duration_human: mins > 0 ? `${mins}m ${secs}s` : `${secs}s`, publish_date: item.snippet.publishedAt, thumbnail: item.snippet.thumbnails?.high?.url || '', description: item.snippet.description || '', transcript: '' };
+      });
+      return res.json({ success: true, videos });
+    }
+
     const handle = channelUrl.replace(/\/$/, '').split('/').pop().replace('@', '');
     const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
       params: { part: 'snippet', q: handle, type: 'channel', maxResults: 1, key: YT_KEY }, timeout: 10000,
