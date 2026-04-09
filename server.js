@@ -572,7 +572,9 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
         const track = tracks.find(t => t.languageCode === 'en') || tracks[0];
         const xmlRes = await axios.get(track.baseUrl, { timeout: 10000 });
         const xml = xmlRes.data;
+        console.log('[transcript] raw sample:', typeof xml === 'string' ? xml.slice(0, 300) : JSON.stringify(xml).slice(0, 300));
         const matches = [...xml.matchAll(/<text[^>]*>([^<]*)<\/text>/g)];
+        console.log('[transcript] matches count:', matches.length);
         return matches.map(m => m[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')).join(' ').replace(/\s+/g,' ').trim();
       } catch(e) {
         console.log('[transcript] failed for', videoId, ':', e.message);
