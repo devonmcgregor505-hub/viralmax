@@ -561,7 +561,7 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
         const py = spawn('python3', ['transcribe.py', videoId], { timeout: 180000 });
         let out = '';
         let err = '';
-        py.stdout.on('data', d => out += d.toString());
+        py.stdout.on('data', d => { out += d.toString(); console.log('[py stdout]', d.toString().trim()); });
         py.stderr.on('data', d => err += d.toString());
         py.on('close', (code) => {
           try {

@@ -7,9 +7,9 @@ import json
 def transcribe(video_id):
     with tempfile.TemporaryDirectory() as tmpdir:
         audio_path = os.path.join(tmpdir, 'audio.mp3')
+        cookies_path = '/app/cookies.txt'
+        cookies_exist = os.path.exists(cookies_path)
         
-        # Download audio only
-        cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cookies.txt')
         cmd = [
             'yt-dlp',
             '-f', 'bestaudio/best',
@@ -19,25 +19,26 @@ def transcribe(video_id):
             '--extractor-args', 'youtube:skip=dash,hls',
             '-o', audio_path,
         ]
-        print(f'[cookies] path={cookies_path} exists={os.path.exists(cookies_path)}', file=sys.stderr)
-        if os.path.exists(cookies_path):
+        if cookies_exist:
             cmd += ['--cookies', cookies_path]
         cmd.append(f'https://www.youtube.com/watch?v={video_id}')
+        
+        print(json.dumps({'debug': f'cookies={cookies_exist} cmd={" ".join(cmd[:6])}'}))
+        sys.stdout.flush()
+        
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
         
         if result.returncode != 0:
-            print(json.dumps({'error': 'yt-dlp failed: ' + result.stderr[-200:]}))
+            print(json.dumps({'error': 'yt-dlp failed: ' + result.stderr[-300:]}))
             return
         
         if not os.path.exists(audio_path):
-            # yt-dlp sometimes adds extension
             candidates = [f for f in os.listdir(tmpdir) if f.startswith('audio')]
             if not candidates:
                 print(json.dumps({'error': 'no audio file found'}))
                 return
             audio_path = os.path.join(tmpdir, candidates[0])
         
-        # Transcribe with faster-whisper
         from faster_whisper import WhisperModel
         model = WhisperModel('tiny', device='cpu', compute_type='int8')
         segments, _ = model.transcribe(audio_path, language='en')
