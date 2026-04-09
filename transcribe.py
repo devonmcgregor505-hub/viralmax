@@ -12,9 +12,11 @@ def transcribe(video_id):
         cookies_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cookies.txt')
         cmd = [
             'yt-dlp',
+            '-f', 'bestaudio/best',
             '-x', '--audio-format', 'mp3',
             '--audio-quality', '5',
             '--no-playlist',
+            '--extractor-args', 'youtube:skip=dash,hls',
             '-o', audio_path,
         ]
         if os.path.exists(cookies_path):
