@@ -631,7 +631,7 @@ async function fetchTranscript(videoId) {
       timeout: 10000
     });
     const html = pageRes.data;
-    const match = html.match(/"captionTracks":s*([.*?])/);
+    const match = html.match(/"captionTracks":\s*(\[.*?\])/s);
     if (!match) return '';
     const tracks = JSON.parse(match[1]);
     const en = tracks.find(t => t.languageCode === 'en' && t.kind !== 'asr')
@@ -642,7 +642,7 @@ async function fetchTranscript(videoId) {
     const text = xmlRes.data
       .replace(/<[^>]+>/g, ' ')
       .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')
-      .replace(/s+/g,' ').trim();
+      .replace(/\s+/g,' ').trim();
     return text;
   } catch(e) {
     return '';
