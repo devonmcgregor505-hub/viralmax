@@ -633,9 +633,15 @@ async function fetchTranscriptVTT(videoId) {
       const proc = spawn('yt-dlp', [
         url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
         '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
-      ], { timeout: 20000 });
-      proc.on('close', resolve);
-      proc.on('error', resolve);
+      ]);
+      let stderr = '';
+      proc.stderr.on('data', d => { stderr += d.toString(); });
+      proc.on('close', (code) => {
+        if (code !== 0) console.log('[transcript] yt-dlp exit', code, 'for', videoId, stderr.slice(0, 100));
+        resolve();
+      });
+      proc.on('error', (e) => { console.log('[transcript] spawn err:', e.message); resolve(); });
+      setTimeout(() => { proc.kill(); resolve(); }, 15000);
     });
     const vttPath = `${tmpBase}.en.vtt`;
     if (!fs.existsSync(vttPath)) return '';
