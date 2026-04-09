@@ -1981,63 +1981,9 @@ if(hash&&document.getElementById('tab-'+hash))switchTab(hash);
 </script>
 
 
-<!-- VOICE PICKER MODAL -->
-<div class="overlay" id="voicePickerModal" style="display:none;" onclick="closeVoicePicker(event)">
-  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:18px;padding:0;width:680px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.7);overflow:hidden;" onclick="event.stopPropagation()">
-    <!-- Header -->
-    <div style="padding:22px 24px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
-        <button onclick="document.getElementById('voicePickerModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:13px;padding:5px 10px;cursor:pointer;">✕</button>
-      </div>
-      <!-- Search -->
-      <input class="inp" id="voiceSearch" placeholder="Search voices..." oninput="filterVoices()" style="margin-bottom:12px;">
-      <!-- Filters -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <div>
-          <select class="sel" id="filterGender" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Gender</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-            <option value="neutral">Neutral</option>
-          </select>
-        </div>
-        <div>
-          <select class="sel" id="filterAccent" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Accent</option>
-            <option value="american">American</option>
-            <option value="british">British</option>
-            <option value="australian">Australian</option>
-            <option value="irish">Irish</option>
-          </select>
-        </div>
-        <div>
-          <select class="sel" id="filterAge" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Age</option>
-            <option value="young">Young</option>
-            <option value="middle aged">Middle Aged</option>
-            <option value="old">Old</option>
-          </select>
-        </div>
-        <button onclick="toggleFavoritesFilter()" id="favFilterBtn" style="padding:6px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--s3);color:var(--t2);font-size:11px;cursor:pointer;transition:all 0.15s;">★ Favorites</button>
-      </div>
-    </div>
-    <!-- Voice list -->
-    <div id="voicePickerList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
-  </div>
-</div>
 
-<!-- CUSTOM VOICE NAME MODAL -->
-<div class="overlay" id="customVoiceNameModal" style="display:none;" onclick="event.stopPropagation()">
-  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
-    <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
-    <div><label class="fl">Voice Name</label><input class="inp" id="customVoiceNameInp" placeholder="e.g. My Deep Voice"></div>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="document.getElementById('customVoiceNameModal').style.display='none'">Cancel</button>
-      <button class="modal-save" onclick="confirmSaveCustomVoice()">Save Voice</button>
-    </div>
-  </div>
-</div>
+
+
 
 <!-- VOICE PICKER MODAL -->
 <div class="overlay" id="voicePickerModal" style="display:none;" onclick="closeVoicePicker(event)">
