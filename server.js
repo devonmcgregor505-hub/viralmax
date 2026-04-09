@@ -557,24 +557,36 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
     // Fetch transcripts in parallel batches of 8
     async function fetchTranscript(videoId) {
       try {
+        // Try WEB client innertube first
         const playerRes = await axios.post('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
-          context: { client: { clientName: 'ANDROID', clientVersion: '20.10.38' } },
+          context: {
+            client: {
+              clientName: 'WEB',
+              clientVersion: '2.20240101',
+              hl: 'en',
+              gl: 'US',
+            }
+          },
           videoId,
         }, {
           headers: {
             'Content-Type': 'application/json',
-            'User-Agent': 'com.google.android.youtube/20.10.38 (Linux; U; Android 14)',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'X-YouTube-Client-Name': '1',
+            'X-YouTube-Client-Version': '2.20240101',
           },
-          timeout: 10000,
+          timeout: 15000,
         });
         const tracks = playerRes.data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+        console.log('[transcript]', videoId, 'tracks:', tracks ? tracks.length : 'none');
         if (!tracks || tracks.length === 0) return '';
         const track = tracks.find(t => t.languageCode === 'en') || tracks[0];
-        const xmlRes = await axios.get(track.baseUrl, { timeout: 10000 });
+        const xmlRes = await axios.get(track.baseUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+          timeout: 10000,
+        });
         const xml = xmlRes.data;
-        console.log('[transcript] raw sample:', typeof xml === 'string' ? xml.slice(0, 300) : JSON.stringify(xml).slice(0, 300));
         const matches = [...xml.matchAll(/<text[^>]*>([^<]*)<\/text>/g)];
-        console.log('[transcript] matches count:', matches.length);
         return matches.map(m => m[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')).join(' ').replace(/\s+/g,' ').trim();
       } catch(e) {
         console.log('[transcript] failed for', videoId, ':', e.message);
