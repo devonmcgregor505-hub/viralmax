@@ -641,14 +641,10 @@ async function fetchTranscriptVTT(videoId) {
     if (!fs.existsSync(vttPath)) return '';
     const vtt = fs.readFileSync(vttPath, 'utf8');
     const vttLines = vtt
-      .replace(/WEBVTT[\s\S]*?
-
-/, '')
-      .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> [^
-]+/g, '')
+      .replace(/WEBVTT[\s\S]*?\n\n/, '')
+      .replace(/\d{2}:\d{2}:\d{2}\.\d{3} --> [^\n]+/g, '')
       .replace(/<[^>]+>/g, '')
-      .split('
-').map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
+      .split('\n').map(l => l.trim()).filter(l => l && !/^[\d:.,\s]+$/.test(l));
     const seen = new Set();
     const transcript = vttLines
       .filter(l => { if (seen.has(l)) return false; seen.add(l); return true; })
