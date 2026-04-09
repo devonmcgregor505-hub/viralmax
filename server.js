@@ -557,37 +557,23 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
     // Fetch transcripts in parallel batches of 8
     async function fetchTranscript(videoId) {
       try {
-        // Try WEB client innertube first
-        const playerRes = await axios.post('https://www.youtube.com/youtubei/v1/player?prettyPrint=false', {
-          context: {
-            client: {
-              clientName: 'WEB',
-              clientVersion: '2.20240101',
-              hl: 'en',
-              gl: 'US',
-            }
-          },
-          videoId,
-        }, {
+        const url = `https://www.youtube.com/api/timedtext?v=${videoId}&lang=en&fmt=json3`;
+        const res = await axios.get(url, {
           headers: {
-            'Content-Type': 'application/json',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'X-YouTube-Client-Name': '1',
-            'X-YouTube-Client-Version': '2.20240101',
+            'Accept-Language': 'en-US,en;q=0.9',
           },
-          timeout: 15000,
-        });
-        const tracks = playerRes.data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-        console.log('[transcript]', videoId, 'tracks:', tracks ? tracks.length : 'none');
-        if (!tracks || tracks.length === 0) return '';
-        const track = tracks.find(t => t.languageCode === 'en') || tracks[0];
-        const xmlRes = await axios.get(track.baseUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
           timeout: 10000,
         });
-        const xml = xmlRes.data;
-        const matches = [...xml.matchAll(/<text[^>]*>([^<]*)<\/text>/g)];
-        return matches.map(m => m[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"')).join(' ').replace(/\s+/g,' ').trim();
+        console.log('[transcript]', videoId, 'status:', res.status, 'type:', typeof res.data, 'keys:', Object.keys(res.data || {}).join(','));
+        const events = res.data?.events;
+        if (!events || events.length === 0) return '';
+        return events
+          .filter(e => e.segs)
+          .flatMap(e => e.segs.map(s => s.utf8 || ''))
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
       } catch(e) {
         console.log('[transcript] failed for', videoId, ':', e.message);
         return '';
