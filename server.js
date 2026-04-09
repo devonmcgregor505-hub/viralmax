@@ -521,9 +521,13 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
       const totalDuration = durMatch
         ? parseInt(durMatch[1]) * 3600 + parseInt(durMatch[2]) * 60 + parseFloat(durMatch[3])
         : null;
+      const hasAudio = probeStderr.includes('Audio:');
 
       if (silences.length === 0) {
-        runFFmpeg(['-y', '-i', videoPath, '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', '-c:a', 'aac', outputPath], 300000);
+        const noSilArgs = ['-y', '-i', videoPath, '-c:v', 'libx264', '-preset', 'fast', '-crf', '22'];
+        if (hasAudio) noSilArgs.push('-c:a', 'aac');
+        noSilArgs.push(outputPath);
+        runFFmpeg(noSilArgs, 300000);
         try { fs.unlinkSync(videoPath); } catch(e) {}
         setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
         return { success: true, videoUrl: `/outputs/trimmed_${timestamp}.mp4`, silencesRemoved: 0 };
@@ -544,38 +548,35 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
         throw new Error('All audio detected as silence — try a lower dB threshold');
       }
 
-      const videoSelect = keepSegments.map(s => `between(t,${s.start.toFixed(3)},${s.end.toFixed(3)})`).join('+');
-
-      // Check if audio stream exists
-      const { stderr: audioProbe } = runFFmpegGetStderr(['-i', videoPath, '-f', 'null', '-'], 30000);
-      const hasAudio = audioProbe.includes('Audio:');
-
-      let ffmpegArgs;
-      if (hasAudio) {
-        const filterComplex = [
-          `[0:v]select='${videoSelect}',setpts=N/FRAME_RATE/TB[v]`,
-          `[0:a]aselect='${videoSelect}',asetpts=N/SR/TB[a]`
-        ].join(';');
-        ffmpegArgs = [
+      // Step 5: extract each segment to a temp file, then concat
+      const segmentFiles = [];
+      for (let i = 0; i < keepSegments.length; i++) {
+        const seg = keepSegments[i];
+        const segPath = path.resolve(`outputs/seg_${timestamp}_${i}.mp4`);
+        const args = [
           '-y', '-i', videoPath,
-          '-filter_complex', filterComplex,
-          '-map', '[v]', '-map', '[a]',
+          '-ss', seg.start.toFixed(3),
+          '-to', seg.end.toFixed(3),
           '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
-          '-c:a', 'aac', outputPath
         ];
-      } else {
-        const filterComplex = `[0:v]select='${videoSelect}',setpts=N/FRAME_RATE/TB[v]`;
-        ffmpegArgs = [
-          '-y', '-i', videoPath,
-          '-filter_complex', filterComplex,
-          '-map', '[v]',
-          '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
-          outputPath
-        ];
+        if (hasAudio) args.push('-c:a', 'aac');
+        args.push(segPath);
+        runFFmpeg(args, 120000);
+        segmentFiles.push(segPath);
       }
 
-      runFFmpeg(ffmpegArgs, 300000);
+      // Step 6: write concat list and merge
+      const concatList = path.resolve(`outputs/concat_${timestamp}.txt`);
+      fs.writeFileSync(concatList, segmentFiles.map(f => `file '${f}'`).join('\n'));
+      runFFmpeg([
+        '-y', '-f', 'concat', '-safe', '0',
+        '-i', concatList,
+        '-c', 'copy',
+        outputPath
+      ], 300000);
 
+      for (const f of segmentFiles) try { fs.unlinkSync(f); } catch(e) {}
+      try { fs.unlinkSync(concatList); } catch(e) {}
       try { fs.unlinkSync(videoPath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
       return { success: true, videoUrl: `/outputs/trimmed_${timestamp}.mp4`, silencesRemoved: silences.length, segmentsKept: keepSegments.length };
