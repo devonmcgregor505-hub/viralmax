@@ -633,7 +633,9 @@ async function fetchTranscriptVTT(videoId) {
       const cookiesPath = require('path').join(__dirname, 'cookies.txt');
       const ytArgs = [
         url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
-        '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
+        '--sub-format', 'vtt', '--no-warnings', '--quiet',
+        '--extractor-args', 'youtube:skip=dash,hls',
+        '-o', tmpBase,
       ];
       if (require('fs').existsSync(cookiesPath)) ytArgs.push('--cookies', cookiesPath);
       const proc = spawn('yt-dlp', ytArgs);
