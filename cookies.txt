@@ -1,3 +1,7 @@
+# Netscape HTTP Cookie File
+# https://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file! Do not edit.
+
 .google.com	TRUE	/	FALSE	13425005562949390	SEARCH_SAMESITE	CgQIzJ8B
 .google.com	TRUE	/	TRUE	13425453786919372	__Secure-BUCKET	CJAH
 .google.com	TRUE	/	FALSE	13454407246912994	APISID	aPDMmofIycn-YOB_/ASgLhX6_j9apX7UqF
