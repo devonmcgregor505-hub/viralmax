@@ -271,10 +271,9 @@ app.post('/pipeline/generate-scene-image', upload.single('refImage'), async (req
   }
   try {
     const result = await enqueue(async () => {
-      const body = { model, input: { prompt, aspect_ratio: '9:16', resolution: '1K' } };
+      const body = { model, input: { prompt, aspect_ratio: '9:16', resolution: '1K', output_format: 'png', image_input: [] } };
       if (refImagePath && fs.existsSync(refImagePath)) {
-        body.input.image_input = fs.readFileSync(refImagePath).toString('base64');
-        body.input.image_mime_type = req.file.mimetype || 'image/jpeg';
+        body.input.image_input = [fs.readFileSync(refImagePath).toString('base64')];
       }
       const submitRes = await axios.post('https://api.kie.ai/api/v1/jobs/createTask', body, {
         headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' },
@@ -408,10 +407,9 @@ app.post('/generate-image', upload.single('refImage'), async (req, res) => {
   const kieResolution = RESOLUTION_MAP[resolution] || '1K';
   try {
     const result = await enqueue(async () => {
-      const body = { model, input: { prompt, aspect_ratio: aspectRatio, resolution: kieResolution } };
+      const body = { model, input: { prompt, aspect_ratio: aspectRatio, resolution: kieResolution, output_format: 'png', image_input: [] } };
       if (refImagePath && fs.existsSync(refImagePath)) {
-        body.input.image_input = fs.readFileSync(refImagePath).toString('base64');
-        body.input.image_mime_type = req.file.mimetype || 'image/jpeg';
+        body.input.image_input = [fs.readFileSync(refImagePath).toString('base64')];
       }
       const submitRes = await axios.post('https://api.kie.ai/api/v1/jobs/createTask', body, {
         headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' },
