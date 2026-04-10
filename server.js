@@ -649,6 +649,33 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
   }
 });
 
+
+// ── ELEVENLABS VOICES (via Algrow) ──
+app.get('/elevenlabs-voices', async (req, res) => {
+  const ALGROW_API_KEY = process.env.ALGROW_API_KEY;
+  if (!ALGROW_API_KEY) return res.json({ success: false, error: 'ALGROW_API_KEY not set' });
+  try {
+    const r = await axios.get('https://api.algrow.online/api/voices', {
+      params: { sort: 'trending', page_size: 100 },
+      headers: { 'Authorization': `Bearer ${ALGROW_API_KEY}` },
+      timeout: 15000,
+    });
+    const voices = (r.data.voices || []).map(v => ({
+      voice_id: v.voice_id,
+      name: v.name,
+      preview_url: v.preview_url,
+      gender: v.gender,
+      age: v.age,
+      accent: v.accent,
+      description: v.description,
+    }));
+    res.json({ success: true, voices });
+  } catch(err) {
+    console.error('[elevenlabs-voices] error:', err.message);
+    res.json({ success: false, error: err.message });
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════════════════
 // YT SCRAPER
 // ══════════════════════════════════════════════════════════════════════════════
