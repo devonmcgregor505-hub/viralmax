@@ -552,6 +552,7 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
         ? parseInt(durMatch[1]) * 3600 + parseInt(durMatch[2]) * 60 + parseFloat(durMatch[3])
         : null;
       const hasAudio = probeStderr.includes('Audio:');
+      const hasVideo = probeStderr.includes('Video:');
 
       if (silences.length === 0) {
         const noSilArgs = ['-y', '-i', videoPath, '-c:v', 'libx264', '-preset', 'fast', '-crf', '22'];
@@ -587,7 +588,8 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
       for (let i = 0; i < keepSegments.length; i++) {
         const seg = keepSegments[i];
         const segPath = path.resolve(`outputs/seg_${timestamp}_${i}.mp4`);
-        const args = ['-y', '-i', videoPath, '-ss', seg.start.toFixed(3), '-to', seg.end.toFixed(3), '-c:v', 'libx264', '-preset', 'fast', '-crf', '22'];
+        const args = ['-y', '-i', videoPath, '-ss', seg.start.toFixed(3), '-to', seg.end.toFixed(3)];
+        if (hasVideo) { args.push('-c:v', 'libx264', '-preset', 'fast', '-crf', '22'); }
         if (hasAudio) args.push('-c:a', 'aac');
         args.push(segPath);
         runFFmpeg(args, 120000);
@@ -597,7 +599,7 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
       if (segmentFiles.length === 1) {
         // Only one segment — just copy it
         fs.copyFileSync(segmentFiles[0], outputPath);
-      } else if (!hasAudio || segmentFiles.length > 12) {
+      } else if (!hasAudio || !hasVideo || segmentFiles.length > 12) {
         // No audio or too many segments for acrossfade chain — use concat copy
         const concatList = path.resolve(`outputs/concat_${timestamp}.txt`);
         fs.writeFileSync(concatList, segmentFiles.map(f => `file '${f}'`).join('\n'));
@@ -612,9 +614,11 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
         // Audio: acrossfade each pair progressively
         const n = segmentFiles.length;
         let filterParts = [];
-        // Video concat
-        const vInputs = segmentFiles.map((_, i) => `[${i}:v]`).join('');
-        filterParts.push(`${vInputs}concat=n=${n}:v=1:a=0[vout]`);
+        // Video concat (only if has video)
+        if (hasVideo) {
+          const vInputs = segmentFiles.map((_, i) => `[${i}:v]`).join('');
+          filterParts.push(`${vInputs}concat=n=${n}:v=1:a=0[vout]`);
+        }
         // Audio acrossfade chain
         if (n === 2) {
           filterParts.push(`[0:a][1:a]acrossfade=d=${fadeMs}:c1=tri:c2=tri[aout]`);
@@ -630,8 +634,8 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
         runFFmpeg([
           '-y', ...inputs,
           '-filter_complex', filterParts.join(';'),
-          '-map', '[vout]', '-map', '[aout]',
-          '-c:v', 'libx264', '-preset', 'fast', '-crf', '22',
+          ...(hasVideo ? ['-map', '[vout]', '-c:v', 'libx264', '-preset', 'fast', '-crf', '22'] : []),
+          '-map', '[aout]',
           '-c:a', 'aac', outputPath
         ], 300000);
       }
