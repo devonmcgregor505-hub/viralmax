@@ -1634,7 +1634,7 @@ async function startVoiceGen() {
   const fill = document.getElementById('vrFill'), pctLbl = document.getElementById('voiceProgPct'), lbl = document.getElementById('voiceProgLbl');
   const tick = setInterval(() => { if (pct < 90) { pct += Math.random() * 3; if (pct > 90) pct = 90; fill.style.width = pct + '%'; pctLbl.textContent = Math.round(pct) + '%'; if (pct > 20) lbl.textContent = 'Generating…'; } }, 600);
   try {
-    const res = await fetch('/generate-voice-elevenlabs', {
+    const res = await fetch('/generate-voice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
