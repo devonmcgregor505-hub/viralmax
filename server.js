@@ -650,27 +650,25 @@ app.post('/remove-deadspace', upload.single('video'), async (req, res) => {
 });
 
 
-// ── ELEVENLABS VOICES (via Algrow) ──
+// ── ELEVENLABS VOICES (direct 11labs API for previews) ──
 app.get('/elevenlabs-voices', async (req, res) => {
-  const ALGROW_API_KEY = process.env.ALGROW_API_KEY;
-  if (!ALGROW_API_KEY) return res.json({ success: false, error: 'ALGROW_API_KEY not set' });
+  const EL_KEY = process.env.ELEVENLABS_API_KEY;
+  if (!EL_KEY) return res.json({ success: false, error: 'ELEVENLABS_API_KEY not set' });
   try {
-    const r = await axios.get('https://api.algrow.online/api/voices', {
-      params: { sort: 'trending', page_size: 100 },
-      headers: { 'Authorization': `Bearer ${ALGROW_API_KEY}` },
+    const r = await axios.get('https://api.elevenlabs.io/v1/voices', {
+      headers: { 'xi-api-key': EL_KEY },
       timeout: 15000,
     });
-    console.log('[algrow voices] raw count:', r.data.voices?.length, 'sample:', JSON.stringify(r.data.voices?.[0]).slice(0,100));
     const voices = (r.data.voices || []).map(v => ({
       id: v.voice_id,
       voice_id: v.voice_id,
       name: v.name,
       preview: v.preview_url,
       preview_url: v.preview_url,
-      gender: v.gender,
-      age: v.age,
-      accent: v.accent,
-      description: v.description,
+      gender: v.labels?.gender || '',
+      age: v.labels?.age || '',
+      accent: v.labels?.accent || '',
+      description: v.labels?.description || v.description || '',
     }));
     res.json({ success: true, voices });
   } catch(err) {
