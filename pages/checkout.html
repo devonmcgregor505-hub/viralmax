@@ -224,7 +224,7 @@ featuresEl.innerHTML = cfg.features.map(f => `<div class="plan-feature">${f}</di
 
 // Stripe
 // TODO: Replace with your Stripe publishable key
-const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
+const stripe = Stripe('REPLACE_WITH_PK_TEST_KEY');
 const elements = stripe.elements({
   appearance: {
     theme: 'night',
