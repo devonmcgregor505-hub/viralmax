@@ -468,19 +468,21 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
         if (!ALGROW_API_KEY) throw new Error('ALGROW_API_KEY not set');
         if (!voiceId) throw new Error('No voiceId provided');
 
-        // Submit to Algrow
-        const FormData = require('form-data');
-        const form = new FormData();
-        form.append('script', text.trim());
-        form.append('voice_id', voiceId);
-        form.append('provider', 'elevenlabs');
-        form.append('model_id', 'eleven_turbo_v2_5');
-        form.append('stability', stability);
-        form.append('similarity_boost', similarity);
-        form.append('speed', speed);
+        // Submit to Algrow using URLSearchParams (multipart/form-data via qs)
+        const params = new URLSearchParams();
+        params.append('script', text.trim());
+        params.append('voice_id', voiceId);
+        params.append('provider', 'elevenlabs');
+        params.append('model_id', 'eleven_turbo_v2_5');
+        params.append('stability', String(stability));
+        params.append('similarity_boost', String(similarity));
+        params.append('speed', String(speed));
 
-        const submitRes = await axios.post('https://api.algrow.online/api/generate-simple', form, {
-          headers: { 'Authorization': `Bearer ${ALGROW_API_KEY}`, ...form.getHeaders() },
+        const submitRes = await axios.post('https://api.algrow.online/api/generate-simple', params.toString(), {
+          headers: {
+            'Authorization': `Bearer ${ALGROW_API_KEY}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
           timeout: 30000,
         });
         console.log('[algrow] submit response:', JSON.stringify(submitRes.data).slice(0, 200));
