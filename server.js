@@ -483,6 +483,7 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
           headers: { 'Authorization': `Bearer ${ALGROW_API_KEY}`, ...form.getHeaders() },
           timeout: 30000,
         });
+        console.log('[algrow] submit response:', JSON.stringify(submitRes.data).slice(0, 200));
         if (!submitRes.data.success) throw new Error('Algrow submit failed: ' + submitRes.data.error);
         const jobId = submitRes.data.job_id;
 
