@@ -271,7 +271,7 @@ app.post('/pipeline/generate-scene-image', upload.single('refImage'), async (req
   }
   try {
     const result = await enqueue(async () => {
-      const body = { model, input: { prompt, aspect_ratio: '9:16', resolution: '1K', output_format: 'png' } };
+      const body = { model, input: { prompt, aspect_ratio: '9:16', resolution: '1K' } };
       if (refImagePath && fs.existsSync(refImagePath)) {
         body.input.image_input = fs.readFileSync(refImagePath).toString('base64');
         body.input.image_mime_type = req.file.mimetype || 'image/jpeg';
@@ -408,7 +408,7 @@ app.post('/generate-image', upload.single('refImage'), async (req, res) => {
   const kieResolution = RESOLUTION_MAP[resolution] || '1K';
   try {
     const result = await enqueue(async () => {
-      const body = { model, input: { prompt, aspect_ratio: aspectRatio, resolution: kieResolution, output_format: 'png' } };
+      const body = { model, input: { prompt, aspect_ratio: aspectRatio, resolution: kieResolution } };
       if (refImagePath && fs.existsSync(refImagePath)) {
         body.input.image_input = fs.readFileSync(refImagePath).toString('base64');
         body.input.image_mime_type = req.file.mimetype || 'image/jpeg';
