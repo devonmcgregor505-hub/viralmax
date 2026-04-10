@@ -273,7 +273,15 @@ app.post('/pipeline/generate-scene-image', upload.single('refImage'), async (req
     const result = await enqueue(async () => {
       const body = { model, input: { prompt, aspect_ratio: '9:16', resolution: '1K', output_format: 'png', image_input: [] } };
       if (refImagePath && fs.existsSync(refImagePath)) {
-        body.input.image_input = [fs.readFileSync(refImagePath).toString('base64')];
+        const mimeType = req.file.mimetype || 'image/jpeg';
+        const b64 = fs.readFileSync(refImagePath).toString('base64');
+        const uploadRes = await axios.post('https://kieai.redpandaai.co/api/file-base64-upload', {
+          base64Data: `data:${mimeType};base64,${b64}`,
+          uploadPath: 'images/viralmax',
+        }, { headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 });
+        const fileUrl = uploadRes.data?.data?.downloadUrl;
+        if (!fileUrl) throw new Error('File upload failed: ' + JSON.stringify(uploadRes.data));
+        body.input.image_input = [fileUrl];
       }
       const submitRes = await axios.post('https://api.kie.ai/api/v1/jobs/createTask', body, {
         headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' },
@@ -409,7 +417,15 @@ app.post('/generate-image', upload.single('refImage'), async (req, res) => {
     const result = await enqueue(async () => {
       const body = { model, input: { prompt, aspect_ratio: aspectRatio, resolution: kieResolution, output_format: 'png', image_input: [] } };
       if (refImagePath && fs.existsSync(refImagePath)) {
-        body.input.image_input = [fs.readFileSync(refImagePath).toString('base64')];
+        const mimeType = req.file.mimetype || 'image/jpeg';
+        const b64 = fs.readFileSync(refImagePath).toString('base64');
+        const uploadRes = await axios.post('https://kieai.redpandaai.co/api/file-base64-upload', {
+          base64Data: `data:${mimeType};base64,${b64}`,
+          uploadPath: 'images/viralmax',
+        }, { headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 });
+        const fileUrl = uploadRes.data?.data?.downloadUrl;
+        if (!fileUrl) throw new Error('File upload failed: ' + JSON.stringify(uploadRes.data));
+        body.input.image_input = [fileUrl];
       }
       const submitRes = await axios.post('https://api.kie.ai/api/v1/jobs/createTask', body, {
         headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' },
