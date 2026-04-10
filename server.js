@@ -660,6 +660,7 @@ app.get('/elevenlabs-voices', async (req, res) => {
       headers: { 'Authorization': `Bearer ${ALGROW_API_KEY}` },
       timeout: 15000,
     });
+    console.log('[algrow voices] raw count:', r.data.voices?.length, 'sample:', JSON.stringify(r.data.voices?.[0]).slice(0,100));
     const voices = (r.data.voices || []).map(v => ({
       id: v.voice_id,
       voice_id: v.voice_id,
