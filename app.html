@@ -808,7 +808,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="voice-script-area">
           <label class="fl">Script</label>
           <textarea class="ta" id="voiceScript" rows="5" placeholder="Enter your script…" oninput="updateCharCount()" style="width:100%;"></textarea>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;"><span class="char-count"><span id="charCount">0</span> / 10,000</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;"><span class="char-count"><span id="charCount">0</span> / 200,000</span></div>
         </div>
         <div class="voice-output-area">
           <label class="fl">Generated Voiceovers</label>
@@ -1715,7 +1715,7 @@ function renderVoiceOutputs(){
     list.appendChild(card);
   });
 }
-function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>9000?'var(--red)':n>7000?'var(--y)':'var(--t3)';const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent=n===0?'0 cr':((Math.ceil(n/1000)||1)*10)+' cr';}
+function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>190000?'var(--red)':n>150000?'var(--y)':'var(--t3)';const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent=n===0?'0 cr':(Math.ceil(n/1000)||1)+' cr';}
 
 // ── SILENCE REMOVER ──
 const dsZone=document.getElementById('dsZone');
