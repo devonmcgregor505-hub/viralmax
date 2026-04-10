@@ -473,7 +473,7 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
         params.append('script', text.trim());
         params.append('voice_id', voiceId);
         params.append('provider', 'elevenlabs');
-        params.append('model_id', 'eleven_v3');
+        params.append('model_id', req.body.model || 'eleven_multilingual_v2');
         params.append('stability', String(stability));
         params.append('similarity_boost', String(similarity));
         params.append('speed', String(speed));

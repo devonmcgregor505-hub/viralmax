@@ -786,6 +786,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
             </div>
 
           </div></div>
+          <div class="card"><div class="card-head">Model</div><div class="card-body">
+            <div class="s-row" style="margin-bottom:0;">
+              <label class="s-lbl">ElevenLabs Model</label>
+            </div>
+            <select id="voiceModelSelect" class="inp" style="width:100%;margin-top:8px;font-size:12px;" onchange="updateVoiceModel()">
+              <option value="eleven_multilingual_v2">Multilingual v2 (Best Quality)</option>
+              <option value="eleven_v3">v3 (Latest)</option>
+              <option value="eleven_flash_v2_5">Flash v2.5 (Fastest)</option>
+              <option value="eleven_turbo_v2_5">Turbo v2.5 (Fast + High Quality)</option>
+              <option value="eleven_turbo_v2">Turbo v2</option>
+              <option value="eleven_flash_v2">Flash v2</option>
+              <option value="eleven_monolingual_v1">English v1 (Legacy)</option>
+            </select>
+          </div></div>
           <div class="card"><div class="card-head">Settings</div><div class="card-body">
             <div class="slider-grp"><label class="s-lbl">Speed</label><div class="slider-labels"><span class="slider-end">Slow</span><span class="slider-val" id="speedVal">1.0</span><span class="slider-end">Fast</span></div><input type="range" class="slider" id="speedSlider" min="0.7" max="1.2" step="0.05" value="1.0" oninput="document.getElementById('speedVal').textContent=this.value"></div>
             <div class="slider-grp"><label class="s-lbl">Stability</label><div class="slider-labels"><span class="slider-end">Variable</span><span class="slider-val" id="stabilityVal">50%</span><span class="slider-end">Stable</span></div><input type="range" class="slider" id="stabilitySlider" min="0" max="100" value="50" oninput="document.getElementById('stabilityVal').textContent=this.value+'%'"></div>
@@ -1622,6 +1636,7 @@ function saveCustomVoiceId_OLD() {
   document.getElementById('customVoiceIdInp').value = '';
 }
 
+function updateVoiceModel() { /* model read directly from select on generate */ }
 function onCloneVoiceChange() { selVoiceId = document.getElementById('cloneVoiceSel').value; const v = loadVoices().find(x => x.id === selVoiceId); selVoiceName = v ? v.name : 'Clone'; updateDelBtn(); }
 
 async function startVoiceGen() {
@@ -1647,13 +1662,14 @@ async function startVoiceGen() {
         stability: parseFloat(document.getElementById('stabilitySlider').value) / 100,
         similarity: parseFloat(document.getElementById('similaritySlider').value) / 100,
         exaggeration: parseFloat(document.getElementById('exagSlider').value),
+        model: document.getElementById('voiceModelSelect').value,
       })
     });
     const data = await res.json();
     clearInterval(tick); fill.style.width = '100%'; pctLbl.textContent = '100%';
     if (!data.success) throw new Error(data.error || 'Failed');
     const charCount = script.length;
-    creds -= 10; updCreds();
+    creds -= Math.ceil(charCount / 1000) || 1; updCreds();
     addVoiceOutput(data.audioUrl, script.slice(0, 60) + (script.length > 60 ? '…' : ''), 'Voice');
   } catch(err) {
     clearInterval(tick);
