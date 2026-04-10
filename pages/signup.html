@@ -262,7 +262,7 @@ async function handleSignup(e) {
       window.location.href = 'app.html';
     } else {
       // Stripe checkout redirect would go here
-      window.location.href = 'checkout.html?plan=' + plan;
+      window.location.href = '/checkout?plan=' + plan;
     }
   }, 1500);
 }
