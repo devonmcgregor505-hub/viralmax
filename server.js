@@ -464,16 +464,43 @@ app.post('/generate-voice', upload.single('voiceSample'), async (req, res) => {
         setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
         return { success: true, audioUrl: `/outputs/voice_${timestamp}.wav` };
       } else {
-        const KIE_API_KEY = process.env.KIE_API_KEY;
-        if (!KIE_API_KEY) throw new Error('KIE_API_KEY not set in .env');
+        const ALGROW_API_KEY = process.env.ALGROW_API_KEY;
+        if (!ALGROW_API_KEY) throw new Error('ALGROW_API_KEY not set');
         if (!voiceId) throw new Error('No voiceId provided');
-        const submitRes = await axios.post('https://api.kie.ai/api/v1/jobs/createTask', {
-          model: kieModel,
-          input: { text: text.trim(), voice: voiceId, stability: parseFloat(stability), similarity_boost: parseFloat(similarity), speed: parseFloat(speed), style: 0 },
-        }, { headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 });
-        const taskId = submitRes.data?.data?.taskId || submitRes.data?.data?.task_id;
-        if (!taskId) throw new Error('No taskId from Kie.ai: ' + JSON.stringify(submitRes.data));
-        const audioUrl = await kieAiPoll(taskId, KIE_API_KEY);
+
+        // Submit to Algrow
+        const FormData = require('form-data');
+        const form = new FormData();
+        form.append('script', text.trim());
+        form.append('voice_id', voiceId);
+        form.append('provider', 'elevenlabs');
+        form.append('model_id', 'eleven_turbo_v2_5');
+        form.append('stability', stability);
+        form.append('similarity_boost', similarity);
+        form.append('speed', speed);
+
+        const submitRes = await axios.post('https://api.algrow.online/api/generate-simple', form, {
+          headers: { 'Authorization': `Bearer ${ALGROW_API_KEY}`, ...form.getHeaders() },
+          timeout: 30000,
+        });
+        if (!submitRes.data.success) throw new Error('Algrow submit failed: ' + submitRes.data.error);
+        const jobId = submitRes.data.job_id;
+
+        // Poll for completion
+        let audioUrl = null;
+        for (let i = 0; i < 60; i++) {
+          await new Promise(r => setTimeout(r, 3000));
+          const pollRes = await axios.get(`https://api.algrow.online/api/job-status/${jobId}`, {
+            headers: { 'Authorization': `Bearer ${ALGROW_API_KEY}` },
+            timeout: 10000,
+          });
+          const status = pollRes.data.status;
+          console.log(`[algrow] poll ${i+1} status=${status}`);
+          if (status === 'completed') { audioUrl = pollRes.data.audio_url; break; }
+          if (status === 'failed') throw new Error('Algrow generation failed: ' + (pollRes.data.error || 'unknown'));
+        }
+        if (!audioUrl) throw new Error('Algrow timed out');
+
         const outputPath = path.resolve(`outputs/voice_${timestamp}.mp3`);
         const dlRes = await axios.get(audioUrl, { responseType: 'arraybuffer', timeout: 60000 });
         fs.writeFileSync(outputPath, Buffer.from(dlRes.data));
