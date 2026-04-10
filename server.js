@@ -661,8 +661,10 @@ app.get('/elevenlabs-voices', async (req, res) => {
       timeout: 15000,
     });
     const voices = (r.data.voices || []).map(v => ({
+      id: v.voice_id,
       voice_id: v.voice_id,
       name: v.name,
+      preview: v.preview_url,
       preview_url: v.preview_url,
       gender: v.gender,
       age: v.age,
