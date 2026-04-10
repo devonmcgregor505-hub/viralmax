@@ -820,3 +820,79 @@ process.on('uncaughtException', err => {
   if (err.code === 'EPIPE') return;
   console.error('Uncaught exception:', err.message);
 });
+// ── Supabase + Stripe ──
+const { createClient } = require('@supabase/supabase-js');
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+const PRICE_MONTHLY = 'price_1TKayhAwQgCwolyMcQ5hvM7D';
+const PRICE_TOPUP = 'price_1TKb39AwQgCwolyMEMlMK9yL';
+const CREDITS_MONTHLY = 2000;
+const CREDITS_TOPUP = 500;
+
+app.get('/api/credits', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  if (!userId) return res.json({ credits: 500 });
+  const { data } = await supabase.from('users').select('credits').eq('id', userId).single();
+  res.json({ credits: data?.credits ?? 500 });
+});
+
+app.post('/api/credits/deduct', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  const { amount = 5 } = req.body;
+  if (!userId) return res.json({ ok: true });
+  const { data } = await supabase.from('users').select('credits').eq('id', userId).single();
+  const current = data?.credits ?? 0;
+  if (current < amount) return res.status(402).json({ error: 'Not enough credits' });
+  await supabase.from('users').update({ credits: current - amount }).eq('id', userId);
+  res.json({ ok: true, credits: current - amount });
+});
+
+app.post('/api/checkout/monthly', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  const userEmail = req.headers['x-user-email'];
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card'],
+    line_items: [{ price: PRICE_MONTHLY, quantity: 1 }],
+    success_url: req.headers.origin + '/app?upgraded=1',
+    cancel_url: req.headers.origin + '/checkout',
+    customer_email: userEmail,
+    metadata: { userId }
+  });
+  res.json({ url: session.url });
+});
+
+app.post('/api/checkout/topup', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  const userEmail = req.headers['x-user-email'];
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    payment_method_types: ['card'],
+    line_items: [{ price: PRICE_TOPUP, quantity: 1 }],
+    success_url: req.headers.origin + '/app?topup=1',
+    cancel_url: req.headers.origin + '/checkout',
+    customer_email: userEmail,
+    metadata: { userId }
+  });
+  res.json({ url: session.url });
+});
+
+app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try { event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET); }
+  catch (err) { return res.status(400).send('Webhook error: ' + err.message); }
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const userId = session.metadata?.userId;
+    if (userId) {
+      const creditsToAdd = session.mode === 'subscription' ? 2000 : 500;
+      const { data } = await supabase.from('users').select('credits').eq('id', userId).single();
+      const current = data?.credits ?? 0;
+      await supabase.from('users').upsert({ id: userId, credits: current + creditsToAdd, plan: session.mode === 'subscription' ? 'pro' : (data?.plan || 'free'), updated_at: new Date().toISOString() });
+    }
+  }
+  res.json({ received: true });
+});
