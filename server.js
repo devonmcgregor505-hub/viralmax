@@ -630,10 +630,13 @@ async function fetchTranscriptVTT(videoId) {
     const tmpBase = `/tmp/transcript_${videoId}`;
     await new Promise(resolve => {
       const { spawn } = require('child_process');
-      const proc = spawn('yt-dlp', [
+      const cookiesPath = require('path').join(__dirname, 'cookies.txt');
+      const ytArgs = [
         url, '--skip-download', '--write-auto-sub', '--sub-lang', 'en',
         '--sub-format', 'vtt', '--no-warnings', '--quiet', '-o', tmpBase,
-      ]);
+      ];
+      if (require('fs').existsSync(cookiesPath)) ytArgs.push('--cookies', cookiesPath);
+      const proc = spawn('yt-dlp', ytArgs);
       let stderr = '';
       proc.stderr.on('data', d => { stderr += d.toString(); });
       proc.on('close', (code) => {
@@ -670,7 +673,8 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
   const YT_KEY = process.env.YOUTUBE_API_KEY;
   if (!YT_KEY) return res.json({ success: false, error: 'YOUTUBE_API_KEY not set' });
   try {
-    const handle = channelUrl.replace(/\/$/, '').split('/').pop().replace('@', '');
+    const cleanUrl = channelUrl.replace(/\/shorts.*$/, '').replace(/\/videos.*$/, '').replace(/\/featured.*$/, '').replace(/\/$/, '');
+    const handle = cleanUrl.split('/').pop().replace('@', '');
     const searchRes = await axios.get('https://www.googleapis.com/youtube/v3/search', {
       params: { part: 'snippet', q: handle, type: 'channel', maxResults: 1, key: YT_KEY }, timeout: 10000,
     });
