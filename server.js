@@ -132,7 +132,7 @@ async function modelsLabPoll(fetchUrl, apiKey, maxAttempts = 120, intervalMs = 5
     await new Promise(r => setTimeout(r, intervalMs));
     const pollRes = await axios.post(fetchUrl, { key: apiKey }, {
       headers: { 'Content-Type': 'application/json' },
-      timeout: 15000,
+      timeout: 60000,
     });
     const d = pollRes.data;
     console.log(`[modelslab] poll ${i + 1} status=${d.status}`);
