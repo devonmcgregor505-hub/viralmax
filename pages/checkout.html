@@ -4,268 +4,81 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout — Viralmax</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus Jakarta Sans:wght@400;600;700;800&family=Space+Mono&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://js.stripe.com/v3/"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --y: #FFE600; --blk: #050505; --blk2: #0a0a0a; --g1: #1a1a1a; --g2: #222; --g3: #2e2e2e;
-  --tx: #f5f5f0; --tx2: #999; --tx3: #555; --grn: #00E676; --red: #FF3D3D;
-}
-body { font-family: 'Manrope', sans-serif; background: var(--blk); color: var(--tx); min-height: 100vh; display: flex; }
-
-.checkout-left {
-  flex: 1; background: var(--blk); padding: 60px;
-  display: flex; flex-direction: column; justify-content: center; align-items: flex-end;
-}
-
-.checkout-right {
-  width: 480px; flex-shrink: 0; background: var(--blk2);
-  border-left: 1px solid var(--g1); padding: 60px 48px;
-  display: flex; flex-direction: column; min-height: 100vh;
-}
-
-.checkout-logo { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; color: var(--y); text-decoration: none; margin-bottom: 48px; display: block; }
-
-.plan-summary { max-width: 380px; width: 100%; }
-
-.plan-summary-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--tx3); margin-bottom: 20px; }
-
-.plan-card {
-  background: var(--blk2); border: 1px solid var(--g1); border-radius: 16px; padding: 28px;
-  margin-bottom: 20px;
-}
-.plan-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
-.plan-card-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.plan-card-price { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 36px; font-weight: 800; color: var(--y); letter-spacing: -2px; }
-.plan-card-period { font-size: 12px; color: var(--tx3); text-align: right; }
-
-.plan-features { display: flex; flex-direction: column; gap: 10px; }
-.plan-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--tx2); }
-.plan-feature::before { content: '✓'; color: var(--y); font-weight: 700; }
-
-.plan-total {
-  background: rgba(255,230,0,0.05); border: 1px solid rgba(255,230,0,0.15);
-  border-radius: 12px; padding: 20px 24px; display: flex; justify-content: space-between;
-  align-items: center; margin-bottom: 20px;
-}
-.plan-total-label { font-size: 14px; color: var(--tx2); }
-.plan-total-amount { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800; color: var(--y); }
-
-.security-badges { display: flex; gap: 16px; margin-top: 16px; }
-.badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--tx3); }
-
-/* Form styles */
-.checkout-h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
-.checkout-sub { font-size: 13px; color: var(--tx2); margin-bottom: 36px; }
-
-.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-.form-label { font-size: 11px; font-weight: 700; color: var(--tx2); letter-spacing: 0.5px; text-transform: uppercase; font-family: 'Space Mono', monospace; }
-
-.form-input {
-  background: var(--g1); border: 1px solid var(--g2); border-radius: 10px;
-  padding: 13px 16px; color: var(--tx); font-size: 14px; font-family: 'Manrope', sans-serif;
-  outline: none; transition: border-color 0.2s; width: 100%;
-}
-.form-input:focus { border-color: rgba(255,230,0,0.4); }
-.form-input::placeholder { color: var(--tx3); }
-
-.card-element-wrap {
-  background: var(--g1); border: 1px solid var(--g2); border-radius: 10px;
-  padding: 14px 16px; transition: border-color 0.2s;
-}
-.card-element-wrap.focused { border-color: rgba(255,230,0,0.4); }
-
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-.btn-pay {
-  width: 100%; padding: 16px; background: var(--y); border: none; border-radius: 10px;
-  color: #000; font-size: 16px; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif;
-  cursor: pointer; transition: all 0.2s; margin-top: 8px;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.btn-pay:hover { background: #FFF176; box-shadow: 0 4px 24px rgba(255,230,0,0.3); }
-.btn-pay:disabled { background: var(--g2); color: var(--tx3); cursor: not-allowed; }
-
-.stripe-badge {
-  text-align: center; margin-top: 16px; font-size: 11px; color: var(--tx3);
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-
-.error-msg { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
-
-.divider-line { height: 1px; background: var(--g1); margin: 28px 0; }
-
-@media (max-width: 900px) { body { flex-direction: column; } .checkout-left { padding: 40px 20px; align-items: flex-start; } .checkout-right { width: 100%; padding: 40px 20px; min-height: auto; } }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#060606;color:#f0f0f0;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:20px;padding:48px;max-width:440px;width:100%;text-align:center}
+.logo{color:#FFE600;font-weight:800;font-size:22px;margin-bottom:32px;display:block;text-decoration:none}
+h1{font-size:28px;font-weight:800;margin-bottom:8px}
+p{color:#888;font-size:14px;margin-bottom:32px}
+.btn{width:100%;padding:14px;background:#FFE600;border:none;border-radius:10px;color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.btn:hover{background:#FFF176}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.plan{background:#1a1a1a;border:1px solid #222;border-radius:10px;padding:16px;cursor:pointer;transition:all 0.2s}
+.plan.selected{border-color:#FFE600;background:rgba(255,230,0,0.05)}
+.plan-name{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.plan-price{font-size:24px;font-weight:800;color:#f0f0f0}
+.plan-desc{font-size:11px;color:#555;margin-top:4px}
+.plan.selected .plan-price{color:#FFE600}
 </style>
 </head>
 <body>
-
-<div class="checkout-left">
-  <div class="plan-summary">
-    <a class="checkout-logo" href="/">Viralmax</a>
-    <div class="plan-summary-title">Your order</div>
-
-    <div class="plan-card" id="planCard">
-      <div class="plan-card-top">
-        <div>
-          <div class="plan-card-name" id="planName">Pro</div>
-          <div style="font-size:13px;color:var(--tx3);margin-top:4px;">Billed monthly</div>
-        </div>
-        <div>
-          <div class="plan-card-price" id="planPrice">$30</div>
-          <div class="plan-card-period">/month</div>
-        </div>
-      </div>
-      <div class="plan-features" id="planFeatures">
-        <div class="plan-feature">3,500 credits per month</div>
-        <div class="plan-feature">All 7 pipeline tools</div>
-        <div class="plan-feature">Voice cloning</div>
-        <div class="plan-feature">Grok 480p + 720p + Veo 3 + Sora 2</div>
-        <div class="plan-feature">Priority GPU queue</div>
-      </div>
+<div class="card">
+  <a class="logo" href="/">• Viralmax</a>
+  <h1>Upgrade your plan</h1>
+  <p>Choose a plan to get more credits</p>
+  <div class="plans">
+    <div class="plan selected" id="plan-monthly" onclick="selectPlan('monthly')">
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$19<span style="font-size:14px;font-weight:400">/mo</span></div>
+      <div class="plan-desc">2,000 credits/mo</div>
     </div>
-
-    <div class="plan-total">
-      <div>
-        <div class="plan-total-label">Total today</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:3px;">Then monthly</div>
-      </div>
-      <div class="plan-total-amount" id="totalAmount">$30.00</div>
-    </div>
-
-    <div class="security-badges">
-      <div class="badge">🔒 SSL encrypted</div>
-      <div class="badge">💳 Powered by Stripe</div>
-      <div class="badge">↩ 7-day refund</div>
+    <div class="plan" id="plan-topup" onclick="selectPlan('topup')">
+      <div class="plan-name">Top-up</div>
+      <div class="plan-price">$5</div>
+      <div class="plan-desc">500 credits</div>
     </div>
   </div>
+  <button class="btn" id="payBtn" onclick="startCheckout()">Continue to payment →</button>
 </div>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const sb = createClient('https://asvpzsnncbxkpycsgfnj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0');
 
-<div class="checkout-right">
-  <h1 class="checkout-h1">Complete your order</h1>
-  <p class="checkout-sub">Enter your payment details below. Your subscription starts immediately.</p>
+let selectedPlan = 'monthly';
+const urlPlan = new URLSearchParams(window.location.search).get('plan');
+if (urlPlan === 'topup') { selectPlan('topup'); }
 
-  <form id="paymentForm" onsubmit="handlePayment(event)">
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">First name</label>
-        <input type="text" class="form-input" id="firstName" placeholder="Devon" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Last name</label>
-        <input type="text" class="form-input" id="lastName" placeholder="McGregor" required>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="email" placeholder="you@example.com" required>
-    </div>
-
-    <div class="divider-line"></div>
-
-    <div class="form-group">
-      <label class="form-label">Card number</label>
-      <div class="card-element-wrap" id="cardNumberWrap">
-        <div id="cardNumber"></div>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Expiry</label>
-        <div class="card-element-wrap">
-          <div id="cardExpiry"></div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">CVC</label>
-        <div class="card-element-wrap">
-          <div id="cardCvc"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="error-msg" id="errorMsg"></div>
-
-    <button class="btn-pay" type="submit" id="payBtn">
-      <span id="payBtnText">🔒 Subscribe — <span id="payBtnAmount">$30</span>/mo</span>
-    </button>
-
-    <div class="stripe-badge">
-      Secured by
-      <svg height="16" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 10.2c0-3.3 2.7-4.6 7.1-4.6 3.2 0 6.9.9 9.7 2.6V2.2C17.1.8 13.4 0 9.8 0 4.1 0 0 2.8 0 9.8c0 10.1 13.9 8.5 13.9 13.7 0 3.9-3.4 5-7.3 5-4 0-7.6-1.4-10.5-3.5v6.2C2.5 32.7 6 33.5 9.8 33.5c6 0 12.1-2.5 12.1-9.7C21.9 13.6 3 15.4 3 10.2z" fill="#555" transform="translate(0 -3)"/>
-        <text x="28" y="18" fill="#555" font-size="14" font-family="sans-serif" font-weight="700">stripe</text>
-      </svg>
-    </div>
-  </form>
-</div>
-
-<script>
-// Plan config
-const plans = {
-  starter: { name: 'Starter', price: 15, features: ['1,500 credits/month','All pipeline tools','Voice cloning','Grok 480p only','YT Scraper (50 vids)'] },
-  pro: { name: 'Pro', price: 30, features: ['3,500 credits/month','All pipeline tools','Voice cloning','Grok 480p + 720p + Veo 3 + Sora 2','Priority GPU queue'] },
-  studio: { name: 'Studio', price: 60, features: ['9,000 credits/month','All pipeline tools','Voice cloning (10 voices)','All video models','Priority + dedicated support','White-label exports'] },
+window.selectPlan = (plan) => {
+  selectedPlan = plan;
+  document.getElementById('plan-monthly').classList.toggle('selected', plan === 'monthly');
+  document.getElementById('plan-topup').classList.toggle('selected', plan === 'topup');
 };
 
-const plan = new URLSearchParams(window.location.search).get('plan') || 'pro';
-const cfg = plans[plan] || plans.pro;
-
-document.getElementById('planName').textContent = cfg.name;
-document.getElementById('planPrice').textContent = '$' + cfg.price;
-document.getElementById('totalAmount').textContent = '$' + cfg.price + '.00';
-document.getElementById('payBtnAmount').textContent = '$' + cfg.price;
-
-const featuresEl = document.getElementById('planFeatures');
-featuresEl.innerHTML = cfg.features.map(f => `<div class="plan-feature">${f}</div>`).join('');
-
-// Stripe
-// TODO: Replace with your Stripe publishable key
-const stripe = Stripe('pk_live_51PXbdpAwQgCwolyMXTNREqh3dQwlCGB1cPKLd0OBltjiMxYRvkku0qQ9dhOF0kwGMdgtLrVitVl6USQoMkK1x3oh004bXDPbnm');
-const elements = stripe.elements({
-  appearance: {
-    theme: 'night',
-    variables: { colorPrimary: '#FFE600', colorBackground: '#1a1a1a', colorText: '#f5f5f0', colorTextPlaceholder: '#555', borderRadius: '8px' }
-  }
-});
-
-const cardNumber = elements.create('cardNumber', { style: { base: { color: '#f5f5f0', fontFamily: 'Manrope, sans-serif', fontSize: '14px' } } });
-const cardExpiry = elements.create('cardExpiry', { style: { base: { color: '#f5f5f0', fontFamily: 'Manrope, sans-serif', fontSize: '14px' } } });
-const cardCvc = elements.create('cardCvc', { style: { base: { color: '#f5f5f0', fontFamily: 'Manrope, sans-serif', fontSize: '14px' } } });
-
-cardNumber.mount('#cardNumber');
-cardExpiry.mount('#cardExpiry');
-cardCvc.mount('#cardCvc');
-
-async function handlePayment(e) {
-  e.preventDefault();
+window.startCheckout = async () => {
   const btn = document.getElementById('payBtn');
   btn.disabled = true;
-  document.getElementById('payBtnText').textContent = 'Redirecting...';
+  btn.textContent = 'Redirecting...';
   try {
-    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
-    const sb = createClient('https://asvpzsnncbxkpycsgfnj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0');
     const { data } = await sb.auth.getUser();
     const userId = data?.user?.id || 'guest';
     const userEmail = data?.user?.email || '';
-    const plan = new URLSearchParams(window.location.search).get('plan') || 'pro';
-    const endpoint = plan === 'topup' ? '/api/checkout/topup' : '/api/checkout/monthly';
+    const endpoint = selectedPlan === 'topup' ? '/api/checkout/topup' : '/api/checkout/monthly';
     const resp = await fetch(endpoint, {
       method: 'POST',
       headers: { 'x-user-id': userId, 'x-user-email': userEmail, 'origin': window.location.origin }
     });
     const json = await resp.json();
     if (json.url) { window.location.href = json.url; }
-    else { alert('Error: ' + JSON.stringify(json)); btn.disabled = false; document.getElementById('payBtnText').textContent = 'Subscribe'; }
+    else { alert('Error: ' + JSON.stringify(json)); btn.disabled = false; btn.textContent = 'Continue to payment →'; }
   } catch(err) {
     alert('Error: ' + err.message);
     btn.disabled = false;
-    document.getElementById('payBtnText').textContent = 'Subscribe';
+    btn.textContent = 'Continue to payment →';
   }
-}
+};
 </script>
 </body>
 </html>
