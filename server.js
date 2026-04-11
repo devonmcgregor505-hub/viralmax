@@ -418,7 +418,8 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
         const modelId = hasImage ? 'veo-3.1-lite-i2v' : 'veo-3.1-lite-t2v';
         const body = { key: ML_KEY, model_id: modelId, prompt: prompt || 'Cinematic motion', duration: String(parseInt(duration)), enhance_prompt: true, generate_audio: true, negative_prompt: null, webhook: null, track_id: null };
         if (hasImage) {
-          body.init_image = `data:${req.file.mimetype || 'image/jpeg'};base64,${fs.readFileSync(imagePath).toString('base64')}`;
+          const fileUrl = await kieUploadImage(imagePath, req.file.mimetype || 'image/jpeg', KIE_KEY);
+          body.init_image = fileUrl;
         } else {
           body.aspect_ratio = aspectRatio;
         }
