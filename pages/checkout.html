@@ -244,17 +244,27 @@ async function handlePayment(e) {
   e.preventDefault();
   const btn = document.getElementById('payBtn');
   btn.disabled = true;
-  document.getElementById('payBtnText').textContent = 'Processing…';
-
-  // TODO: Create PaymentMethod and send to backend
-  // Backend creates a Stripe Subscription
-  // const { paymentMethod, error } = await stripe.createPaymentMethod({ type: 'card', card: cardNumber, billing_details: { name: firstName + ' ' + lastName, email } });
-  // await fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ paymentMethodId: paymentMethod.id, plan }) });
-
-  // Simulate for now
-  setTimeout(() => {
-    window.location.href = 'app.html?welcome=1';
-  }, 2000);
+  document.getElementById('payBtnText').textContent = 'Redirecting...';
+  try {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+    const sb = createClient('https://asvpzsnncbxkpycsgfnj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0');
+    const { data } = await sb.auth.getUser();
+    const userId = data?.user?.id || 'guest';
+    const userEmail = data?.user?.email || '';
+    const plan = new URLSearchParams(window.location.search).get('plan') || 'pro';
+    const endpoint = plan === 'topup' ? '/api/checkout/topup' : '/api/checkout/monthly';
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'x-user-id': userId, 'x-user-email': userEmail, 'origin': window.location.origin }
+    });
+    const json = await resp.json();
+    if (json.url) { window.location.href = json.url; }
+    else { alert('Error: ' + JSON.stringify(json)); btn.disabled = false; document.getElementById('payBtnText').textContent = 'Subscribe'; }
+  } catch(err) {
+    alert('Error: ' + err.message);
+    btn.disabled = false;
+    document.getElementById('payBtnText').textContent = 'Subscribe';
+  }
 }
 </script>
 </body>
