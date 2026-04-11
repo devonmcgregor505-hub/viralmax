@@ -1317,8 +1317,18 @@ async function startVidGen(){
   const tick=setInterval(()=>{if(pct<85){pct+=Math.random()*1.2;if(pct>85)pct=85;fill.style.width=pct+'%';pctLbl.textContent=Math.round(pct)+'%';if(pct>20&&si<1){si=1;lbl.textContent=stages[1]}if(pct>50&&si<2){si=2;lbl.textContent=stages[2]}if(pct>75&&si<3){si=3;lbl.textContent=stages[3]}}},1000);
   try{
     const fd=new FormData();if(selImg)fd.append('image',selImg);fd.append('model',model);fd.append('prompt',prompt);fd.append('duration',dur);fd.append('aspectRatio',asp);fd.append('quality',quality);
-    // Send and get jobId immediately
-    const res=await fetch('/generate-video',{method:'POST',body:fd});const data=await res.json();
+    const res=await fetch('/generate-video',{method:'POST',body:fd});
+    const initData=await res.json();
+    if(!initData.success||!initData.jobId)throw new Error(initData.error||'Failed to start');
+    let data=null;
+    for(let i=0;i<120;i++){
+      await new Promise(r=>setTimeout(r,3000));
+      const poll=await fetch('/job-status/'+initData.jobId);
+      const pd=await poll.json();
+      if(pd.status==='done'){data=pd.result;break;}
+      if(pd.status==='error')throw new Error(pd.error||'Generation failed');
+    }
+    if(!data)throw new Error('Generation timed out');
     clearInterval(tick);fill.style.width='100%';pctLbl.textContent='100%';lbl.textContent='Done!';
     if(!data.success)throw new Error(data.error||'Unknown error');
     const vid=document.getElementById('vidVideo');vid.src=data.videoUrl;vid.style.display='block';document.getElementById('vidEmpty').style.display='none';
