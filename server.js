@@ -432,7 +432,17 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
       }
       const outputPath = path.resolve(`outputs/gen_${timestamp}.mp4`);
       console.log('[generate-video] downloading:', videoUrl);
-      const dlRes = await axios.get(videoUrl, { responseType: 'arraybuffer', timeout: 300000 });
+      let dlRes;
+      for (let dlAttempt = 0; dlAttempt < 5; dlAttempt++) {
+        try {
+          dlRes = await axios.get(videoUrl, { responseType: 'arraybuffer', timeout: 300000 });
+          break;
+        } catch(dlErr) {
+          console.log(`[generate-video] download attempt ${dlAttempt+1} failed:`, dlErr.message);
+          if (dlAttempt < 4) await new Promise(r => setTimeout(r, 5000));
+          else throw dlErr;
+        }
+      }
       fs.writeFileSync(outputPath, Buffer.from(dlRes.data));
       if (imagePath) try { fs.unlinkSync(imagePath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
