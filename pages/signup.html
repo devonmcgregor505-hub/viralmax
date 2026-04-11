@@ -241,7 +241,7 @@ function selectPlan(plan) {
 const urlPlan = new URLSearchParams(window.location.search).get('plan');
 if (urlPlan) selectPlan(urlPlan);
 
-function signInGoogle() {
+function signInGoogle() { signUpGoogle(); } function signUpGoogle_unused() {
   // TODO: Implement Google OAuth
   signUpGoogle();
 }
