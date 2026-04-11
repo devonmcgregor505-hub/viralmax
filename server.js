@@ -279,7 +279,8 @@ app.post('/pipeline/generate-scene-image', upload.single('refImage'), async (req
           base64Data: `data:${mimeType};base64,${b64}`,
           uploadPath: 'images/viralmax',
         }, { headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 });
-        const fileUrl = uploadRes.data?.data?.downloadUrl;
+        console.log('[kie upload]', JSON.stringify(uploadRes.data?.data));
+        const fileUrl = uploadRes.data?.data?.fileUrl || uploadRes.data?.data?.downloadUrl;
         if (!fileUrl) throw new Error('File upload failed: ' + JSON.stringify(uploadRes.data));
         body.input.image_input = [fileUrl];
       }
@@ -423,7 +424,8 @@ app.post('/generate-image', upload.single('refImage'), async (req, res) => {
           base64Data: `data:${mimeType};base64,${b64}`,
           uploadPath: 'images/viralmax',
         }, { headers: { 'Authorization': `Bearer ${KIE_API_KEY}`, 'Content-Type': 'application/json' }, timeout: 30000 });
-        const fileUrl = uploadRes.data?.data?.downloadUrl;
+        console.log('[kie upload]', JSON.stringify(uploadRes.data?.data));
+        const fileUrl = uploadRes.data?.data?.fileUrl || uploadRes.data?.data?.downloadUrl;
         if (!fileUrl) throw new Error('File upload failed: ' + JSON.stringify(uploadRes.data));
         body.input.image_input = [fileUrl];
       }
