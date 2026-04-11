@@ -228,4 +228,66 @@ body { font-family: 'Manrope', sans-serif; background: var(--blk); color: var(--
 </div>
 
 
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const sb = createClient('https://asvpzsnncbxkpycsgfnj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0');
+
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) window.location.href = '/app';
+});
+
+async function googleAuth() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/app' }
+  });
+  if (error) alert(error.message);
+}
+
+async function emailSignup(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Creating account...'; btn.disabled = true;
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: { emailRedirectTo: window.location.origin + '/app' }
+  });
+  if (error) {
+    alert(error.message); btn.textContent = 'Create account'; btn.disabled = false; return;
+  }
+  const plan = new URLSearchParams(window.location.search).get('plan') || 'free';
+  if (plan === 'free') {
+    alert('Check your email to confirm your account!');
+    window.location.href = '/app';
+  } else {
+    const resp = await fetch('/api/checkout/monthly', {
+      method: 'POST',
+      headers: { 'x-user-id': data.user.id, 'x-user-email': email, 'origin': window.location.origin }
+    });
+    const json = await resp.json();
+    if (json.url) window.location.href = json.url;
+    else { alert('Account created! Check your email.'); window.location.href = '/app'; }
+  }
+}
+
+function selectPlan(plan) {
+  document.querySelectorAll('.plan-option').forEach(el => el.classList.remove('selected'));
+  const el = document.querySelector('[data-plan="' + plan + '"]');
+  if (el) el.classList.add('selected');
+  const url = new URL(window.location);
+  url.searchParams.set('plan', plan);
+  window.history.replaceState({}, '', url);
+}
+
+const urlPlan = new URLSearchParams(window.location.search).get('plan');
+if (urlPlan) selectPlan(urlPlan);
+window.selectPlan = selectPlan;
+
+document.getElementById('googleBtn').addEventListener('click', googleAuth);
+document.querySelector('form') && document.querySelector('form').addEventListener('submit', emailSignup);
+</script>
+</body>
 </html>
