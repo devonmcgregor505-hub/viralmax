@@ -701,6 +701,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           <input type="file" id="imgInp" accept="image/*" style="display:none">
           <span class="zone-icon">🖼</span><div class="zone-title">Image Input <span style="font-size:9px;color:var(--t4);font-weight:400;">(optional)</span></div>
           <div class="zone-hint">PNG · JPG · WEBP</div><div class="zone-fname" id="imgFnm"></div>
+          <button id="imgRemoveBtn" onclick="event.stopPropagation();clearVidImg()" style="display:none;position:absolute;top:6px;right:6px;background:rgba(255,0,0,0.7);border:none;border-radius:4px;color:#fff;font-size:10px;padding:2px 6px;cursor:pointer;">✕ Remove</button>
         </div>
         <div><label class="fl">Prompt</label><textarea class="ta" id="vgPrompt" rows="3" placeholder="Describe the motion…"></textarea></div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
@@ -729,10 +730,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="tab-panel" id="tab-imggen">
     <div class="workspace">
       <div class="left-col">
-        <div class="zone" id="refDrop" onclick="document.getElementById('refInp').click()">
+        <div class="zone" id="refDrop" style="position:relative;" onclick="document.getElementById('refInp').click()">
           <input type="file" id="refInp" accept="image/*" style="display:none">
           <span class="zone-icon">📷</span><div class="zone-title">Reference Image <span style="font-size:9px;color:var(--t4);font-weight:400;">(optional)</span></div>
           <div class="zone-hint">PNG · JPG · WEBP</div><div class="zone-fname" id="refFnm"></div>
+          <button id="refRemoveBtn" onclick="event.stopPropagation();clearRefImg()" style="display:none;position:absolute;top:6px;right:6px;background:rgba(255,0,0,0.7);border:none;border-radius:4px;color:#fff;font-size:10px;padding:2px 6px;cursor:pointer;">✕ Remove</button>
         </div>
         <div><label class="fl">Prompt</label><textarea class="ta" id="imgPrompt" rows="4" placeholder="Describe the image…"></textarea></div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
@@ -909,7 +911,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 // ── MODEL CONFIG ──
 const MODEL_CFG = {
   'veo3-lite':{credits:15,durations:[8],defaultDur:8,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
-  'sora2':{credits:20,durations:[10,15],defaultDur:10,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
+  'sora2':{credits:20,durations:[10,15],defaultDur:15,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
   'grok':{credits:15,durations:[6],defaultDur:6,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'},{v:'1:1',l:'1:1 Square'}],defaultAsp:'9:16',qualities:[{v:'720p',l:'720p'},{v:'480p',l:'480p'}],defaultQ:'720p',creditsByQ:{'720p':15,'480p':10}},
 };
 const IMG_CFG = {
@@ -1298,7 +1300,9 @@ document.getElementById('imgDrop').addEventListener('dragover',e=>{e.preventDefa
 document.getElementById('imgDrop').addEventListener('dragleave',()=>document.getElementById('imgDrop').classList.remove('drag'));
 document.getElementById('imgDrop').addEventListener('drop',e=>{e.preventDefault();document.getElementById('imgDrop').classList.remove('drag');if(e.dataTransfer.files[0]&&e.dataTransfer.files[0].type.startsWith('image/'))loadVgImg(e.dataTransfer.files[0])});
 document.getElementById('imgInp').addEventListener('change',()=>{if(document.getElementById('imgInp').files[0])loadVgImg(document.getElementById('imgInp').files[0])});
-function loadVgImg(f){selImg=f;document.getElementById('imgFnm').textContent='📎 '+f.name;document.getElementById('imgDrop').classList.add('has')}
+function loadVgImg(f){selImg=f;document.getElementById('imgFnm').textContent='📎 '+f.name;document.getElementById('imgDrop').classList.add('has');const btn=document.getElementById('imgRemoveBtn');if(btn)btn.style.display='block';}
+function clearVidImg(){selImg=null;document.getElementById('imgFnm').textContent='';document.getElementById('imgDrop').classList.remove('has');document.getElementById('imgInp').value='';const btn=document.getElementById('imgRemoveBtn');if(btn)btn.style.display='none';}
+function clearRefImg(){selRefImg=null;document.getElementById('refFnm').textContent='';document.getElementById('refDrop').classList.remove('has');document.getElementById('refInp').value='';const btn=document.getElementById('refRemoveBtn');if(btn)btn.style.display='none';}
 
 async function startVidGen(){
   const prompt=document.getElementById('vgPrompt').value.trim();if(!prompt){alert('Enter a prompt');return}
@@ -1328,7 +1332,7 @@ async function startVidGen(){
 document.getElementById('refDrop').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('refDrop').classList.add('drag')});
 document.getElementById('refDrop').addEventListener('dragleave',()=>document.getElementById('refDrop').classList.remove('drag'));
 document.getElementById('refDrop').addEventListener('drop',e=>{e.preventDefault();document.getElementById('refDrop').classList.remove('drag');if(e.dataTransfer.files[0]){selRefImg=e.dataTransfer.files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has')}});
-document.getElementById('refInp').addEventListener('change',()=>{if(document.getElementById('refInp').files[0]){selRefImg=document.getElementById('refInp').files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has')}});
+document.getElementById('refInp').addEventListener('change',()=>{if(document.getElementById('refInp').files[0]){selRefImg=document.getElementById('refInp').files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has');const rb=document.getElementById('refRemoveBtn');if(rb)rb.style.display='block';}});
 
 function onImgModelChange(){onImgResChange()}
 function onImgResChange(){const m=document.getElementById('imgModel').value;document.getElementById('imgCost').textContent=(IMG_CFG[m]?.credits||0)+' cr'}
