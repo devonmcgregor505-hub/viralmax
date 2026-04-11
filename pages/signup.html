@@ -227,45 +227,5 @@ body { font-family: 'Manrope', sans-serif; background: var(--blk); color: var(--
   </div>
 </div>
 
-<script>
-function selectPlan(plan) {
-  document.querySelectorAll('.plan-option').forEach(el => el.classList.remove('selected'));
-  document.querySelector(`[data-plan="${plan}"]`).classList.add('selected');
-  // Read from URL params
-  const url = new URL(window.location);
-  url.searchParams.set('plan', plan);
-  window.history.replaceState({}, '', url);
-}
 
-// Pre-select from URL
-const urlPlan = new URLSearchParams(window.location.search).get('plan');
-if (urlPlan) selectPlan(urlPlan);
-
-function signInGoogle() { window.signUpGoogle signUpGoogle();signUpGoogle(); signUpGoogle(); } function signUpGoogle_unused() {
-  // TODO: Implement Google OAuth
-  window.signUpGoogle signUpGoogle();signUpGoogle(); signUpGoogle();
-}
-
-async function handleSignup(e) {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = 'Creating account…';
-  btn.disabled = true;
-
-  // TODO: Connect to your auth backend (e.g. Supabase, Firebase, or custom)
-  // Then redirect to Stripe checkout for paid plans
-  const plan = new URLSearchParams(window.location.search).get('plan') || 'pro';
-
-  setTimeout(() => {
-    // Simulate success
-    if (plan === 'free') {
-      window.location.href = 'app.html';
-    } else {
-      // Stripe checkout redirect would go here
-      window.location.href = '/checkout?plan=' + plan;
-    }
-  }, 1500);
-}
-</script>
-</body>
 </html>
