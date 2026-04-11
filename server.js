@@ -84,6 +84,21 @@ app.get('/queue', (req, res) => {
   res.json({ active: activeJobs, waiting: queue.length, max: MAX_CONCURRENT });
 });
 
+// ── Async jobs store ──
+const asyncJobs = {};
+function createJob() {
+  const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  asyncJobs[id] = { status: 'pending', result: null, error: null, createdAt: Date.now() };
+  // Auto-cleanup after 10 minutes
+  setTimeout(() => { delete asyncJobs[id]; }, 600000);
+  return id;
+}
+app.get('/job-status/:id', (req, res) => {
+  const job = asyncJobs[req.params.id];
+  if (!job) return res.json({ status: 'not_found' });
+  res.json(job);
+});
+
 // ── Chatterbox warmup ──
 function warmupChatterbox() {
   const CHATTERBOX_URL = process.env.CHATTERBOX_MODAL_URL;
@@ -376,8 +391,10 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
   const { model = 'veo3-lite', prompt = '', duration = '8', aspectRatio = '9:16', quality = '720p' } = req.body;
   const ML_KEY = process.env.MODELSLAB_API_KEY;
   const KIE_KEY = process.env.KIE_API_KEY;
-  try {
-    const result = await enqueue(async () => {
+  const jobId = createJob();
+  res.json({ success: true, jobId });
+  enqueue(async () => {
+    try {
       let videoUrl;
       if (model === 'grok') {
         if (!KIE_KEY) throw new Error('KIE_API_KEY not configured in .env');
@@ -448,14 +465,13 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
       fs.writeFileSync(outputPath, Buffer.from(dlRes.data));
       if (imagePath) try { fs.unlinkSync(imagePath); } catch(e) {}
       setTimeout(() => { try { fs.unlinkSync(outputPath); } catch(e) {} }, 600000);
-      return { success: true, videoUrl: `/outputs/gen_${timestamp}.mp4` };
-    });
-    res.json(result);
-  } catch(err) {
-    console.error('[generate-video] error:', err.message);
-    if (imagePath) try { fs.unlinkSync(imagePath); } catch(e) {}
-    res.status(500).json({ success: false, error: err.message });
-  }
+      asyncJobs[jobId] = { status: 'done', result: { success: true, videoUrl: `/outputs/gen_${timestamp}.mp4` } };
+    } catch(err) {
+      console.error('[generate-video] error:', err.message);
+      if (imagePath) try { fs.unlinkSync(imagePath); } catch(e) {}
+      asyncJobs[jobId] = { status: 'error', error: err.message };
+    }
+  }).catch(() => {});
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
