@@ -160,9 +160,15 @@ async function kieAiPoll(taskId, apiKey, maxAttempts = 120, intervalMs = 5000) {
     console.log(`[kie.ai] poll ${i + 1} taskId=${taskId} state=${state}`);
     if (state === 'success') {
       let url = null;
-      try { const rj = JSON.parse(taskData.resultJson); url = rj?.resultUrls?.[0] || rj?.result_urls?.[0]; } catch(e) {}
-      if (!url) url = taskData?.video_url || taskData?.audio_url || taskData?.output?.video_url || taskData?.output?.audio_url;
+      console.log('[kie.ai] resultJson:', taskData.resultJson?.slice(0, 300));
+      try {
+        const rj = JSON.parse(taskData.resultJson);
+        url = rj?.resultUrls?.[0] || rj?.result_urls?.[0] || rj?.videoUrl || rj?.video_url || rj?.imageUrl || rj?.image_url || rj?.url;
+        if (!url && Array.isArray(rj)) url = rj[0];
+      } catch(e) {}
+      if (!url) url = taskData?.video_url || taskData?.audio_url || taskData?.image_url || taskData?.output?.video_url || taskData?.output?.audio_url;
       if (!url) throw new Error('Kie.ai success but no URL found. resultJson: ' + taskData.resultJson);
+      console.log('[kie.ai] result url:', url);
       return url;
     }
     if (state === 'failed' || state === 'error' || state === 'fail') {
@@ -405,14 +411,20 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
         videoUrl = await kieAiPoll(taskId, KIE_KEY);
       } else {
         if (!ML_KEY) throw new Error('MODELSLAB_API_KEY not configured in .env');
-        const modelIdMap = { 'veo3-lite': 'veo-3.1-lite-t2v', 'veo3lite': 'veo-3.1-lite-t2v' };
-        const modelId = modelIdMap[model] || 'veo-3.1-lite-t2v';
-        const body = { key: ML_KEY, model_id: modelId, prompt: prompt || 'Cinematic motion', aspect_ratio: aspectRatio, duration: String(parseInt(duration)), enhance_prompt: true, generate_audio: true, negative_prompt: null, webhook: null, track_id: null };
-        if (imagePath && fs.existsSync(imagePath)) {
+        const hasImage = imagePath && fs.existsSync(imagePath);
+        const endpoint = hasImage
+          ? 'https://modelslab.com/api/v7/video-fusion/image-to-video'
+          : 'https://modelslab.com/api/v7/video-fusion/text-to-video';
+        const modelId = hasImage ? 'veo-3.1-lite-i2v' : 'veo-3.1-lite-t2v';
+        const body = { key: ML_KEY, model_id: modelId, prompt: prompt || 'Cinematic motion', duration: String(parseInt(duration)), enhance_prompt: true, generate_audio: true, negative_prompt: null, webhook: null, track_id: null };
+        if (hasImage) {
           body.init_image = `data:${req.file.mimetype || 'image/jpeg'};base64,${fs.readFileSync(imagePath).toString('base64')}`;
+        } else {
+          body.aspect_ratio = aspectRatio;
         }
-        const submitRes = await axios.post('https://modelslab.com/api/v7/video-fusion/text-to-video', body, { headers: { 'Content-Type': 'application/json' }, timeout: 60000 });
+        const submitRes = await axios.post(endpoint, body, { headers: { 'Content-Type': 'application/json' }, timeout: 60000 });
         const d = submitRes.data;
+        console.log('[modelslab] response:', JSON.stringify(d).slice(0, 200));
         if (d.status === 'success' && d.output?.[0]) videoUrl = d.output[0];
         else if (d.status === 'processing' && d.fetch_result) videoUrl = await modelsLabPoll(d.fetch_result, ML_KEY);
         else throw new Error('Unexpected ModelsLab response: ' + JSON.stringify(d).slice(0, 300));
