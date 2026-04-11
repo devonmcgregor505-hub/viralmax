@@ -418,6 +418,7 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
         else throw new Error('Unexpected ModelsLab response: ' + JSON.stringify(d).slice(0, 300));
       }
       const outputPath = path.resolve(`outputs/gen_${timestamp}.mp4`);
+      console.log('[generate-video] downloading:', videoUrl);
       const dlRes = await axios.get(videoUrl, { responseType: 'arraybuffer', timeout: 300000 });
       fs.writeFileSync(outputPath, Buffer.from(dlRes.data));
       if (imagePath) try { fs.unlinkSync(imagePath); } catch(e) {}
