@@ -399,7 +399,8 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
         const hasImage = imagePath && fs.existsSync(imagePath);
         const soraModel = hasImage ? 'sora-2-image-to-video' : 'sora-2-text-to-video';
         const soraAspect = (aspectRatio === '9:16' || aspectRatio === 'portrait') ? 'portrait' : 'landscape';
-        const soraInput = { prompt: prompt || 'Cinematic motion', aspect_ratio: soraAspect, n_frames: '15', remove_watermark: true, upload_method: 's3' };
+        const soraFrames = parseInt(duration) >= 15 ? '15' : '10';
+        const soraInput = { prompt: prompt || 'Cinematic motion', aspect_ratio: soraAspect, n_frames: soraFrames, remove_watermark: true, upload_method: 's3' };
         if (hasImage) {
           const fileUrl = await kieUploadImage(imagePath, req.file.mimetype || 'image/jpeg', KIE_KEY);
           soraInput.image_urls = [fileUrl];
