@@ -224,24 +224,41 @@ pipeRefDrop.addEventListener('drop',e=>{e.preventDefault();pipeRefDrop.classList
 pipeRefInp.addEventListener('change',()=>{if(pipeRefInp.files[0])loadPipeRef(pipeRefInp.files[0])});
 function loadPipeRef(f){pipe.refImageFile=f;document.getElementById('pipeRefName').textContent='📎 '+f.name;pipeRefDrop.classList.add('has')}
 
+function openScriptPopup(text){
+  let modal=document.getElementById('scriptPopupModal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='scriptPopupModal';
+    modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML=`<div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:28px 28px 24px;max-width:480px;width:90%;position:relative;max-height:70vh;overflow-y:auto;">
+      <button onclick="document.getElementById('scriptPopupModal').style.display=\'none\'" style="position:absolute;top:14px;right:14px;background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:28px;height:28px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      <div id="scriptPopupText" style="font-size:13px;line-height:1.7;color:var(--tx);font-family:\'DM Sans\',sans-serif;padding-right:8px;white-space:pre-wrap;"></div>
+    </div>`;
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.style.display='none';});
+    document.body.appendChild(modal);
+  }
+  document.getElementById('scriptPopupText').textContent=text;
+  modal.style.display='flex';
+}
 function renderImgGrid(){
   if(!pipe.scenes.length)return;
   document.getElementById('imgsEmpty').style.display='none';
   const grid=document.getElementById('imgGrid');grid.style.display='grid';grid.innerHTML='';
   pipe.scenes.forEach((scene,idx)=>{
     const cell=document.createElement('div');cell.className='img-cell';cell.id=`ic-${idx}`;
+    const txt=scene.scriptText||'';
     cell.innerHTML=`<div class="img-box${scene.imageUrl?' done':''}" id="ib-${idx}">
       ${scene.imageUrl?`<img src="${scene.imageUrl}" class="loaded" alt="">`:`<div class="img-ph"><span class="img-ph-icon">🖼</span><span>S${scene.sceneNumber}</span></div>`}
     </div>
-    <div class="img-cell-lbl" style="font-size:9px;color:var(--t2);line-height:1.4;margin:4px 0;padding:0 1px;">${scene.scriptText||''}</div>
-    <div style="display:flex;gap:3px;margin-bottom:3px;">
-      <button class="btn-tiny" onclick="openPromptModal('image',${idx})">Edit</button>
-      <select style="flex:1;font-size:8px;padding:3px 4px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:4px;outline:none;" id="im-${idx}" onchange="updateImgBtnCost(${idx})">
+    <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:6px 0 4px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${txt}</div>
+    <div style="display:flex;gap:5px;margin-bottom:5px;align-items:center;">
+      <button onclick="openPromptModal('image',${idx})" style="flex-shrink:0;height:30px;padding:0 10px;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;white-space:nowrap;">Edit</button>
+      <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="im-${idx}" onchange="updateImgBtnCost(${idx})">
         <option value="nano-banana-pro">Nano Banana Pro</option>
         <option value="nano-banana-2">Nano Banana 2</option>
       </select>
     </div>
-    <button class="btn-tiny pri" id="igenb-${idx}" onclick="genSingleImg(${idx})" style="width:100%;padding:5px;">${scene.imageUrl?'↺ Regenerate':'Generate'} (15 cr)</button>`;
+    <button id="igenb-${idx}" onclick="genSingleImg(${idx})" style="width:100%;height:34px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;background:var(--y);color:#000;border:none;border-radius:7px;cursor:pointer;">${scene.imageUrl?'↺ Regenerate':'Generate'} (15 cr)</button>`;
     grid.appendChild(cell);
     setTimeout(()=>updateImgBtnCost(idx),0);
   });
@@ -299,21 +316,22 @@ function renderClipGrid(){
   const grid=document.getElementById('clipGrid');grid.style.display='grid';grid.innerHTML='';
   pipe.scenes.forEach((scene,idx)=>{
     const cell=document.createElement('div');cell.className='clip-cell';
+    const ctxt=scene.scriptText||'';
     cell.innerHTML=`<div class="clip-box${scene.videoUrl?' done':''}" id="cb-${idx}">
       ${scene.videoUrl?`<video src="${scene.videoUrl}" loop muted autoplay playsinline></video>`:scene.imageUrl?`<img class="ref-img" src="${scene.imageUrl}" alt="">`:``}
       ${!scene.videoUrl?`<div class="img-ph"><span class="img-ph-icon">🎬</span><span>S${scene.sceneNumber}</span></div>`:''}
     </div>
-    <div class="img-cell-lbl" style="font-size:9px;color:var(--t2);line-height:1.4;margin:4px 0;padding:0 1px;">${scene.scriptText||''}</div>
-    <div style="display:flex;gap:3px;margin-bottom:3px;">
-      <button class="btn-tiny" onclick="openPromptModal('video',${idx})">Edit</button>
-      <select style="flex:1;font-size:8px;padding:3px 4px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:4px;outline:none;" id="cm-${idx}" onchange="document.getElementById('cgenb-${idx}').textContent=(pipe.scenes[${idx}].videoUrl?'↺ Regenerate':'Generate')+' ('+getVidCr(this.value)+' cr)'">
+    <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:6px 0 4px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${ctxt}</div>
+    <div style="display:flex;gap:5px;margin-bottom:5px;align-items:center;">
+      <button onclick="openPromptModal('video',${idx})" style="flex-shrink:0;height:30px;padding:0 10px;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;white-space:nowrap;">Edit</button>
+      <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="cm-${idx}" onchange="document.getElementById('cgenb-${idx}').textContent=(pipe.scenes[${idx}].videoUrl?'↺ Regenerate':'Generate')+' ('+getVidCr(this.value)+' cr)'">
         <option value="grok">Grok 480p</option>
         <option value="grok720">Grok 720p</option>
         <option value="veo3">Veo 3 Lite</option>
         <option value="sora2">Sora 2</option>
       </select>
     </div>
-    <button class="btn-tiny pri" id="cgenb-${idx}" onclick="genSingleClip(${idx})" style="width:100%;padding:5px;">${scene.videoUrl?'↺ Regenerate':'Generate'} (20 cr)</button>`;
+    <button id="cgenb-${idx}" onclick="genSingleClip(${idx})" style="width:100%;height:34px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;background:var(--y);color:#000;border:none;border-radius:7px;cursor:pointer;">${scene.videoUrl?'↺ Regenerate':'Generate'} (20 cr)</button>`;
     grid.appendChild(cell);
   });
 }
