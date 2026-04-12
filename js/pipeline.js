@@ -1,9 +1,13 @@
 // ── STEP 1: IDEATION ──
-const chFileDrop=document.getElementById('chFileDrop'),chFileInput=document.getElementById('chFileInput');
-chFileDrop.addEventListener('dragover',e=>{e.preventDefault();chFileDrop.classList.add('drag')});
-chFileDrop.addEventListener('dragleave',()=>chFileDrop.classList.remove('drag'));
-chFileDrop.addEventListener('drop',e=>{e.preventDefault();chFileDrop.classList.remove('drag');Array.from(e.dataTransfer.files).forEach(f=>loadChFile(f))});
-chFileInput.addEventListener('change',()=>{Array.from(chFileInput.files).forEach(f=>loadChFile(f));chFileInput.value=''});
+function initIdeationListeners(){
+  const chFileDrop=document.getElementById('chFileDrop'),chFileInput=document.getElementById('chFileInput');
+  if(!chFileDrop||!chFileInput)return;
+  chFileDrop.addEventListener('dragover',e=>{e.preventDefault();chFileDrop.classList.add('drag')});
+  chFileDrop.addEventListener('dragleave',()=>chFileDrop.classList.remove('drag'));
+  chFileDrop.addEventListener('drop',e=>{e.preventDefault();chFileDrop.classList.remove('drag');Array.from(e.dataTransfer.files).forEach(f=>loadChFile(f))});
+  chFileInput.addEventListener('change',()=>{Array.from(chFileInput.files).forEach(f=>loadChFile(f));chFileInput.value=''});
+}
+document.addEventListener('DOMContentLoaded', initIdeationListeners);
 
 function loadChFile(f){
   if(!f.name.endsWith('.json')){alert('JSON only');return}
@@ -103,11 +107,15 @@ function continueToSilenceRemove(){
 }
 
 // ── STEP 4: SILENCE ──
-const pipeSilZone=document.getElementById('pipeSilZone'),pipeSilInp=document.getElementById('pipeSilInp');
-pipeSilZone.addEventListener('dragover',e=>{e.preventDefault();pipeSilZone.classList.add('drag')});
-pipeSilZone.addEventListener('dragleave',()=>pipeSilZone.classList.remove('drag'));
-pipeSilZone.addEventListener('drop',e=>{e.preventDefault();pipeSilZone.classList.remove('drag');if(e.dataTransfer.files[0])loadPipeSilFile(e.dataTransfer.files[0])});
-pipeSilInp.addEventListener('change',()=>{if(pipeSilInp.files[0])loadPipeSilFile(pipeSilInp.files[0])});
+function initSilenceListeners(){
+  const pipeSilZone=document.getElementById('pipeSilZone'),pipeSilInp=document.getElementById('pipeSilInp');
+  if(!pipeSilZone||!pipeSilInp)return;
+  pipeSilZone.addEventListener('dragover',e=>{e.preventDefault();pipeSilZone.classList.add('drag')});
+  pipeSilZone.addEventListener('dragleave',()=>pipeSilZone.classList.remove('drag'));
+  pipeSilZone.addEventListener('drop',e=>{e.preventDefault();pipeSilZone.classList.remove('drag');if(e.dataTransfer.files[0])loadPipeSilFile(e.dataTransfer.files[0])});
+  pipeSilInp.addEventListener('change',()=>{if(pipeSilInp.files[0])loadPipeSilFile(pipeSilInp.files[0])});
+}
+document.addEventListener('DOMContentLoaded', initSilenceListeners);
 function loadPipeSilFile(f){pipeSilFile=f;document.getElementById('pipeSilFname').textContent='📎 '+f.name}
 
 async function runPipelineSilence(){
