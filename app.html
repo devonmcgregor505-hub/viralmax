@@ -1025,7 +1025,13 @@ function renderScenesList(){
   const list=document.getElementById('scenesList');list.innerHTML='';
   pipe.scenes.forEach((scene,idx)=>{
     const card=document.createElement('div');card.className='scene-card';
-    card.innerHTML=`<div class="scene-head"><span class="scene-badge">Scene ${scene.sceneNumber}</span><button class="scene-del" onclick="deleteScene(${idx})">✕</button></div>
+    card.innerHTML=`<div class="scene-head" style="display:flex;align-items:center;gap:6px;">
+      <span style="color:var(--t3);font-size:16px;line-height:1;padding:0 2px;cursor:grab;">⠿</span>
+      <span class="scene-badge" style="flex:1;">Scene ${scene.sceneNumber}</span>
+      <button class="scene-del" style="background:none;border:1px solid var(--bd);color:var(--t2);border-radius:4px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="moveScene(${idx},-1)">▲</button>
+      <button class="scene-del" style="background:none;border:1px solid var(--bd);color:var(--t2);border-radius:4px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="moveScene(${idx},1)">▼</button>
+      <button class="scene-del" onclick="deleteScene(${idx})">✕</button>
+    </div>
     <div class="scene-body">
       <div class="scene-script" contenteditable="true" onblur="pipe.scenes[${idx}].scriptText=this.textContent">${scene.scriptText}</div>
 
