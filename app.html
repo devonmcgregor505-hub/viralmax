@@ -540,6 +540,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
             </div>
             <div class="s-row"><label class="s-lbl">Model (all scenes)</label><select class="sel" id="imgGlobalModel" onchange="syncImgModels(this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
             <button class="btn-y" id="imgGenAllBtn" onclick="generateAllImages()">Generate All Images</button>
+            <button class="btn-y" onclick="downloadAllImages()" style="background:var(--s3);border:1px solid var(--bd2);color:var(--tx);">⬇ Download All Images</button>
             <div class="prog" id="imgAllProg"><div class="prog-top"><span class="prog-lbl" id="imgAllProgLbl">Generating…</span><span class="prog-pct" id="imgAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="imgAllProgFill"></div></div></div>
             <div class="err" id="imgsErr"><div class="err-title">ERROR</div><div class="err-msg" id="imgsErrMsg"></div></div>
             <button class="btn-y" id="imgsContinueBtn" onclick="continueToClips()" style="display:none;">Continue to Videos →</button>
@@ -556,8 +557,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="workspace">
           <div class="left-col">
             <div class="strip"><b>Step 3 — Videos.</b> Generate a 9:16 clip for each scene.</div>
-            <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok 480p (10 cr)</option><option value="veo3">Veo 3 Lite (15 cr)</option><option value="sora2">Sora 2 (20 cr)</option></select></div>
+            <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok (10 cr)</option><option value="veo3">Veo 3 Lite (15 cr)</option><option value="sora2">Sora 2 (20 cr)</option></select></div>
             <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">Generate All Clips</button>
+            <button class="btn-y" onclick="downloadAllVideos()" style="background:var(--s3);border:1px solid var(--bd2);color:var(--tx);">⬇ Download All Videos</button>
             <div class="prog" id="clipAllProg"><div class="prog-top"><span class="prog-lbl" id="clipAllProgLbl">Generating…</span><span class="prog-pct" id="clipAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="clipAllProgFill"></div></div></div>
             <div class="err" id="clipsErr"><div class="err-title">ERROR</div><div class="err-msg" id="clipsErrMsg"></div></div>
           </div>

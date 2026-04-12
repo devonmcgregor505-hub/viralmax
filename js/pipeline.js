@@ -241,6 +241,39 @@ function removePipeRef(){
   const rb=document.getElementById('pipeRefRemove');if(rb)rb.style.display='none';
 }
 
+async function downloadFile(url, filename){
+  try{
+    const res=await fetch(url);const blob=await res.blob();
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }catch(e){alert('Download failed: '+e.message)}
+}
+async function downloadAllImages(){
+  const scenes=pipe.scenes.filter(s=>s.imageUrl);
+  if(!scenes.length){alert('No images generated yet');return}
+  const {default:JSZip}=await import('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+  const zip=new JSZip();
+  await Promise.all(scenes.map(async(s,i)=>{
+    const res=await fetch(s.imageUrl);const blob=await res.blob();
+    zip.file('image_'+(i+1)+'.png',blob);
+  }));
+  const content=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(content);a.download='viralmax_images.zip';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function downloadAllVideos(){
+  const scenes=pipe.scenes.filter(s=>s.videoUrl);
+  if(!scenes.length){alert('No videos generated yet');return}
+  const {default:JSZip}=await import('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+  const zip=new JSZip();
+  await Promise.all(scenes.map(async(s,i)=>{
+    const res=await fetch(s.videoUrl);const blob=await res.blob();
+    zip.file('video_'+(i+1)+'.mp4',blob);
+  }));
+  const content=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(content);a.download='viralmax_videos.zip';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 function openScriptPopup(text){
   let modal=document.getElementById('scriptPopupModal');
   if(!modal){
@@ -270,7 +303,7 @@ function renderImgGrid(){
     <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:10px 0 6px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${txt}</div>
     <div style="display:flex;gap:5px;margin-bottom:5px;align-items:center;">
       <button onclick="openPromptModal('image',${idx})" style="flex-shrink:0;height:30px;padding:0 10px;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;white-space:nowrap;">Edit</button>
-      ${scene.imageUrl?`<a href="${scene.imageUrl}" download="scene-${scene.sceneNumber}.jpg" style="flex-shrink:0;height:30px;width:30px;display:flex;align-items:center;justify-content:center;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;text-decoration:none;font-size:14px;" title="Download image">↓</a>`:''}
+      ${scene.imageUrl?`<button onclick="downloadFile('${scene.imageUrl}','image_${scene.sceneNumber}.png')" style="flex-shrink:0;height:30px;width:30px;display:flex;align-items:center;justify-content:center;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;font-size:14px;" title="Download image">↓</button>`:''}
       <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="im-${idx}" onchange="updateImgBtnCost(${idx})">
         <option value="nano-banana-pro">Nano Banana Pro</option>
         <option value="nano-banana-2">Nano Banana 2</option>
@@ -336,19 +369,22 @@ function renderClipGrid(){
     const cell=document.createElement('div');cell.className='clip-cell';
     const ctxt=scene.scriptText||'';
     cell.innerHTML=`<div class="clip-box${scene.videoUrl?' done':''}" id="cb-${idx}">
-      ${scene.videoUrl?`<video src="${scene.videoUrl}" loop muted autoplay playsinline></video>`:scene.imageUrl?`<img class="ref-img" src="${scene.imageUrl}" alt="">`:``}
+      ${scene.videoUrl?`<video src="${scene.videoUrl}" controls loop muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`:scene.imageUrl?`<img class="ref-img" src="${scene.imageUrl}" alt="">`:``}
       ${!scene.videoUrl?`<div class="img-ph"><span class="img-ph-icon">🎬</span><span>S${scene.sceneNumber}</span></div>`:''}
     </div>
     <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:6px 0 4px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${ctxt}</div>
     <div style="display:flex;gap:5px;margin-bottom:5px;align-items:center;">
       <button onclick="openPromptModal('video',${idx})" style="flex-shrink:0;height:30px;padding:0 10px;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;white-space:nowrap;">Edit</button>
       <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="cm-${idx}" onchange="document.getElementById('cgenb-${idx}').textContent=(pipe.scenes[${idx}].videoUrl?'↺ Regenerate':'Generate')+' ('+getVidCr(this.value)+' cr)';updateClipAllCost();">
-        <option value="grok">Grok 480p (10 cr)</option>
+        <option value="grok">Grok (10 cr)</option>
         <option value="veo3">Veo 3 Lite (15 cr)</option>
         <option value="sora2">Sora 2 (20 cr)</option>
       </select>
     </div>
-    <button id="cgenb-${idx}" onclick="genSingleClip(${idx})" style="width:100%;height:34px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;background:var(--y);color:#000;border:none;border-radius:7px;cursor:pointer;">${scene.videoUrl?'↺ Regenerate':'Generate'} (20 cr)</button>`;
+    <div style="display:flex;gap:5px;margin-bottom:5px;">
+      <button id="cgenb-${idx}" onclick="genSingleClip(${idx})" style="flex:1;height:34px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;background:var(--y);color:#000;border:none;border-radius:7px;cursor:pointer;">${scene.videoUrl?'↺ Regenerate':'Generate'} (${getVidCr('grok')} cr)</button>
+      ${scene.videoUrl?`<button onclick="downloadFile('${scene.videoUrl}','video_${scene.sceneNumber}.mp4')" style="flex-shrink:0;height:34px;width:34px;display:flex;align-items:center;justify-content:center;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:7px;cursor:pointer;font-size:14px;" title="Download video">↓</button>`:''}
+    </div>`;
     grid.appendChild(cell);
   });
 }

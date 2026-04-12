@@ -309,7 +309,8 @@ app.post('/pipeline/generate-scene-video', express.json(), async (req, res) => {
       } else if (model === 'veo3' || model === 'sora2') {
         if (!ML_KEY) throw new Error('MODELSLAB_API_KEY not configured');
         const modelIdMap = { 'veo3': 'veo-3.1-lite-t2v', 'sora2': 'sora-2' };
-        const body = { key: ML_KEY, model_id: modelIdMap[model], prompt: prompt || 'Cinematic motion', aspect_ratio: model === 'sora2' ? '720x1280' : '9:16', duration: '6', enhance_prompt: true, negative_prompt: null, webhook: null, track_id: null };
+        const duration_val = model === 'sora2' ? '15' : '6';
+        const body = { key: ML_KEY, model_id: modelIdMap[model], prompt: prompt || 'Cinematic motion', aspect_ratio: model === 'sora2' ? '720x1280' : '9:16', duration: duration_val, n_frames: model === 'sora2' ? '15' : undefined, enhance_prompt: true, negative_prompt: null, webhook: null, track_id: null };
         if (model === 'veo3') body.generate_audio = true;
         if (localImagePath) {
           const fileUrl = await kieUploadImage(localImagePath, 'image/png', KIE_KEY);
