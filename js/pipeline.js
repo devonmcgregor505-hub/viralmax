@@ -218,6 +218,7 @@ function savePromptEdit(){
 
 // ── STEP 6: IMAGES ──
 const pipeRefDrop=document.getElementById('pipeRefDrop'),pipeRefInp=document.getElementById('pipeRefInp');
+pipeRefDrop.addEventListener('click',()=>pipeRefInp.click());
 pipeRefDrop.addEventListener('dragover',e=>{e.preventDefault();pipeRefDrop.classList.add('drag')});
 pipeRefDrop.addEventListener('dragleave',()=>pipeRefDrop.classList.remove('drag'));
 pipeRefDrop.addEventListener('drop',e=>{e.preventDefault();pipeRefDrop.classList.remove('drag');if(e.dataTransfer.files[0])loadPipeRef(e.dataTransfer.files[0])});
@@ -250,7 +251,7 @@ function renderImgGrid(){
     cell.innerHTML=`<div class="img-box${scene.imageUrl?' done':''}" id="ib-${idx}">
       ${scene.imageUrl?`<img src="${scene.imageUrl}" class="loaded" alt="">`:`<div class="img-ph"><span class="img-ph-icon">🖼</span><span>S${scene.sceneNumber}</span></div>`}
     </div>
-    <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:6px 0 4px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${txt}</div>
+    <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:10px 0 6px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${txt}</div>
     <div style="display:flex;gap:5px;margin-bottom:5px;align-items:center;">
       <button onclick="openPromptModal('image',${idx})" style="flex-shrink:0;height:30px;padding:0 10px;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;white-space:nowrap;">Edit</button>
       <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="im-${idx}" onchange="updateImgBtnCost(${idx})">
