@@ -501,12 +501,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1)"><span class="step-num">2</span>Images</button>
         <span class="step-div">›</span>
         <button class="step-btn locked" id="pstep-2" onclick="goPipeStep(2)"><span class="step-num">3</span>Videos</button>
-        <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Scenes</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1)"><span class="step-num">2</span>Images</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-2" onclick="goPipeStep(2)"><span class="step-num">3</span>Videos</button>
-        <div class="left-col">
+      </div>
+      <!-- STEP 1: SCENES -->
+      <div class="step-panel active" id="pcontent-0">
+        <div class="workspace">
+          <div class="left-col">
             <div class="strip"><b>Step 1 — Scenes.</b> Claude splits the script into scenes with image + video prompts.</div>
             <div><label class="fl">Your Script</label><textarea class="ta" id="scenesScriptInput" rows="6" placeholder="Paste your script here…" oninput="pipe.script=this.value"></textarea></div>
             <button class="btn-y" id="scenesGenBtn" onclick="runScenesGen()">🎬 Auto-Split into Scenes</button>
@@ -521,7 +520,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           </div>
         </div>
       </div>
-
       <!-- STEP 6: IMAGES -->
       <div class="step-panel" id="pcontent-1">
         <div class="workspace">
