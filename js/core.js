@@ -37,6 +37,8 @@ function goPipeStep(step){
   });
   document.querySelectorAll('.step-panel').forEach((el,i)=>el.classList.toggle('active',i===step));
   document.querySelectorAll('.nav-sub-item').forEach((el,i)=>el.classList.toggle('active',i===step));
+  if(step===1&&typeof renderImgGrid==='function'){renderImgGrid();setTimeout(updateImgAllCost,100);}
+  if(step===2&&typeof renderClipGrid==='function'){renderClipGrid();setTimeout(updateClipAllCost,100);}
 }
 function unlockStep(s){pipe.unlocked.add(s);const el=document.getElementById('pstep-'+s);if(el)el.classList.remove('locked')}
 
