@@ -280,17 +280,28 @@ async function kieUploadImage(imagePath, mimeType, apiKey) {
 
 app.post('/pipeline/generate-scene-video', express.json(), async (req, res) => {
   const timestamp = Date.now();
-  const { prompt, model = 'grok', quality = '480p', sceneIndex } = req.body;
+  const { prompt, model = 'grok', quality = '480p', sceneIndex, imageUrl: sceneImageUrl } = req.body;
   const KIE_KEY = process.env.KIE_API_KEY;
   const ML_KEY = process.env.MODELSLAB_API_KEY;
   try {
     const result = await enqueue(async () => {
       let videoUrl;
+      // Resolve local scene image to absolute path if available
+      let localImagePath = null;
+      if (sceneImageUrl && sceneImageUrl.startsWith('/outputs/')) {
+        const candidate = path.resolve(sceneImageUrl.slice(1));
+        if (fs.existsSync(candidate)) localImagePath = candidate;
+      }
       if (model === 'grok') {
         if (!KIE_KEY) throw new Error('KIE_API_KEY not configured');
+        const grokModel = localImagePath ? 'grok-imagine/image-to-video' : 'grok-imagine/text-to-video';
+        const grokInput = { prompt: prompt || 'Cinematic motion', aspect_ratio: '9:16', duration: 6, resolution: quality };
+        if (localImagePath) {
+          const fileUrl = await kieUploadImage(localImagePath, 'image/png', KIE_KEY);
+          grokInput.image_urls = [fileUrl];
+        }
         const submitRes = await axios.post('https://api.kie.ai/api/v1/jobs/createTask', {
-          model: 'grok-imagine/text-to-video',
-          input: { prompt: prompt || 'Cinematic motion', aspect_ratio: '9:16', duration: 6, resolution: quality },
+          model: grokModel, input: grokInput,
         }, { headers: { 'Authorization': `Bearer ${KIE_KEY}`, 'Content-Type': 'application/json' }, timeout: 60000 });
         const taskId = submitRes.data?.data?.taskId || submitRes.data?.data?.task_id;
         if (!taskId) throw new Error('No taskId from Kie.ai: ' + JSON.stringify(submitRes.data).slice(0, 200));
@@ -300,6 +311,10 @@ app.post('/pipeline/generate-scene-video', express.json(), async (req, res) => {
         const modelIdMap = { 'veo3': 'veo-3.1-lite-t2v', 'sora2': 'sora-2' };
         const body = { key: ML_KEY, model_id: modelIdMap[model], prompt: prompt || 'Cinematic motion', aspect_ratio: model === 'sora2' ? '720x1280' : '9:16', duration: '6', enhance_prompt: true, negative_prompt: null, webhook: null, track_id: null };
         if (model === 'veo3') body.generate_audio = true;
+        if (localImagePath) {
+          const fileUrl = await kieUploadImage(localImagePath, 'image/png', KIE_KEY);
+          body.init_image = fileUrl;
+        }
         const submitRes = await axios.post('https://modelslab.com/api/v7/video-fusion/text-to-video', body, { headers: { 'Content-Type': 'application/json' }, timeout: 60000 });
         const d = submitRes.data;
         if (d.status === 'success' && d.output?.[0]) videoUrl = d.output[0];

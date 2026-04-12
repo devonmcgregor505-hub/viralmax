@@ -527,12 +527,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
             <div class="strip"><b>Step 2 — Images.</b> Generate reference images for each scene.</div>
             <div>
               <label class="fl">Skeleton Reference <span style="color:var(--t4);font-weight:400;">(recommended)</span></label>
-              <div class="zone" id="pipeRefDrop">
-                <input type="file" id="pipeRefInp" accept="image/*" style="display:none">
-                <span class="zone-icon">💀</span>
-                <div class="zone-title">Drop reference image</div>
-                <div class="zone-hint">PNG · JPG · WEBP</div>
-                <div class="zone-fname" id="pipeRefName"></div>
+              <div style="position:relative;">
+                <div class="zone" id="pipeRefDrop">
+                  <input type="file" id="pipeRefInp" accept="image/*" style="display:none">
+                  <span class="zone-icon">💀</span>
+                  <div class="zone-title">Drop reference image</div>
+                  <div class="zone-hint">PNG · JPG · WEBP</div>
+                  <div class="zone-fname" id="pipeRefName"></div>
+                </div>
+                <button id="pipeRefRemove" onclick="removePipeRef()" style="display:none;position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:1px solid var(--bd2);color:var(--tx);border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;z-index:2;">✕</button>
               </div>
             </div>
             <div class="s-row"><label class="s-lbl">Model (all scenes)</label><select class="sel" id="imgGlobalModel" onchange="syncImgModels(this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
@@ -553,7 +556,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         <div class="workspace">
           <div class="left-col">
             <div class="strip"><b>Step 3 — Videos.</b> Generate a 9:16 clip for each scene.</div>
-            <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok 480p</option><option value="grok720">Grok 720p</option><option value="veo3">Veo 3 Lite</option><option value="sora2">Sora 2</option></select></div>
+            <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok 480p (10 cr)</option><option value="veo3">Veo 3 Lite (15 cr)</option><option value="sora2">Sora 2 (20 cr)</option></select></div>
             <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">Generate All Clips</button>
             <div class="prog" id="clipAllProg"><div class="prog-top"><span class="prog-lbl" id="clipAllProgLbl">Generating…</span><span class="prog-pct" id="clipAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="clipAllProgFill"></div></div></div>
             <div class="err" id="clipsErr"><div class="err-title">ERROR</div><div class="err-msg" id="clipsErrMsg"></div></div>

@@ -227,7 +227,19 @@ function initPipeRefDrop(){
   pipeRefInp.addEventListener('change',()=>{if(pipeRefInp.files[0])loadPipeRef(pipeRefInp.files[0])});
 }
 initPipeRefDrop();
-function loadPipeRef(f){pipe.refImageFile=f;document.getElementById('pipeRefName').textContent='📎 '+f.name;pipeRefDrop.classList.add('has')}
+function loadPipeRef(f){
+  pipe.refImageFile=f;
+  document.getElementById('pipeRefName').textContent='📎 '+f.name;
+  document.getElementById('pipeRefDrop').classList.add('has');
+  const rb=document.getElementById('pipeRefRemove');if(rb)rb.style.display='block';
+}
+function removePipeRef(){
+  pipe.refImageFile=null;
+  document.getElementById('pipeRefName').textContent='';
+  document.getElementById('pipeRefDrop').classList.remove('has');
+  document.getElementById('pipeRefInp').value='';
+  const rb=document.getElementById('pipeRefRemove');if(rb)rb.style.display='none';
+}
 
 function openScriptPopup(text){
   let modal=document.getElementById('scriptPopupModal');
@@ -258,6 +270,7 @@ function renderImgGrid(){
     <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:10px 0 6px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${txt}</div>
     <div style="display:flex;gap:5px;margin-bottom:5px;align-items:center;">
       <button onclick="openPromptModal('image',${idx})" style="flex-shrink:0;height:30px;padding:0 10px;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;white-space:nowrap;">Edit</button>
+      ${scene.imageUrl?`<a href="${scene.imageUrl}" download="scene-${scene.sceneNumber}.jpg" style="flex-shrink:0;height:30px;width:30px;display:flex;align-items:center;justify-content:center;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;text-decoration:none;font-size:14px;" title="Download image">↓</a>`:''}
       <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="im-${idx}" onchange="updateImgBtnCost(${idx})">
         <option value="nano-banana-pro">Nano Banana Pro</option>
         <option value="nano-banana-2">Nano Banana 2</option>
@@ -310,10 +323,10 @@ function updateImgAllCost(){
   if(btn)btn.textContent='Generate All Images ('+total+' cr)';
   return total;
 }
-function continueToClips(){unlockStep(2);goPipeStep(2);renderClipGrid();setTimeout(updateClipAllCost,100)}
+function continueToClips(){unlockStep(2);goPipeStep(2);renderClipGrid();setTimeout(()=>{updateClipAllCost();updateImgAllCost();},100)}
 
 // ── STEP 7: CLIPS ──
-const VID_CREDITS={'grok':20,'grok720':40,'veo3':50,'sora2':50};
+const VID_CREDITS={'grok':10,'veo3':15,'sora2':20};
 function getVidCr(model){return VID_CREDITS[model]||20;}
 function renderClipGrid(){
   if(!pipe.scenes.length)return;
@@ -329,11 +342,10 @@ function renderClipGrid(){
     <div onclick="openScriptPopup(pipe.scenes[${idx}].scriptText)" style="font-size:11px;color:var(--t2);line-height:1.5;margin:6px 0 4px;padding:0 1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;min-height:33px;" title="Click to read full text">${ctxt}</div>
     <div style="display:flex;gap:5px;margin-bottom:5px;align-items:center;">
       <button onclick="openPromptModal('video',${idx})" style="flex-shrink:0;height:30px;padding:0 10px;font-size:11px;font-family:'DM Sans',sans-serif;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);border-radius:6px;cursor:pointer;white-space:nowrap;">Edit</button>
-      <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="cm-${idx}" onchange="document.getElementById('cgenb-${idx}').textContent=(pipe.scenes[${idx}].videoUrl?'↺ Regenerate':'Generate')+' ('+getVidCr(this.value)+' cr)'">
-        <option value="grok">Grok 480p</option>
-        <option value="grok720">Grok 720p</option>
-        <option value="veo3">Veo 3 Lite</option>
-        <option value="sora2">Sora 2</option>
+      <select style="flex:1;height:30px;font-size:11px;font-family:'DM Sans',sans-serif;padding:0 6px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:6px;outline:none;" id="cm-${idx}" onchange="document.getElementById('cgenb-${idx}').textContent=(pipe.scenes[${idx}].videoUrl?'↺ Regenerate':'Generate')+' ('+getVidCr(this.value)+' cr)';updateClipAllCost();">
+        <option value="grok">Grok 480p (10 cr)</option>
+        <option value="veo3">Veo 3 Lite (15 cr)</option>
+        <option value="sora2">Sora 2 (20 cr)</option>
       </select>
     </div>
     <button id="cgenb-${idx}" onclick="genSingleClip(${idx})" style="width:100%;height:34px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;background:var(--y);color:#000;border:none;border-radius:7px;cursor:pointer;">${scene.videoUrl?'↺ Regenerate':'Generate'} (20 cr)</button>`;
@@ -342,11 +354,11 @@ function renderClipGrid(){
 }
 async function genSingleClip(idx){
   const scene=pipe.scenes[idx];const modelVal=document.getElementById(`cm-${idx}`)?.value||'grok';
-  const model=modelVal==='grok720'?'grok':modelVal;const quality=modelVal==='grok720'?'720p':'480p';
+  const model=modelVal;const quality='480p';
   const btn=document.getElementById(`cgenb-${idx}`),box=document.getElementById(`cb-${idx}`);
   if(btn){btn.disabled=true;btn.textContent='…'}if(box)box.classList.add('gen');
   try{
-    const res=await fetch('/pipeline/generate-scene-video',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:scene.videoPrompt,model,quality,sceneIndex:idx})});
+    const res=await fetch('/pipeline/generate-scene-video',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:scene.videoPrompt,model,quality,sceneIndex:idx,imageUrl:scene.imageUrl||null})});
     const data=await res.json();if(!data.success)throw new Error(data.error);
     pipe.scenes[idx].videoUrl=data.videoUrl;
     if(box){box.classList.remove('gen');box.classList.add('done');box.innerHTML=`<video src="${data.videoUrl}" loop muted autoplay playsinline></video>`}
