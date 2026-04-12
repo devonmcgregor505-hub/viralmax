@@ -248,10 +248,20 @@ async function downloadFile(url, filename){
     setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   }catch(e){alert('Download failed: '+e.message)}
 }
+function loadJSZip(){
+  return new Promise((resolve,reject)=>{
+    if(window.JSZip)return resolve(window.JSZip);
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload=()=>resolve(window.JSZip);
+    s.onerror=reject;
+    document.head.appendChild(s);
+  });
+}
 async function downloadAllImages(){
   const scenes=pipe.scenes.filter(s=>s.imageUrl);
   if(!scenes.length){alert('No images generated yet');return}
-  const {default:JSZip}=await import('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+  const JSZip=await loadJSZip();
   const zip=new JSZip();
   await Promise.all(scenes.map(async(s,i)=>{
     const res=await fetch(s.imageUrl);const blob=await res.blob();
@@ -264,7 +274,7 @@ async function downloadAllImages(){
 async function downloadAllVideos(){
   const scenes=pipe.scenes.filter(s=>s.videoUrl);
   if(!scenes.length){alert('No videos generated yet');return}
-  const {default:JSZip}=await import('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+  const JSZip=await loadJSZip();
   const zip=new JSZip();
   await Promise.all(scenes.map(async(s,i)=>{
     const res=await fetch(s.videoUrl);const blob=await res.blob();
