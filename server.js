@@ -196,7 +196,68 @@ async function kieAiPoll(taskId, apiKey, maxAttempts = 120, intervalMs = 5000) {
 // ══════════════════════════════════════════════════════════════════════════════
 // PIPELINE ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
+app.post('/pipeline/ideate', upload.array('channelFiles', 10), async (req, res) => {
+  const { customIdea } = req.body;
+  const files = req.files || [];
+  try {
+    let channelData = [];
+    for (const file of files) {
+      try {
+        const raw = fs.readFileSync(file.path, 'utf8');
+        const parsed = JSON.parse(raw);
+        channelData.push(parsed);
+        fs.unlinkSync(file.path);
+      } catch(e) { try { fs.unlinkSync(file.path); } catch(e2) {} }
+    }
+    if (customIdea && customIdea.trim()) {
+      return res.json({ success: true, ideas: [customIdea.trim()], custom: true });
+    }
+    if (channelData.length === 0) {
+      return res.json({ success: false, error: 'Please upload at least one channel data file or enter your own idea.' });
+    }
+    const channelSummary = channelData.map((ch, i) => {
+      const videos = Array.isArray(ch) ? ch : (ch.videos || []);
+      const topVideos = videos.slice(0, 15).map(v => `  - "${v.title}" — ${(v.view_count || 0).toLocaleString()} views`).join('\n');
+      return `Channel ${i + 1}:\n${topVideos}`;
+    }).join('\n\n');
+    const prompt = `Based on all the data from the channels above, could you give me 5 viral worthy ideas for yt shorts (in viral worthy title format)\n\nChannel data:\n${channelSummary}\n\nReturn ONLY a JSON array of exactly 5 strings, no other text:\n["idea 1", "idea 2", "idea 3", "idea 4", "idea 5"]`;
+    const response = await callClaude([{ role: 'user', content: prompt }], '', 1000);
+    let ideas;
+    try {
+      const clean = response.replace(/```json|```/g, '').trim();
+      ideas = JSON.parse(clean);
+    } catch(e) {
+      const match = response.match(/\[[\s\S]*\]/);
+      if (match) ideas = JSON.parse(match[0]);
+      else throw new Error('Could not parse ideas from Claude response');
+    }
+    res.json({ success: true, ideas });
+  } catch(err) {
+    console.error('[pipeline/ideate] error:', err.message);
+    res.json({ success: false, error: err.message });
+  }
+});
 
+app.post('/pipeline/script', express.json(), async (req, res) => {
+  const { idea, channelData, customPrompt } = req.body;
+  if (!idea) return res.json({ success: false, error: 'No idea provided' });
+  try {
+    let channelContext = '';
+    if (channelData && channelData.length > 0) {
+      const topScripts = channelData.flatMap(ch => {
+        const videos = Array.isArray(ch) ? ch : (ch.videos || []);
+        return videos.slice(0, 5).map(v => `Title: "${v.title}"\nViews: ${(v.view_count || 0).toLocaleString()}\nDescription: ${(v.description || '').slice(0, 200)}`);
+      }).slice(0, 10).join('\n\n---\n\n');
+      channelContext = `\n\nHere are the competitor's most viral videos for reference on style, length, and pacing:\n\n${topScripts}`;
+    }
+    const prompt = `With the idea we just got, and based on channels attached and their success, make me a similar length viral script for the idea above (put it in 1 big paragraph).\n\nIdea: ${idea}${channelContext}\n\nReturn ONLY the script text, nothing else.`;
+    const script = await callClaude([{ role: 'user', content: prompt }], '', 2000);
+    res.json({ success: true, script: script.trim() });
+  } catch(err) {
+    console.error('[pipeline/script] error:', err.message);
+    res.json({ success: false, error: err.message });
+  }
+});
 
 app.post('/pipeline/scenes', express.json(), async (req, res) => {
   const { script, idea } = req.body;
