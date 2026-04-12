@@ -427,13 +427,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
   <nav class="nav">
     
-    <button class="nav-item active" id="nav-pipeline" onclick="switchTab('pipeline')">
+    <button class="nav-item active" id="nav-pipeline" onclick="switchTab('pipeline')" style="display:none;">
       <span class="nav-icon">⚡</span>Automation<span class="nav-badge b-hot">HOT</span>
     </button>
     <div class="nav-sub" id="pipe-sub" style="display:none;">
-      <button class="nav-sub-item active" onclick="goPipeStep(0);switchTab('pipeline')"><span class="sub-dot"></span>Scenes</button>
-      <button class="nav-sub-item" onclick="goPipeStep(1);switchTab('pipeline');renderImgGrid();setTimeout(updateImgAllCost,100)"><span class="sub-dot"></span>Images</button>
-      <button class="nav-sub-item" onclick="goPipeStep(2);switchTab('pipeline');renderClipGrid();setTimeout(updateClipAllCost,100)"><span class="sub-dot"></span>Videos</button>
+      <button class="nav-sub-item active" onclick="goPipeStep(0);switchTab('pipeline')" style="display:none;"><span class="sub-dot"></span>Scenes</button>
+      <button class="nav-sub-item" onclick="goPipeStep(1);switchTab('pipeline');renderImgGrid();setTimeout(updateImgAllCost,100)" style="display:none;"><span class="sub-dot"></span>Images</button>
+      <button class="nav-sub-item" onclick="goPipeStep(2);switchTab('pipeline');renderClipGrid();setTimeout(updateClipAllCost,100)" style="display:none;"><span class="sub-dot"></span>Videos</button>
     </div>
 
     <span class="nav-sec-lbl">Generation</span>
