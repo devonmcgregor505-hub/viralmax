@@ -1068,19 +1068,18 @@ function renderImgGrid(){
   const grid=document.getElementById('imgGrid');grid.style.display='grid';grid.innerHTML='';
   pipe.scenes.forEach((scene,idx)=>{
     const cell=document.createElement('div');cell.className='img-cell';cell.id=`ic-${idx}`;
-    const imgCr=scene.imageUrl?10:10;
     cell.innerHTML=`<div class="img-box${scene.imageUrl?' done':''}" id="ib-${idx}">
       ${scene.imageUrl?`<img src="${scene.imageUrl}" class="loaded" alt="">`:`<div class="img-ph"><span class="img-ph-icon">🖼</span><span>S${scene.sceneNumber}</span></div>`}
     </div>
     <div class="img-cell-lbl" style="font-size:9px;color:var(--t2);line-height:1.4;margin:4px 0;padding:0 1px;">${scene.scriptText||''}</div>
     <div style="display:flex;gap:3px;margin-bottom:3px;">
       <button class="btn-tiny" onclick="openPromptModal('image',${idx})">Edit</button>
-      <select style="flex:1;font-size:8px;padding:3px 4px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:4px;outline:none;" id="im-${idx}" onchange="renderImgGrid()">
+      <select style="flex:1;font-size:8px;padding:3px 4px;background:var(--s3);border:1px solid var(--bd);color:var(--tx);border-radius:4px;outline:none;" id="im-${idx}" onchange="updateImgBtnCost(${idx})">
         <option value="nano-banana-pro">Nano Banana Pro</option>
         <option value="nano-banana-2">Nano Banana 2</option>
       </select>
     </div>
-    <button class="btn-tiny pri" id="igenb-${idx}" onclick="genSingleImg(${idx})" style="width:100%;padding:5px;">${scene.imageUrl?'↺ Regenerate':'Generate'} (10 cr)</button>`;
+    <button class="btn-tiny pri" id="igenb-${idx}" onclick="genSingleImg(${idx})" style="width:100%;padding:5px;">${scene.imageUrl?'↺ Regenerate':'Generate'} (15 cr)</button>`;
     grid.appendChild(cell);
   });
 }
@@ -1112,9 +1111,16 @@ async function generateAllImages(){
   btn.disabled=false;btn.textContent='Generate All Images ('+updateImgAllCost()+' cr)';setTimeout(()=>document.getElementById('imgAllProg').classList.remove('vis'),2000);checkImgsDone();
 }
 function checkImgsDone(){document.getElementById('imgsContinueBtn').style.display=pipe.scenes.every(s=>s.imageUrl)?'block':'none'}
+function getImgCr(model){return model==='nano-banana-2'?10:15;}
+function updateImgBtnCost(idx){
+  const m=document.getElementById('im-'+idx)?.value||'nano-banana-pro';
+  const btn=document.getElementById('igenb-'+idx);
+  if(btn){const done=pipe.scenes[idx]?.imageUrl;btn.textContent=(done?'↺ Regenerate':'Generate')+' ('+getImgCr(m)+' cr)';}
+  updateImgAllCost();
+}
 function updateImgAllCost(){
   let total=0;
-  pipe.scenes.forEach((_,i)=>{const s=document.getElementById('im-'+i);const m=s?s.value:'nano-banana-pro';total+=10;});
+  pipe.scenes.forEach((_,i)=>{const s=document.getElementById('im-'+i);const m=s?s.value:'nano-banana-pro';total+=getImgCr(m);});
   const btn=document.getElementById('imgGenAllBtn');
   if(btn)btn.textContent='Generate All Images ('+total+' cr)';
   return total;
