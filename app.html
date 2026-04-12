@@ -535,7 +535,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
                 <div class="zone-fname" id="pipeRefName"></div>
               </div>
             </div>
-            <div class="s-row"><label class="s-lbl">Model (all scenes)</label><select class="sel" id="imgGlobalModel"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
+            <div class="s-row"><label class="s-lbl">Model (all scenes)</label><select class="sel" id="imgGlobalModel" onchange="syncImgModels(this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
             <button class="btn-y" id="imgGenAllBtn" onclick="generateAllImages()">Generate All Images</button>
             <div class="prog" id="imgAllProg"><div class="prog-top"><span class="prog-lbl" id="imgAllProgLbl">Generating…</span><span class="prog-pct" id="imgAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="imgAllProgFill"></div></div></div>
             <div class="err" id="imgsErr"><div class="err-title">ERROR</div><div class="err-msg" id="imgsErrMsg"></div></div>
@@ -1026,7 +1026,7 @@ function renderScenesList(){
   pipe.scenes.forEach((scene,idx)=>{
     const card=document.createElement('div');card.className='scene-card';
     card.innerHTML=`<div class="scene-head" style="display:flex;align-items:center;gap:6px;">
-      <span style="color:var(--t3);font-size:16px;line-height:1;padding:0 2px;cursor:grab;">⠿</span>
+      <span style="color:var(--t3);font-size:16px;line-height:1;padding:0 2px;cursor:grab;" class="drag-handle">⠿</span>
       <span class="scene-badge" style="flex:1;">Scene ${scene.sceneNumber}</span>
       <button class="scene-del" style="background:none;border:1px solid var(--bd);color:var(--t2);border-radius:4px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="moveScene(${idx},-1)">▲</button>
       <button class="scene-del" style="background:none;border:1px solid var(--bd);color:var(--t2);border-radius:4px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="moveScene(${idx},1)">▼</button>
@@ -1038,6 +1038,8 @@ function renderScenesList(){
     </div>`;
     list.appendChild(card);
   });
+  });
+  initSceneDrag();
 }
 function deleteScene(idx){pipe.scenes.splice(idx,1);renderScenesList()}
 function moveScene(idx,dir){
@@ -1046,6 +1048,29 @@ function moveScene(idx,dir){
   const tmp=pipe.scenes[idx];pipe.scenes[idx]=pipe.scenes[newIdx];pipe.scenes[newIdx]=tmp;
   pipe.scenes.forEach((s,i)=>{s.sceneNumber=i+1;if(s.sceneLabel)s.sceneLabel=s.sceneLabel.replace(/Scene \d+/,'Scene '+(i+1));});
   renderScenesList();renderImgGrid();renderClipGrid();
+}
+function syncImgModels(model){
+  pipe.scenes.forEach((_,i)=>{const s=document.getElementById('im-'+i);if(s){s.value=model;updateImgBtnCost(i);}});
+  updateImgAllCost();
+}
+function initSceneDrag(){
+  const list=document.getElementById('scenesList');
+  let dragIdx=null;
+  list.querySelectorAll('.scene-card').forEach((card,idx)=>{
+    const handle=card.querySelector('.drag-handle');
+    if(!handle)return;
+    handle.addEventListener('mousedown',()=>{card.setAttribute('draggable','true');});
+    card.addEventListener('dragstart',e=>{dragIdx=idx;card.style.opacity='0.4';e.dataTransfer.effectAllowed='move';});
+    card.addEventListener('dragend',()=>{card.style.opacity='';card.setAttribute('draggable','false');dragIdx=null;});
+    card.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';});
+    card.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(dragIdx===null||dragIdx===idx)return;
+      const tmp=pipe.scenes[dragIdx];pipe.scenes[dragIdx]=pipe.scenes[idx];pipe.scenes[idx]=tmp;
+      pipe.scenes.forEach((s,i)=>{s.sceneNumber=i+1;if(s.sceneLabel)s.sceneLabel=s.sceneLabel.replace(/Scene \d+/,'Scene '+(i+1));});
+      renderScenesList();renderImgGrid();renderClipGrid();
+    });
+  });
 }
 function addManualScene(){
   pipe.scenes.push({sceneNumber:pipe.scenes.length+1,scriptText:'Enter scene text…',imagePrompt:'Enter image prompt…',videoPrompt:'Enter video prompt…',imageUrl:null,videoUrl:null});
