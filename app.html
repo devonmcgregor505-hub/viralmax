@@ -1087,9 +1087,8 @@ function renderImgGrid(){
       </select>
     </div>
     <button class="btn-tiny pri" id="igenb-${idx}" onclick="genSingleImg(${idx})" style="width:100%;padding:5px;">${scene.imageUrl?'↺ Regenerate':'Generate'} (15 cr)</button>`;
-    // update cost after DOM insert
-    setTimeout(()=>updateImgBtnCost(${idx}),0);
     grid.appendChild(cell);
+    setTimeout(()=>updateImgBtnCost(idx),0);
   });
 }
 async function genSingleImg(idx){
