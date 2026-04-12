@@ -8,4 +8,3 @@ onModelChange();updCreds();onImgModelChange();renderVoiceSel();renderVoiceOutput
 // Handle hash routing from homepage
 const hash=window.location.hash.replace('#','');
 if(hash&&document.getElementById('tab-'+hash))switchTab(hash);
-</script>
