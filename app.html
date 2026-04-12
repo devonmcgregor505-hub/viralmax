@@ -1034,6 +1034,13 @@ function renderScenesList(){
   });
 }
 function deleteScene(idx){pipe.scenes.splice(idx,1);renderScenesList()}
+function moveScene(idx,dir){
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=pipe.scenes.length)return;
+  const tmp=pipe.scenes[idx];pipe.scenes[idx]=pipe.scenes[newIdx];pipe.scenes[newIdx]=tmp;
+  pipe.scenes.forEach((s,i)=>{s.sceneNumber=i+1;if(s.sceneLabel)s.sceneLabel=s.sceneLabel.replace(/Scene \d+/,'Scene '+(i+1));});
+  renderScenesList();renderImgGrid();renderClipGrid();
+}
 function addManualScene(){
   pipe.scenes.push({sceneNumber:pipe.scenes.length+1,scriptText:'Enter scene text…',imagePrompt:'Enter image prompt…',videoPrompt:'Enter video prompt…',imageUrl:null,videoUrl:null});
   renderScenesList();document.getElementById('scenesEmpty').style.display='none';document.getElementById('scenesContinueBtn').style.display='block';
