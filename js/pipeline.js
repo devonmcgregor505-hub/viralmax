@@ -369,7 +369,7 @@ function updateImgAllCost(){
 function continueToClips(){unlockStep(2);goPipeStep(2);renderClipGrid();setTimeout(()=>{updateClipAllCost();updateImgAllCost();},100)}
 
 // ── STEP 7: CLIPS ──
-const VID_CREDITS={'grok':10,'veo3':15,'sora2':20};
+var VID_CREDITS={'grok':10,'veo3':15,'sora2':20};
 function getVidCr(model){return VID_CREDITS[model]||20;}
 function renderClipGrid(){
   if(!pipe.scenes.length)return;
