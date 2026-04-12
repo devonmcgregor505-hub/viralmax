@@ -431,13 +431,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       <span class="nav-icon">⚡</span>Automation<span class="nav-badge b-hot">HOT</span>
     </button>
     <div class="nav-sub" id="pipe-sub" style="display:none;">
-      <button class="nav-sub-item active" onclick="goPipeStep(0);switchTab('pipeline')"><span class="sub-dot"></span>Idea</button>
-      <button class="nav-sub-item" onclick="goPipeStep(1);switchTab('pipeline')"><span class="sub-dot"></span>Script</button>
-      <button class="nav-sub-item" onclick="goPipeStep(2);switchTab('pipeline')"><span class="sub-dot"></span>Voiceover</button>
-      <button class="nav-sub-item" onclick="goPipeStep(3);switchTab('pipeline')"><span class="sub-dot"></span>Silence Remove</button>
-      <button class="nav-sub-item" onclick="goPipeStep(4);switchTab('pipeline')"><span class="sub-dot"></span>Scenes</button>
-      <button class="nav-sub-item" onclick="goPipeStep(5);switchTab('pipeline')"><span class="sub-dot"></span>Images</button>
-      <button class="nav-sub-item" onclick="goPipeStep(6);switchTab('pipeline')"><span class="sub-dot"></span>Videos</button>
+      <button class="nav-sub-item active" onclick="goPipeStep(0);switchTab('pipeline')"><span class="sub-dot"></span>Scenes</button>
+      <button class="nav-sub-item" onclick="goPipeStep(1);switchTab('pipeline')"><span class="sub-dot"></span>Images</button>
+      <button class="nav-sub-item" onclick="goPipeStep(2);switchTab('pipeline')"><span class="sub-dot"></span>Videos</button>
     </div>
 
     <span class="nav-sec-lbl">Generation</span>
@@ -462,7 +458,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="topbar">
     <div class="topbar-title" id="topTitle">Automation</div>
     <span class="topbar-sep" id="topSep">—</span>
-    <div class="topbar-sub" id="topSub">Idea → Script → Voice → Scenes → Images → Clips</div>
+    <div class="topbar-sub" id="topSub">Scenes → Images → Clips</div>
     <div class="topbar-right">
       <div class="topbar-pill" id="queuePill">Queue: 0 active</div>
     </div>
@@ -480,7 +476,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       <div onclick="selectNichePick('Skeleton')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s2)'">
         <div style="font-size:40px;margin-bottom:12px;">💀</div>
         <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Skeleton</div>
-        <div style="font-size:11px;color:var(--t3);line-height:1.5;">Full 7-step pipeline for skeleton content</div>
+        <div style="font-size:11px;color:var(--t3);line-height:1.5;">3-step pipeline: Scenes → Images → Clips</div>
         <div style="margin-top:14px;display:inline-block;background:var(--y);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'Space Mono',monospace;">LIVE</div>
       </div>
       <div onclick="selectNichePick('Ronaldo')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;opacity:0.6;" onmouseover="this.style.borderColor='var(--bd2)'" onmouseout="this.style.borderColor='var(--bd)'">
@@ -500,138 +496,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div id="pipeline-content" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
     <div class="pipe-wrap">
       <div class="step-nav" style="position:relative;"><button onclick="changeNiche()" style="margin-right:8px;padding:6px 14px;background:var(--s3);border:1px solid var(--bd2);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.color='var(--y)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t2)'">← Change Niche</button>
-        <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Idea</button>
+        <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Scenes</button>
         <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1)"><span class="step-num">2</span>Script</button>
+        <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1)"><span class="step-num">2</span>Images</button>
         <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-2" onclick="goPipeStep(2)"><span class="step-num">3</span>Voice</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-3" onclick="goPipeStep(3)"><span class="step-num">4</span>Trim</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-4" onclick="goPipeStep(4)"><span class="step-num">5</span>Scenes</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-5" onclick="goPipeStep(5)"><span class="step-num">6</span>Images</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-6" onclick="goPipeStep(6)"><span class="step-num">7</span>Videos</button>
+        <button class="step-btn locked" id="pstep-2" onclick="goPipeStep(2)"><span class="step-num">3</span>Videos</button>
       </div>
 
-      <!-- STEP 1: IDEA -->
-      <div class="step-panel active" id="pcontent-0">
-        <div class="workspace">
-          <div class="left-col">
-            <div class="strip"><b>Step 1 — Idea.</b> Upload competitor JSONs from YT Scraper and Claude generates 5 viral titles. Or type your own.</div>
-            <div>
-              <label class="fl">Competitor Channel Data <span style="color:var(--t4);font-weight:400;">(up to 10 JSONs)</span></label>
-              <div class="zone" id="chFileDrop" onclick="document.getElementById('chFileInput').click()">
-                <input type="file" id="chFileInput" accept=".json" multiple style="display:none">
-                <span class="zone-icon">📁</span>
-                <div class="zone-title">Drop JSON files</div>
-                <div class="zone-hint">Exported from YT Scraper</div>
-              </div>
-              <div class="chips" id="chChips"></div>
-            </div>
-            <div>
-              <label class="fl">Or enter your own idea</label>
-              <div style="display:flex;gap:6px;">
-                <input class="inp" id="customIdeaInp" placeholder="Your viral idea…" style="flex:1;" onkeydown="if(event.key==='Enter')useCustomIdea()">
-                <button class="btn-sm" onclick="useCustomIdea()">Use →</button>
-              </div>
-            </div>
-            <button class="btn-y" id="ideateBtn" onclick="runIdeation()" disabled>⚡ Generate 5 Ideas</button>
-            <div class="prog" id="ideateProg"><div class="prog-top"><span class="prog-lbl" id="ideateProgLbl">Analysing…</span><span class="prog-pct" id="ideateProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="ideateProgFill"></div></div></div>
-            <div class="err" id="ideateErr"><div class="err-title">ERROR</div><div class="err-msg" id="ideateErrMsg"></div></div>
-          </div>
-          <div class="right-col">
-            <div id="ideaCards" style="width:100%;max-width:560px;"><div class="empty"><span class="empty-icon">💡</span><div class="empty-txt">Upload channel data or type your own idea</div></div></div>
-            <button class="btn-y" id="ideaContinueBtn" onclick="continueToScript()" style="display:none;max-width:280px;">Continue to Script →</button>
-          </div>
-        </div>
+
       </div>
 
-      <!-- STEP 2: SCRIPT -->
-      <div class="step-panel" id="pcontent-1">
-        <div class="workspace">
-          <div class="left-col">
-            <div class="strip"><b>Step 2 — Script.</b> Claude writes a viral script matching competitor style and length.</div>
-            <div><label class="fl">Selected Idea</label><div id="scriptIdeaDisplay" style="background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--y);line-height:1.5;font-weight:600;"></div></div>
-            <div><label class="fl">Additional Direction <span style="color:var(--t4);font-weight:400;">(optional)</span></label><textarea class="ta" id="scriptCustomPrompt" rows="2" placeholder="e.g. Make it darker, more dramatic…"></textarea></div>
-            <button class="btn-y" id="scriptGenBtn" onclick="runScriptGen()">📝 Generate Script</button>
-            <div class="prog" id="scriptProg"><div class="prog-top"><span class="prog-lbl" id="scriptProgLbl">Writing…</span><span class="prog-pct" id="scriptProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="scriptProgFill"></div></div></div>
-            <div class="err" id="scriptErr"><div class="err-title">ERROR</div><div class="err-msg" id="scriptErrMsg"></div></div>
-          </div>
-          <div class="right-col" style="align-items:stretch;max-width:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:0 2px;"><label class="fl" style="margin:0;">Script Output</label><button class="btn-sm" id="scriptContinueBtn" onclick="continueToVoiceover()" style="display:none;">Continue →</button></div>
-            <textarea class="ta" id="scriptOutput" style="flex:1;min-height:360px;resize:none;" placeholder="Your script will appear here — edit before continuing…" oninput="onScriptEdit()"></textarea>
-          </div>
-        </div>
-      </div>
 
-      <!-- STEP 3: VOICEOVER -->
-      <div class="step-panel" id="pcontent-2">
-        <div class="workspace">
-          <div class="left-col">
-            <div class="strip"><b>Step 3 — Voiceover.</b> Generate the VO using your cloned voice.</div>
-            <div class="card">
-              <div class="card-head">Voice</div>
-              <div class="card-body">
-                <div class="s-row"><label class="s-lbl">Selected Voice</label><div style="display:flex;gap:6px;"><select class="sel" id="pipeVoiceSel" style="flex:1;" onchange="pipeVoiceId=this.value"></select><button class="btn-sm" onclick="openAddVoiceModal()" style="flex-shrink:0;">+</button></div></div>
-                <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="pipeExagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="pipeExagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('pipeExagVal').textContent=this.value"></div>
-              </div>
-            </div>
-            <button class="btn-y" id="pipeVoiceBtn" onclick="runPipelineVoice()">🎙 Generate Voiceover</button>
-            <div class="prog" id="pipeVoiceProg"><div class="prog-top"><span class="prog-lbl" id="pipeVoiceProgLbl">Generating…</span><span class="prog-pct" id="pipeVoiceProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="pipeVoiceProgFill"></div></div></div>
-            <div class="err" id="pipeVoiceErr"><div class="err-title">ERROR</div><div class="err-msg" id="pipeVoiceErrMsg"></div></div>
-          </div>
-          <div class="right-col">
-            <div id="pipeVoiceResult" style="display:none;width:100%;max-width:380px;display:flex;flex-direction:column;gap:11px;">
-              <label class="fl">Generated Voiceover</label>
-              <audio id="pipeAudioPlayer" controls style="width:100%;accent-color:var(--y);"></audio>
-              <a id="pipeAudioDl" class="dl-btn" download="voiceover.wav">⬇ Download Voiceover</a>
-              <button class="btn-y" onclick="continueToSilenceRemove()">Continue to Silence Remove →</button>
-            </div>
-            <div id="pipeVoiceEmpty" class="empty"><span class="empty-icon">🎙</span><div class="empty-txt">Voiceover will appear here</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 4: SILENCE REMOVE -->
-      <div class="step-panel" id="pcontent-3">
-        <div class="workspace">
-          <div class="left-col">
-            <div class="strip"><b>Step 4 — Trim.</b> Remove dead air from the voiceover.</div>
-            <div>
-              <label class="fl">Audio File</label>
-              <div class="zone has" id="pipeSilZone" onclick="document.getElementById('pipeSilInp').click()">
-                <input type="file" id="pipeSilInp" accept="audio/*,video/*" style="display:none">
-                <span class="zone-icon">🎵</span>
-                <div class="zone-title" id="pipeSilTitle">Voiceover auto-loaded</div>
-                <div class="zone-hint">Or drop a different file</div>
-                <div class="zone-fname" id="pipeSilFname"></div>
-              </div>
-            </div>
-            <div class="card"><div class="card-head">Settings</div><div class="card-body"><div class="slider-grp"><label class="s-lbl">Silence Threshold</label><div class="slider-labels"><span class="slider-end">Sensitive</span><span class="slider-val" id="pipeDbVal">-40 dB</span><span class="slider-end">Aggressive</span></div><input type="range" class="slider" id="pipeDbSlider" min="-60" max="-10" value="-40" oninput="document.getElementById('pipeDbVal').textContent=this.value+' dB'"></div></div></div>
-            <button class="btn-y" id="pipeSilBtn" onclick="runPipelineSilence()">✂️ Remove Silence</button>
-            <div class="prog" id="pipeSilProg"><div class="prog-top"><span class="prog-lbl">Processing…</span><span class="prog-pct" id="pipeSilProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="pipeSilProgFill"></div></div></div>
-            <div class="err" id="pipeSilErr"><div class="err-title">ERROR</div><div class="err-msg" id="pipeSilErrMsg"></div></div>
-          </div>
-          <div class="right-col">
-            <div id="pipeSilResult" style="display:none;width:100%;max-width:380px;display:flex;flex-direction:column;gap:11px;">
-              <label class="fl">Trimmed Audio</label>
-              <audio id="pipeSilAudio" controls style="width:100%;accent-color:var(--y);"></audio>
-              <a id="pipeSilDl" class="dl-btn" download="trimmed.mp4">⬇ Download Trimmed</a>
-              <button class="btn-y" onclick="continueToScenes()">Continue to Scenes →</button>
-            </div>
-            <div id="pipeSilEmpty" class="empty"><span class="empty-icon">✂️</span><div class="empty-txt">Trimmed audio will appear here</div></div>
-          </div>
-        </div>
       </div>
 
       <!-- STEP 5: SCENES -->
-      <div class="step-panel" id="pcontent-4">
+      <div class="step-panel" id="pcontent-0">
         <div class="workspace">
           <div class="left-col">
-            <div class="strip"><b>Step 5 — Scenes.</b> Claude splits the script into scenes with image + video prompts.</div>
-            <div><label class="fl">Script Preview</label><div id="scenesScriptPrev" style="background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:10.5px;color:var(--t2);line-height:1.7;max-height:180px;overflow-y:auto;"></div></div>
+            <div class="strip"><b>Step 1 — Scenes.</b> Paste your script and Claude splits it into scenes with image + video prompts.</div>
+            <div>
+              <label class="fl">Your Script</label>
+              <textarea class="ta" id="scenesScriptInput" rows="6" placeholder="Paste your script here…" oninput="pipe.script=this.value"></textarea>
+            </div>
             <button class="btn-y" id="scenesGenBtn" onclick="runScenesGen()">🎬 Auto-Split into Scenes</button>
             <button class="btn-ghost" onclick="addManualScene()" style="margin-top:-4px;">+ Add Scene Manually</button>
             <div class="prog" id="scenesProg"><div class="prog-top"><span class="prog-lbl" id="scenesProgLbl">Splitting…</span><span class="prog-pct" id="scenesProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="scenesProgFill"></div></div></div>
@@ -646,10 +532,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       </div>
 
       <!-- STEP 6: IMAGES -->
-      <div class="step-panel" id="pcontent-5">
+      <div class="step-panel" id="pcontent-1">
         <div class="workspace">
           <div class="left-col">
-            <div class="strip"><b>Step 6 — Images.</b> Generate reference images for each scene.</div>
+            <div class="strip"><b>Step 2 — Images.</b> Generate reference images for each scene.</div>
             <div>
               <label class="fl">Skeleton Reference <span style="color:var(--t4);font-weight:400;">(recommended)</span></label>
               <div class="zone" id="pipeRefDrop" onclick="document.getElementById('pipeRefInp').click()">
@@ -674,10 +560,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       </div>
 
       <!-- STEP 7: VIDEOS -->
-      <div class="step-panel" id="pcontent-6">
+      <div class="step-panel" id="pcontent-2">
         <div class="workspace">
           <div class="left-col">
-            <div class="strip"><b>Step 7 — Videos.</b> Generate a 9:16 clip for each scene.</div>
+            <div class="strip"><b>Step 3 — Videos.</b> Generate a 9:16 clip for each scene.</div>
             <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok 480p</option><option value="grok720">Grok 720p</option><option value="veo3">Veo 3 Lite</option><option value="sora2">Sora 2</option></select></div>
             <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">🎬 Generate All Clips</button>
             <div class="prog" id="clipAllProg"><div class="prog-top"><span class="prog-lbl" id="clipAllProgLbl">Generating…</span><span class="prog-pct" id="clipAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="clipAllProgFill"></div></div></div>
@@ -953,7 +839,7 @@ setInterval(async()=>{
 
 // ── TAB SWITCHING ──
 const tabMeta={
-  pipeline:['Automation','Idea → Script → Voice → Scenes → Images → Clips'],
+  pipeline:['Automation','Scenes → Images → Clips'],
   vidgen:['Video Gen','AI video generation'],
   imggen:['Image Gen','AI image generation'],
   voicegen:['Voice Gen','Clone and generate voiceovers'],
@@ -1129,7 +1015,7 @@ async function runPipelineSilence(){
   }catch(err){document.getElementById('pipeSilErr').classList.add('vis');document.getElementById('pipeSilErrMsg').textContent=err.message}
   btn.disabled=false;btn.textContent='✂️ Remove Silence';setTimeout(()=>document.getElementById('pipeSilProg').classList.remove('vis'),2000);
 }
-function continueToScenes(){unlockStep(4);goPipeStep(4);document.getElementById('scenesScriptPrev').textContent=pipe.script}
+
 
 // ── STEP 5: SCENES ──
 async function runScenesGen(){
@@ -1138,7 +1024,7 @@ async function runScenesGen(){
   document.getElementById('scenesContinueBtn').style.display='none';
   const tick=animProg('scenesProgFill','scenesProgPct','scenesProgLbl',88,'Splitting scenes…');
   try{
-    const res=await fetch('/pipeline/scenes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({script:pipe.script,idea:pipe.selectedIdea})});
+    const res=await fetch('/pipeline/scenes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({script:document.getElementById('scenesScriptInput').value.trim(),idea:''})});
     const data=await res.json();clearInterval(tick);document.getElementById('scenesProgFill').style.width='100%';document.getElementById('scenesProgPct').textContent='100%';
     if(!data.success)throw new Error(data.error);
     pipe.scenes=data.scenes.map(s=>({...s,imageUrl:null,videoUrl:null}));
@@ -1164,7 +1050,7 @@ function addManualScene(){
   pipe.scenes.push({sceneNumber:pipe.scenes.length+1,scriptText:'Enter scene text…',imagePrompt:'Enter image prompt…',videoPrompt:'Enter video prompt…',imageUrl:null,videoUrl:null});
   renderScenesList();document.getElementById('scenesEmpty').style.display='none';document.getElementById('scenesContinueBtn').style.display='block';
 }
-function continueToImages(){if(!pipe.scenes.length){alert('Generate scenes first');return}unlockStep(5);goPipeStep(5);renderImgGrid()}
+function continueToImages(){if(!pipe.scenes.length){alert('Generate scenes first');return}unlockStep(1);goPipeStep(1);renderImgGrid()}
 
 // ── PROMPT MODAL ──
 function openPromptModal(type,idx){
@@ -1234,7 +1120,7 @@ async function generateAllImages(){
   btn.disabled=false;btn.textContent='🖼 Generate All Images';setTimeout(()=>document.getElementById('imgAllProg').classList.remove('vis'),2000);checkImgsDone();
 }
 function checkImgsDone(){document.getElementById('imgsContinueBtn').style.display=pipe.scenes.every(s=>s.imageUrl)?'block':'none'}
-function continueToClips(){unlockStep(6);goPipeStep(6);renderClipGrid()}
+function continueToClips(){unlockStep(2);goPipeStep(2);renderClipGrid()}
 
 // ── STEP 7: CLIPS ──
 function renderClipGrid(){
