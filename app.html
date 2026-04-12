@@ -1028,8 +1028,7 @@ function renderScenesList(){
     card.innerHTML=`<div class="scene-head"><span class="scene-badge">Scene ${scene.sceneNumber}</span><button class="scene-del" onclick="deleteScene(${idx})">✕</button></div>
     <div class="scene-body">
       <div class="scene-script" contenteditable="true" onblur="pipe.scenes[${idx}].scriptText=this.textContent">${scene.scriptText}</div>
-      <div class="prompt-blk"><div class="prompt-tag">🖼 Image Prompt</div><div class="prompt-prev" onclick="openPromptModal('image',${idx})">${scene.imagePrompt}</div></div>
-      <div class="prompt-blk"><div class="prompt-tag">🎬 Video Prompt</div><div class="prompt-prev" onclick="openPromptModal('video',${idx})">${scene.videoPrompt}</div></div>
+
     </div>`;
     list.appendChild(card);
   });

@@ -201,7 +201,7 @@ app.post('/pipeline/scenes', express.json(), async (req, res) => {
   if (!script) return res.json({ success: false, error: 'No script provided' });
   try {
     const prompt = `You are a YouTube Shorts scene breakdown expert for the skeleton niche.\n\nHere is the full script:\n---\n${script}\n---\n\nYOUR TASK: Split this script into individual scenes, then generate image and video prompts for each scene.\n\nSCENE SPLITTING RULES:\n- SKIP the very first sentence entirely — do not make it a scene or prompt\n- Split aggressively — one visual moment per scene, never group two things into one scene\n- Each sentence or bullet point is its own scene\n- EXAMPLES of correct splitting:\n  - "Month four, you've lost weight without trying." = Scene A. "Turns out a third of your calories were liquid." = Scene B. These are 2 scenes not 1.\n  - "Month six, soda tastes like chemicals." = Scene A. "Coffee smells good but tastes wrong." = Scene B. These are 2 scenes not 1.\n  - "People ask what you're doing differently." = Scene A. "You say nothing." = Scene B. "They don't believe you." = Scene C. These are 3 scenes not 1.\n- Extract the age/time reference from each scene and include it in sceneLabel e.g. "Scene 1 (Age 2)"\n- Keep the exact script text for each scene\n\nIMAGE PROMPT RULES:\n- Start EVERY image prompt with exactly: "Keep the skeleton the exact same as the reference image (with the white body and clear skin), make the skeleton the size of a normal human compared to the environment, and make the skeleton naturally a part of the environment. Not just forward facing the camera strangely."\n- Then describe the specific scene moment in vivid cinematic detail\n- 9:16 vertical format\n\nVIDEO PROMPT RULES:\n- Start EVERY video prompt with exactly: "Keep the bone character the exact same (with white body and clear skin), no dialogue, no music. Don't make the bone character walk with its hips shaking. Keep the bone characters' eyes the same throughout."\n- Then describe the specific motion/action for this scene\n- Replace "skeleton" with "bone character" everywhere\n\nReturn ONLY a JSON array, no other text:\n[\n  {\n    "sceneNumber": 1,\n    "sceneLabel": "Scene 1 (Age 2)",\n    "scriptText": "exact script text for this scene",\n    "imagePrompt": "full image prompt...",\n    "videoPrompt": "full video prompt..."\n  }\n]`;
-    const response = await callClaude([{ role: 'user', content: prompt }], '', 8000);
+    const response = await callClaude([{ role: 'user', content: prompt }], '', 16000);
     let scenes;
     try {
       const clean = response.replace(/```json|```/g, '').trim();
@@ -209,7 +209,7 @@ app.post('/pipeline/scenes', express.json(), async (req, res) => {
     } catch(e) {
       const match = response.match(/\[[\s\S]*\]/);
       if (match) { try { scenes = JSON.parse(match[0]); } catch(e2) { throw new Error('Could not parse scenes JSON from Claude'); } }
-      else throw new Error('Could not parse scenes from Claude response');
+      else throw new Error('Could not parse scenes. Claude returned: ' + response.slice(0, 300));
     }
     res.json({ success: true, scenes });
   } catch(err) {
