@@ -200,7 +200,7 @@ function addManualScene(){
   pipe.scenes.push({sceneNumber:pipe.scenes.length+1,scriptText:'Enter scene text…',imagePrompt:'Enter image prompt…',videoPrompt:'Enter video prompt…',imageUrl:null,videoUrl:null});
   renderScenesList();document.getElementById('scenesEmpty').style.display='none';document.getElementById('scenesContinueBtn').style.display='block';
 }
-function continueToImages(){if(!pipe.scenes.length){alert('Generate scenes first');return}unlockStep(1);goPipeStep(1);renderImgGrid();setTimeout(updateImgAllCost,100)}
+function continueToImages(){if(!pipe.scenes.length){alert('Generate scenes first');return}unlockStep(1);goPipeStep(1);renderImgGrid();setTimeout(updateImgAllCost,100);setTimeout(initPipeRefDrop,100);}
 
 // ── PROMPT MODAL ──
 function openPromptModal(type,idx){
@@ -226,7 +226,7 @@ function initPipeRefDrop(){
   pipeRefDrop.addEventListener('drop',e=>{e.preventDefault();pipeRefDrop.classList.remove('drag');if(e.dataTransfer.files[0])loadPipeRef(e.dataTransfer.files[0])});
   pipeRefInp.addEventListener('change',()=>{if(pipeRefInp.files[0])loadPipeRef(pipeRefInp.files[0])});
 }
-document.addEventListener('DOMContentLoaded',initPipeRefDrop);
+initPipeRefDrop();
 function loadPipeRef(f){pipe.refImageFile=f;document.getElementById('pipeRefName').textContent='📎 '+f.name;pipeRefDrop.classList.add('has')}
 
 function openScriptPopup(text){
