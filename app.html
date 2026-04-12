@@ -323,7 +323,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
 /* ── IMG GRID ── */
 .img-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
-.img-cell{display:flex;flex-direction:column;gap:5px}
+.img-cell{display:flex;flex-direction:column;gap:8px;padding-bottom:16px}
 .img-box{aspect-ratio:9/16;background:var(--s3);border:1.5px solid var(--bd);border-radius:9px;overflow:hidden;position:relative;cursor:pointer;transition:border-color 0.15s}
 .img-box:hover{border-color:var(--bd2)}
 .img-box.gen{border-color:rgba(255,230,0,0.4);animation:pulse 1.5s ease-in-out infinite}
@@ -543,7 +543,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           </div>
           <div class="right-col">
             <div class="empty" id="imgsEmpty"><span class="empty-icon">🖼</span><div class="empty-txt">Scene images will appear here</div></div>
-            <div class="img-grid" id="imgGrid" style="display:none;"></div>
+            <div class="img-grid" id="imgGrid" style="display:none;row-gap:28px;"></div>
           </div>
         </div>
       </div>
@@ -560,7 +560,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           </div>
           <div class="right-col">
             <div class="empty" id="clipsEmpty"><span class="empty-icon">🎬</span><div class="empty-txt">Video clips will appear here</div></div>
-            <div class="clip-grid" id="clipGrid" style="display:none;"></div>
+            <div class="clip-grid" id="clipGrid" style="display:none;row-gap:28px;"></div>
           </div>
         </div>
       </div>

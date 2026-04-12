@@ -217,12 +217,16 @@ function savePromptEdit(){
 }
 
 // ── STEP 6: IMAGES ──
-const pipeRefDrop=document.getElementById('pipeRefDrop'),pipeRefInp=document.getElementById('pipeRefInp');
-pipeRefDrop.addEventListener('click',()=>pipeRefInp.click());
-pipeRefDrop.addEventListener('dragover',e=>{e.preventDefault();pipeRefDrop.classList.add('drag')});
-pipeRefDrop.addEventListener('dragleave',()=>pipeRefDrop.classList.remove('drag'));
-pipeRefDrop.addEventListener('drop',e=>{e.preventDefault();pipeRefDrop.classList.remove('drag');if(e.dataTransfer.files[0])loadPipeRef(e.dataTransfer.files[0])});
-pipeRefInp.addEventListener('change',()=>{if(pipeRefInp.files[0])loadPipeRef(pipeRefInp.files[0])});
+function initPipeRefDrop(){
+  const pipeRefDrop=document.getElementById('pipeRefDrop'),pipeRefInp=document.getElementById('pipeRefInp');
+  if(!pipeRefDrop||!pipeRefInp)return;
+  pipeRefDrop.addEventListener('click',()=>pipeRefInp.click());
+  pipeRefDrop.addEventListener('dragover',e=>{e.preventDefault();pipeRefDrop.classList.add('drag')});
+  pipeRefDrop.addEventListener('dragleave',()=>pipeRefDrop.classList.remove('drag'));
+  pipeRefDrop.addEventListener('drop',e=>{e.preventDefault();pipeRefDrop.classList.remove('drag');if(e.dataTransfer.files[0])loadPipeRef(e.dataTransfer.files[0])});
+  pipeRefInp.addEventListener('change',()=>{if(pipeRefInp.files[0])loadPipeRef(pipeRefInp.files[0])});
+}
+document.addEventListener('DOMContentLoaded',initPipeRefDrop);
 function loadPipeRef(f){pipe.refImageFile=f;document.getElementById('pipeRefName').textContent='📎 '+f.name;pipeRefDrop.classList.add('has')}
 
 function openScriptPopup(text){
