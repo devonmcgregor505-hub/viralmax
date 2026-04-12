@@ -536,7 +536,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
               </div>
             </div>
             <div class="s-row"><label class="s-lbl">Model (all scenes)</label><select class="sel" id="imgGlobalModel"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
-            <button class="btn-y" id="imgGenAllBtn" onclick="generateAllImages()">🖼 Generate All Images</button>
+            <button class="btn-y" id="imgGenAllBtn" onclick="generateAllImages()">Generate All Images</button>
             <div class="prog" id="imgAllProg"><div class="prog-top"><span class="prog-lbl" id="imgAllProgLbl">Generating…</span><span class="prog-pct" id="imgAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="imgAllProgFill"></div></div></div>
             <div class="err" id="imgsErr"><div class="err-title">ERROR</div><div class="err-msg" id="imgsErrMsg"></div></div>
             <button class="btn-y" id="imgsContinueBtn" onclick="continueToClips()" style="display:none;">Continue to Videos →</button>
@@ -554,7 +554,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           <div class="left-col">
             <div class="strip"><b>Step 3 — Videos.</b> Generate a 9:16 clip for each scene.</div>
             <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok 480p</option><option value="grok720">Grok 720p</option><option value="veo3">Veo 3 Lite</option><option value="sora2">Sora 2</option></select></div>
-            <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">🎬 Generate All Clips</button>
+            <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">Generate All Clips</button>
             <div class="prog" id="clipAllProg"><div class="prog-top"><span class="prog-lbl" id="clipAllProgLbl">Generating…</span><span class="prog-pct" id="clipAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="clipAllProgFill"></div></div></div>
             <div class="err" id="clipsErr"><div class="err-title">ERROR</div><div class="err-msg" id="clipsErrMsg"></div></div>
           </div>
@@ -1038,7 +1038,7 @@ function addManualScene(){
   pipe.scenes.push({sceneNumber:pipe.scenes.length+1,scriptText:'Enter scene text…',imagePrompt:'Enter image prompt…',videoPrompt:'Enter video prompt…',imageUrl:null,videoUrl:null});
   renderScenesList();document.getElementById('scenesEmpty').style.display='none';document.getElementById('scenesContinueBtn').style.display='block';
 }
-function continueToImages(){if(!pipe.scenes.length){alert('Generate scenes first');return}unlockStep(1);goPipeStep(1);renderImgGrid()}
+function continueToImages(){if(!pipe.scenes.length){alert('Generate scenes first');return}unlockStep(1);goPipeStep(1);renderImgGrid();setTimeout(updateImgAllCost,100)}
 
 // ── PROMPT MODAL ──
 function openPromptModal(type,idx){
@@ -1109,10 +1109,17 @@ async function generateAllImages(){
     await genSingleImg(i);done++;
     const pct=Math.round((done/total)*100);document.getElementById('imgAllProgFill').style.width=pct+'%';document.getElementById('imgAllProgPct').textContent=pct+'%';
   }
-  btn.disabled=false;btn.textContent='🖼 Generate All Images';setTimeout(()=>document.getElementById('imgAllProg').classList.remove('vis'),2000);checkImgsDone();
+  btn.disabled=false;btn.textContent='Generate All Images ('+updateImgAllCost()+' cr)';setTimeout(()=>document.getElementById('imgAllProg').classList.remove('vis'),2000);checkImgsDone();
 }
 function checkImgsDone(){document.getElementById('imgsContinueBtn').style.display=pipe.scenes.every(s=>s.imageUrl)?'block':'none'}
-function continueToClips(){unlockStep(2);goPipeStep(2);renderClipGrid()}
+function updateImgAllCost(){
+  let total=0;
+  pipe.scenes.forEach((_,i)=>{const s=document.getElementById('im-'+i);const m=s?s.value:'nano-banana-pro';total+=10;});
+  const btn=document.getElementById('imgGenAllBtn');
+  if(btn)btn.textContent='Generate All Images ('+total+' cr)';
+  return total;
+}
+function continueToClips(){unlockStep(2);goPipeStep(2);renderClipGrid();setTimeout(updateClipAllCost,100)}
 
 // ── STEP 7: CLIPS ──
 const VID_CREDITS={'grok':20,'grok720':40,'veo3':50,'sora2':50};
@@ -1154,6 +1161,13 @@ async function genSingleClip(idx){
     if(btn){btn.disabled=false;btn.textContent='↺'}
   }catch(err){if(box)box.classList.remove('gen');if(btn){btn.disabled=false;btn.textContent='Gen'}alert('Clip failed S'+(idx+1)+': '+err.message)}
 }
+function updateClipAllCost(){
+  let total=0;
+  pipe.scenes.forEach((_,i)=>{const s=document.getElementById('cm-'+i);const m=s?s.value:'grok';total+=getVidCr(m);});
+  const btn=document.getElementById('clipGenAllBtn');
+  if(btn)btn.textContent='Generate All Clips ('+total+' cr)';
+  return total;
+}
 async function generateAllClips(){
   const globalModel=document.getElementById('clipGlobalModel').value;
   const btn=document.getElementById('clipGenAllBtn');btn.disabled=true;btn.textContent='⏳ Generating…';
@@ -1165,7 +1179,7 @@ async function generateAllClips(){
     await genSingleClip(i);done++;
     const pct=Math.round((done/total)*100);document.getElementById('clipAllProgFill').style.width=pct+'%';document.getElementById('clipAllProgPct').textContent=pct+'%';
   }
-  btn.disabled=false;btn.textContent='🎬 Generate All Clips';setTimeout(()=>document.getElementById('clipAllProg').classList.remove('vis'),2000);
+  btn.disabled=false;btn.textContent='Generate All Clips ('+updateClipAllCost()+' cr)';setTimeout(()=>document.getElementById('clipAllProg').classList.remove('vis'),2000);
 }
 
 // ── VID GEN ──
