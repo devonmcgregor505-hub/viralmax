@@ -90,14 +90,17 @@ const sb = createClient(
 );
 const msg = document.getElementById('msg');
 
-// Don't redirect if we just signed out
+// Never auto-redirect if we just signed out
 const justSignedOut = new URLSearchParams(window.location.search).get('signedout');
 if (!justSignedOut) {
-  sb.auth.getSession().then(({ data }) => {
-    if (data.session && data.session.expires_at * 1000 > Date.now()) {
-      window.location.href = '/app';
-    }
-  });
+  // Small delay to let Supabase finish clearing
+  setTimeout(() => {
+    sb.auth.getSession().then(({ data }) => {
+      if (data.session && data.session.expires_at * 1000 > Date.now()) {
+        window.location.href = '/app';
+      }
+    });
+  }, 300);
 }
 
 // Google
