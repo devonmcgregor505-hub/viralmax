@@ -37,11 +37,12 @@ function closeTopUp(e){if(e.target===document.getElementById('topUpModal'))docum
 async function buyCredits(amount, price){
   // TODO: wire to Stripe checkout
   if (!currentUser) { window.location.href = '/login'; return; }
-  const endpoint = amount <= 500 ? '/api/checkout/topup' : '/api/checkout/monthly';
+  const endpoint = [1200,3500,7500].includes(amount) ? '/api/checkout/topup' : '/api/checkout/plan';
   try {
     const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id, 'x-user-email': currentUser.email, 'origin': window.location.origin }
+      headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id, 'x-user-email': currentUser.email, 'origin': window.location.origin },
+      body: JSON.stringify({ amount, plan: [1200,3500,7500].includes(amount) ? undefined : 'pro' })
     });
     const data = await res.json();
     if (data.url) window.location.href = data.url;
