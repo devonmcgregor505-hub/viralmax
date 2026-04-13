@@ -1,13 +1,15 @@
 // ── INIT ──
+// Define logout immediately, before any async code
+async function logout() {
+  if (window._sb) {
+    await window._sb.auth.signOut();
+  }
+  window.location.href = '/login';
+}
+
 (async function() {
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-  // Store globally IMMEDIATELY so logout works any time
   window._sb = sb;
-  window.logout = async function() {
-    await window._sb.auth.signOut();
-    window.location.href = '/login';
-  };
 
   // Check session
   const { data: { session } } = await sb.auth.getSession();
