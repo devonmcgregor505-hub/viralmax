@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Viralmax</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --y: #FFE600; --blk: #050505; --blk2: #0a0a0a;
+  --g1: #1a1a1a; --g2: #222; --g3: #2e2e2e;
+  --tx: #f5f5f0; --tx2: #999; --tx3: #555;
+  --grn: #00E676; --red: #FF3D3D;
+}
+body { font-family: 'Manrope', sans-serif; background: var(--blk); color: var(--tx); min-height: 100vh; padding: 40px 24px; }
+.wrap { max-width: 1100px; margin: 0 auto; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
+.logo { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; color: var(--y); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.logo span { width: 7px; height: 7px; background: var(--y); border-radius: 50%; }
+.badge { background: rgba(255,230,0,0.15); border: 1px solid rgba(255,230,0,0.3); color: var(--y); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px; }
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 32px; }
+.stat { background: var(--blk2); border: 1px solid var(--g2); border-radius: 12px; padding: 20px; }
+.stat-val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 32px; font-weight: 800; color: var(--y); letter-spacing: -1px; }
+.stat-lbl { font-size: 12px; color: var(--tx3); margin-top: 4px; }
+.card { background: var(--blk2); border: 1px solid var(--g2); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+.card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--tx2); text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; }
+.search-row { display: flex; gap: 10px; margin-bottom: 16px; }
+input, select { background: var(--g1); border: 1px solid var(--g2); border-radius: 8px; padding: 10px 14px; color: var(--tx); font-size: 13px; font-family: 'Manrope', sans-serif; outline: none; }
+input:focus, select:focus { border-color: rgba(255,230,0,0.4); }
+input[type=text], input[type=email], input[type=number] { flex: 1; }
+.btn { padding: 10px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all 0.15s; }
+.btn-y { background: var(--y); color: #000; }
+.btn-y:hover { background: #FFF176; }
+.btn-ghost { background: var(--g1); border: 1px solid var(--g2); color: var(--tx2); }
+.btn-ghost:hover { border-color: var(--tx3); color: var(--tx); }
+.btn-red { background: rgba(255,61,61,0.15); border: 1px solid rgba(255,61,61,0.3); color: var(--red); }
+.btn-red:hover { background: rgba(255,61,61,0.25); }
+.btn-grn { background: rgba(0,230,118,0.15); border: 1px solid rgba(0,230,118,0.3); color: var(--grn); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 10px 12px; color: var(--tx3); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--g2); }
+td { padding: 12px; border-bottom: 1px solid var(--g1); color: var(--tx2); vertical-align: middle; }
+tr:hover td { background: var(--g1); }
+.plan-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+.plan-free { background: var(--g2); color: var(--tx3); }
+.plan-starter { background: rgba(0,150,255,0.15); color: #4fc3f7; }
+.plan-pro { background: rgba(255,230,0,0.15); color: var(--y); }
+.plan-studio { background: rgba(0,230,118,0.15); color: var(--grn); }
+.credit-input { width: 80px; background: var(--g1); border: 1px solid var(--g2); border-radius: 6px; padding: 6px 10px; color: var(--tx); font-size: 13px; text-align: center; }
+.msg { font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+.msg.ok { background: rgba(0,230,118,0.1); color: var(--grn); border: 1px solid rgba(0,230,118,0.2); }
+.msg.err { background: rgba(255,61,61,0.1); color: var(--red); border: 1px solid rgba(255,61,61,0.2); }
+#loading { text-align: center; padding: 40px; color: var(--tx3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <a class="logo" href="/app"><span></span>Viralmax <span class="badge" style="margin-left:8px;">ADMIN</span></a>
+    <div style="font-size:12px;color:var(--tx3);" id="adminEmail"></div>
+  </div>
+
+  <div id="authGate" style="display:none;text-align:center;padding:80px;color:var(--red);">
+    <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+    <div style="font-size:18px;font-weight:700;">Access Denied</div>
+    <div style="font-size:13px;color:var(--tx3);margin-top:8px;">This page is restricted.</div>
+  </div>
+
+  <div id="adminContent" style="display:none;">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="statTotal">—</div><div class="stat-lbl">Total Users</div></div>
+      <div class="stat"><div class="stat-val" id="statPaid">—</div><div class="stat-lbl">Paid Users</div></div>
+      <div class="stat"><div class="stat-val" id="statFree">—</div><div class="stat-lbl">Free Users</div></div>
+      <div class="stat"><div class="stat-val" id="statCredits">—</div><div class="stat-lbl">Total Credits Issued</div></div>
+    </div>
+
+    <!-- Quick credit grant -->
+    <div class="card">
+      <div class="card-title">Quick Credit Grant</div>
+      <div class="search-row">
+        <input type="email" id="grantEmail" placeholder="user@example.com">
+        <input type="number" id="grantAmount" placeholder="Credits" style="width:120px;flex:none;" value="500">
+        <select id="grantPlan" style="width:130px;flex:none;">
+          <option value="">Keep plan</option>
+          <option value="free">Free</option>
+          <option value="starter">Starter</option>
+          <option value="pro">Pro</option>
+          <option value="studio">Studio</option>
+        </select>
+        <button class="btn btn-y" onclick="grantCredits()">Grant Credits</button>
+      </div>
+      <div id="grantMsg"></div>
+    </div>
+
+    <!-- Users table -->
+    <div class="card">
+      <div class="card-title">All Users</div>
+      <div class="search-row">
+        <input type="text" id="searchInp" placeholder="Search by email..." oninput="filterUsers()">
+        <select id="filterPlan" onchange="filterUsers()">
+          <option value="">All plans</option>
+          <option value="free">Free</option>
+          <option value="starter">Starter</option>
+          <option value="pro">Pro</option>
+          <option value="studio">Studio</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadUsers()">↺ Refresh</button>
+      </div>
+      <div id="loading">Loading users…</div>
+      <table id="usersTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Plan</th>
+            <th>Credits</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const ADMIN_EMAIL = 'devonmcgregor505@gmail.com';
+const sb = window.supabase.createClient(
+  'https://asvpzsnncbxkpycsgfnj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0'
+);
+
+let allUsers = [];
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session || session.user.email !== ADMIN_EMAIL) {
+    document.getElementById('authGate').style.display = 'block';
+    return;
+  }
+  document.getElementById('adminEmail').textContent = session.user.email;
+  document.getElementById('adminContent').style.display = 'block';
+  loadUsers();
+})();
+
+async function loadUsers() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('usersTable').style.display = 'none';
+
+  const res = await fetch('/api/admin/users', {
+    headers: { 'x-admin-key': 'devonmcgregor505@gmail.com' }
+  });
+  const data = await res.json();
+  if (!data.users) { document.getElementById('loading').textContent = 'Error loading users'; return; }
+
+  allUsers = data.users;
+  renderUsers(allUsers);
+
+  // Stats
+  const paid = allUsers.filter(u => u.plan !== 'free').length;
+  document.getElementById('statTotal').textContent = allUsers.length;
+  document.getElementById('statPaid').textContent = paid;
+  document.getElementById('statFree').textContent = allUsers.length - paid;
+  document.getElementById('statCredits').textContent = allUsers.reduce((s,u) => s + (u.credits||0), 0).toLocaleString();
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '';
+  users.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-family:'Space Mono',monospace;font-size:12px;color:var(--tx);">${u.email || '—'}</td>
+      <td><span class="plan-badge plan-${u.plan||'free'}">${u.plan||'free'}</span></td>
+      <td>
+        <input class="credit-input" type="number" value="${u.credits||0}" id="cr-${u.id}">
+      </td>
+      <td style="font-size:11px;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-grn" style="font-size:11px;padding:6px 10px;" onclick="saveCredits('${u.id}','${u.email}')">Save</button>
+        <select id="plan-${u.id}" style="font-size:11px;padding:6px 8px;">
+          <option value="free" ${u.plan==='free'?'selected':''}>Free</option>
+          <option value="starter" ${u.plan==='starter'?'selected':''}>Starter</option>
+          <option value="pro" ${u.plan==='pro'?'selected':''}>Pro</option>
+          <option value="studio" ${u.plan==='studio'?'selected':''}>Studio</option>
+        </select>
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="savePlan('${u.id}','${u.email}')">Set Plan</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('usersTable').style.display = 'table';
+}
+
+function filterUsers() {
+  const q = document.getElementById('searchInp').value.toLowerCase();
+  const plan = document.getElementById('filterPlan').value;
+  renderUsers(allUsers.filter(u =>
+    (!q || (u.email||'').toLowerCase().includes(q)) &&
+    (!plan || u.plan === plan)
+  ));
+}
+
+async function saveCredits(userId, email) {
+  const credits = parseInt(document.getElementById('cr-'+userId).value);
+  const res = await fetch('/api/admin/set-credits', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': 'devonmcgregor505@gmail.com' },
+    body: JSON.stringify({ userId, credits })
+  });
+  const data = await res.json();
+  if (data.ok) showMsg('grantMsg', `✅ Set ${credits} credits for ${email}`, 'ok');
+  else showMsg('grantMsg', '❌ ' + data.error, 'err');
+}
+
+async function savePlan(userId, email) {
+  const plan = document.getElementById('plan-'+userId).value;
+  const res = await fetch('/api/admin/set-plan', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': 'devonmcgregor505@gmail.com' },
+    body: JSON.stringify({ userId, plan })
+  });
+  const data = await res.json();
+  if (data.ok) showMsg('grantMsg', `✅ Set plan to ${plan} for ${email}`, 'ok');
+  else showMsg('grantMsg', '❌ ' + data.error, 'err');
+}
+
+async function grantCredits() {
+  const email = document.getElementById('grantEmail').value.trim();
+  const amount = parseInt(document.getElementById('grantAmount').value);
+  const plan = document.getElementById('grantPlan').value;
+  if (!email || !amount) { showMsg('grantMsg', '❌ Enter email and amount', 'err'); return; }
+  const res = await fetch('/api/admin/grant-credits', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': 'devonmcgregor505@gmail.com' },
+    body: JSON.stringify({ email, amount, plan })
+  });
+  const data = await res.json();
+  if (data.ok) { showMsg('grantMsg', `✅ Granted ${amount} credits to ${email}`, 'ok'); loadUsers(); }
+  else showMsg('grantMsg', '❌ ' + data.error, 'err');
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text; el.className = 'msg ' + type;
+  setTimeout(() => { el.textContent = ''; el.className = 'msg'; }, 4000);
+}
+</script>
+</body>
+</html>

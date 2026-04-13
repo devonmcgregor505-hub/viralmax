@@ -853,6 +853,56 @@ app.post('/scrape-channel', express.json(), async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════════
 // START
 // ══════════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ADMIN ROUTES
+// ══════════════════════════════════════════════════════════════════════════════
+const ADMIN_EMAIL = 'devonmcgregor505@gmail.com';
+function isAdmin(req) { return req.headers['x-admin-key'] === ADMIN_EMAIL; }
+
+app.get('/api/admin/users', async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  try {
+    const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json({ users: data });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/set-credits', express.json(), async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  const { userId, credits } = req.body;
+  try {
+    const { error } = await supabase.from('users').update({ credits }).eq('id', userId);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/set-plan', express.json(), async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  const { userId, plan } = req.body;
+  try {
+    const { error } = await supabase.from('users').update({ plan }).eq('id', userId);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/grant-credits', express.json(), async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  const { email, amount, plan } = req.body;
+  try {
+    const update = { credits: amount };
+    if (plan) update.plan = plan;
+    const { error } = await supabase.from('users').update(update).eq('email', email);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'pages', 'admin.html')));
+
 app.listen(PORT, () => {
   console.log('\n✅ Viralmax running at http://localhost:' + PORT);
   console.log('   Routes: / (home)  /app (tools)  /login  /signup  /legal  /checkout');
