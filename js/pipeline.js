@@ -334,6 +334,8 @@ function renderImgGrid(){
 }
 async function genSingleImg(idx){
   const scene=pipe.scenes[idx];const model=document.getElementById(`im-${idx}`)?.value||'nano-banana-pro';
+  const cost=getImgCr(model);
+  if(!await requireCredits(cost))return;
   const btn=document.getElementById(`igenb-${idx}`),box=document.getElementById(`ib-${idx}`);
   if(btn){btn.disabled=true;btn.textContent='…'}if(box)box.classList.add('gen');
   try{
@@ -408,6 +410,8 @@ function renderClipGrid(){
 async function genSingleClip(idx){
   const scene=pipe.scenes[idx];const modelVal=document.getElementById(`cm-${idx}`)?.value||'grok';
   const model=modelVal;const quality='480p';
+  const cost=getVidCr(modelVal);
+  if(!await requireCredits(cost))return;
   const btn=document.getElementById(`cgenb-${idx}`),box=document.getElementById(`cb-${idx}`);
   if(btn){btn.disabled=true;btn.textContent='…'}if(box)box.classList.add('gen');
   try{

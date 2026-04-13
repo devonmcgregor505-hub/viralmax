@@ -8,6 +8,9 @@ function onImgModelChange(){onImgResChange()}
 function onImgResChange(){const m=document.getElementById('imgModel').value;document.getElementById('imgCost').textContent=(IMG_CFG[m]?.credits||0)+' cr'}
 
 async function startImgGen(){
+  const model=document.getElementById('imgModel')?.value||'nano-banana-pro';
+  const cost=IMG_CFG[model]?.credits||15;
+  if(!await requireCredits(cost))return;
   const prompt=document.getElementById('imgPrompt').value.trim();if(!prompt){alert('Enter a prompt');return}
   const model=document.getElementById('imgModel').value,asp=document.getElementById('imgAsp').value,res='2K';
   const btn=document.getElementById('imgBtn');btn.disabled=true;btn.textContent='⏳ Generating…';

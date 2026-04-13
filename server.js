@@ -875,6 +875,10 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 
 const PRICE_MONTHLY = 'price_1TKayhAwQgCwolyMcQ5hvM7D';
 const PRICE_TOPUP = 'price_1TKb39AwQgCwolyMEMlMK9yL';
+// Plan price IDs - set real ones in Railway env or reuse existing for testing
+const PRICE_STARTER = process.env.STRIPE_PRICE_STARTER || 'price_1TKayhAwQgCwolyMcQ5hvM7D';
+const PRICE_PRO = process.env.STRIPE_PRICE_PRO || 'price_1TKayhAwQgCwolyMcQ5hvM7D';
+const PRICE_STUDIO = process.env.STRIPE_PRICE_STUDIO || 'price_1TKayhAwQgCwolyMcQ5hvM7D';
 const CREDITS_MONTHLY = 2000;
 const CREDITS_TOPUP = 500;
 

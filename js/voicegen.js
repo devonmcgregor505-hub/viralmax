@@ -337,6 +337,7 @@ function restoreVoicePrefs() {
 function onCloneVoiceChange() { selVoiceId = document.getElementById('cloneVoiceSel').value; const v = loadVoices().find(x => x.id === selVoiceId); selVoiceName = v ? v.name : 'Clone'; updateDelBtn(); }
 
 async function startVoiceGen() {
+  if(!await requireCredits(5))return;
   const script = document.getElementById('voiceScript').value.trim();
   if (!script) { alert('Enter a script'); return; }
   const voiceId = selectedVoiceId;
@@ -378,6 +379,7 @@ async function startVoiceGen() {
 }
 
 async function startCloneGen() {
+  if(!await requireCredits(10))return;
   const script = document.getElementById('voiceScript').value.trim();
   if (!script) { alert('Enter a script'); return; }
   if (!selVoiceId) { alert('Select a voice first'); return; }

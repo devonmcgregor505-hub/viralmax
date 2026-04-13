@@ -20,6 +20,11 @@ function clearVidImg(){selImg=null;document.getElementById('imgFnm').textContent
 function clearRefImg(){selRefImg=null;document.getElementById('refFnm').textContent='';document.getElementById('refDrop').classList.remove('has');document.getElementById('refInp').value='';const btn=document.getElementById('refRemoveBtn');if(btn)btn.style.display='none';}
 
 async function startVidGen(){
+  const model=document.getElementById('vidModel')?.value||'grok';
+  const qual=document.getElementById('vidQual')?.value||'720p';
+  const cfg=MODEL_CFG[model];
+  const cost=cfg?.creditsByQ?.[qual]||cfg?.credits||15;
+  if(!await requireCredits(cost))return;
   const prompt=document.getElementById('vgPrompt').value.trim();if(!prompt){alert('Enter a prompt');return}
   const model=document.getElementById('vidModel').value,cfg=MODEL_CFG[model];
   const dur=document.getElementById('vidDur').value,asp=document.getElementById('vidAsp').value;
