@@ -1102,10 +1102,10 @@ footer {
     Full pipeline from idea to uploaded clip. AI scripts, cloned voice, scene images, and generated video — all in one place.
   </p>
   <div class="hero-ctas">
-    <a class="btn-hero-primary" href="/signup">
+    <a class="btn-hero-primary" href="/signup" data-smart-cta>
       Get started free <span class="arrow">→</span>
     </a>
-    <a class="btn-hero-ghost" href="/app">
+    <a class="btn-hero-ghost" href="/signup" data-smart-cta>
       ▷ &nbsp;See the tools
     </a>
   </div>
@@ -1405,7 +1405,7 @@ footer {
       <p class="cta-sub">The full pipeline is waiting — take 10 minutes and make your first AI Short.</p>
     </div>
     <div class="cta-right">
-      <a class="btn-cta-dark" href="/signup">
+      <a class="btn-cta-dark" href="/signup" data-smart-cta>
         Start for free <span>→</span>
       </a>
     </div>
@@ -1527,6 +1527,29 @@ const statObserver = new IntersectionObserver(entries => {
 }, { threshold: 0.5 });
 
 document.querySelectorAll('.stat-cell').forEach(el => statObserver.observe(el));
+</script>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const sb = createClient(
+  'https://asvpzsnncbxkpycsgfnj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0'
+);
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  const dest = session ? '/app' : '/signup';
+  // Update all CTAs to point to correct destination
+  document.querySelectorAll('[data-smart-cta]').forEach(el => {
+    el.href = dest;
+  });
+  // Update nav CTA
+  const navCta = document.querySelector('.btn-nav-cta');
+  if (navCta) navCta.href = dest;
+  // Update tool cards
+  document.querySelectorAll('a[href^="/app"]').forEach(el => {
+    if (!session) el.href = '/signup';
+  });
+})();
 </script>
 </body>
 </html>

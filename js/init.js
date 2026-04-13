@@ -50,12 +50,12 @@
     }, 500);
   }
 
+  // Store sb globally
+  window._sb = sb;
+
   // Logout handler
   window.logout = async function() {
-    await sb.auth.signOut();
+    await window._sb.auth.signOut();
     window.location.href = '/login';
   };
-
-  // Store sb globally for credit deduction
-  window._sb = sb;
 })();
