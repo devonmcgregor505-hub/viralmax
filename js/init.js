@@ -1,8 +1,13 @@
 // ── INIT ──
 (async function() {
-  // Load Supabase
-  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // Store globally IMMEDIATELY so logout works any time
+  window._sb = sb;
+  window.logout = async function() {
+    await window._sb.auth.signOut();
+    window.location.href = '/login';
+  };
 
   // Check session
   const { data: { session } } = await sb.auth.getSession();
@@ -13,7 +18,7 @@
 
   currentUser = session.user;
 
-  // Show user email in UI
+  // Show user email
   const emailEl = document.getElementById('userEmail');
   if (emailEl) emailEl.textContent = currentUser.email;
 
@@ -49,13 +54,4 @@
       window.history.replaceState({}, '', '/app');
     }, 500);
   }
-
-  // Store sb globally
-  window._sb = sb;
-
-  // Logout handler
-  window.logout = async function() {
-    await window._sb.auth.signOut();
-    window.location.href = '/login';
-  };
 })();
