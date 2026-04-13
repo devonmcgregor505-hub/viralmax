@@ -90,12 +90,15 @@ const sb = createClient(
 );
 const msg = document.getElementById('msg');
 
-// Already logged in → go to app (only if session is fresh/valid)
-sb.auth.getSession().then(({ data }) => {
-  if (data.session && data.session.expires_at * 1000 > Date.now()) {
-    window.location.href = '/app';
-  }
-});
+// Don't redirect if we just signed out
+const justSignedOut = new URLSearchParams(window.location.search).get('signedout');
+if (!justSignedOut) {
+  sb.auth.getSession().then(({ data }) => {
+    if (data.session && data.session.expires_at * 1000 > Date.now()) {
+      window.location.href = '/app';
+    }
+  });
+}
 
 // Google
 document.getElementById('googleBtn').addEventListener('click', async () => {
