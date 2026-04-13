@@ -424,9 +424,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
       <div style="font-size:10px;font-weight:700;color:var(--y);background:rgba(255,230,0,0.15);border:1px solid rgba(255,230,0,0.25);border-radius:5px;padding:3px 8px;">Top Up</div>
     </div>
   </div>
-  <div style="padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);margin-bottom:4px;">
-    <span id="userEmail" style="font-size:10px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;"></span>
-    <button onclick="logout()" style="font-size:10px;color:var(--t3);background:none;border:1px solid var(--bd);border-radius:4px;padding:2px 7px;cursor:pointer;">Log out</button>
+  <div style="padding:4px 16px 8px;">
+    <span id="userEmail" style="font-size:10px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;"></span>
   </div>
 
   <nav class="nav">
@@ -453,7 +452,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="sidebar-footer">
     <a href="/">← Home</a>
     <a href="/legal">Legal</a>
-    <a href="/signup">Upgrade plan</a>
+    <a href="/checkout">Upgrade plan</a>
+    <a href="#" onclick="logout();return false;" style="color:var(--t3);">Sign out</a>
   </div>
 </aside>
 
