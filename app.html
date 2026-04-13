@@ -417,12 +417,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
   <div class="credits-bar" style="cursor:pointer;" onclick="openTopUp()">
     <div>
-      <div class="credits-num" id="creditsDisplay">500</div>
+      <div class="credits-num" id="creditsDisplay">0</div>
       <div class="credits-lbl">Credits</div>
     </div>
     <div style="text-align:right;">
       <div style="font-size:10px;font-weight:700;color:var(--y);background:rgba(255,230,0,0.15);border:1px solid rgba(255,230,0,0.25);border-radius:5px;padding:3px 8px;">Top Up</div>
     </div>
+  </div>
+  <div style="padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);margin-bottom:4px;">
+    <span id="userEmail" style="font-size:10px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;"></span>
+    <button onclick="logout()" style="font-size:10px;color:var(--t3);background:none;border:1px solid var(--bd);border-radius:4px;padding:2px 7px;cursor:pointer;">Log out</button>
   </div>
 
   <nav class="nav">

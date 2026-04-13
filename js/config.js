@@ -10,7 +10,10 @@ const IMG_CFG = {
 };
 
 // ── STATE ──
-let creds = 500;
+let creds = 0;
+let currentUser = null;
+const SUPABASE_URL = 'https://asvpzsnncbxkpycsgfnj.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0';
 let selImg=null, selRefImg=null, selVoiceId=null, selVoiceName=null, pipeVoiceId=null, modalAudioFile=null;
 let lastScrape=[];
 let promptCtx=null;
@@ -22,6 +25,7 @@ let pipe = {
 };
 
 function updCreds(){
+  const tb=document.getElementById('topUpBalance');if(tb)tb.textContent=creds;
   document.getElementById('creditsDisplay').textContent=creds;
   localStorage.setItem('viralmax_credits', creds);
 }
@@ -32,6 +36,48 @@ function openTopUp(){
 function closeTopUp(e){if(e.target===document.getElementById('topUpModal'))document.getElementById('topUpModal').style.display='none';}
 function buyCredits(amount, price){
   // TODO: wire to Stripe checkout
-  alert('Stripe checkout coming soon!\nYou selected: ' + amount + ' credits for $' + price);
+  if (!currentUser) { window.location.href = '/login'; return; }
+  const endpoint = amount <= 500 ? '/api/checkout/topup' : '/api/checkout/monthly';
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id, 'x-user-email': currentUser.email, 'origin': window.location.origin }
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert('Checkout error: ' + (data.error || 'unknown'));
+  } catch(e) { alert('Checkout failed: ' + e.message); }
   document.getElementById('topUpModal').style.display='none';
+}
+
+async function requireCredits(amount) {
+  if (!currentUser) { window.location.href = '/login'; return false; }
+  if (creds < amount) {
+    if (confirm('Not enough credits. You need ' + amount + ' credits but have ' + creds + '.\n\nClick OK to top up.')) {
+      openTopUp();
+    }
+    return false;
+  }
+  // Deduct from server
+  try {
+    const res = await fetch('/api/credits/deduct', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+      body: JSON.stringify({ amount })
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      if (data.error === 'Not enough credits') {
+        if (confirm('Not enough credits.\n\nClick OK to top up.')) openTopUp();
+        return false;
+      }
+      throw new Error(data.error);
+    }
+    creds = data.credits;
+    updCreds();
+    return true;
+  } catch(e) {
+    alert('Credit check failed: ' + e.message);
+    return false;
+  }
 }

@@ -29,16 +29,28 @@ p{color:#888;font-size:14px;margin-bottom:32px}
   <a class="logo" href="/">• Viralmax</a>
   <h1>Upgrade your plan</h1>
   <p>Choose a plan to get more credits</p>
-  <div class="plans">
-    <div class="plan selected" id="plan-monthly" onclick="selectPlan('monthly')">
-      <div class="plan-name">Pro</div>
-      <div class="plan-price">$19<span style="font-size:14px;font-weight:400">/mo</span></div>
-      <div class="plan-desc">2,000 credits/mo</div>
+  <div class="plans" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="plan" id="plan-starter" onclick="selectPlan('starter')">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">$15<span style="font-size:14px;font-weight:400">/mo</span></div>
+      <div class="plan-desc">1,500 credits/mo</div>
     </div>
-    <div class="plan" id="plan-topup" onclick="selectPlan('topup')">
-      <div class="plan-name">Top-up</div>
+    <div class="plan selected" id="plan-pro" onclick="selectPlan('pro')">
+      <div class="plan-name">Pro ⭐</div>
+      <div class="plan-price">$30<span style="font-size:14px;font-weight:400">/mo</span></div>
+      <div class="plan-desc">3,500 credits/mo</div>
+    </div>
+    <div class="plan" id="plan-studio" onclick="selectPlan('studio')">
+      <div class="plan-name">Studio</div>
+      <div class="plan-price">$60<span style="font-size:14px;font-weight:400">/mo</span></div>
+      <div class="plan-desc">9,000 credits/mo</div>
+    </div>
+  </div>
+  <div style="margin-bottom:12px;text-align:center;">
+    <div class="plan" id="plan-topup" onclick="selectPlan('topup')" style="display:inline-block;min-width:200px;margin-top:8px;">
+      <div class="plan-name">One-time Top-up</div>
       <div class="plan-price">$5</div>
-      <div class="plan-desc">500 credits</div>
+      <div class="plan-desc">500 credits, no subscription</div>
     </div>
   </div>
   <button class="btn" id="payBtn" onclick="startCheckout()">Continue to payment →</button>
@@ -47,7 +59,7 @@ p{color:#888;font-size:14px;margin-bottom:32px}
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const sb = createClient('https://asvpzsnncbxkpycsgfnj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0');
 
-let selectedPlan = 'monthly';
+let selectedPlan = 'pro';
 const urlPlan = new URLSearchParams(window.location.search).get('plan');
 if (urlPlan === 'topup') { selectPlan('topup'); }
 

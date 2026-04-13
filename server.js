@@ -896,6 +896,24 @@ app.post('/api/credits/deduct', async (req, res) => {
   res.json({ ok: true, credits: current - amount });
 });
 
+app.post('/api/checkout/plan', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  const userEmail = req.headers['x-user-email'];
+  const { plan } = req.body;
+  const priceMap = { starter: PRICE_STARTER, pro: PRICE_PRO, studio: PRICE_STUDIO };
+  const creditsMap = { starter: 1500, pro: 3500, studio: 9000 };
+  const price = priceMap[plan] || PRICE_PRO;
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card'],
+    line_items: [{ price, quantity: 1 }],
+    success_url: req.headers.origin + '/app?upgraded=1',
+    cancel_url: req.headers.origin + '/checkout',
+    customer_email: userEmail,
+    metadata: { userId, plan, creditsToAdd: String(creditsMap[plan] || 3500) }
+  });
+  res.json({ url: session.url });
+});
 app.post('/api/checkout/monthly', async (req, res) => {
   const userId = req.headers['x-user-id'];
   const userEmail = req.headers['x-user-email'];
@@ -935,7 +953,8 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
     const session = event.data.object;
     const userId = session.metadata?.userId;
     if (userId) {
-      const creditsToAdd = session.mode === 'subscription' ? 2000 : 500;
+      const planCredits = {'price_1TKayhAwQgCwolyMcQ5hvM7D': 3500};
+      const creditsToAdd = session.metadata?.creditsToAdd ? parseInt(session.metadata.creditsToAdd) : session.mode === 'subscription' ? 3500 : 500;
       const { data } = await supabase.from('users').select('credits').eq('id', userId).single();
       const current = data?.credits ?? 0;
       await supabase.from('users').upsert({ id: userId, credits: current + creditsToAdd, plan: session.mode === 'subscription' ? 'pro' : (data?.plan || 'free'), updated_at: new Date().toISOString() });
