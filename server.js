@@ -992,18 +992,28 @@ app.post('/api/checkout/monthly', async (req, res) => {
 });
 
 app.post('/api/checkout/topup', async (req, res) => {
-  const userId = req.headers['x-user-id'];
-  const userEmail = req.headers['x-user-email'];
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    line_items: [{ price: PRICE_TOPUP, quantity: 1 }],
-    success_url: req.headers.origin + '/app?topup=1',
-    cancel_url: req.headers.origin + '/checkout',
-    customer_email: userEmail,
-    metadata: { userId }
-  });
-  res.json({ url: session.url });
+  try {
+    const userId = req.headers['x-user-id'];
+    const userEmail = req.headers['x-user-email'];
+    const origin = req.headers.origin || 'https://viralmax.up.railway.app';
+    const { amount = 1200 } = req.body;
+    const priceMap = { 1200: PRICE_TOPUP, 3500: PRICE_TOPUP_25, 7500: PRICE_TOPUP_50 };
+    const creditsMap = { 1200: 1200, 3500: 3500, 7500: 7500 };
+    const price = priceMap[amount] || PRICE_TOPUP;
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [{ price, quantity: 1 }],
+      success_url: origin + '/app?topup=1',
+      cancel_url: origin + '/checkout',
+      customer_email: userEmail,
+      metadata: { userId, creditsToAdd: String(creditsMap[amount] || 1200) }
+    });
+    res.json({ url: session.url });
+  } catch(err) {
+    console.error('[checkout/topup] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
