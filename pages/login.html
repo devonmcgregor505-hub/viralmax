@@ -90,9 +90,11 @@ const sb = createClient(
 );
 const msg = document.getElementById('msg');
 
-// Already logged in → go to app
+// Already logged in → go to app (only if session is fresh/valid)
 sb.auth.getSession().then(({ data }) => {
-  if (data.session) window.location.href = '/app';
+  if (data.session && data.session.expires_at * 1000 > Date.now()) {
+    window.location.href = '/app';
+  }
 });
 
 // Google
