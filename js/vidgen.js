@@ -1,4 +1,4 @@
-x`// ── VID GEN ──
+// ── VID GEN ──
 function onModelChange(){
   const model=document.getElementById('vidModel').value;const cfg=MODEL_CFG[model];if(!cfg)return;
   const dur=document.getElementById('vidDur');dur.innerHTML='';cfg.durations.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d+'s';if(d===cfg.defaultDur)o.selected=true;dur.appendChild(o)});

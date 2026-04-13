@@ -48,6 +48,16 @@ async function logout() {
   if (hash && document.getElementById('tab-'+hash)) switchTab(hash);
   else switchTab('vidgen');
 
+  // Refresh credits from server every 30 seconds
+  setInterval(async () => {
+    if (!currentUser) return;
+    try {
+      const res = await fetch('/api/credits', { headers: { 'x-user-id': currentUser.id } });
+      const data = await res.json();
+      if (data.credits !== undefined) { creds = data.credits; updCreds(); }
+    } catch(e) {}
+  }, 30000);
+
   // Handle post-payment redirect
   const params = new URLSearchParams(window.location.search);
   if (params.get('upgraded') || params.get('topup')) {
