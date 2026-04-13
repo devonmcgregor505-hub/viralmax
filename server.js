@@ -924,7 +924,9 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
 const PRICE_MONTHLY = 'price_1TKayhAwQgCwolyMcQ5hvM7D';
-const PRICE_TOPUP = 'price_1TKb39AwQgCwolyMEMlMK9yL';
+const PRICE_TOPUP = process.env.STRIPE_PRICE_TOPUP || 'price_1TKb39AwQgCwolyMEMlMK9yL';
+const PRICE_TOPUP_25 = process.env.STRIPE_PRICE_TOPUP_25 || process.env.STRIPE_PRICE_TOPUP || 'price_1TKb39AwQgCwolyMEMlMK9yL';
+const PRICE_TOPUP_50 = process.env.STRIPE_PRICE_TOPUP_50 || process.env.STRIPE_PRICE_TOPUP || 'price_1TKb39AwQgCwolyMEMlMK9yL';
 // Plan price IDs - set real ones in Railway env or reuse existing for testing
 const PRICE_STARTER = process.env.STRIPE_PRICE_STARTER || 'price_1TKayhAwQgCwolyMcQ5hvM7D';
 const PRICE_PRO = process.env.STRIPE_PRICE_PRO || 'price_1TKayhAwQgCwolyMcQ5hvM7D';
