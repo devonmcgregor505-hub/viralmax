@@ -901,7 +901,7 @@ app.post('/api/checkout/plan', async (req, res) => {
   const userEmail = req.headers['x-user-email'];
   const { plan } = req.body;
   const priceMap = { starter: PRICE_STARTER, pro: PRICE_PRO, studio: PRICE_STUDIO };
-  const creditsMap = { starter: 1500, pro: 4000, studio: 10000 };
+  const creditsMap = { starter: 2000, pro: 4500, studio: 10000 };
   const price = priceMap[plan] || PRICE_PRO;
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',

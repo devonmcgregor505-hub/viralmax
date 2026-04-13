@@ -34,7 +34,7 @@ function openTopUp(){
   document.getElementById('topUpModal').style.display='flex';
 }
 function closeTopUp(e){if(e.target===document.getElementById('topUpModal'))document.getElementById('topUpModal').style.display='none';}
-function buyCredits(amount, price){
+async function buyCredits(amount, price){
   // TODO: wire to Stripe checkout
   if (!currentUser) { window.location.href = '/login'; return; }
   const endpoint = amount <= 500 ? '/api/checkout/topup' : '/api/checkout/monthly';
