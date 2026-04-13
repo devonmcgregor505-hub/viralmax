@@ -897,22 +897,30 @@ app.post('/api/credits/deduct', async (req, res) => {
 });
 
 app.post('/api/checkout/plan', async (req, res) => {
-  const userId = req.headers['x-user-id'];
-  const userEmail = req.headers['x-user-email'];
-  const { plan } = req.body;
-  const priceMap = { starter: PRICE_STARTER, pro: PRICE_PRO, studio: PRICE_STUDIO };
-  const creditsMap = { starter: 2000, pro: 4500, studio: 10000 };
-  const price = priceMap[plan] || PRICE_PRO;
-  const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    payment_method_types: ['card'],
-    line_items: [{ price, quantity: 1 }],
-    success_url: req.headers.origin + '/app?upgraded=1',
-    cancel_url: req.headers.origin + '/checkout',
-    customer_email: userEmail,
-    metadata: { userId, plan, creditsToAdd: String(creditsMap[plan] || 3500) }
-  });
-  res.json({ url: session.url });
+  try {
+    const userId = req.headers['x-user-id'];
+    const userEmail = req.headers['x-user-email'];
+    const origin = req.headers.origin || 'https://viralmax.up.railway.app';
+    const { plan } = req.body;
+    console.log('[checkout/plan] plan:', plan, 'userId:', userId, 'email:', userEmail);
+    const priceMap = { starter: PRICE_STARTER, pro: PRICE_PRO, studio: PRICE_STUDIO };
+    const creditsMap = { starter: 2000, pro: 4500, studio: 10000 };
+    const price = priceMap[plan] || PRICE_PRO;
+    if (!price) return res.status(400).json({ error: 'Invalid plan' });
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price, quantity: 1 }],
+      success_url: origin + '/app?upgraded=1',
+      cancel_url: origin + '/checkout',
+      customer_email: userEmail,
+      metadata: { userId, plan, creditsToAdd: String(creditsMap[plan] || 2000) }
+    });
+    res.json({ url: session.url });
+  } catch(err) {
+    console.error('[checkout/plan] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 app.post('/api/checkout/monthly', async (req, res) => {
   const userId = req.headers['x-user-id'];
