@@ -75,6 +75,7 @@ async function requireCredits(amount) {
       throw new Error(data.error);
     }
     creds = data.credits;
+    if(currentUser) localStorage.setItem('vm_credits_' + currentUser.id, creds);
     updCreds();
     return true;
   } catch(e) {

@@ -24,15 +24,19 @@ async function logout() {
   const emailEl = document.getElementById('userEmail');
   if (emailEl) emailEl.textContent = currentUser.email;
 
-  // Fetch real credits from server
+  // Show cached credits instantly, then fetch real value
+  const cachedCreds = localStorage.getItem('vm_credits_' + currentUser.id);
+  if (cachedCreds !== null) { creds = parseInt(cachedCreds); updCreds(); }
+
   try {
     const res = await fetch('/api/credits', {
       headers: { 'x-user-id': currentUser.id }
     });
     const data = await res.json();
     creds = data.credits ?? 0;
+    localStorage.setItem('vm_credits_' + currentUser.id, creds);
   } catch(e) {
-    creds = 0;
+    creds = cachedCreds ? parseInt(cachedCreds) : 0;
   }
 
   // Init UI
