@@ -2,9 +2,10 @@
 // Show cached credits as soon as DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
   try {
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('vm_credits_'));
-    if (keys.length > 0) {
-      const cached = parseInt(localStorage.getItem(keys[0]));
+    // Try generic last-known credits first (no user ID needed)
+    const lastKnown = localStorage.getItem('vm_credits_last');
+    if (lastKnown !== null) {
+      const cached = parseInt(lastKnown);
       if (!isNaN(cached)) {
         creds = cached;
         const el = document.getElementById('creditsDisplay');
@@ -50,6 +51,7 @@ async function logout() {
     const data = await res.json();
     creds = data.credits ?? 0;
     localStorage.setItem('vm_credits_' + currentUser.id, creds);
+    localStorage.setItem('vm_credits_last', creds);
   } catch(e) {
     creds = cachedCreds ? parseInt(cachedCreds) : 0;
   }
