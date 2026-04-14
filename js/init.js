@@ -1,4 +1,19 @@
 // ── INIT ──
+// Show cached credits IMMEDIATELY before any async code runs
+(function() {
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('vm_credits_'));
+    if (keys.length > 0) {
+      const cached = parseInt(localStorage.getItem(keys[0]));
+      if (!isNaN(cached)) {
+        creds = cached;
+        const el = document.getElementById('creditsDisplay');
+        if (el) el.textContent = cached;
+      }
+    }
+  } catch(e) {}
+})();
+
 // Define logout immediately, before any async code
 async function logout() {
   if (window._sb) {
