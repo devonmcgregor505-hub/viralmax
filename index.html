@@ -1532,20 +1532,49 @@ const sb = createClient(
   'https://asvpzsnncbxkpycsgfnj.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0'
 );
+function markPlan(plan) {
+  const planMap = { starter: 'btn-plan-starter', pro: 'btn-plan-pro', studio: 'btn-plan-studio' };
+  Object.entries(planMap).forEach(([p, id]) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    if (p === plan) {
+      btn.textContent = '✓ Current plan';
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.7';
+      btn.style.background = 'rgba(255,230,0,0.1)';
+      btn.style.borderColor = 'rgba(255,230,0,0.4)';
+      btn.style.color = '#FFE600';
+      btn.removeAttribute('href');
+    } else {
+      btn.href = '/checkout';
+    }
+  });
+}
+
+// Show cached plan instantly
+try {
+  const cached = localStorage.getItem('vm_plan_last');
+  if (cached && cached !== 'free') markPlan(cached);
+} catch(e) {}
+
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   const dest = session ? '/app' : '/signup';
-  // Update all CTAs to point to correct destination
-  document.querySelectorAll('[data-smart-cta]').forEach(el => {
-    el.href = dest;
-  });
-  // Update nav CTA
+  document.querySelectorAll('[data-smart-cta]').forEach(el => { el.href = dest; });
   const navCta = document.querySelector('.btn-nav-cta');
-  if (navCta) navCta.href = dest;
-  // Update tool cards
-  document.querySelectorAll('a[href^="/app"]').forEach(el => {
-    if (!session) el.href = '/signup';
-  });
+  if (navCta) { navCta.href = dest; if (session) navCta.textContent = 'Go to app →'; }
+  document.querySelectorAll('a[href^="/app"]').forEach(el => { if (!session) el.href = '/signup'; });
+
+  if (session) {
+    try {
+      const res = await fetch('/api/credits', { headers: { 'x-user-id': session.user.id } });
+      const data = await res.json();
+      if (data.plan && data.plan !== 'free') {
+        localStorage.setItem('vm_plan_last', data.plan);
+        markPlan(data.plan);
+      }
+    } catch(e) {}
+  }
 })();
 </script>
 </body>
