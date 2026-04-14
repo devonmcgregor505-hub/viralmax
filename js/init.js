@@ -58,6 +58,10 @@ async function logout() {
     creds = data.credits ?? 0;
     localStorage.setItem('vm_credits_' + currentUser.id, creds);
     localStorage.setItem('vm_credits_last', creds);
+    if (data.plan) {
+      localStorage.setItem('vm_plan_' + currentUser.id, data.plan);
+      localStorage.setItem('vm_plan_last', data.plan);
+    }
   } catch(e) {
     creds = cachedCreds ? parseInt(cachedCreds) : 0;
   }
