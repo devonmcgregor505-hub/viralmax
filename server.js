@@ -38,6 +38,39 @@ const PORT = process.env.PORT || 3000;
 
 app.use((req, res, next) => { req.setTimeout(0); res.setTimeout(0); next(); });
 app.use(cors());
+app.post('/api/webhook', express.raw({ type: '*/*' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try { event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET); }
+  catch (err) { return res.status(400).send('Webhook error: ' + err.message); }
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const userId = session.metadata?.userId;
+    console.log('[webhook] session completed, userId:', userId, 'metadata:', session.metadata);
+    if (userId) {
+      try {
+        const creditsToAdd = session.metadata?.creditsToAdd ? parseInt(session.metadata.creditsToAdd) : session.mode === 'subscription' ? 3500 : 1200;
+        const planName = session.metadata?.plan || (session.mode === 'subscription' ? 'starter' : null);
+        const { data } = await supabase.from('users').select('credits, plan').eq('id', userId).single();
+        const current = data?.credits ?? 0;
+        const updateObj = { 
+          id: userId, 
+          credits: current + creditsToAdd, 
+          updated_at: new Date().toISOString() 
+        };
+        if (planName) updateObj.plan = planName;
+        console.log('[webhook] updating user:', updateObj);
+        const { error } = await supabase.from('users').upsert(updateObj);
+        if (error) console.error('[webhook] supabase error:', error.message);
+        else console.log('[webhook] success: added', creditsToAdd, 'credits to', userId);
+      } catch(err) {
+        console.error('[webhook] error:', err.message);
+      }
+    }
+  }
+  res.json({ received: true });
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/outputs', express.static('outputs'));
@@ -1018,35 +1051,4 @@ app.post('/api/checkout/topup', async (req, res) => {
   }
 });
 
-app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  let event;
-  try { event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET); }
-  catch (err) { return res.status(400).send('Webhook error: ' + err.message); }
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const userId = session.metadata?.userId;
-    console.log('[webhook] session completed, userId:', userId, 'metadata:', session.metadata);
-    if (userId) {
-      try {
-        const creditsToAdd = session.metadata?.creditsToAdd ? parseInt(session.metadata.creditsToAdd) : session.mode === 'subscription' ? 3500 : 1200;
-        const planName = session.metadata?.plan || (session.mode === 'subscription' ? 'starter' : null);
-        const { data } = await supabase.from('users').select('credits, plan').eq('id', userId).single();
-        const current = data?.credits ?? 0;
-        const updateObj = { 
-          id: userId, 
-          credits: current + creditsToAdd, 
-          updated_at: new Date().toISOString() 
-        };
-        if (planName) updateObj.plan = planName;
-        console.log('[webhook] updating user:', updateObj);
-        const { error } = await supabase.from('users').upsert(updateObj);
-        if (error) console.error('[webhook] supabase error:', error.message);
-        else console.log('[webhook] success: added', creditsToAdd, 'credits to', userId);
-      } catch(err) {
-        console.error('[webhook] error:', err.message);
-      }
-    }
-  }
-  res.json({ received: true });
-});
+
