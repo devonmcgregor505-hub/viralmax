@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
   try { onModelChange(); } catch(e) {}
   try { onImgModelChange(); } catch(e) {}
   try { renderVoiceSel(); } catch(e) {}
+  // Switch to vidgen immediately so UI looks correct before auth completes
+  try { switchTab('vidgen'); } catch(e) {}
 });
 
 // Define logout immediately, before any async code
