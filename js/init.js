@@ -49,8 +49,12 @@ document.addEventListener('DOMContentLoaded', function() {
   try { onModelChange(); } catch(e) {}
   try { onImgModelChange(); } catch(e) {}
   try { renderVoiceSel(); } catch(e) {}
-  // Switch to vidgen immediately so UI looks correct before auth completes
-  try { switchTab('vidgen'); } catch(e) {}
+  // Restore last active tab or default to vidgen
+  try {
+    const lastTab = localStorage.getItem('vm_lastTab') || 'vidgen';
+    const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper'];
+    switchTab(validTabs.includes(lastTab) ? lastTab : 'vidgen');
+  } catch(e) { switchTab('vidgen'); }
 
   // Restore vid dur/asp/qual after onModelChange populates them
   try {

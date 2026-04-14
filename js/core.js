@@ -21,8 +21,8 @@ function switchTab(tab){
   const t=tabMeta[tab]||['Viralmax',''];
   document.getElementById('topTitle').textContent=t[0];
   document.getElementById('topSub').textContent=t[1];
-  
   document.querySelectorAll('.nav-sub-item').forEach((el,i)=>el.classList.toggle('active',tab==='pipeline'&&i===pipe.step));
+  try { localStorage.setItem('vm_lastTab', tab); } catch(e) {}
 }
 
 // ── PIPELINE STEP NAV ──
