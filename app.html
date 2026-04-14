@@ -900,6 +900,7 @@ body{
                 <option value="veo3-lite">Veo 3.1 Lite</option>
                 <option value="sora2" selected>Sora 2 – Best Quality</option>
                 <option value="grok">Grok</option>
+                <option value="sora2-12s">Sora 2 – 12s (ML)</option>
               </select>
             </div>
             <div class="select-row">
@@ -1192,6 +1193,8 @@ function setVidMode(mode){
   document.getElementById('modeText').classList.toggle('active',mode==='text');
   document.getElementById('modeImage').classList.toggle('active',mode==='image');
   document.getElementById('vidImgInput').style.display=mode==='image'?'block':'none';
+  var s12=document.getElementById('vidModel').querySelector('option[value="sora2-12s"]');
+  if(s12){s12.disabled=mode==='image';if(mode==='image'&&document.getElementById('vidModel').value==='sora2-12s')document.getElementById('vidModel').value='sora2';}
 }
 
 // Char counter
