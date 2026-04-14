@@ -1,8 +1,8 @@
 // ── INIT ──
-// Show cached credits as soon as DOM is ready
+// Initialise UI instantly on DOMContentLoaded - no async needed
 document.addEventListener('DOMContentLoaded', function() {
+  // Show cached credits
   try {
-    // Try generic last-known credits first (no user ID needed)
     const lastKnown = localStorage.getItem('vm_credits_last');
     if (lastKnown !== null) {
       const cached = parseInt(lastKnown);
@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   } catch(e) {}
+  // Populate dropdowns immediately
+  try { onModelChange(); } catch(e) {}
+  try { onImgModelChange(); } catch(e) {}
+  try { renderVoiceSel(); } catch(e) {}
 });
 
 // Define logout immediately, before any async code
