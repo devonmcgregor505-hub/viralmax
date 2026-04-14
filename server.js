@@ -46,28 +46,48 @@ app.post('/api/webhook', express.raw({ type: '*/*' }), async (req, res) => {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const userId = session.metadata?.userId;
-    console.log('[webhook] session completed, userId:', userId, 'metadata:', session.metadata);
+    console.log('[webhook] checkout completed, userId:', userId, 'metadata:', session.metadata);
     if (userId) {
       try {
         const creditsToAdd = session.metadata?.creditsToAdd ? parseInt(session.metadata.creditsToAdd) : session.mode === 'subscription' ? 3500 : 1200;
         const planName = session.metadata?.plan || (session.mode === 'subscription' ? 'starter' : null);
         const { data } = await supabase.from('users').select('credits, plan').eq('id', userId).single();
         const current = data?.credits ?? 0;
-        const updateObj = { 
-          id: userId, 
-          credits: current + creditsToAdd, 
-          updated_at: new Date().toISOString() 
-        };
+        const updateObj = { id: userId, credits: current + creditsToAdd, updated_at: new Date().toISOString() };
         if (planName) updateObj.plan = planName;
-        console.log('[webhook] updating user:', updateObj);
+        // Store subscription info for renewal
+        if (session.subscription) updateObj.stripe_subscription_id = session.subscription;
+        if (session.customer) updateObj.stripe_customer_id = session.customer;
         const { error } = await supabase.from('users').upsert(updateObj);
         if (error) console.error('[webhook] supabase error:', error.message);
-        else console.log('[webhook] success: added', creditsToAdd, 'credits to', userId);
-      } catch(err) {
-        console.error('[webhook] error:', err.message);
-      }
+        else console.log('[webhook] checkout success: added', creditsToAdd, 'credits, plan:', planName);
+      } catch(err) { console.error('[webhook] checkout error:', err.message); }
     }
   }
+
+  // Monthly renewal - add credits when subscription renews
+  if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+    // Only process subscription renewals, not initial payments (those are handled by checkout.session.completed)
+    if (invoice.billing_reason === 'subscription_cycle' && invoice.subscription) {
+      try {
+        console.log('[webhook] renewal for subscription:', invoice.subscription);
+        // Find user by stripe_customer_id
+        const { data: userData } = await supabase.from('users').select('id, credits, plan').eq('stripe_customer_id', invoice.customer).single();
+        if (userData) {
+          const planCreditsMap = { starter: 2000, pro: 4500, studio: 10000 };
+          const creditsToAdd = planCreditsMap[userData.plan] || 2000;
+          const { error } = await supabase.from('users').update({ 
+            credits: userData.credits + creditsToAdd,
+            updated_at: new Date().toISOString()
+          }).eq('id', userData.id);
+          if (error) console.error('[webhook] renewal error:', error.message);
+          else console.log('[webhook] renewal success: added', creditsToAdd, 'credits to', userData.id);
+        }
+      } catch(err) { console.error('[webhook] renewal error:', err.message); }
+    }
+  }
+
   res.json({ received: true });
 });
 
@@ -969,9 +989,9 @@ const CREDITS_TOPUP = 500;
 
 app.get('/api/credits', async (req, res) => {
   const userId = req.headers['x-user-id'];
-  if (!userId) return res.json({ credits: 500 });
-  const { data } = await supabase.from('users').select('credits').eq('id', userId).single();
-  res.json({ credits: data?.credits ?? 500 });
+  if (!userId) return res.json({ credits: 0, plan: 'free' });
+  const { data } = await supabase.from('users').select('credits, plan').eq('id', userId).single();
+  res.json({ credits: data?.credits ?? 0, plan: data?.plan || 'free' });
 });
 
 app.post('/api/credits/deduct', async (req, res) => {

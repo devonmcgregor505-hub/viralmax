@@ -56,6 +56,7 @@ body { font-family: 'Manrope', sans-serif; background: var(--blk); color: var(--
     <p>All plans include every tool. Only credits differ.</p>
   </div>
 
+  <div id="currentPlanBanner" style="display:none;"></div>
   <div class="grid">
     <!-- STARTER -->
     <div class="card">
@@ -123,11 +124,46 @@ const sb = window.supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0'
 );
 
-async function startCheckout(plan) {
+let currentUserSession = null;
+
+async function loadCurrentPlan() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '/login'; return; }
+  currentUserSession = session;
 
-  const btns = document.querySelectorAll('.btn');
+  try {
+    const res = await fetch('/api/credits', { headers: { 'x-user-id': session.user.id } });
+    const data = await res.json();
+    const plan = data.plan || 'free';
+    const credits = data.credits || 0;
+
+    // Show current plan banner
+    if (plan !== 'free') {
+      const banner = document.getElementById('currentPlanBanner');
+      if (banner) {
+        banner.style.display = 'block';
+        banner.innerHTML = `<div style="background:rgba(255,230,0,0.1);border:1px solid rgba(255,230,0,0.3);border-radius:10px;padding:14px 20px;text-align:center;margin-bottom:24px;font-size:14px;">
+          ✅ You're on the <strong style="color:var(--y);text-transform:capitalize;">${plan}</strong> plan · <strong style="color:var(--y);">${credits.toLocaleString()}</strong> credits remaining
+        </div>`;
+      }
+    }
+
+    // Mark current plan button
+    const planBtns = { starter: 0, pro: 1, studio: 2 };
+    if (planBtns[plan] !== undefined) {
+      const cards = document.querySelectorAll('.card');
+      if (cards[planBtns[plan]]) {
+        const btn = cards[planBtns[plan]].querySelector('.btn');
+        if (btn) { btn.textContent = '✓ Current plan'; btn.disabled = true; btn.style.opacity = '0.6'; }
+      }
+    }
+  } catch(e) { console.error('Failed to load plan:', e); }
+}
+
+async function startCheckout(plan) {
+  if (!currentUserSession) { window.location.href = '/login'; return; }
+
+  const btns = document.querySelectorAll('.btn:not([disabled])');
   btns.forEach(b => { b.disabled = true; b.textContent = 'Loading…'; });
 
   try {
@@ -135,8 +171,8 @@ async function startCheckout(plan) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': session.user.id,
-        'x-user-email': session.user.email,
+        'x-user-id': currentUserSession.user.id,
+        'x-user-email': currentUserSession.user.email,
         'origin': window.location.origin
       },
       body: JSON.stringify({ plan })
@@ -146,12 +182,11 @@ async function startCheckout(plan) {
     else throw new Error(data.error || 'Checkout failed');
   } catch(e) {
     alert('Error: ' + e.message);
-    btns.forEach((b, i) => {
-      b.disabled = false;
-      b.textContent = ['Get Starter →', 'Get Pro →', 'Get Studio →'][i];
-    });
+    loadCurrentPlan();
   }
 }
+
+loadCurrentPlan();
 </script>
 </body>
 </html>
