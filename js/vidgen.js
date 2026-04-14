@@ -52,3 +52,6 @@ async function startVidGen(){
   }catch(err){clearInterval(tick);document.getElementById('vidErr').classList.add('vis');document.getElementById('vidErrMsg').textContent=err.message}
   btn.disabled=false;btn.textContent='⚡ Generate Video';setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
 }
+
+// Auto-init dropdowns as soon as this script loads
+try { onModelChange(); } catch(e) {}

@@ -29,3 +29,6 @@ async function startImgGen(){
   }catch(err){clearInterval(tick);document.getElementById('imgErr').classList.add('vis');document.getElementById('imgErrMsg').textContent=err.message}
   btn.disabled=false;btn.textContent='🎨 Generate Image';setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
 }
+
+// Auto-init dropdowns as soon as this script loads
+try { onImgModelChange(); } catch(e) {}
