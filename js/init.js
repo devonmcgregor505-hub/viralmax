@@ -90,9 +90,16 @@ async function logout() {
 
   currentUser = session.user;
 
-  // Show user email
+  // Show user info in top nav
+  const email = currentUser.email || '';
   const emailEl = document.getElementById('userEmail');
-  if (emailEl) emailEl.textContent = currentUser.email;
+  if (emailEl) emailEl.textContent = email;
+  const emailShort = document.getElementById('userEmailShort');
+  if (emailShort) emailShort.textContent = email.split('@')[0];
+  const emailFull = document.getElementById('userEmailFull');
+  if (emailFull) emailFull.textContent = email;
+  const avatarEl = document.getElementById('userAvatarInitial');
+  if (avatarEl) avatarEl.textContent = email.charAt(0).toUpperCase();
 
   // Show cached credits instantly, then fetch real value
   const cachedCreds = localStorage.getItem('vm_credits_' + currentUser.id);

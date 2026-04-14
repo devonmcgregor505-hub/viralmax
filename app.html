@@ -5,121 +5,104 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Viralmax — Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 
 :root{
-  --y:#FFE600;--y2:#FFF176;--yd:rgba(255,230,0,0.1);--yg:rgba(255,230,0,0.2);
-  --blk:#060606;--s1:#0d0d0d;--s2:#111;--s3:#161616;--s4:#1c1c1c;--s5:#232323;
-  --bd:#262626;--bd2:#303030;--tx:#f0f0ee;--t2:#888;--t3:#4a4a4a;--t4:#2a2a2a;
-  --grn:#00E676;--red:#FF3D3D;--sidebar:220px;
+  --y:#FFE600;--y2:#FFF176;--yd:rgba(255,230,0,0.08);--yg:rgba(255,230,0,0.15);
+  --blk:#080808;--s1:#0e0e0e;--s2:#141414;--s3:#1a1a1a;--s4:#202020;--s5:#282828;
+  --bd:#1e1e1e;--bd2:#2a2a2a;--tx:#f2f2f0;--t2:#777;--t3:#444;--t4:#252525;
+  --grn:#00E676;--red:#FF3D3D;--topnav:56px;
 }
 
-body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);display:flex}
+body{font-family:'Inter',sans-serif;background:var(--blk);color:var(--tx);display:flex;flex-direction:column;}
 
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--s5);border-radius:3px}
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:var(--sidebar);height:100vh;background:var(--s1);
-  border-right:1px solid var(--bd);display:flex;flex-direction:column;
-  flex-shrink:0;position:relative;z-index:10;
+/* ── TOP NAV ── */
+.topnav{
+  height:var(--topnav);background:var(--s1);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 24px;gap:0;flex-shrink:0;
+  position:relative;z-index:100;width:100%;
 }
+.logo-wrap{display:flex;align-items:center;gap:8px;margin-right:32px;text-decoration:none;}
+.logo-dot{width:7px;height:7px;background:var(--y);border-radius:50%;flex-shrink:0;animation:pulse-dot 2s ease-in-out infinite;}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:0.6}}
+.logo-text{font-weight:800;font-size:18px;letter-spacing:-0.5px;color:var(--y);}
 
-.logo-wrap{
-  padding:18px 16px 14px;border-bottom:1px solid var(--bd);
-  display:flex;align-items:center;gap:8px;
+.nav-tabs{display:flex;align-items:center;gap:2px;flex:1;}
+.nav-tab{
+  display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:8px;
+  font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;
+  transition:all 0.15s;border:none;background:none;
 }
-.logo-text{
-  font-family:'DM Sans',sans-serif;font-weight:800;font-size:20px;
-  letter-spacing:-0.5px;color:var(--y);line-height:1;
-}
-.logo-dot{
-  width:7px;height:7px;background:var(--y);border-radius:50%;flex-shrink:0;
-  animation:pulse-dot 2s ease-in-out infinite;
-}
-@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:0.5}}
-
-.credits-bar{
-  margin:10px 12px;background:var(--yd);border:1px solid rgba(255,230,0,0.15);
-  border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;
-}
-.credits-num{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--y)}
-.credits-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px}
-
-.nav{flex:1;overflow-y:auto;padding:8px}
-.nav-sec-lbl{
-  font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;
-  text-transform:uppercase;color:var(--t3);padding:0 8px;margin:14px 0 4px;display:block;
-}
-.nav-item{
-  display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;
-  font-size:12.5px;font-weight:600;color:var(--t2);cursor:pointer;
-  transition:all 0.15s;border:1px solid transparent;margin-bottom:1px;
-  background:none;width:100%;text-align:left;
-}
-.nav-item:hover{background:var(--s3);color:var(--tx)}
-.nav-item.active{background:var(--yd);border-color:rgba(255,230,0,0.12);color:var(--y)}
-.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nav-tab:hover{color:var(--tx);background:var(--s3);}
+.nav-tab.active{color:var(--y);background:var(--yd);}
+.nav-tab-icon{font-size:14px;}
 .nav-badge{
-  margin-left:auto;font-size:7px;font-weight:800;letter-spacing:0.5px;
-  padding:2px 5px;border-radius:4px;text-transform:uppercase;
-  font-family:'Space Mono',monospace;
+  font-size:7px;font-weight:800;letter-spacing:0.5px;padding:2px 5px;
+  border-radius:4px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;
 }
-.b-live{background:rgba(0,230,118,0.1);color:var(--grn)}
-.b-hot{background:var(--yd);color:var(--y)}
+.b-live{background:rgba(0,230,118,0.1);color:var(--grn);}
+.b-hot{background:var(--yd);color:var(--y);}
 
-.nav-sub{padding-left:6px;border-left:1px solid var(--bd);margin:2px 0 2px 20px}
-.nav-sub-item{
-  display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;
-  font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;
-  transition:all 0.12s;background:none;width:100%;text-align:left;border:none;
-}
-.nav-sub-item:hover{color:var(--t2);background:var(--s3)}
-.nav-sub-item.active{color:var(--y)}
-.sub-dot{width:4px;height:4px;border-radius:50%;background:var(--t4);flex-shrink:0;transition:background 0.15s}
-.nav-sub-item.active .sub-dot{background:var(--y)}
+.nav-divider{width:1px;height:20px;background:var(--bd);margin:0 8px;}
 
-.sidebar-footer{
-  padding:12px;border-top:1px solid var(--bd);
-  display:flex;flex-direction:column;gap:6px;
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.credits-pill{
+  display:flex;align-items:center;gap:7px;background:var(--yd);
+  border:1px solid rgba(255,230,0,0.15);border-radius:8px;
+  padding:6px 12px;cursor:pointer;transition:all 0.15s;
 }
-.sidebar-footer a{
-  display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;
-  font-size:11px;font-weight:600;color:var(--t3);text-decoration:none;transition:all 0.15s;
+.credits-pill:hover{border-color:rgba(255,230,0,0.3);}
+.credits-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--y);}
+.credits-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;}
+.user-menu{position:relative;}
+.user-btn{
+  display:flex;align-items:center;gap:8px;padding:6px 12px;
+  background:var(--s3);border:1px solid var(--bd);border-radius:8px;
+  cursor:pointer;transition:all 0.15s;font-size:12px;color:var(--t2);
 }
-.sidebar-footer a:hover{color:var(--t2);background:var(--s3)}
+.user-btn:hover{border-color:var(--bd2);color:var(--tx);}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:var(--y);color:#000;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.user-dropdown{
+  position:absolute;top:calc(100% + 8px);right:0;background:var(--s2);
+  border:1px solid var(--bd2);border-radius:10px;min-width:180px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);overflow:hidden;display:none;z-index:200;
+}
+.user-dropdown.open{display:block;}
+.user-dropdown a,.user-dropdown button{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;
+  cursor:pointer;transition:background 0.12s;background:none;border:none;
+  width:100%;text-align:left;
+}
+.user-dropdown a:hover,.user-dropdown button:hover{background:var(--s3);color:var(--tx);}
+.user-dropdown-sep{height:1px;background:var(--bd);margin:4px 0;}
+.user-email{padding:10px 14px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--bd);}
 
 /* ── MAIN ── */
-.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+/* hide old sidebar */
+.sidebar{display:none;}
 
-.topbar{
-  height:48px;border-bottom:1px solid var(--bd);display:flex;align-items:center;
-  padding:0 20px;gap:10px;flex-shrink:0;background:var(--s1);
-}
-.topbar-title{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;color:var(--tx);letter-spacing:-0.3px}
-.topbar-sep{color:var(--bd2)}
-.topbar-sub{font-size:11px;color:var(--t3);font-weight:500}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.topbar-pill{
-  font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);
-  background:var(--s3);border:1px solid var(--bd);border-radius:5px;padding:3px 8px;
-}
+.topbar{display:none;}
+.topbar-title,.topbar-sep,.topbar-sub,.topbar-right,.topbar-pill{display:none;}
 
 /* ── PANELS ── */
 .tab-panel{display:none;flex:1;overflow:hidden;min-height:0}
-.tab-panel.active{display:flex;height:calc(100vh - 48px)}
+.tab-panel.active{display:flex;height:calc(100vh - var(--topnav));}
 
 /* ── LAYOUT ── */
 .workspace{flex:1;display:flex;overflow:hidden;height:100%}
 .left-col{
-  width:340px;flex-shrink:0;border-right:1px solid var(--bd);
-  overflow-y:auto;padding:18px;display:flex;flex-direction:column;
-  gap:12px;background:var(--s1);
+  width:360px;flex-shrink:0;border-right:1px solid var(--bd);
+  overflow-y:auto;padding:20px;display:flex;flex-direction:column;
+  gap:14px;background:var(--s1);
 }
 .right-col{
   flex:1;overflow-y:auto;display:flex;flex-direction:column;
@@ -131,7 +114,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
 .inp{
   background:var(--s2);border:1px solid var(--bd);border-radius:8px;
-  padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'DM Sans',sans-serif;
+  padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'Inter',sans-serif;
   width:100%;outline:none;transition:border-color 0.15s;
 }
 .inp:focus{border-color:rgba(255,230,0,0.35)}
@@ -139,7 +122,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
 .ta{
   background:var(--s2);border:1px solid var(--bd);border-radius:8px;
-  padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'DM Sans',sans-serif;
+  padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'Inter',sans-serif;
   width:100%;outline:none;resize:vertical;min-height:80px;
   transition:border-color 0.15s;line-height:1.6;
 }
@@ -148,7 +131,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
 .sel{
   background:var(--s3);border:1px solid var(--bd);color:var(--tx);
-  padding:10px 12px;border-radius:8px;font-size:12.5px;font-family:'DM Sans',sans-serif;
+  padding:10px 12px;border-radius:8px;font-size:12.5px;font-family:'Inter',sans-serif;
   width:100%;outline:none;cursor:pointer;transition:border-color 0.15s;appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23555' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 11px center;padding-right:28px;
@@ -158,7 +141,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 /* ── BUTTONS ── */
 .btn-y{
   width:100%;padding:12px;background:var(--y);color:#000;border:none;border-radius:9px;
-  font-size:13px;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;
+  font-size:13px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;
   letter-spacing:0.2px;transition:all 0.2s;
 }
 .btn-y:hover{background:var(--y2);box-shadow:0 4px 20px rgba(255,230,0,0.25);transform:translateY(-1px)}
@@ -167,13 +150,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .btn-ghost{
   width:100%;padding:10px;background:transparent;color:var(--t2);
   border:1px solid var(--bd2);border-radius:8px;font-size:12px;font-weight:600;
-  font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.15s;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;
 }
 .btn-ghost:hover{border-color:rgba(255,230,0,0.3);color:var(--y);background:var(--yd)}
 
 .btn-sm{
   padding:6px 11px;background:var(--y);color:#000;border:none;border-radius:6px;
-  font-size:10px;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;
+  font-size:10px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;
 }
 .btn-sm:hover{background:var(--y2)}
 .btn-sm:disabled{background:var(--s4);color:var(--t3);cursor:not-allowed}
@@ -182,7 +165,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
 .card-head{
   padding:9px 13px;border-bottom:1px solid var(--bd);
-  font-family:'Space Mono',monospace;font-size:8px;font-weight:700;
+  font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;
   letter-spacing:2px;text-transform:uppercase;color:var(--y);
   display:flex;align-items:center;justify-content:space-between;
 }
@@ -205,15 +188,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .prog{display:none}
 .prog.vis{display:block}
 .prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.prog-lbl{font-size:9px;color:var(--t3);font-family:'Space Mono',monospace}
-.prog-pct{font-size:9px;color:var(--y);font-family:'Space Mono',monospace}
+.prog-lbl{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.prog-pct{font-size:9px;color:var(--y);font-family:'JetBrains Mono',monospace}
 .prog-track{background:var(--s4);border-radius:999px;height:2px;overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--y),var(--y2));border-radius:999px;width:0%;transition:width 0.3s ease;box-shadow:0 0 6px rgba(255,230,0,0.35)}
 
 /* ── ERROR ── */
 .err{background:rgba(255,61,61,0.05);border:1px solid rgba(255,61,61,0.15);border-radius:8px;padding:10px 12px;display:none}
 .err.vis{display:block}
-.err-title{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--red);margin-bottom:3px;font-family:'Space Mono',monospace}
+.err-title{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--red);margin-bottom:3px;font-family:'JetBrains Mono',monospace}
 .err-msg{color:#ff7070;font-size:11px;line-height:1.5}
 
 /* ── INFO STRIP ── */
@@ -235,14 +218,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .phone-empty-icon{font-size:32px}
 .phone-empty-txt{font-size:11px;font-weight:500}
 .phone video,.phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.preview-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-family:'Space Mono',monospace}
+.preview-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace}
 
 /* ── DOWNLOAD BTN ── */
 .dl-btn{
   display:block;width:100%;max-width:293px;padding:10px;background:var(--grn);
   color:#000;border:none;border-radius:8px;font-size:12px;font-weight:800;
   cursor:pointer;text-align:center;text-decoration:none;transition:all 0.2s;
-  font-family:'DM Sans',sans-serif;
+  font-family:'Inter',sans-serif;
 }
 .dl-btn:hover{background:#00ff8a}
 
@@ -250,14 +233,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .slider-grp{display:flex;flex-direction:column;gap:5px}
 .slider-labels{display:flex;justify-content:space-between}
 .slider-end{font-size:9px;color:var(--t3)}
-.slider-val{font-family:'Space Mono',monospace;font-size:9px;color:var(--y);text-align:center}
+.slider-val{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--y);text-align:center}
 .slider{-webkit-appearance:none;width:100%;height:2px;border-radius:2px;background:var(--s5);outline:none;cursor:pointer}
 .slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--y);cursor:pointer;box-shadow:0 0 5px rgba(255,230,0,0.35)}
 
 /* ── SETTING ROW ── */
 .s-row{display:flex;flex-direction:column;gap:4px}
 .s-lbl{font-size:11px;font-weight:600;color:var(--t2)}
-.s-val{font-family:'Space Mono',monospace;font-size:11px;color:var(--y)}
+.s-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--y)}
 
 /* ── PIPELINE ── */
 .pipe-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -280,7 +263,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .step-num{
   width:18px;height:18px;border-radius:50%;background:var(--s4);font-size:8px;
   font-weight:800;display:flex;align-items:center;justify-content:center;
-  font-family:'Space Mono',monospace;flex-shrink:0;
+  font-family:'JetBrains Mono',monospace;flex-shrink:0;
 }
 .step-btn.active .step-num{background:var(--y);color:#000}
 .step-div{color:var(--bd2);font-size:9px;padding:0 2px;flex-shrink:0}
@@ -296,7 +279,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 }
 .idea-card:hover{border-color:rgba(255,230,0,0.2);background:var(--s3)}
 .idea-card.sel{border-color:var(--y);background:rgba(255,230,0,0.03)}
-.idea-num{font-family:'Space Mono',monospace;font-size:9px;color:var(--y);flex-shrink:0;margin-top:2px}
+.idea-num{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--y);flex-shrink:0;margin-top:2px}
 .idea-txt{font-size:13px;font-weight:500;color:var(--tx);line-height:1.5;flex:1}
 .idea-chk{width:18px;height:18px;border-radius:50%;background:var(--y);color:#000;font-size:10px;display:none;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
 .idea-card.sel .idea-chk{display:flex}
@@ -311,7 +294,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .scene-card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:8px;transition:border-color 0.15s}
 .scene-card:hover{border-color:var(--bd2)}
 .scene-head{padding:9px 13px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--s3)}
-.scene-badge{font-family:'Space Mono',monospace;font-size:9px;font-weight:500;color:var(--y);background:var(--yd);border:1px solid rgba(255,230,0,0.12);border-radius:4px;padding:2px 7px}
+.scene-badge{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;color:var(--y);background:var(--yd);border:1px solid rgba(255,230,0,0.12);border-radius:4px;padding:2px 7px}
 .scene-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:3px 6px;border-radius:4px;transition:all 0.12s}
 .scene-del:hover{color:var(--red);background:rgba(255,61,61,0.08)}
 .scene-body{padding:12px;display:flex;flex-direction:column;gap:8px}
@@ -332,7 +315,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .img-box img.loaded{display:block}
 .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--t3);font-size:9px}
 .img-ph-icon{font-size:18px}
-.img-cell-lbl{font-size:8px;color:var(--t3);font-family:'Space Mono',monospace}
+.img-cell-lbl{font-size:8px;color:var(--t3);font-family:'JetBrains Mono',monospace}
 .img-cell-acts{display:flex;gap:3px}
 .btn-tiny{flex:1;padding:4px 5px;font-size:8px;font-weight:700;border-radius:4px;border:1px solid var(--bd);background:var(--s3);color:var(--t3);cursor:pointer;transition:all 0.12s;text-align:center}
 .btn-tiny:hover{border-color:rgba(255,230,0,0.3);color:var(--y)}
@@ -360,7 +343,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .vo-card:hover{border-color:var(--bd2)}
 .vo-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .vo-preview{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.vo-meta{font-size:9px;color:var(--t3);margin-top:1px;font-family:'Space Mono',monospace}
+.vo-meta{font-size:9px;color:var(--t3);margin-top:1px;font-family:'JetBrains Mono',monospace}
 .vo-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;flex-shrink:0;transition:color 0.12s}
 .vo-del:hover{color:var(--red)}
 .vo-audio{width:100%;height:28px;accent-color:var(--y)}
@@ -368,13 +351,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .vo-dl:hover{background:var(--grn);color:#000;border-color:var(--grn)}
 
 /* ── ADD VOICE MODAL ── */
-.add-voice-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;background:var(--s3);border:1.5px dashed var(--bd2);border-radius:8px;color:var(--t3);font-size:11.5px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.add-voice-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;background:var(--s3);border:1.5px dashed var(--bd2);border-radius:8px;color:var(--t3);font-size:11.5px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif}
 .add-voice-btn:hover{border-color:rgba(255,230,0,0.3);color:var(--y);background:var(--yd)}
 
 /* ── SCRAPER ── */
 .scraper-results{width:100%;max-width:500px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
 .scraper-head{padding:11px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--s3)}
-.scraper-head-title{font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--y)}
+.scraper-head-title{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--y)}
 .scraper-list{max-height:460px;overflow-y:auto}
 .scraper-item{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;gap:9px;align-items:flex-start;transition:background 0.12s}
 .scraper-item:hover{background:var(--s3)}
@@ -382,17 +365,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .scraper-thumb{width:46px;height:46px;object-fit:cover;border-radius:5px;flex-shrink:0;background:var(--s4)}
 .scraper-info{flex:1;min-width:0}
 .scraper-title{font-size:11px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-.scraper-meta{font-size:9px;color:var(--t3);font-family:'Space Mono',monospace}
+.scraper-meta{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace}
 .scraper-link{font-size:9px;color:var(--y);text-decoration:none;display:inline-block;margin-top:2px}
 
 /* ── MODALS ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center}
 .modal{background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:20px;width:360px;display:flex;flex-direction:column;gap:13px;box-shadow:0 20px 50px rgba(0,0,0,0.6)}
-.modal-title{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.5px;color:var(--y)}
+.modal-title{font-family:'Inter',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.5px;color:var(--y)}
 .modal-btns{display:flex;gap:7px}
-.modal-cancel{flex:1;padding:10px;background:var(--s4);border:1px solid var(--bd);border-radius:8px;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.modal-cancel{flex:1;padding:10px;background:var(--s4);border:1px solid var(--bd);border-radius:8px;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
 .modal-cancel:hover{border-color:var(--bd2);color:var(--tx)}
-.modal-save{flex:1;padding:10px;background:var(--y);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.modal-save{flex:1;padding:10px;background:var(--y);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
 .modal-save:hover{background:var(--y2)}
 
 .prompt-modal{background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:20px;width:540px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;gap:13px;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.6)}
@@ -403,64 +386,68 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 .empty-txt{font-size:12px;font-weight:500;line-height:1.6}
 
 /* ── CHAR COUNT ── */
-.char-count{font-size:10px;color:var(--t3);font-family:'Space Mono',monospace}
+.char-count{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace}
 </style>
 </head>
 <body>
 
-<!-- ═══ SIDEBAR ═══ -->
-<aside class="sidebar">
-  <div class="logo-wrap">
+<!-- hidden legacy elements for JS compat -->
+<aside class="sidebar" style="display:none;">
+  <button class="nav-item" id="nav-pipeline"></button>
+  <button class="nav-item" id="nav-vidgen"></button>
+  <button class="nav-item" id="nav-imggen"></button>
+  <button class="nav-item" id="nav-voicegen"></button>
+  <button class="nav-item" id="nav-deadspace"></button>
+  <button class="nav-item" id="nav-scraper"></button>
+  <span id="userEmail"></span>
+</aside>
+
+<!-- ═══ TOP NAV ═══ -->
+<nav class="topnav">
+  <a class="logo-wrap" href="/">
     <div class="logo-dot"></div>
     <div class="logo-text">Viralmax</div>
+  </a>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="navtab-vidgen" onclick="switchTab('vidgen')"><span class="nav-tab-icon">🎬</span>Vid Gen</button>
+    <button class="nav-tab" id="navtab-imggen" onclick="switchTab('imggen')"><span class="nav-tab-icon">🖼</span>Image Gen</button>
+    <button class="nav-tab" id="navtab-voicegen" onclick="switchTab('voicegen')"><span class="nav-tab-icon">🎙</span>Voice Gen</button>
+    <div class="nav-divider"></div>
+    <button class="nav-tab" id="navtab-deadspace" onclick="switchTab('deadspace')"><span class="nav-tab-icon">✂️</span>Silence Remover</button>
+    <button class="nav-tab" id="navtab-scraper" onclick="switchTab('scraper')"><span class="nav-tab-icon">📊</span>YT Scraper</button>
   </div>
 
-  <div class="credits-bar" style="cursor:pointer;" onclick="openTopUp()">
-    <div>
-      <div class="credits-num" id="creditsDisplay"><script>document.write(localStorage.getItem('vm_credits_last')||'0')</script></div>
-      <div class="credits-lbl">Credits</div>
+  <div class="nav-right">
+    <div class="credits-pill" onclick="openTopUp()">
+      <div>
+        <div class="credits-num" id="creditsDisplay"><script>document.write(localStorage.getItem('vm_credits_last')||'0')</script></div>
+        <div class="credits-lbl">Credits</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:var(--y);background:rgba(255,230,0,0.1);border:1px solid rgba(255,230,0,0.2);border-radius:5px;padding:3px 8px;">Top Up</div>
     </div>
-    <div style="text-align:right;">
-      <div style="font-size:10px;font-weight:700;color:var(--y);background:rgba(255,230,0,0.15);border:1px solid rgba(255,230,0,0.25);border-radius:5px;padding:3px 8px;">Top Up</div>
+    <div class="user-menu">
+      <div class="user-btn" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="userAvatarInitial">?</div>
+        <span style="font-size:11px;" id="userEmailShort"></span>
+        <span style="font-size:9px;color:var(--t3);">▼</span>
+      </div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-email" id="userEmailFull"></div>
+        <a href="/checkout">⬆ Upgrade plan</a>
+        <a href="#" onclick="openPortal();return false;">⚙ Manage billing</a>
+        <a href="/legal">Legal</a>
+        <a href="/">← Home</a>
+        <div class="user-dropdown-sep"></div>
+        <button onclick="logout()">Sign out</button>
+      </div>
     </div>
   </div>
-  <div style="padding:4px 16px 8px;">
-    <span id="userEmail" style="font-size:10px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;"></span>
-  </div>
-
-  <nav class="nav">
-    
-    <button class="nav-item" id="nav-pipeline" onclick="switchTab('pipeline')" style="display:none;">
-      <span class="nav-icon">⚡</span>Automation<span class="nav-badge b-hot">HOT</span>
-    </button>
-    <div class="nav-sub" id="pipe-sub" style="display:none;">
-      <button class="nav-sub-item active" onclick="goPipeStep(0);switchTab('pipeline')" style="display:none;"><span class="sub-dot"></span>Scenes</button>
-      <button class="nav-sub-item" onclick="goPipeStep(1);switchTab('pipeline');renderImgGrid();setTimeout(updateImgAllCost,100)" style="display:none;"><span class="sub-dot"></span>Images</button>
-      <button class="nav-sub-item" onclick="goPipeStep(2);switchTab('pipeline');renderClipGrid();setTimeout(updateClipAllCost,100)" style="display:none;"><span class="sub-dot"></span>Videos</button>
-    </div>
-
-    <span class="nav-sec-lbl">Generation</span>
-    <button class="nav-item active" id="nav-vidgen" onclick="switchTab('vidgen')"><span class="nav-icon">🎬</span>Vid Gen<span class="nav-badge b-live">LIVE</span></button>
-    <button class="nav-item" id="nav-imggen" onclick="switchTab('imggen')"><span class="nav-icon">🖼</span>Image Gen<span class="nav-badge b-live">LIVE</span></button>
-    <button class="nav-item" id="nav-voicegen" onclick="switchTab('voicegen')"><span class="nav-icon">🎙</span>Voice Gen<span class="nav-badge b-live">LIVE</span></button>
-
-    <span class="nav-sec-lbl">Tools</span>
-    <button class="nav-item" id="nav-deadspace" onclick="switchTab('deadspace')"><span class="nav-icon">✂️</span>Silence Remover<span class="nav-badge b-live">LIVE</span></button>
-    <button class="nav-item" id="nav-scraper" onclick="switchTab('scraper')"><span class="nav-icon">📊</span>YT Scraper<span class="nav-badge b-live">LIVE</span></button>
-  </nav>
-
-  <div class="sidebar-footer">
-    <a href="/">← Home</a>
-    <a href="/legal">Legal</a>
-    <a href="/checkout">Upgrade plan</a>
-    <a href="#" onclick="openPortal();return false;">Manage billing</a>
-    <a href="#" onclick="logout();return false;" style="color:var(--t3);">Sign out</a>
-  </div>
-</aside>
+</nav>
 
 <!-- ═══ MAIN ═══ -->
 <div class="main">
-  <div class="topbar">
+  <div class="topbar" style="display:none;">
     <div class="topbar-title" id="topTitle">Video Gen</div>
     <span class="topbar-sep" id="topSep">—</span>
     <div class="topbar-sub" id="topSub">AI video generation</div>
@@ -473,34 +460,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="tab-panel" id="tab-pipeline">
   <div id="niche-picker" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:40px;background:var(--blk);">
     <div style="text-align:center;">
-      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:12px;">Step 0</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--tx);margin-bottom:8px;">Choose your niche</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:12px;">Step 0</div>
+      <div style="font-family:'Inter',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--tx);margin-bottom:8px;">Choose your niche</div>
       <div style="font-size:14px;color:var(--t2);">Select a content type to start the automation pipeline</div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:700px;width:100%;">
       <div onclick="selectNichePick('Skeleton')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s2)'">
         <div style="font-size:40px;margin-bottom:12px;">💀</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Skeleton</div>
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Skeleton</div>
         <div style="font-size:11px;color:var(--t3);line-height:1.5;">Full 7-step pipeline for skeleton content</div>
-        <div style="margin-top:14px;display:inline-block;background:var(--y);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'Space Mono',monospace;">LIVE</div>
+        <div style="margin-top:14px;display:inline-block;background:var(--y);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">LIVE</div>
       </div>
       <div onclick="selectNichePick('Ronaldo')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;opacity:0.6;" onmouseover="this.style.borderColor='var(--bd2)'" onmouseout="this.style.borderColor='var(--bd)'">
         <div style="font-size:40px;margin-bottom:12px;">⚽</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Ronaldo Adventures</div>
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Ronaldo Adventures</div>
         <div style="font-size:11px;color:var(--t3);line-height:1.5;">Automated Ronaldo content pipeline</div>
-        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'Space Mono',monospace;">COMING SOON</div>
+        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">COMING SOON</div>
       </div>
       <div onclick="suggestNiche()" style="background:var(--s2);border:1.5px dashed var(--bd2);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.background='var(--s2)'">
         <div style="font-size:40px;margin-bottom:12px;">💡</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--t2);margin-bottom:6px;">Suggest a Niche</div>
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--t2);margin-bottom:6px;">Suggest a Niche</div>
         <div style="font-size:11px;color:var(--t3);line-height:1.5;">Tell us what you want next</div>
-        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'Space Mono',monospace;">REQUEST</div>
+        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">REQUEST</div>
       </div>
     </div>
   </div>
   <div id="pipeline-content" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
     <div class="pipe-wrap">
-      <div class="step-nav" style="position:relative;"><button onclick="changeNiche()" style="margin-right:8px;padding:6px 14px;background:var(--s3);border:1px solid var(--bd2);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.color='var(--y)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t2)'">← Change Niche</button>
+      <div class="step-nav" style="position:relative;"><button onclick="changeNiche()" style="margin-right:8px;padding:6px 14px;background:var(--s3);border:1px solid var(--bd2);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.color='var(--y)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t2)'">← Change Niche</button>
         <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Scenes</button>
         <span class="step-div">›</span>
         <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1);renderImgGrid();setTimeout(updateImgAllCost,100)"><span class="step-num">2</span>Images</button>
@@ -654,7 +641,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
             <!-- DEFAULT VOICES -->
             <div class="s-row">
               <label class="s-lbl">Default Voices</label>
-              <button onclick="openVoicePicker()" style="width:100%;background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.35)'" onmouseout="this.style.borderColor='var(--bd)'">
+              <button onclick="openVoicePicker()" style="width:100%;background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'Inter',sans-serif;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.35)'" onmouseout="this.style.borderColor='var(--bd)'">
                 <span id="selectedVoiceLabel">Rachel</span>
                 <span style="color:var(--t3);font-size:10px;">▼ Browse</span>
               </button>
@@ -801,7 +788,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     <!-- Header -->
     <div style="padding:22px 24px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
         <button onclick="document.getElementById('voicePickerModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:13px;padding:5px 10px;cursor:pointer;">✕</button>
       </div>
       <!-- Search -->
@@ -844,7 +831,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 <!-- CUSTOM VOICE NAME MODAL -->
 <div class="overlay" id="customVoiceNameModal" style="display:none;" onclick="event.stopPropagation()">
   <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
-    <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
+    <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
     <div><label class="fl">Voice Name</label><input class="inp" id="customVoiceNameInp" placeholder="e.g. My Deep Voice"></div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="document.getElementById('customVoiceNameModal').style.display='none'">Cancel</button>
@@ -859,7 +846,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     <!-- Header -->
     <div style="padding:22px 24px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
         <button onclick="document.getElementById('voicePickerModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:13px;padding:5px 10px;cursor:pointer;">✕</button>
       </div>
       <!-- Search -->
@@ -902,7 +889,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 <!-- CUSTOM VOICE NAME MODAL -->
 <div class="overlay" id="customVoiceNameModal" style="display:none;" onclick="event.stopPropagation()">
   <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
-    <div style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
+    <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
     <div><label class="fl">Voice Name</label><input class="inp" id="customVoiceNameInp" placeholder="e.g. My Deep Voice"></div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="document.getElementById('customVoiceNameModal').style.display='none'">Cancel</button>
@@ -915,27 +902,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:18px;padding:32px;width:480px;max-width:95vw;display:flex;flex-direction:column;gap:24px;box-shadow:0 24px 60px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;color:var(--y);letter-spacing:-0.5px;">Top Up Credits</div>
+        <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:var(--y);letter-spacing:-0.5px;">Top Up Credits</div>
         <div style="font-size:12px;color:var(--t3);margin-top:3px;">Current balance: <span id="topUpBalance" style="color:var(--y);font-weight:700;">500</span> credits</div>
       </div>
       <button onclick="document.getElementById('topUpModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:14px;padding:6px 10px;cursor:pointer;">✕</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
       <div onclick="buyCredits(1200,10)" style="background:var(--s3);border:1px solid var(--bd);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s3)'">
-        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'DM Sans',sans-serif;letter-spacing:-1px;">1200</div>
+        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'Inter',sans-serif;letter-spacing:-1px;">1200</div>
         <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
-        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'DM Sans',sans-serif;">$10.00</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'Inter',sans-serif;">$10.00</div>
       </div>
       <div onclick="buyCredits(3500,25)" style="background:var(--s3);border:2px solid rgba(255,230,0,0.35);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;" onmouseover="this.style.borderColor='rgba(255,230,0,0.6)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='rgba(255,230,0,0.35)';this.style.background='var(--s3)'">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;font-size:8px;font-weight:800;padding:2px 8px;border-radius:4px;font-family:'DM Sans',sans-serif;white-space:nowrap;">BEST VALUE</div>
-        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'DM Sans',sans-serif;letter-spacing:-1px;">3500</div>
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;font-size:8px;font-weight:800;padding:2px 8px;border-radius:4px;font-family:'Inter',sans-serif;white-space:nowrap;">BEST VALUE</div>
+        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'Inter',sans-serif;letter-spacing:-1px;">3500</div>
         <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
-        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'DM Sans',sans-serif;">$25.00</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'Inter',sans-serif;">$25.00</div>
       </div>
       <div onclick="buyCredits(7500,50)" style="background:var(--s3);border:1px solid var(--bd);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s3)'">
-        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'DM Sans',sans-serif;letter-spacing:-1px;">7500</div>
+        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'Inter',sans-serif;letter-spacing:-1px;">7500</div>
         <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
-        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'DM Sans',sans-serif;">$50.00</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'Inter',sans-serif;">$50.00</div>
       </div>
     </div>
     <div style="font-size:11px;color:var(--t3);text-align:center;">Payments processed securely by Stripe · Credits never expire</div>

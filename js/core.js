@@ -15,15 +15,29 @@ const tabMeta={
 
 function switchTab(tab){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.nav-item,.nav-tab').forEach(n=>n.classList.remove('active'));
+  const panel=document.getElementById('tab-'+tab);if(panel)panel.classList.add('active');
   const el=document.getElementById('nav-'+tab);if(el)el.classList.add('active');
+  const navtab=document.getElementById('navtab-'+tab);if(navtab)navtab.classList.add('active');
   const t=tabMeta[tab]||['Viralmax',''];
-  document.getElementById('topTitle').textContent=t[0];
-  document.getElementById('topSub').textContent=t[1];
+  const tt=document.getElementById('topTitle');if(tt)tt.textContent=t[0];
+  const ts=document.getElementById('topSub');if(ts)ts.textContent=t[1];
   document.querySelectorAll('.nav-sub-item').forEach((el,i)=>el.classList.toggle('active',tab==='pipeline'&&i===pipe.step));
   try { localStorage.setItem('vm_lastTab', tab); } catch(e) {}
+  // close user menu if open
+  const dd=document.getElementById('userDropdown');if(dd)dd.classList.remove('open');
 }
+function toggleUserMenu(){
+  const dd=document.getElementById('userDropdown');
+  if(dd)dd.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  const menu=document.querySelector('.user-menu');
+  if(menu&&!menu.contains(e.target)){
+    const dd=document.getElementById('userDropdown');
+    if(dd)dd.classList.remove('open');
+  }
+});
 
 // ── PIPELINE STEP NAV ──
 function goPipeStep(step){
