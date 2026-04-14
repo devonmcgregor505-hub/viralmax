@@ -45,18 +45,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   } catch(e) {}
 
+  // Restore last tab FIRST before anything else
+  try {
+    const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper'];
+    const lastTab = localStorage.getItem('vm_lastTab') || 'vidgen';
+    switchTab(validTabs.includes(lastTab) ? lastTab : 'vidgen');
+  } catch(e) { try { switchTab('vidgen'); } catch(e2) {} }
   // Populate dropdowns immediately (uses restored model value)
   try { onModelChange(); } catch(e) {}
   try { onImgModelChange(); } catch(e) {}
   try { renderVoiceSel(); } catch(e) {}
-  // Restore tab from URL hash, then localStorage, then default vidgen
-  try {
-    const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper'];
-    const hash = window.location.hash.replace('#','');
-    const lastTab = localStorage.getItem('vm_lastTab') || 'vidgen';
-    const tab = validTabs.includes(hash) ? hash : validTabs.includes(lastTab) ? lastTab : 'vidgen';
-    switchTab(tab);
-  } catch(e) { switchTab('vidgen'); }
 
   // Restore vid dur/asp/qual after onModelChange populates them
   try {
