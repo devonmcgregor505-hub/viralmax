@@ -84,3 +84,16 @@ async function requireCredits(amount) {
     return false;
   }
 }
+
+async function openPortal() {
+  if (!currentUser) { window.location.href = '/login'; return; }
+  try {
+    const res = await fetch('/api/portal', {
+      method: 'POST',
+      headers: { 'x-user-id': currentUser.id, 'origin': window.location.origin }
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert('Error: ' + (data.error || 'Could not open billing portal'));
+  } catch(e) { alert('Failed to open portal: ' + e.message); }
+}

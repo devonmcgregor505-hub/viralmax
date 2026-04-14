@@ -956,6 +956,27 @@ app.post('/api/admin/grant-credits', express.json(), async (req, res) => {
 
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'pages', 'admin.html')));
 
+app.post('/api/portal', async (req, res) => {
+  try {
+    const userId = req.headers['x-user-id'];
+    const origin = req.headers.origin || 'https://viralmax.up.railway.app';
+    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+
+    // Get customer ID from supabase
+    const { data } = await supabase.from('users').select('stripe_customer_id').eq('id', userId).single();
+    if (!data?.stripe_customer_id) return res.status(400).json({ error: 'No subscription found. Please purchase a plan first.' });
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: data.stripe_customer_id,
+      return_url: origin + '/app',
+    });
+    res.json({ url: session.url });
+  } catch(err) {
+    console.error('[portal] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log('\n✅ Viralmax running at http://localhost:' + PORT);
   console.log('   Routes: / (home)  /app (tools)  /login  /signup  /legal  /checkout');

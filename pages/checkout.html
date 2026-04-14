@@ -114,6 +114,9 @@ body { font-family: 'Manrope', sans-serif; background: var(--blk); color: var(--
   </div>
 
   <div class="footer-note">Cancel anytime · Payments by Stripe · Credits never expire</div>
+  <div style="text-align:center;margin-top:16px;">
+    <button onclick="openManageBilling()" style="background:none;border:1px solid #333;color:#666;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">⚙️ Manage subscription & billing</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -189,8 +192,40 @@ async function startCheckout(plan) {
     else throw new Error(data.error || 'Checkout failed');
   } catch(e) {
     alert('Error: ' + e.message);
-    loadCurrentPlan();
+    async function openManageBilling() {
+  if (!currentUserSession) { window.location.href = '/login'; return; }
+  try {
+    const btn = document.querySelector('[onclick="openManageBilling()"]');
+    if (btn) btn.textContent = 'Loading…';
+    const res = await fetch('/api/portal', {
+      method: 'POST',
+      headers: { 'x-user-id': currentUserSession.user.id, 'origin': window.location.origin }
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert('Error: ' + (data.error || 'No subscription found'));
+    if (btn) btn.textContent = '⚙️ Manage subscription & billing';
+  } catch(e) { alert('Failed: ' + e.message); }
+}
+
+loadCurrentPlan();
   }
+}
+
+async function openManageBilling() {
+  if (!currentUserSession) { window.location.href = '/login'; return; }
+  try {
+    const btn = document.querySelector('[onclick="openManageBilling()"]');
+    if (btn) btn.textContent = 'Loading…';
+    const res = await fetch('/api/portal', {
+      method: 'POST',
+      headers: { 'x-user-id': currentUserSession.user.id, 'origin': window.location.origin }
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert('Error: ' + (data.error || 'No subscription found'));
+    if (btn) btn.textContent = '⚙️ Manage subscription & billing';
+  } catch(e) { alert('Failed: ' + e.message); }
 }
 
 loadCurrentPlan();
