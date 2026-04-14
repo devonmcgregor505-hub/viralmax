@@ -27,11 +27,20 @@ function toggleUserMenu(){
   const dd=document.getElementById('userDropdown');
   if(dd)dd.classList.toggle('open');
 }
+function toggleTopbarMenu(){
+  const dd=document.getElementById('topbarDropdown');
+  if(dd)dd.classList.toggle('open');
+}
 document.addEventListener('click',function(e){
   const area=document.querySelector('.sidebar-user');
   if(area&&!area.contains(e.target)){
     const dd=document.getElementById('userDropdown');
     if(dd)dd.classList.remove('open');
+  }
+  const tarea=document.getElementById('topbarAvatar');
+  if(tarea&&!tarea.contains(e.target)){
+    const tdd=document.getElementById('topbarDropdown');
+    if(tdd)tdd.classList.remove('open');
   }
 });
 

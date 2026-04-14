@@ -100,6 +100,16 @@ async function logout() {
   if (emailFull) emailFull.textContent = email;
   const avatarEl = document.getElementById('userAvatarInitial');
   if (avatarEl) avatarEl.textContent = email.charAt(0).toUpperCase();
+  // Topbar avatar letter + dropdown email
+  const topLetter = document.getElementById('topbarAvatarLetter');
+  if (topLetter) topLetter.textContent = email.charAt(0).toUpperCase();
+  const topEmail = document.getElementById('topbarEmailFull');
+  if (topEmail) topEmail.textContent = email;
+  // Sidebar user info
+  const sideAv = document.getElementById('userAvatarSidebar');
+  if (sideAv) sideAv.textContent = email.charAt(0).toUpperCase();
+  const sideName = document.getElementById('userEmailSidebar');
+  if (sideName) sideName.textContent = email.split('@')[0];
 
   // Show cached credits instantly, then fetch real value
   const cachedCreds = localStorage.getItem('vm_credits_' + currentUser.id);

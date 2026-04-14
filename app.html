@@ -135,6 +135,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
 }
 .user-dd a:hover,.user-dd button:hover{background:#1d1d2e;color:var(--text);}
 .user-dd-sep{height:1px;background:var(--border);margin:4px 0;}
+.topbar-dd{
+  position:absolute;top:calc(100%+8px);right:0;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;min-width:200px;
+  box-shadow:0 8px 30px rgba(0,0,0,.6);
+  overflow:hidden;display:none;z-index:500;
+}
+.topbar-dd.open{display:block;}
+.topbar-dd a,.topbar-dd button{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  font-size:12.5px;font-weight:500;color:var(--t2);text-decoration:none;
+  cursor:pointer;transition:all .12s;background:none;border:none;width:100%;text-align:left;
+}
+.topbar-dd a:hover,.topbar-dd button:hover{background:#1d1d2e;color:var(--text);}
 
 /* ═══ MAIN ═══ */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -507,8 +521,11 @@ select.styled-sel:focus{border-color:rgba(255,230,0,.5);}
 
 <!-- TOPBAR -->
 <header class="topbar">
+  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;margin-right:20px;flex-shrink:0;">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></div>
+    <span class="logo-text">Viralmax</span>
+  </a>
   <nav class="topbar-nav">
-    <a href="/app" onclick="return false;">Dashboard</a>
     <a href="/app" class="active" onclick="return false;">Create</a>
     <a href="/app" onclick="return false;">History</a>
     <a href="/checkout">Pricing</a>
@@ -518,8 +535,18 @@ select.styled-sel:focus{border-color:rgba(255,230,0,.5);}
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12" stroke="#FFE600" stroke-width="2" fill="none"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="#FFE600" stroke-width="2" fill="none"/></svg>
       <span id="creditsDisplay"><script>document.write((localStorage.getItem('vm_credits_last')||'0').replace(/\B(?=(\d{3})+(?!\d))/g,','))</script></span> Credits
     </div>
-    <div class="icon-btn">🔔</div>
-    <div class="topbar-avatar" id="topbarAvatar" onclick="toggleUserMenu()">?</div>
+    <div class="topbar-avatar" id="topbarAvatar" onclick="toggleTopbarMenu()" style="position:relative;cursor:pointer;">
+      <span id="topbarAvatarLetter">?</span>
+      <div class="topbar-dd" id="topbarDropdown">
+        <div style="padding:12px 14px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--border);" id="topbarEmailFull"></div>
+        <a href="/checkout">⬆ Upgrade plan</a>
+        <a href="#" onclick="openPortal();return false;">⚙ Manage billing</a>
+        <a href="/legal">Legal</a>
+        <a href="/">← Home</a>
+        <div class="user-dd-sep"></div>
+        <button onclick="logout()">Sign out</button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -528,28 +555,6 @@ select.styled-sel:focus{border-color:rgba(255,230,0,.5);}
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
-      </div>
-      <span class="logo-text">Viralmax</span>
-    </div>
-
-    <div class="sidebar-section-label">MENU</div>
-    <ul class="sidebar-nav">
-      <li><a href="/app" onclick="return false;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home
-      </a></li>
-      <li><a href="/app" onclick="return false;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Templates
-      </a></li>
-      <li><a href="/app" onclick="return false;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>History
-      </a></li>
-    </ul>
-
-    <div class="sidebar-divider"></div>
-
     <div class="sidebar-section-label">AI TOOLS</div>
     <ul class="sidebar-nav">
       <li><button class="active" id="sitem-vidgen" onclick="switchTab('vidgen')">
@@ -707,34 +712,6 @@ select.styled-sel:focus{border-color:rgba(255,230,0,.5);}
     <!-- VID GEN -->
     <div class="tab-panel active" id="tab-vidgen">
       <div class="content">
-        <!-- HERO -->
-        <div class="hero">
-          <div>
-            <div class="hero-label">AI VIDEO GENERATOR</div>
-            <h1>Turn Ideas Into <span>Viral Videos</span></h1>
-            <p>Create stunning videos from text or images using state-of-the-art AI. Perfect for faceless channels, ads, and social media.</p>
-            <div class="hero-tags">
-              <div class="hero-tag">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                Lightning Fast
-              </div>
-              <div class="hero-tag">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                Grok · Veo 3 · Sora 2
-              </div>
-              <div class="hero-tag">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--y)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                HD Quality
-              </div>
-            </div>
-          </div>
-          <div class="hero-play">
-            <div class="hero-play-inner">
-              <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
-            </div>
-          </div>
-        </div>
-
         <!-- CREATE CARD -->
         <div class="create-card">
           <div class="create-left">
@@ -826,19 +803,6 @@ select.styled-sel:focus{border-color:rgba(255,230,0,.5);}
     <!-- IMAGE GEN -->
     <div class="tab-panel" id="tab-imggen">
       <div class="content">
-        <div class="hero">
-          <div>
-            <div class="hero-label">AI IMAGE GENERATOR</div>
-            <h1>Generate <span>Stunning Images</span></h1>
-            <p>Create high-quality images with reference image support for consistent characters and scenes.</p>
-            <div class="hero-tags">
-              <div class="hero-tag">✨ Nano Banana Pro</div>
-              <div class="hero-tag">🖼 Nano Banana 2</div>
-              <div class="hero-tag">📐 9:16 · 16:9 · 1:1</div>
-            </div>
-          </div>
-          <div class="hero-play"><div class="hero-play-inner"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" fill="#000"/><circle cx="8.5" cy="8.5" r="1.5" fill="#000"/></svg></div></div>
-        </div>
         <div class="create-card">
           <div class="create-left">
             <div class="create-title">Create Your Image</div>
@@ -940,19 +904,6 @@ select.styled-sel:focus{border-color:rgba(255,230,0,.5);}
     <!-- SILENCE REMOVER -->
     <div class="tab-panel" id="tab-deadspace">
       <div class="content">
-        <div class="hero">
-          <div>
-            <div class="hero-label">AUDIO TOOL</div>
-            <h1>Remove <span>Silence</span></h1>
-            <p>Automatically remove dead air from video or audio files using FFmpeg.</p>
-            <div class="hero-tags">
-              <div class="hero-tag">✂️ MP4 · MOV</div>
-              <div class="hero-tag">🎵 WAV · MP3</div>
-              <div class="hero-tag">⚡ Powered by FFmpeg</div>
-            </div>
-          </div>
-          <div class="hero-play"><div class="hero-play-inner"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke="#000" stroke-width="3" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="#000" stroke-width="3" stroke-linecap="round"/></svg></div></div>
-        </div>
         <div class="create-card">
           <div class="create-left">
             <div class="create-title">Upload File</div>
@@ -993,19 +944,6 @@ select.styled-sel:focus{border-color:rgba(255,230,0,.5);}
     <!-- YT SCRAPER -->
     <div class="tab-panel" id="tab-scraper">
       <div class="content">
-        <div class="hero">
-          <div>
-            <div class="hero-label">RESEARCH TOOL</div>
-            <h1>YouTube <span>Scraper</span></h1>
-            <p>Scrape any YouTube channel's top Shorts. Get titles, views, and transcripts in seconds.</p>
-            <div class="hero-tags">
-              <div class="hero-tag">📊 YouTube Data API v3</div>
-              <div class="hero-tag">📝 Transcripts</div>
-              <div class="hero-tag">⬇ Export JSON</div>
-            </div>
-          </div>
-          <div class="hero-play"><div class="hero-play-inner"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-        </div>
         <div class="create-card">
           <div class="create-left">
             <div class="create-title">Scrape Channel</div>
