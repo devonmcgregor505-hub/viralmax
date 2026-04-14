@@ -207,7 +207,7 @@ body{
   font-size:12px;font-weight:600;color:var(--text);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.user-plan{font-size:10.5px;color:var(--t3);margin-top:1px;}
+.user-plan{font-size:10.5px;color:var(--t3);margin-top:3px;}
 .user-chevron{font-size:14px;color:var(--t3);}
 .user-dd{
   display:none;position:absolute;bottom:calc(100% + 6px);left:10px;right:10px;
@@ -898,8 +898,8 @@ body{
               <div class="field-label">Model</div>
               <select class="styled-sel" id="vidModel" onchange="onModelChange();localStorage.setItem('vm_vidModel',this.value)">
                 <option value="veo3-lite">Veo 3.1 Lite</option>
-                <option value="sora2">Sora 2 – Best Quality</option>
-                <option value="grok" selected>Grok</option>
+                <option value="sora2" selected>Sora 2 – Best Quality</option>
+                <option value="grok">Grok</option>
               </select>
             </div>
             <div class="select-row">
