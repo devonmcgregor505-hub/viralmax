@@ -589,10 +589,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         </div>
         <div><label class="fl">Prompt</label><textarea class="ta" id="vgPrompt" rows="3" placeholder="Describe the motion…"></textarea></div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="vidModel" onchange="onModelChange()"><option value="veo3-lite">Veo 3.1 Lite</option><option value="sora2">Sora 2</option><option value="grok" selected>Grok</option></select></div>
-          <div class="s-row" id="durRow"><label class="s-lbl">Duration</label><select class="sel" id="vidDur"></select></div>
-          <div class="s-row" id="aspRow"><label class="s-lbl">Aspect</label><select class="sel" id="vidAsp"></select></div>
-          <div class="s-row" id="qualRow" style="display:none;"><label class="s-lbl">Quality</label><select class="sel" id="vidQual" onchange="onQualityChange()"></select></div>
+          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="vidModel" onchange="onModelChange();localStorage.setItem('vm_vidModel',this.value)"><option value="veo3-lite">Veo 3.1 Lite</option><option value="sora2">Sora 2</option><option value="grok" selected>Grok</option></select></div>
+          <div class="s-row" id="durRow"><label class="s-lbl">Duration</label><select class="sel" id="vidDur" onchange="localStorage.setItem('vm_vidDur',this.value)"></select></div>
+          <div class="s-row" id="aspRow"><label class="s-lbl">Aspect</label><select class="sel" id="vidAsp" onchange="localStorage.setItem('vm_vidAsp',this.value)"></select></div>
+          <div class="s-row" id="qualRow" style="display:none;"><label class="s-lbl">Quality</label><select class="sel" id="vidQual" onchange="onQualityChange();localStorage.setItem('vm_vidQual',this.value)"></select></div>
           <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="vidCost">15 cr</div></div>
         </div></div>
         <button class="btn-y" id="vidBtn" onclick="startVidGen()">⚡ Generate Video</button>
@@ -622,7 +622,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
         </div>
         <div><label class="fl">Prompt</label><textarea class="ta" id="imgPrompt" rows="4" placeholder="Describe the image…"></textarea></div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="imgModel" onchange="onImgModelChange()"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
+          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="imgModel" onchange="onImgModelChange();localStorage.setItem('vm_imgModel',this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
           <div class="s-row"><label class="s-lbl">Aspect Ratio</label><select class="sel" id="imgAsp"><option value="9:16" selected>9:16 Portrait</option><option value="16:9">16:9 Landscape</option><option value="1:1">1:1 Square</option></select></div>
           
           <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="imgCost">15 cr</div></div>
@@ -728,7 +728,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
           <div class="zone-hint">MP4 · MOV · WAV · MP3</div><div class="zone-fname" id="dsFnm"></div>
         </div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="slider-grp"><label class="s-lbl">Silence Threshold</label><div class="slider-labels"><span class="slider-end">Sensitive</span><span class="slider-val" id="dbVal">-40 dB</span><span class="slider-end">Aggressive</span></div><input type="range" class="slider" id="dbSlider" min="-60" max="-10" value="-40" oninput="document.getElementById('dbVal').textContent=this.value+' dB'"></div>
+          <div class="slider-grp"><label class="s-lbl">Silence Threshold</label><div class="slider-labels"><span class="slider-end">Sensitive</span><span class="slider-val" id="dbVal">-40 dB</span><span class="slider-end">Aggressive</span></div><input type="range" class="slider" id="dbSlider" min="-60" max="-10" value="-40" oninput="document.getElementById('dbVal').textContent=this.value+' dB';localStorage.setItem('vm_dbSlider',this.value)"></div>
           
         </div></div>
         <button class="btn-y" id="dsBtn" onclick="startDeadspace()" disabled>✂️ Remove Silence</button>
@@ -748,10 +748,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
   <div class="tab-panel" id="tab-scraper">
     <div class="workspace">
       <div class="left-col">
-        <div><label class="fl">Channel URL</label><input type="text" class="inp" id="ytUrl" placeholder="https://youtube.com/@channelname"></div>
+        <div><label class="fl">Channel URL</label><input type="text" class="inp" id="ytUrl" placeholder="https://youtube.com/@channelname" oninput="localStorage.setItem('vm_ytUrl',this.value)"></div>
         <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Number of Videos</label><select class="sel" id="ytCount"><option value="10">10 videos</option><option value="25" selected>25 videos</option><option value="50">50 videos</option><option value="100">100 videos</option></select></div>
-          <div class="s-row"><label class="s-lbl">Sort By</label><select class="sel" id="ytSort"><option value="newest" selected>📅 Newest</option><option value="popular">🔥 Most Popular</option><option value="trending">📈 Trending</option></select></div>
+          <div class="s-row"><label class="s-lbl">Number of Videos</label><select class="sel" id="ytCount" onchange="localStorage.setItem('vm_ytCount',this.value)"><option value="10">10 videos</option><option value="25" selected>25 videos</option><option value="50">50 videos</option><option value="100">100 videos</option></select></div>
+          <div class="s-row"><label class="s-lbl">Sort By</label><select class="sel" id="ytSort" onchange="localStorage.setItem('vm_ytSort',this.value)"><option value="newest" selected>📅 Newest</option><option value="popular">🔥 Most Popular</option><option value="trending">📈 Trending</option></select></div>
           
         </div></div>
         <button class="btn-y" id="scrapBtn" onclick="startScrape()">📊 Scrape Channel</button>

@@ -13,12 +13,56 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   } catch(e) {}
-  // Populate dropdowns immediately
+  // Restore saved settings from localStorage
+  try {
+    const vm = localStorage.getItem('vm_vidModel');
+    if (vm) { const el = document.getElementById('vidModel'); if(el) el.value = vm; }
+  } catch(e) {}
+  try {
+    const im = localStorage.getItem('vm_imgModel');
+    if (im) { const el = document.getElementById('imgModel'); if(el) el.value = im; }
+  } catch(e) {}
+  try {
+    const ytc = localStorage.getItem('vm_ytCount');
+    if (ytc) { const el = document.getElementById('ytCount'); if(el) el.value = ytc; }
+    const yts = localStorage.getItem('vm_ytSort');
+    if (yts) { const el = document.getElementById('ytSort'); if(el) el.value = yts; }
+    const ytu = localStorage.getItem('vm_ytUrl');
+    if (ytu) { const el = document.getElementById('ytUrl'); if(el) el.value = ytu; }
+  } catch(e) {}
+  try {
+    const db = localStorage.getItem('vm_dbSlider');
+    if (db) {
+      const el = document.getElementById('dbSlider');
+      if(el) { el.value = db; document.getElementById('dbVal').textContent = db + ' dB'; }
+    }
+  } catch(e) {}
+  try {
+    const exag = localStorage.getItem('vm_exag');
+    if (exag) {
+      const el = document.getElementById('exagSlider');
+      if(el) { el.value = exag; document.getElementById('exagVal').textContent = exag; }
+    }
+  } catch(e) {}
+
+  // Populate dropdowns immediately (uses restored model value)
   try { onModelChange(); } catch(e) {}
   try { onImgModelChange(); } catch(e) {}
   try { renderVoiceSel(); } catch(e) {}
   // Switch to vidgen immediately so UI looks correct before auth completes
   try { switchTab('vidgen'); } catch(e) {}
+
+  // Restore vid dur/asp/qual after onModelChange populates them
+  try {
+    const vd = localStorage.getItem('vm_vidDur');
+    const va = localStorage.getItem('vm_vidAsp');
+    const vq = localStorage.getItem('vm_vidQual');
+    setTimeout(() => {
+      if (vd) { const el = document.getElementById('vidDur'); if(el) el.value = vd; }
+      if (va) { const el = document.getElementById('vidAsp'); if(el) el.value = va; }
+      if (vq) { const el = document.getElementById('vidQual'); if(el) el.value = vq; onQualityChange(); }
+    }, 50);
+  } catch(e) {}
 });
 
 // Define logout immediately, before any async code
