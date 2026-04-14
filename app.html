@@ -417,7 +417,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
   <div class="credits-bar" style="cursor:pointer;" onclick="openTopUp()">
     <div>
-      <div class="credits-num" id="creditsDisplay">0</div>
+      <div class="credits-num" id="creditsDisplay"><script>document.write(localStorage.getItem('vm_credits_last')||'0')</script></div>
       <div class="credits-lbl">Credits</div>
     </div>
     <div style="text-align:right;">
