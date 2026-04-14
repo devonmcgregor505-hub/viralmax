@@ -46,8 +46,8 @@ async function startVidGen(){
     if(!data)throw new Error('Generation timed out');
     clearInterval(tick);fill.style.width='100%';pctLbl.textContent='100%';lbl.textContent='Done!';
     if(!data.success)throw new Error(data.error||'Unknown error');
-    const vid=document.getElementById('vidVideo');vid.src=data.videoUrl;vid.style.display='block';document.getElementById('vidEmpty').style.display='none';
-    const dl=document.getElementById('vidDlBtn');dl.href=data.videoUrl;dl.style.display='block';
+    showVidPreview(data.videoUrl);
+;
     creds-=cfg.qualities?cfg.creditsByQ[quality]:cfg.credits;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('vidErr').classList.add('vis');document.getElementById('vidErrMsg').textContent=err.message}
   btn.disabled=false;btn.textContent='⚡ Generate Video';setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
