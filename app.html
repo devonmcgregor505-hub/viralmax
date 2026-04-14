@@ -408,6 +408,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 </head>
 <body>
 
+<script>
+// Restore last tab instantly - runs before any other JS
+(function(){
+  try {
+    var validTabs = ['vidgen','imggen','voicegen','deadspace','scraper'];
+    var last = localStorage.getItem('vm_lastTab') || 'vidgen';
+    var tab = validTabs.indexOf(last) !== -1 ? last : 'vidgen';
+    // Remove active from pipeline, add to correct tab
+    var panels = document.querySelectorAll('.tab-panel');
+    panels.forEach(function(p){ p.classList.remove('active'); });
+    var target = document.getElementById('tab-'+tab);
+    if(target) target.classList.add('active');
+  } catch(e){}
+})();
+</script>
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar">
   <div class="logo-wrap">
