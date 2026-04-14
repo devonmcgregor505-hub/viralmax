@@ -1,6 +1,6 @@
 // ── INIT ──
-// Show cached credits IMMEDIATELY before any async code runs
-(function() {
+// Show cached credits as soon as DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
   try {
     const keys = Object.keys(localStorage).filter(k => k.startsWith('vm_credits_'));
     if (keys.length > 0) {
@@ -12,7 +12,7 @@
       }
     }
   } catch(e) {}
-})();
+});
 
 // Define logout immediately, before any async code
 async function logout() {
