@@ -1,9 +1,5 @@
-// ── QUEUE POLL ──
-setInterval(async()=>{
-  try{const r=await fetch('/queue');const d=await r.json();const el=document.getElementById('queuePill');if(el)el.textContent=`Queue: ${d.active} active, ${d.waiting} waiting`;}catch(e){}
-},10000);
+setInterval(async()=>{try{const r=await fetch('/queue');const d=await r.json();const el=document.getElementById('queuePill');if(el)el.textContent=`Queue: ${d.active} active, ${d.waiting} waiting`;}catch(e){}},10000);
 
-// ── TAB META ──
 const tabMeta={
   pipeline:['Automation','Scenes → Images → Clips'],
   vidgen:['Video Gen','AI video generation'],
@@ -13,10 +9,9 @@ const tabMeta={
   scraper:['YT Scraper','Scrape channel data'],
 };
 
-// ── SWITCH TAB ──
 function switchTab(tab){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item,.nav-item,.nav-tab,.nav-btn').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav button,.sidebar-nav a').forEach(n=>n.classList.remove('active'));
   const panel=document.getElementById('tab-'+tab);if(panel)panel.classList.add('active');
   const si=document.getElementById('sitem-'+tab);if(si)si.classList.add('active');
   const el=document.getElementById('nav-'+tab);if(el)el.classList.add('active');
@@ -33,14 +28,13 @@ function toggleUserMenu(){
   if(dd)dd.classList.toggle('open');
 }
 document.addEventListener('click',function(e){
-  const area=document.querySelector('.user-row');
+  const area=document.querySelector('.sidebar-user');
   if(area&&!area.contains(e.target)){
     const dd=document.getElementById('userDropdown');
     if(dd)dd.classList.remove('open');
   }
 });
 
-// ── PIPELINE ──
 function goPipeStep(step){
   if(!pipe.unlocked.has(step))return;
   pipe.step=step;
