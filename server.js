@@ -1026,12 +1026,26 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const userId = session.metadata?.userId;
+    console.log('[webhook] session completed, userId:', userId, 'metadata:', session.metadata);
     if (userId) {
-      const planCredits = {'price_1TKayhAwQgCwolyMcQ5hvM7D': 3500};
-      const creditsToAdd = session.metadata?.creditsToAdd ? parseInt(session.metadata.creditsToAdd) : session.mode === 'subscription' ? 3500 : 500;
-      const { data } = await supabase.from('users').select('credits').eq('id', userId).single();
-      const current = data?.credits ?? 0;
-      await supabase.from('users').upsert({ id: userId, credits: current + creditsToAdd, plan: session.mode === 'subscription' ? 'pro' : (data?.plan || 'free'), updated_at: new Date().toISOString() });
+      try {
+        const creditsToAdd = session.metadata?.creditsToAdd ? parseInt(session.metadata.creditsToAdd) : session.mode === 'subscription' ? 3500 : 1200;
+        const planName = session.metadata?.plan || (session.mode === 'subscription' ? 'starter' : null);
+        const { data } = await supabase.from('users').select('credits, plan').eq('id', userId).single();
+        const current = data?.credits ?? 0;
+        const updateObj = { 
+          id: userId, 
+          credits: current + creditsToAdd, 
+          updated_at: new Date().toISOString() 
+        };
+        if (planName) updateObj.plan = planName;
+        console.log('[webhook] updating user:', updateObj);
+        const { error } = await supabase.from('users').upsert(updateObj);
+        if (error) console.error('[webhook] supabase error:', error.message);
+        else console.log('[webhook] success: added', creditsToAdd, 'credits to', userId);
+      } catch(err) {
+        console.error('[webhook] error:', err.message);
+      }
     }
   }
   res.json({ received: true });
