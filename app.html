@@ -4,758 +4,934 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Viralmax — Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-
 :root{
-  --y:#FFE600;--y2:#FFF176;--yd:rgba(255,230,0,0.08);--yg:rgba(255,230,0,0.15);
-  --blk:#080808;--s1:#0e0e0e;--s2:#141414;--s3:#1a1a1a;--s4:#202020;--s5:#282828;
-  --bd:#1e1e1e;--bd2:#2a2a2a;--tx:#f2f2f0;--t2:#777;--t3:#444;--t4:#252525;
-  --grn:#00E676;--red:#FF3D3D;--topnav:56px;
+  --y:#FFE600;--y2:#FFF176;--yd:rgba(255,230,0,0.1);
+  --blk:#0c0c0e;--s1:#111114;--s2:#18181c;--s3:#1e1e24;--s4:#26262e;--s5:#2e2e38;
+  --bd:#222228;--bd2:#2e2e38;--tx:#f0f0f5;--t2:#9090a0;--t3:#5a5a6a;--t4:#3a3a48;
+  --grn:#00E676;--red:#FF3D3D;--sw:240px;--nav-h:52px;
 }
-
 body{font-family:'Inter',sans-serif;background:var(--blk);color:var(--tx);display:flex;flex-direction:column;}
-
-::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--s5);border-radius:3px}
+::-webkit-scrollbar-thumb{background:var(--s5);border-radius:4px}
 
-/* ── TOP NAV ── */
+/* ═══ TOP NAV ═══ */
 .topnav{
-  height:var(--topnav);background:var(--s1);border-bottom:1px solid var(--bd);
-  display:flex;align-items:center;padding:0 24px;gap:0;flex-shrink:0;
-  position:relative;z-index:100;width:100%;
+  height:var(--nav-h);background:var(--s1);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;padding:0 20px 0 24px;flex-shrink:0;z-index:100;gap:0;
 }
-.logo-wrap{display:flex;align-items:center;gap:8px;margin-right:32px;text-decoration:none;}
-.logo-dot{width:7px;height:7px;background:var(--y);border-radius:50%;flex-shrink:0;animation:pulse-dot 2s ease-in-out infinite;}
-@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:0.6}}
-.logo-text{font-weight:800;font-size:18px;letter-spacing:-0.5px;color:var(--y);}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;width:var(--sw);flex-shrink:0;}
+.logo-icon{width:28px;height:28px;background:var(--y);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-icon svg{width:16px;height:16px;}
+.logo-text{font-size:16px;font-weight:800;color:var(--tx);letter-spacing:-0.4px;}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;}
+.nav-link{padding:6px 14px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;transition:all 0.15s;text-decoration:none;display:block;}
+.nav-link:hover{color:var(--tx);background:var(--s3);}
+.nav-link.active{color:#000;background:var(--y);font-weight:700;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.credits-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,230,0,0.08);border:1px solid rgba(255,230,0,0.2);border-radius:8px;cursor:pointer;transition:all 0.15s;}
+.credits-badge:hover{border-color:rgba(255,230,0,0.4);}
+.credits-icon{font-size:14px;}
+.credits-text{font-size:13px;font-weight:700;color:var(--y);font-family:'JetBrains Mono',monospace;}
+.notif-btn{width:34px;height:34px;border-radius:8px;background:var(--s3);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:16px;transition:all 0.15s;}
+.notif-btn:hover{color:var(--tx);border-color:var(--bd2);}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--y);color:#000;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid var(--bd2);transition:all 0.15s;}
+.avatar:hover{border-color:rgba(255,230,0,0.5);}
 
-.nav-tabs{display:flex;align-items:center;gap:2px;flex:1;}
-.nav-tab{
-  display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:8px;
+/* ═══ BODY LAYOUT ═══ */
+.body-wrap{flex:1;display:flex;overflow:hidden;min-height:0;}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{
+  width:var(--sw);flex-shrink:0;background:var(--s1);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:12px 10px;}
+.sidebar-section{margin-bottom:4px;}
+.sidebar-sec-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);padding:8px 10px 4px;display:block;}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;
   font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;
-  transition:all 0.15s;border:none;background:none;
+  transition:all 0.15s;border:none;background:none;width:100%;text-align:left;
+  text-decoration:none;
 }
-.nav-tab:hover{color:var(--tx);background:var(--s3);}
-.nav-tab.active{color:var(--y);background:var(--yd);}
-.nav-tab-icon{font-size:14px;}
-.nav-badge{
-  font-size:7px;font-weight:800;letter-spacing:0.5px;padding:2px 5px;
-  border-radius:4px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;
+.sidebar-item:hover{background:var(--s3);color:var(--tx);}
+.sidebar-item.active{background:var(--s3);color:var(--tx);}
+.sidebar-item svg{width:16px;height:16px;flex-shrink:0;opacity:0.7;}
+.sidebar-item.active svg{opacity:1;}
+.sidebar-item-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;background:var(--s3);}
+.sidebar-item.active .sidebar-item-icon{background:var(--s4);}
+
+/* Upgrade card */
+.upgrade-card{
+  margin:10px;background:linear-gradient(135deg,rgba(255,230,0,0.06),rgba(255,230,0,0.02));
+  border:1px solid rgba(255,230,0,0.15);border-radius:12px;padding:16px;
 }
-.b-live{background:rgba(0,230,118,0.1);color:var(--grn);}
-.b-hot{background:var(--yd);color:var(--y);}
-
-.nav-divider{width:1px;height:20px;background:var(--bd);margin:0 8px;}
-
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
-.credits-pill{
-  display:flex;align-items:center;gap:7px;background:var(--yd);
-  border:1px solid rgba(255,230,0,0.15);border-radius:8px;
-  padding:6px 12px;cursor:pointer;transition:all 0.15s;
+.upgrade-card-icon{font-size:20px;margin-bottom:8px;}
+.upgrade-card-title{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px;}
+.upgrade-card-desc{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:12px;}
+.upgrade-btn{
+  width:100%;padding:9px;background:var(--y);color:#000;border:none;border-radius:8px;
+  font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;
 }
-.credits-pill:hover{border-color:rgba(255,230,0,0.3);}
-.credits-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--y);}
-.credits-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;}
-.user-menu{position:relative;}
-.user-btn{
-  display:flex;align-items:center;gap:8px;padding:6px 12px;
-  background:var(--s3);border:1px solid var(--bd);border-radius:8px;
-  cursor:pointer;transition:all 0.15s;font-size:12px;color:var(--t2);
+.upgrade-btn:hover{background:var(--y2);}
+
+/* User row */
+.user-row{
+  padding:12px 10px;border-top:1px solid var(--bd);
+  display:flex;align-items:center;gap:9px;cursor:pointer;
+  transition:background 0.15s;position:relative;
 }
-.user-btn:hover{border-color:var(--bd2);color:var(--tx);}
-.user-avatar{width:24px;height:24px;border-radius:50%;background:var(--y);color:#000;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.user-dropdown{
-  position:absolute;top:calc(100% + 8px);right:0;background:var(--s2);
-  border:1px solid var(--bd2);border-radius:10px;min-width:180px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.5);overflow:hidden;display:none;z-index:200;
+.user-row:hover{background:var(--s3);}
+.user-row-av{width:32px;height:32px;border-radius:50%;background:var(--y);color:#000;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.user-row-info{flex:1;min-width:0;}
+.user-row-name{font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-row-plan{font-size:10px;color:var(--t3);}
+.user-row-caret{font-size:10px;color:var(--t3);}
+.user-dd{position:absolute;bottom:calc(100%+4px);left:8px;right:8px;background:var(--s2);border:1px solid var(--bd2);border-radius:10px;box-shadow:0 -8px 30px rgba(0,0,0,0.5);overflow:hidden;display:none;z-index:500;}
+.user-dd.open{display:block;}
+.user-dd a,.user-dd button{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12.5px;font-weight:500;color:var(--t2);text-decoration:none;cursor:pointer;transition:all 0.12s;background:none;border:none;width:100%;text-align:left;}
+.user-dd a:hover,.user-dd button:hover{background:var(--s3);color:var(--tx);}
+.user-dd-sep{height:1px;background:var(--bd);margin:4px 0;}
+
+/* ═══ MAIN CONTENT ═══ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--blk);}
+
+/* TAB PANELS */
+.tab-panel{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0;}
+.tab-panel.active{display:flex;}
+
+/* ═══ VID GEN LAYOUT ═══ */
+.vidgen-layout{flex:1;display:flex;overflow:hidden;min-height:0;}
+
+/* Left create panel */
+.create-panel{
+  width:520px;flex-shrink:0;overflow-y:auto;padding:28px 24px;
+  border-right:1px solid var(--bd);
 }
-.user-dropdown.open{display:block;}
-.user-dropdown a,.user-dropdown button{
-  display:flex;align-items:center;gap:8px;padding:10px 14px;
-  font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;
-  cursor:pointer;transition:background 0.12s;background:none;border:none;
-  width:100%;text-align:left;
+.tool-cat{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--y);display:block;margin-bottom:10px;}
+.tool-title{font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--tx);line-height:1.1;margin-bottom:8px;}
+.tool-desc{font-size:13.5px;color:var(--t2);line-height:1.5;margin-bottom:14px;}
+.tool-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;}
+.tbadge{display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--s3);border:1px solid var(--bd2);border-radius:7px;font-size:11.5px;font-weight:500;color:var(--t2);}
+.tbadge svg{width:12px;height:12px;color:var(--y);}
+
+/* Create card */
+.create-card{background:var(--s2);border:1px solid var(--bd2);border-radius:14px;overflow:hidden;margin-bottom:0;}
+.create-card-header{padding:16px 18px;border-bottom:1px solid var(--bd);}
+.create-card-title{font-size:16px;font-weight:700;color:var(--tx);}
+
+/* Mode toggle */
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--s3);border-radius:9px;padding:3px;margin-bottom:16px;}
+.mode-btn{padding:8px;border-radius:7px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.mode-btn:hover{color:var(--tx);}
+.mode-btn.active{background:var(--y);color:#000;font-weight:700;}
+.mode-btn svg{width:14px;height:14px;}
+
+/* Prompt area */
+.prompt-wrap{position:relative;margin-bottom:4px;}
+.prompt-ta{
+  width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:10px;
+  padding:13px 14px 36px;color:var(--tx);font-size:13.5px;font-family:'Inter',sans-serif;
+  outline:none;resize:none;height:120px;line-height:1.6;transition:border-color 0.15s;
 }
-.user-dropdown a:hover,.user-dropdown button:hover{background:var(--s3);color:var(--tx);}
-.user-dropdown-sep{height:1px;background:var(--bd);margin:4px 0;}
-.user-email{padding:10px 14px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--bd);}
+.prompt-ta:focus{border-color:rgba(255,230,0,0.4);}
+.prompt-ta::placeholder{color:var(--t4);}
+.prompt-counter{position:absolute;bottom:10px;right:12px;font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
 
-/* ── MAIN ── */
-.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
-/* hide old sidebar */
-.sidebar{display:none;}
-
-.topbar{display:none;}
-.topbar-title,.topbar-sep,.topbar-sub,.topbar-right,.topbar-pill{display:none;}
-
-/* ── PANELS ── */
-.tab-panel{display:none;flex:1;overflow:hidden;min-height:0}
-.tab-panel.active{display:flex;height:calc(100vh - var(--topnav));}
-
-/* ── LAYOUT ── */
-.workspace{flex:1;display:flex;overflow:hidden;height:100%}
-.left-col{
-  width:360px;flex-shrink:0;border-right:1px solid var(--bd);
-  overflow-y:auto;padding:20px;display:flex;flex-direction:column;
-  gap:14px;background:var(--s1);
+/* Settings */
+.settings-section{margin-top:16px;}
+.settings-title{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:12px;}
+.setting-row{margin-bottom:12px;}
+.setting-label{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;display:block;}
+.setting-sel{
+  width:100%;background:var(--s3);border:1px solid var(--bd2);color:var(--tx);
+  padding:10px 12px;border-radius:9px;font-size:13px;font-family:'Inter',sans-serif;
+  outline:none;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%235a5a6a' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  transition:border-color 0.15s;
 }
-.right-col{
-  flex:1;overflow-y:auto;display:flex;flex-direction:column;
-  align-items:center;padding:24px;gap:14px;background:var(--blk);
-}
+.setting-sel:focus{border-color:rgba(255,230,0,0.4);}
+.setting-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 
-/* ── FORM ── */
-.fl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;display:block}
-
-.inp{
-  background:var(--s2);border:1px solid var(--bd);border-radius:8px;
-  padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'Inter',sans-serif;
-  width:100%;outline:none;transition:border-color 0.15s;
-}
-.inp:focus{border-color:rgba(255,230,0,0.35)}
-.inp::placeholder{color:var(--t4)}
-
-.ta{
-  background:var(--s2);border:1px solid var(--bd);border-radius:8px;
-  padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'Inter',sans-serif;
-  width:100%;outline:none;resize:vertical;min-height:80px;
-  transition:border-color 0.15s;line-height:1.6;
-}
-.ta:focus{border-color:rgba(255,230,0,0.35)}
-.ta::placeholder{color:var(--t4)}
-
-.sel{
-  background:var(--s3);border:1px solid var(--bd);color:var(--tx);
-  padding:10px 12px;border-radius:8px;font-size:12.5px;font-family:'Inter',sans-serif;
-  width:100%;outline:none;cursor:pointer;transition:border-color 0.15s;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23555' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 11px center;padding-right:28px;
-}
-.sel:focus{border-color:rgba(255,230,0,0.35)}
-
-/* ── BUTTONS ── */
-.btn-y{
-  width:100%;padding:12px;background:var(--y);color:#000;border:none;border-radius:9px;
-  font-size:13px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;
-  letter-spacing:0.2px;transition:all 0.2s;
-}
-.btn-y:hover{background:var(--y2);box-shadow:0 4px 20px rgba(255,230,0,0.25);transform:translateY(-1px)}
-.btn-y:disabled{background:var(--s4);color:var(--t3);cursor:not-allowed;transform:none;box-shadow:none}
-
-.btn-ghost{
-  width:100%;padding:10px;background:transparent;color:var(--t2);
-  border:1px solid var(--bd2);border-radius:8px;font-size:12px;font-weight:600;
-  font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;
-}
-.btn-ghost:hover{border-color:rgba(255,230,0,0.3);color:var(--y);background:var(--yd)}
-
-.btn-sm{
-  padding:6px 11px;background:var(--y);color:#000;border:none;border-radius:6px;
-  font-size:10px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;
-}
-.btn-sm:hover{background:var(--y2)}
-.btn-sm:disabled{background:var(--s4);color:var(--t3);cursor:not-allowed}
-
-/* ── CARD ── */
-.card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
-.card-head{
-  padding:9px 13px;border-bottom:1px solid var(--bd);
-  font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;
-  letter-spacing:2px;text-transform:uppercase;color:var(--y);
+/* Generate button */
+.gen-btn{
+  width:100%;padding:13px 16px;background:var(--y);color:#000;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;
   display:flex;align-items:center;justify-content:space-between;
+  transition:all 0.2s;margin-top:16px;
 }
-.card-body{padding:13px;display:flex;flex-direction:column;gap:11px}
+.gen-btn:hover{background:var(--y2);box-shadow:0 4px 24px rgba(255,230,0,0.25);transform:translateY(-1px);}
+.gen-btn:disabled{background:var(--s4);color:var(--t3);cursor:not-allowed;transform:none;box-shadow:none;}
+.gen-btn-left{display:flex;align-items:center;gap:8px;}
+.gen-btn-right{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(0,0,0,0.15);padding:4px 9px;border-radius:6px;}
 
-/* ── UPLOAD ZONE ── */
-.zone{
-  border:1.5px dashed var(--bd2);border-radius:10px;padding:18px;text-align:center;
-  cursor:pointer;transition:all 0.2s;background:var(--s2);position:relative;
+/* Right preview panel */
+.preview-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.preview-top{flex:1;display:flex;align-items:center;justify-content:center;padding:32px;background:var(--blk);border-bottom:1px solid var(--bd);}
+.preview-phone{
+  width:220px;aspect-ratio:9/16;border-radius:14px;
+  background:var(--s2);border:1.5px solid var(--bd2);
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);position:relative;overflow:hidden;
 }
-.zone:hover{border-color:rgba(255,230,0,0.35);background:var(--s3)}
-.zone.drag{border-color:var(--y);background:var(--yd)}
-.zone.has{border-style:solid;border-color:rgba(255,230,0,0.25);background:rgba(255,230,0,0.02)}
-.zone-icon{font-size:22px;display:block;margin-bottom:5px}
-.zone-title{font-size:12.5px;font-weight:700;margin-bottom:2px}
-.zone-hint{font-size:10px;color:var(--t3)}
-.zone-fname{font-size:10px;color:var(--y);font-weight:600;margin-top:4px;word-break:break-all}
-
-/* ── PROGRESS ── */
-.prog{display:none}
-.prog.vis{display:block}
-.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.prog-lbl{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.prog-pct{font-size:9px;color:var(--y);font-family:'JetBrains Mono',monospace}
-.prog-track{background:var(--s4);border-radius:999px;height:2px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--y),var(--y2));border-radius:999px;width:0%;transition:width 0.3s ease;box-shadow:0 0 6px rgba(255,230,0,0.35)}
-
-/* ── ERROR ── */
-.err{background:rgba(255,61,61,0.05);border:1px solid rgba(255,61,61,0.15);border-radius:8px;padding:10px 12px;display:none}
-.err.vis{display:block}
-.err-title{font-size:8px;font-weight:800;letter-spacing:1px;color:var(--red);margin-bottom:3px;font-family:'JetBrains Mono',monospace}
-.err-msg{color:#ff7070;font-size:11px;line-height:1.5}
-
-/* ── INFO STRIP ── */
-.strip{
-  background:rgba(255,230,0,0.03);border:1px solid rgba(255,230,0,0.08);
-  border-left:2px solid var(--y);border-radius:0 8px 8px 0;
-  padding:9px 12px;font-size:11.5px;color:var(--t2);line-height:1.7;
+.preview-phone video,.preview-phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.preview-empty{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;
 }
-.strip b{color:var(--y)}
+.preview-empty-icon{color:var(--y);opacity:0.5;}
+.preview-empty-icon svg{width:40px;height:40px;}
+.preview-empty-title{font-size:13px;font-weight:600;color:var(--t2);text-align:center;}
+.preview-empty-sub{font-size:11px;color:var(--t3);text-align:center;}
 
-/* ── PHONE FRAME ── */
-.phone{
-  height:calc(100vh - 48px - 70px);max-height:520px;aspect-ratio:9/16;max-width:293px;
-  border-radius:18px;overflow:hidden;background:#000;
-  border:1.5px solid var(--bd2);box-shadow:0 16px 50px rgba(0,0,0,0.7);
-  position:relative;flex-shrink:0;
-}
-.phone-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--t3)}
-.phone-empty-icon{font-size:32px}
-.phone-empty-txt{font-size:11px;font-weight:500}
-.phone video,.phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.preview-lbl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace}
+/* Recent generations */
+.recents-panel{flex-shrink:0;padding:20px 24px;background:var(--blk);}
+.recents-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.recents-title{font-size:15px;font-weight:700;color:var(--tx);}
+.recents-link{font-size:13px;font-weight:600;color:var(--y);text-decoration:none;display:flex;align-items:center;gap:4px;}
+.recents-link:hover{color:var(--y2);}
+.recents-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
+.recent-item{aspect-ratio:9/16;border-radius:10px;background:var(--s3);border:1.5px solid var(--bd2);overflow:hidden;position:relative;cursor:pointer;transition:all 0.15s;}
+.recent-item:hover{border-color:rgba(255,230,0,0.3);transform:translateY(-2px);}
+.recent-item video,.recent-item img{width:100%;height:100%;object-fit:cover;}
+.recent-duration{position:absolute;bottom:5px;right:6px;background:rgba(0,0,0,0.7);color:#fff;font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;}
+.recent-menu{position:absolute;top:5px;right:5px;background:rgba(0,0,0,0.6);border-radius:5px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;cursor:pointer;opacity:0;transition:opacity 0.15s;}
+.recent-item:hover .recent-menu{opacity:1;}
 
-/* ── DOWNLOAD BTN ── */
-.dl-btn{
-  display:block;width:100%;max-width:293px;padding:10px;background:var(--grn);
-  color:#000;border:none;border-radius:8px;font-size:12px;font-weight:800;
-  cursor:pointer;text-align:center;text-decoration:none;transition:all 0.2s;
-  font-family:'Inter',sans-serif;
-}
-.dl-btn:hover{background:#00ff8a}
+/* ═══ IMAGE GEN ═══ */
+.imggen-layout{flex:1;display:flex;overflow:hidden;min-height:0;}
+.imggen-preview{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;background:var(--blk);}
 
-/* ── SLIDER ── */
-.slider-grp{display:flex;flex-direction:column;gap:5px}
-.slider-labels{display:flex;justify-content:space-between}
-.slider-end{font-size:9px;color:var(--t3)}
-.slider-val{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--y);text-align:center}
-.slider{-webkit-appearance:none;width:100%;height:2px;border-radius:2px;background:var(--s5);outline:none;cursor:pointer}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--y);cursor:pointer;box-shadow:0 0 5px rgba(255,230,0,0.35)}
+/* ═══ VOICE GEN ═══ */
+.voicegen-layout{flex:1;display:flex;overflow:hidden;min-height:0;}
+.voice-right{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.voice-script{padding:20px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.voice-outputs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px;}
 
-/* ── SETTING ROW ── */
-.s-row{display:flex;flex-direction:column;gap:4px}
-.s-lbl{font-size:11px;font-weight:600;color:var(--t2)}
-.s-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--y)}
+/* ═══ SHARED ═══ */
+.inp{background:var(--s3);border:1px solid var(--bd2);border-radius:9px;padding:10px 13px;color:var(--tx);font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none;transition:border-color 0.15s;}
+.inp:focus{border-color:rgba(255,230,0,0.4);}
+.inp::placeholder{color:var(--t4);}
+.ta{background:var(--s3);border:1px solid var(--bd2);border-radius:9px;padding:11px 13px;color:var(--tx);font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none;resize:vertical;min-height:80px;transition:border-color 0.15s;line-height:1.6;}
+.ta:focus{border-color:rgba(255,230,0,0.4);}
+.ta::placeholder{color:var(--t4);}
+.sel{background:var(--s3);border:1px solid var(--bd2);color:var(--tx);padding:10px 12px;border-radius:9px;font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%235a5a6a' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;transition:border-color 0.15s;}
+.sel:focus{border-color:rgba(255,230,0,0.4);}
+.s-row{display:flex;flex-direction:column;gap:5px;}
+.s-lbl{font-size:12px;font-weight:500;color:var(--t2);}
+.s-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--y);}
+.fl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;display:block;}
+.card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;overflow:hidden;}
+.card-head{padding:10px 14px;border-bottom:1px solid var(--bd);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--y);display:flex;align-items:center;justify-content:space-between;}
+.card-body{padding:14px;display:flex;flex-direction:column;gap:12px;}
+.zone{border:1.5px dashed var(--bd2);border-radius:11px;padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--s2);position:relative;}
+.zone:hover{border-color:rgba(255,230,0,0.35);background:var(--s3);}
+.zone.drag{border-color:var(--y);background:var(--yd);}
+.zone.has{border-style:solid;border-color:rgba(255,230,0,0.25);}
+.zone-icon{font-size:22px;display:block;margin-bottom:5px;}
+.zone-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.zone-hint{font-size:11px;color:var(--t3);}
+.zone-fname{font-size:11px;color:var(--y);font-weight:600;margin-top:4px;word-break:break-all;}
+.btn-y{width:100%;padding:12px;background:var(--y);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s;}
+.btn-y:hover{background:var(--y2);box-shadow:0 4px 20px rgba(255,230,0,0.2);transform:translateY(-1px);}
+.btn-y:disabled{background:var(--s4);color:var(--t3);cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-ghost{width:100%;padding:11px;background:transparent;color:var(--t2);border:1px solid var(--bd2);border-radius:10px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;}
+.btn-ghost:hover{border-color:rgba(255,230,0,0.3);color:var(--y);background:var(--yd);}
+.btn-sm{padding:7px 12px;background:var(--y);color:#000;border:none;border-radius:7px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-sm:hover{background:var(--y2);}
+.btn-sm:disabled{background:var(--s4);color:var(--t3);cursor:not-allowed;}
+.prog{display:none;}
+.prog.vis{display:block;}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:5px;}
+.prog-lbl{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.prog-pct{font-size:10px;color:var(--y);font-family:'JetBrains Mono',monospace;}
+.prog-track{background:var(--s5);border-radius:999px;height:3px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--y),var(--y2));width:0%;transition:width 0.3s;border-radius:999px;}
+.err{background:rgba(255,61,61,0.06);border:1px solid rgba(255,61,61,0.2);border-radius:9px;padding:11px 13px;display:none;}
+.err.vis{display:block;}
+.err-title{font-size:9px;font-weight:800;letter-spacing:1px;color:var(--red);margin-bottom:3px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+.err-msg{color:#ff7070;font-size:12px;line-height:1.5;}
+.empty{text-align:center;padding:48px 20px;color:var(--t3);}
+.empty-icon{font-size:40px;display:block;margin-bottom:12px;opacity:0.4;}
+.empty-txt{font-size:13px;font-weight:500;line-height:1.6;}
+.strip{background:rgba(255,230,0,0.03);border:1px solid rgba(255,230,0,0.08);border-left:2px solid var(--y);border-radius:0 9px 9px 0;padding:10px 13px;font-size:12px;color:var(--t2);line-height:1.7;}
+.strip b{color:var(--y);}
+.phone{height:400px;aspect-ratio:9/16;max-width:220px;border-radius:14px;overflow:hidden;background:var(--s2);border:1.5px solid var(--bd2);box-shadow:0 16px 50px rgba(0,0,0,0.6);position:relative;flex-shrink:0;}
+.phone-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--t3);}
+.phone-empty-icon{font-size:32px;opacity:0.4;}
+.phone-empty-txt{font-size:12px;font-weight:500;text-align:center;line-height:1.5;}
+.phone video,.phone img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.preview-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.dl-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;max-width:220px;padding:11px;background:var(--grn);color:#000;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.dl-btn:hover{background:#00ff8a;transform:translateY(-1px);}
+.slider-grp{display:flex;flex-direction:column;gap:6px;}
+.slider-labels{display:flex;justify-content:space-between;}
+.slider-end{font-size:10px;color:var(--t3);}
+.slider-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--y);text-align:center;}
+.slider{-webkit-appearance:none;width:100%;height:3px;border-radius:3px;background:var(--s5);outline:none;cursor:pointer;}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--y);cursor:pointer;box-shadow:0 0 6px rgba(255,230,0,0.4);}
+.char-count{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
 
-/* ── PIPELINE ── */
-.pipe-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.step-nav{
-  display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--bd);
-  background:var(--s1);flex-shrink:0;overflow-x:auto;gap:2px;
-}
-.step-nav::-webkit-scrollbar{height:0}
-.step-btn{
-  display:flex;align-items:center;gap:7px;padding:0 14px;height:44px;
-  font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;
-  border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;
-  background:none;border-top:none;border-left:none;border-right:none;flex-shrink:0;
-}
-.step-btn:hover{color:var(--t2)}
-.step-btn.active{color:var(--y);border-bottom-color:var(--y)}
-.step-btn.done{color:var(--grn)}
-.step-btn.done .step-num{background:var(--grn);color:#000}
-.step-btn.locked{opacity:0.3;cursor:not-allowed}
-.step-num{
-  width:18px;height:18px;border-radius:50%;background:var(--s4);font-size:8px;
-  font-weight:800;display:flex;align-items:center;justify-content:center;
-  font-family:'JetBrains Mono',monospace;flex-shrink:0;
-}
-.step-btn.active .step-num{background:var(--y);color:#000}
-.step-div{color:var(--bd2);font-size:9px;padding:0 2px;flex-shrink:0}
-.step-panel{display:none;flex:1;overflow:hidden}
-.step-panel.active{display:flex;height:100%}
-
-/* ── IDEAS ── */
-.idea-grid{display:flex;flex-direction:column;gap:7px;width:100%}
-.idea-card{
-  background:var(--s2);border:1px solid var(--bd);border-radius:10px;
-  padding:13px 14px;cursor:pointer;transition:all 0.15s;
-  display:flex;align-items:flex-start;gap:10px;
-}
-.idea-card:hover{border-color:rgba(255,230,0,0.2);background:var(--s3)}
-.idea-card.sel{border-color:var(--y);background:rgba(255,230,0,0.03)}
-.idea-num{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--y);flex-shrink:0;margin-top:2px}
-.idea-txt{font-size:13px;font-weight:500;color:var(--tx);line-height:1.5;flex:1}
-.idea-chk{width:18px;height:18px;border-radius:50%;background:var(--y);color:#000;font-size:10px;display:none;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
-.idea-card.sel .idea-chk{display:flex}
-
-/* ── CHIPS ── */
-.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.chip{background:var(--s3);border:1px solid var(--bd);border-radius:5px;padding:3px 7px;font-size:10px;color:var(--t2);display:flex;align-items:center;gap:4px}
-.chip-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:10px;padding:0}
-.chip-del:hover{color:var(--red)}
-
-/* ── SCENES ── */
-.scene-card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:8px;transition:border-color 0.15s}
-.scene-card:hover{border-color:var(--bd2)}
-.scene-head{padding:9px 13px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--s3)}
-.scene-badge{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;color:var(--y);background:var(--yd);border:1px solid rgba(255,230,0,0.12);border-radius:4px;padding:2px 7px}
-.scene-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:3px 6px;border-radius:4px;transition:all 0.12s}
-.scene-del:hover{color:var(--red);background:rgba(255,61,61,0.08)}
-.scene-body{padding:12px;display:flex;flex-direction:column;gap:8px}
-.scene-script{font-size:11.5px;color:var(--tx);line-height:1.7;background:var(--s3);border:1px solid var(--bd);border-radius:7px;padding:8px 11px;outline:none}
-.prompt-blk{display:flex;flex-direction:column;gap:3px}
-.prompt-tag{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3)}
-.prompt-prev{background:var(--s3);border:1px solid var(--bd);border-radius:7px;padding:7px 11px;font-size:10.5px;color:var(--t3);cursor:pointer;transition:all 0.12s;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
-.prompt-prev:hover{border-color:rgba(255,230,0,0.2);color:var(--t2)}
-
-/* ── IMG GRID ── */
-.img-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
-.img-cell{display:flex;flex-direction:column;gap:8px;padding-bottom:16px}
-.img-box{aspect-ratio:9/16;background:var(--s3);border:1.5px solid var(--bd);border-radius:9px;overflow:hidden;position:relative;cursor:pointer;transition:border-color 0.15s}
-.img-box:hover{border-color:var(--bd2)}
-.img-box.gen{border-color:rgba(255,230,0,0.4);animation:pulse 1.5s ease-in-out infinite}
-.img-box.done{border-color:rgba(0,230,118,0.3)}
-.img-box img{width:100%;height:100%;object-fit:cover;display:none}
-.img-box img.loaded{display:block}
-.img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--t3);font-size:9px}
-.img-ph-icon{font-size:18px}
-.img-cell-lbl{font-size:8px;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.img-cell-acts{display:flex;gap:3px}
-.btn-tiny{flex:1;padding:4px 5px;font-size:8px;font-weight:700;border-radius:4px;border:1px solid var(--bd);background:var(--s3);color:var(--t3);cursor:pointer;transition:all 0.12s;text-align:center}
-.btn-tiny:hover{border-color:rgba(255,230,0,0.3);color:var(--y)}
-.btn-tiny.pri{background:var(--y);color:#000;border-color:var(--y);font-weight:800}
-.btn-tiny.pri:hover{background:var(--y2)}
-.btn-tiny:disabled{opacity:0.4;cursor:not-allowed}
-
-/* ── CLIP GRID ── */
-.clip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
-.clip-cell{display:flex;flex-direction:column;gap:5px}
-.clip-box{aspect-ratio:9/16;background:var(--s3);border:1.5px solid var(--bd);border-radius:9px;overflow:hidden;position:relative;transition:border-color 0.15s}
-.clip-box.gen{border-color:rgba(255,230,0,0.4);animation:pulse 1.5s ease-in-out infinite}
-.clip-box.done{border-color:rgba(0,230,118,0.3)}
-.clip-box video,.clip-box img.ref-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.clip-box img.ref-img{opacity:0.2}
-
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.45}}
-
-/* ── VOICE ── */
-.voice-layout{flex:1;display:flex;overflow:hidden;height:100%}
-.voice-right{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.voice-script-area{padding:16px 18px;border-bottom:1px solid var(--bd);flex-shrink:0}
-.voice-output-area{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
-.vo-card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:border-color 0.15s}
-.vo-card:hover{border-color:var(--bd2)}
-.vo-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.vo-preview{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.vo-meta{font-size:9px;color:var(--t3);margin-top:1px;font-family:'JetBrains Mono',monospace}
-.vo-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;flex-shrink:0;transition:color 0.12s}
-.vo-del:hover{color:var(--red)}
-.vo-audio{width:100%;height:28px;accent-color:var(--y)}
-.vo-dl{display:block;width:100%;padding:6px;background:var(--s3);border:1px solid var(--bd);border-radius:6px;color:var(--t3);font-size:10px;font-weight:700;text-align:center;text-decoration:none;transition:all 0.15s}
-.vo-dl:hover{background:var(--grn);color:#000;border-color:var(--grn)}
-
-/* ── ADD VOICE MODAL ── */
-.add-voice-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;background:var(--s3);border:1.5px dashed var(--bd2);border-radius:8px;color:var(--t3);font-size:11.5px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif}
-.add-voice-btn:hover{border-color:rgba(255,230,0,0.3);color:var(--y);background:var(--yd)}
-
-/* ── SCRAPER ── */
-.scraper-results{width:100%;max-width:500px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
-.scraper-head{padding:11px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--s3)}
-.scraper-head-title{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--y)}
-.scraper-list{max-height:460px;overflow-y:auto}
-.scraper-item{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;gap:9px;align-items:flex-start;transition:background 0.12s}
-.scraper-item:hover{background:var(--s3)}
-.scraper-item:last-child{border-bottom:none}
-.scraper-thumb{width:46px;height:46px;object-fit:cover;border-radius:5px;flex-shrink:0;background:var(--s4)}
-.scraper-info{flex:1;min-width:0}
-.scraper-title{font-size:11px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-.scraper-meta{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.scraper-link{font-size:9px;color:var(--y);text-decoration:none;display:inline-block;margin-top:2px}
-
-/* ── MODALS ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center}
-.modal{background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:20px;width:360px;display:flex;flex-direction:column;gap:13px;box-shadow:0 20px 50px rgba(0,0,0,0.6)}
-.modal-title{font-family:'Inter',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.5px;color:var(--y)}
-.modal-btns{display:flex;gap:7px}
-.modal-cancel{flex:1;padding:10px;background:var(--s4);border:1px solid var(--bd);border-radius:8px;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
-.modal-cancel:hover{border-color:var(--bd2);color:var(--tx)}
-.modal-save{flex:1;padding:10px;background:var(--y);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
-.modal-save:hover{background:var(--y2)}
-
-.prompt-modal{background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:20px;width:540px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;gap:13px;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.6)}
-
-/* ── EMPTY STATE ── */
-.empty{text-align:center;padding:50px 20px;color:var(--t3)}
-.empty-icon{font-size:36px;display:block;margin-bottom:10px;opacity:0.45}
-.empty-txt{font-size:12px;font-weight:500;line-height:1.6}
-
-/* ── CHAR COUNT ── */
-.char-count{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+/* PIPELINE */
+.pipe-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.step-nav{display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;overflow-x:auto;gap:2px;}
+.step-nav::-webkit-scrollbar{height:0;}
+.step-btn{display:flex;align-items:center;gap:8px;padding:0 14px;height:46px;font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;flex-shrink:0;}
+.step-btn:hover{color:var(--t2);}
+.step-btn.active{color:var(--y);border-bottom-color:var(--y);}
+.step-btn.done{color:var(--grn);}
+.step-btn.done .step-num{background:var(--grn);color:#000;}
+.step-btn.locked{opacity:0.3;cursor:not-allowed;}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--s4);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.step-btn.active .step-num{background:var(--y);color:#000;}
+.step-div{color:var(--bd2);font-size:10px;padding:0 2px;flex-shrink:0;}
+.step-panel{display:none;flex:1;overflow:hidden;}
+.step-panel.active{display:flex;height:100%;}
+.workspace{flex:1;display:flex;overflow:hidden;margin:14px 18px;gap:16px;min-height:0;}
+.left-col{width:340px;flex-shrink:0;background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:13px;}
+.right-col{flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:14px;display:flex;flex-direction:column;align-items:center;padding:24px;gap:14px;overflow-y:auto;}
+.scene-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;overflow:hidden;margin-bottom:8px;transition:border-color 0.15s;}
+.scene-card:hover{border-color:var(--bd2);}
+.scene-head{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px;background:var(--s3);}
+.scene-badge{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;color:var(--y);background:var(--yd);border:1px solid rgba(255,230,0,0.15);border-radius:4px;padding:2px 8px;flex:1;}
+.scene-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;padding:3px 6px;border-radius:4px;transition:all 0.12s;}
+.scene-del:hover{color:var(--red);background:rgba(255,61,61,0.08);}
+.scene-body{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.scene-script{font-size:12px;color:var(--tx);line-height:1.7;background:var(--s3);border:1px solid var(--bd);border-radius:7px;padding:9px 12px;outline:none;}
+.prompt-prev{background:var(--s3);border:1px solid var(--bd);border-radius:7px;padding:8px 12px;font-size:11px;color:var(--t3);cursor:pointer;transition:all 0.12s;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;}
+.prompt-prev:hover{border-color:rgba(255,230,0,0.2);color:var(--t2);}
+.img-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;}
+.img-cell{display:flex;flex-direction:column;gap:8px;padding-bottom:16px;}
+.img-box{aspect-ratio:9/16;background:var(--s3);border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:border-color 0.15s;}
+.img-box:hover{border-color:var(--bd2);}
+.img-box.gen{border-color:rgba(255,230,0,0.4);animation:pulse 1.5s ease-in-out infinite;}
+.img-box.done{border-color:rgba(0,230,118,0.3);}
+.img-box img{width:100%;height:100%;object-fit:cover;display:none;}
+.img-box img.loaded{display:block;}
+.img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--t3);font-size:10px;}
+.img-ph-icon{font-size:20px;}
+.img-cell-lbl{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.img-cell-acts{display:flex;gap:4px;}
+.btn-tiny{flex:1;padding:5px 6px;font-size:9px;font-weight:700;border-radius:5px;border:1px solid var(--bd);background:var(--s3);color:var(--t3);cursor:pointer;transition:all 0.12s;text-align:center;}
+.btn-tiny:hover{border-color:rgba(255,230,0,0.3);color:var(--y);}
+.btn-tiny.pri{background:var(--y);color:#000;border-color:var(--y);font-weight:800;}
+.btn-tiny.pri:hover{background:var(--y2);}
+.btn-tiny:disabled{opacity:0.4;cursor:not-allowed;}
+.clip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;}
+.clip-cell{display:flex;flex-direction:column;gap:6px;}
+.clip-box{aspect-ratio:9/16;background:var(--s3);border:1.5px solid var(--bd);border-radius:10px;overflow:hidden;position:relative;transition:border-color 0.15s;}
+.clip-box.gen{border-color:rgba(255,230,0,0.4);animation:pulse 1.5s ease-in-out infinite;}
+.clip-box.done{border-color:rgba(0,230,118,0.3);}
+.clip-box video,.clip-box img.ref-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.clip-box img.ref-img{opacity:0.2;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.scraper-results{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:11px;overflow:hidden;}
+.scraper-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--s3);}
+.scraper-head-title{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--y);}
+.scraper-list{max-height:500px;overflow-y:auto;}
+.scraper-item{padding:11px 15px;border-bottom:1px solid var(--bd);display:flex;gap:10px;align-items:flex-start;transition:background 0.12s;}
+.scraper-item:hover{background:var(--s3);}
+.scraper-item:last-child{border-bottom:none;}
+.scraper-thumb{width:50px;height:50px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--s4);}
+.scraper-info{flex:1;min-width:0;}
+.scraper-title{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.scraper-meta{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.scraper-link{font-size:10px;color:var(--y);text-decoration:none;display:inline-block;margin-top:3px;}
+.idea-grid{display:flex;flex-direction:column;gap:8px;width:100%;}
+.idea-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:flex-start;gap:11px;}
+.idea-card:hover{border-color:rgba(255,230,0,0.2);background:var(--s3);}
+.idea-card.sel{border-color:var(--y);background:rgba(255,230,0,0.03);}
+.idea-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--y);flex-shrink:0;margin-top:2px;}
+.idea-txt{font-size:13px;font-weight:500;color:var(--tx);line-height:1.5;flex:1;}
+.idea-chk{width:20px;height:20px;border-radius:50%;background:var(--y);color:#000;font-size:10px;display:none;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;}
+.idea-card.sel .idea-chk{display:flex;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.chip{background:var(--s3);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px;}
+.chip-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:11px;padding:0;}
+.chip-del:hover{color:var(--red);}
+.vo-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:9px;transition:border-color 0.15s;}
+.vo-card:hover{border-color:var(--bd2);}
+.vo-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.vo-preview{font-size:12.5px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.vo-meta{font-size:10px;color:var(--t3);margin-top:1px;font-family:'JetBrains Mono',monospace;}
+.vo-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;flex-shrink:0;transition:color 0.12s;}
+.vo-del:hover{color:var(--red);}
+.vo-audio{width:100%;height:30px;accent-color:var(--y);}
+.vo-dl{display:block;width:100%;padding:7px;background:var(--s3);border:1px solid var(--bd);border-radius:7px;color:var(--t3);font-size:11px;font-weight:700;text-align:center;text-decoration:none;transition:all 0.15s;}
+.vo-dl:hover{background:var(--grn);color:#000;border-color:var(--grn);}
+.add-voice-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:var(--s3);border:1.5px dashed var(--bd2);border-radius:9px;color:var(--t3);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.add-voice-btn:hover{border-color:rgba(255,230,0,0.35);color:var(--y);background:var(--yd);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:400;display:flex;align-items:center;justify-content:center;}
+.modal{background:var(--s2);border:1px solid var(--bd2);border-radius:16px;padding:24px;width:380px;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 60px rgba(0,0,0,0.7);}
+.modal-title{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:var(--y);}
+.modal-btns{display:flex;gap:8px;}
+.modal-cancel{flex:1;padding:11px;background:var(--s4);border:1px solid var(--bd);border-radius:9px;color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.modal-cancel:hover{border-color:var(--bd2);color:var(--tx);}
+.modal-save{flex:1;padding:11px;background:var(--y);border:none;border-radius:9px;color:#000;font-size:13px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.modal-save:hover{background:var(--y2);}
+.prompt-modal{background:var(--s2);border:1px solid var(--bd2);border-radius:16px;padding:24px;width:560px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;gap:16px;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.7);}
 </style>
 </head>
 <body>
 
-<!-- hidden legacy elements for JS compat -->
-<aside class="sidebar" style="display:none;">
-  <button class="nav-item" id="nav-pipeline"></button>
-  <button class="nav-item" id="nav-vidgen"></button>
-  <button class="nav-item" id="nav-imggen"></button>
-  <button class="nav-item" id="nav-voicegen"></button>
-  <button class="nav-item" id="nav-deadspace"></button>
-  <button class="nav-item" id="nav-scraper"></button>
+<!-- Legacy compat -->
+<aside style="display:none;">
+  <button id="nav-pipeline"></button>
+  <button id="nav-vidgen"></button>
+  <button id="nav-imggen"></button>
+  <button id="nav-voicegen"></button>
+  <button id="nav-deadspace"></button>
+  <button id="nav-scraper"></button>
   <span id="userEmail"></span>
+  <div id="queuePill"></div>
+  <div id="topTitle"></div>
+  <div id="topSub"></div>
 </aside>
 
-<!-- ═══ TOP NAV ═══ -->
+<!-- TOP NAV -->
 <nav class="topnav">
-  <a class="logo-wrap" href="/">
-    <div class="logo-dot"></div>
-    <div class="logo-text">Viralmax</div>
-  </a>
-
-  <div class="nav-tabs">
-    <button class="nav-tab active" id="navtab-vidgen" onclick="switchTab('vidgen')"><span class="nav-tab-icon">🎬</span>Vid Gen</button>
-    <button class="nav-tab" id="navtab-imggen" onclick="switchTab('imggen')"><span class="nav-tab-icon">🖼</span>Image Gen</button>
-    <button class="nav-tab" id="navtab-voicegen" onclick="switchTab('voicegen')"><span class="nav-tab-icon">🎙</span>Voice Gen</button>
-    <div class="nav-divider"></div>
-    <button class="nav-tab" id="navtab-deadspace" onclick="switchTab('deadspace')"><span class="nav-tab-icon">✂️</span>Silence Remover</button>
-    <button class="nav-tab" id="navtab-scraper" onclick="switchTab('scraper')"><span class="nav-tab-icon">📊</span>YT Scraper</button>
-  </div>
-
-  <div class="nav-right">
-    <div class="credits-pill" onclick="openTopUp()">
-      <div>
-        <div class="credits-num" id="creditsDisplay"><script>document.write(localStorage.getItem('vm_credits_last')||'0')</script></div>
-        <div class="credits-lbl">Credits</div>
-      </div>
-      <div style="font-size:10px;font-weight:700;color:var(--y);background:rgba(255,230,0,0.1);border:1px solid rgba(255,230,0,0.2);border-radius:5px;padding:3px 8px;">Top Up</div>
+  <a class="logo" href="/">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#000" stroke="#000" stroke-width="1"/></svg>
     </div>
-    <div class="user-menu">
-      <div class="user-btn" onclick="toggleUserMenu()">
-        <div class="user-avatar" id="userAvatarInitial">?</div>
-        <span style="font-size:11px;" id="userEmailShort"></span>
-        <span style="font-size:9px;color:var(--t3);">▼</span>
+    <span class="logo-text">Viralmax</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/app" onclick="switchTab('vidgen');return false;">Dashboard</a>
+    <a class="nav-link active" href="/app" onclick="return false;">Create</a>
+    <a class="nav-link" href="/app" onclick="return false;">History</a>
+    <a class="nav-link" href="/checkout">Pricing</a>
+  </div>
+  <div class="nav-right">
+    <div class="credits-badge" onclick="openTopUp()">
+      <span class="credits-icon">⚡</span>
+      <span class="credits-text" id="creditsDisplay"><script>document.write(localStorage.getItem('vm_credits_last')||'0')</script></span>
+      <span style="font-size:10px;color:var(--t3);margin-left:2px;">Credits</span>
+    </div>
+    <div class="notif-btn">🔔</div>
+    <div class="avatar" id="userAvatarInitial" onclick="toggleUserMenu()">?</div>
+  </div>
+</nav>
+
+<!-- BODY -->
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-scroll">
+      <div class="sidebar-section">
+        <div class="sidebar-item" onclick="switchTab('vidgen')" id="sitem-vidgen">
+          <div class="sidebar-item-icon">🎬</div>
+          <span>Video Generator</span>
+        </div>
+        <div class="sidebar-item" onclick="switchTab('imggen')" id="sitem-imggen">
+          <div class="sidebar-item-icon">🖼</div>
+          <span>Image to Video</span>
+        </div>
+        <div class="sidebar-item" onclick="switchTab('voicegen')" id="sitem-voicegen">
+          <div class="sidebar-item-icon">🎙</div>
+          <span>Voice Generator</span>
+        </div>
+        <div class="sidebar-item" onclick="switchTab('deadspace')" id="sitem-deadspace">
+          <div class="sidebar-item-icon">✂️</div>
+          <span>Silence Remover</span>
+        </div>
+        <div class="sidebar-item" onclick="switchTab('scraper')" id="sitem-scraper">
+          <div class="sidebar-item-icon">📊</div>
+          <span>YT Scraper</span>
+        </div>
       </div>
-      <div class="user-dropdown" id="userDropdown">
-        <div class="user-email" id="userEmailFull"></div>
+    </div>
+
+    <!-- Upgrade card -->
+    <div class="upgrade-card">
+      <div class="upgrade-card-icon">⚡</div>
+      <div class="upgrade-card-title">Upgrade to Pro</div>
+      <div class="upgrade-card-desc">Unlock unlimited generations, faster queues, and premium models.</div>
+      <button class="upgrade-btn" onclick="window.location.href='/checkout'">Upgrade Plan</button>
+    </div>
+
+    <!-- User row -->
+    <div class="user-row" onclick="toggleUserMenu()">
+      <div class="user-row-av" id="userAvatarSidebar">?</div>
+      <div class="user-row-info">
+        <div class="user-row-name" id="userEmailSidebar">Account</div>
+        <div class="user-row-plan" id="userPlanSidebar">Free Plan</div>
+      </div>
+      <span class="user-row-caret">▲</span>
+      <div class="user-dd" id="userDropdown">
+        <div style="padding:12px 14px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--bd);" id="userEmailFull"></div>
         <a href="/checkout">⬆ Upgrade plan</a>
         <a href="#" onclick="openPortal();return false;">⚙ Manage billing</a>
         <a href="/legal">Legal</a>
         <a href="/">← Home</a>
-        <div class="user-dropdown-sep"></div>
+        <div class="user-dd-sep"></div>
         <button onclick="logout()">Sign out</button>
       </div>
     </div>
-  </div>
-</nav>
+  </aside>
 
-<!-- ═══ MAIN ═══ -->
-<div class="main">
-  <div class="topbar" style="display:none;">
-    <div class="topbar-title" id="topTitle">Video Gen</div>
-    <span class="topbar-sep" id="topSep">—</span>
-    <div class="topbar-sub" id="topSub">AI video generation</div>
-    <div class="topbar-right">
-      <div class="topbar-pill" id="queuePill">Queue: 0 active</div>
-    </div>
-  </div>
+  <!-- MAIN -->
+  <div class="main">
 
-  <!-- ═══ PIPELINE ═══ -->
-  <div class="tab-panel" id="tab-pipeline">
-  <div id="niche-picker" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:40px;background:var(--blk);">
-    <div style="text-align:center;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:12px;">Step 0</div>
-      <div style="font-family:'Inter',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--tx);margin-bottom:8px;">Choose your niche</div>
-      <div style="font-size:14px;color:var(--t2);">Select a content type to start the automation pipeline</div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:700px;width:100%;">
-      <div onclick="selectNichePick('Skeleton')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s2)'">
-        <div style="font-size:40px;margin-bottom:12px;">💀</div>
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Skeleton</div>
-        <div style="font-size:11px;color:var(--t3);line-height:1.5;">Full 7-step pipeline for skeleton content</div>
-        <div style="margin-top:14px;display:inline-block;background:var(--y);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">LIVE</div>
-      </div>
-      <div onclick="selectNichePick('Ronaldo')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;opacity:0.6;" onmouseover="this.style.borderColor='var(--bd2)'" onmouseout="this.style.borderColor='var(--bd)'">
-        <div style="font-size:40px;margin-bottom:12px;">⚽</div>
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Ronaldo Adventures</div>
-        <div style="font-size:11px;color:var(--t3);line-height:1.5;">Automated Ronaldo content pipeline</div>
-        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">COMING SOON</div>
-      </div>
-      <div onclick="suggestNiche()" style="background:var(--s2);border:1.5px dashed var(--bd2);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.background='var(--s2)'">
-        <div style="font-size:40px;margin-bottom:12px;">💡</div>
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--t2);margin-bottom:6px;">Suggest a Niche</div>
-        <div style="font-size:11px;color:var(--t3);line-height:1.5;">Tell us what you want next</div>
-        <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">REQUEST</div>
-      </div>
-    </div>
-  </div>
-  <div id="pipeline-content" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
-    <div class="pipe-wrap">
-      <div class="step-nav" style="position:relative;"><button onclick="changeNiche()" style="margin-right:8px;padding:6px 14px;background:var(--s3);border:1px solid var(--bd2);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)';this.style.color='var(--y)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--t2)'">← Change Niche</button>
-        <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Scenes</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1);renderImgGrid();setTimeout(updateImgAllCost,100)"><span class="step-num">2</span>Images</button>
-        <span class="step-div">›</span>
-        <button class="step-btn locked" id="pstep-2" onclick="goPipeStep(2);renderClipGrid();setTimeout(updateClipAllCost,100)"><span class="step-num">3</span>Videos</button>
-      </div>
-      <!-- STEP 1: SCENES -->
-      <div class="step-panel active" id="pcontent-0">
-        <div class="workspace">
-          <div class="left-col">
-            <div class="strip"><b>Step 1 — Scenes.</b> Claude splits the script into scenes with image + video prompts.</div>
-            <div><label class="fl">Your Script</label><textarea class="ta" id="scenesScriptInput" rows="6" placeholder="Paste your script here…" oninput="pipe.script=this.value"></textarea></div>
-            <button class="btn-y" id="scenesGenBtn" onclick="runScenesGen()">🎬 Auto-Split into Scenes</button>
-            <button class="btn-ghost" onclick="addManualScene()" style="margin-top:-4px;">+ Add Scene Manually</button>
-            <div class="prog" id="scenesProg"><div class="prog-top"><span class="prog-lbl" id="scenesProgLbl">Splitting…</span><span class="prog-pct" id="scenesProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="scenesProgFill"></div></div></div>
-            <div class="err" id="scenesErr"><div class="err-title">ERROR</div><div class="err-msg" id="scenesErrMsg"></div></div>
-            <button class="btn-y" id="scenesContinueBtn" onclick="continueToImages()" style="display:none;">Continue to Images →</button>
+    <!-- PIPELINE -->
+    <div class="tab-panel" id="tab-pipeline">
+      <div id="niche-picker" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:40px;">
+        <div style="text-align:center;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:12px;">Step 0</div>
+          <div style="font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--tx);margin-bottom:8px;">Choose your niche</div>
+          <div style="font-size:14px;color:var(--t2);">Select a content type to start the automation pipeline</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:700px;width:100%;">
+          <div onclick="selectNichePick('Skeleton')" style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s3)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s2)'">
+            <div style="font-size:40px;margin-bottom:12px;">💀</div>
+            <div style="font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Skeleton</div>
+            <div style="font-size:11px;color:var(--t3);line-height:1.5;">Full pipeline for skeleton content</div>
+            <div style="margin-top:14px;display:inline-block;background:var(--y);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">LIVE</div>
           </div>
-          <div class="right-col" style="align-items:stretch;">
-            <div class="empty" id="scenesEmpty"><span class="empty-icon">🎬</span><div class="empty-txt">Click Auto-Split to generate scenes</div></div>
-            <div id="scenesList" style="width:100%;"></div>
+          <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;opacity:0.6;">
+            <div style="font-size:40px;margin-bottom:12px;">⚽</div>
+            <div style="font-size:18px;font-weight:800;color:var(--tx);margin-bottom:6px;">Ronaldo Adventures</div>
+            <div style="font-size:11px;color:var(--t3);line-height:1.5;">Automated Ronaldo content</div>
+            <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">COMING SOON</div>
+          </div>
+          <div onclick="suggestNiche()" style="background:var(--s2);border:1.5px dashed var(--bd2);border-radius:14px;padding:32px 24px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.3)'" onmouseout="this.style.borderColor='var(--bd2)'">
+            <div style="font-size:40px;margin-bottom:12px;">💡</div>
+            <div style="font-size:18px;font-weight:800;color:var(--t2);margin-bottom:6px;">Suggest a Niche</div>
+            <div style="font-size:11px;color:var(--t3);line-height:1.5;">Tell us what you want next</div>
+            <div style="margin-top:14px;display:inline-block;background:var(--s4);color:var(--t3);font-size:10px;font-weight:800;padding:4px 10px;border-radius:5px;font-family:'JetBrains Mono',monospace;">REQUEST</div>
           </div>
         </div>
       </div>
-      <!-- STEP 6: IMAGES -->
-      <div class="step-panel" id="pcontent-1">
-        <div class="workspace">
-          <div class="left-col">
-            <div class="strip"><b>Step 2 — Images.</b> Generate reference images for each scene.</div>
-            <div>
-              <label class="fl">Skeleton Reference <span style="color:var(--t4);font-weight:400;">(recommended)</span></label>
-              <div style="position:relative;">
-                <div class="zone" id="pipeRefDrop">
-                  <input type="file" id="pipeRefInp" accept="image/*" style="display:none">
-                  <span class="zone-icon">💀</span>
-                  <div class="zone-title">Drop reference image</div>
-                  <div class="zone-hint">PNG · JPG · WEBP</div>
-                  <div class="zone-fname" id="pipeRefName"></div>
-                </div>
-                <button id="pipeRefRemove" onclick="removePipeRef()" style="display:none;position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:1px solid var(--bd2);color:var(--tx);border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;z-index:2;">✕</button>
+      <div id="pipeline-content" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
+        <div class="pipe-wrap">
+          <div class="step-nav">
+            <button onclick="changeNiche()" style="margin-right:8px;padding:6px 14px;background:var(--s3);border:1px solid var(--bd2);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;">← Change Niche</button>
+            <button class="step-btn active" id="pstep-0" onclick="goPipeStep(0)"><span class="step-num">1</span>Scenes</button>
+            <span class="step-div">›</span>
+            <button class="step-btn locked" id="pstep-1" onclick="goPipeStep(1);renderImgGrid();setTimeout(updateImgAllCost,100)"><span class="step-num">2</span>Images</button>
+            <span class="step-div">›</span>
+            <button class="step-btn locked" id="pstep-2" onclick="goPipeStep(2);renderClipGrid();setTimeout(updateClipAllCost,100)"><span class="step-num">3</span>Videos</button>
+          </div>
+          <div class="step-panel active" id="pcontent-0">
+            <div class="workspace">
+              <div class="left-col">
+                <div class="strip"><b>Step 1 — Scenes.</b> Claude splits the script into scenes.</div>
+                <div><label class="fl">Your Script</label><textarea class="ta" id="scenesScriptInput" rows="6" placeholder="Paste your script here…" oninput="pipe.script=this.value"></textarea></div>
+                <button class="btn-y" id="scenesGenBtn" onclick="runScenesGen()">🎬 Auto-Split into Scenes</button>
+                <button class="btn-ghost" onclick="addManualScene()">+ Add Scene Manually</button>
+                <div class="prog" id="scenesProg"><div class="prog-top"><span class="prog-lbl" id="scenesProgLbl">Splitting…</span><span class="prog-pct" id="scenesProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="scenesProgFill"></div></div></div>
+                <div class="err" id="scenesErr"><div class="err-title">ERROR</div><div class="err-msg" id="scenesErrMsg"></div></div>
+                <button class="btn-y" id="scenesContinueBtn" onclick="continueToImages()" style="display:none;">Continue to Images →</button>
+              </div>
+              <div class="right-col" style="align-items:stretch;">
+                <div class="empty" id="scenesEmpty"><span class="empty-icon">🎬</span><div class="empty-txt">Click Auto-Split to generate scenes</div></div>
+                <div id="scenesList" style="width:100%;"></div>
               </div>
             </div>
-            <div class="s-row"><label class="s-lbl">Model (all scenes)</label><select class="sel" id="imgGlobalModel" onchange="syncImgModels(this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
-            <button class="btn-y" id="imgGenAllBtn" onclick="generateAllImages()">Generate All Images</button>
-            <button class="btn-y" onclick="downloadAllImages()" style="background:var(--s3);border:1px solid var(--bd2);color:var(--tx);">⬇ Download All Images</button>
-            <div class="prog" id="imgAllProg"><div class="prog-top"><span class="prog-lbl" id="imgAllProgLbl">Generating…</span><span class="prog-pct" id="imgAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="imgAllProgFill"></div></div></div>
-            <div class="err" id="imgsErr"><div class="err-title">ERROR</div><div class="err-msg" id="imgsErrMsg"></div></div>
-            <button class="btn-y" id="imgsContinueBtn" onclick="continueToClips()" style="display:none;">Continue to Videos →</button>
           </div>
-          <div class="right-col">
-            <div class="empty" id="imgsEmpty"><span class="empty-icon">🖼</span><div class="empty-txt">Scene images will appear here</div></div>
-            <div class="img-grid" id="imgGrid" style="display:none;row-gap:28px;"></div>
+          <div class="step-panel" id="pcontent-1">
+            <div class="workspace">
+              <div class="left-col">
+                <div class="strip"><b>Step 2 — Images.</b> Generate reference images for each scene.</div>
+                <div style="position:relative;">
+                  <div class="zone" id="pipeRefDrop">
+                    <input type="file" id="pipeRefInp" accept="image/*" style="display:none">
+                    <span class="zone-icon">💀</span>
+                    <div class="zone-title">Drop reference image</div>
+                    <div class="zone-hint">PNG · JPG · WEBP</div>
+                    <div class="zone-fname" id="pipeRefName"></div>
+                  </div>
+                  <button id="pipeRefRemove" onclick="removePipeRef()" style="display:none;position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);border:1px solid var(--bd2);color:var(--tx);border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;z-index:2;">✕</button>
+                </div>
+                <div class="s-row"><label class="s-lbl">Model (all scenes)</label><select class="sel" id="imgGlobalModel" onchange="syncImgModels(this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
+                <button class="btn-y" id="imgGenAllBtn" onclick="generateAllImages()">Generate All Images</button>
+                <button class="btn-ghost" onclick="downloadAllImages()">⬇ Download All Images</button>
+                <div class="prog" id="imgAllProg"><div class="prog-top"><span class="prog-lbl" id="imgAllProgLbl">Generating…</span><span class="prog-pct" id="imgAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="imgAllProgFill"></div></div></div>
+                <div class="err" id="imgsErr"><div class="err-title">ERROR</div><div class="err-msg" id="imgsErrMsg"></div></div>
+                <button class="btn-y" id="imgsContinueBtn" onclick="continueToClips()" style="display:none;">Continue to Videos →</button>
+              </div>
+              <div class="right-col">
+                <div class="empty" id="imgsEmpty"><span class="empty-icon">🖼</span><div class="empty-txt">Scene images will appear here</div></div>
+                <div class="img-grid" id="imgGrid" style="display:none;row-gap:28px;"></div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <!-- STEP 7: VIDEOS -->
-      <div class="step-panel" id="pcontent-2">
-        <div class="workspace">
-          <div class="left-col">
-            <div class="strip"><b>Step 3 — Videos.</b> Generate a 9:16 clip for each scene.</div>
-            <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok (10 cr)</option><option value="veo3">Veo 3 Lite (15 cr)</option><option value="sora2">Sora 2 (20 cr)</option></select></div>
-            <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">Generate All Clips</button>
-            <button class="btn-y" onclick="downloadAllVideos()" style="background:var(--s3);border:1px solid var(--bd2);color:var(--tx);">⬇ Download All Videos</button>
-            <div class="prog" id="clipAllProg"><div class="prog-top"><span class="prog-lbl" id="clipAllProgLbl">Generating…</span><span class="prog-pct" id="clipAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="clipAllProgFill"></div></div></div>
-            <div class="err" id="clipsErr"><div class="err-title">ERROR</div><div class="err-msg" id="clipsErrMsg"></div></div>
-          </div>
-          <div class="right-col">
-            <div class="empty" id="clipsEmpty"><span class="empty-icon">🎬</span><div class="empty-txt">Video clips will appear here</div></div>
-            <div class="clip-grid" id="clipGrid" style="display:none;row-gap:28px;"></div>
+          <div class="step-panel" id="pcontent-2">
+            <div class="workspace">
+              <div class="left-col">
+                <div class="strip"><b>Step 3 — Videos.</b> Generate a 9:16 clip for each scene.</div>
+                <div class="s-row"><label class="s-lbl">Video Model</label><select class="sel" id="clipGlobalModel"><option value="grok" selected>Grok (10 cr)</option><option value="veo3">Veo 3 Lite (15 cr)</option><option value="sora2">Sora 2 (20 cr)</option></select></div>
+                <button class="btn-y" id="clipGenAllBtn" onclick="generateAllClips()">Generate All Clips</button>
+                <button class="btn-ghost" onclick="downloadAllVideos()">⬇ Download All Videos</button>
+                <div class="prog" id="clipAllProg"><div class="prog-top"><span class="prog-lbl" id="clipAllProgLbl">Generating…</span><span class="prog-pct" id="clipAllProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="clipAllProgFill"></div></div></div>
+                <div class="err" id="clipsErr"><div class="err-title">ERROR</div><div class="err-msg" id="clipsErrMsg"></div></div>
+              </div>
+              <div class="right-col">
+                <div class="empty" id="clipsEmpty"><span class="empty-icon">🎬</span><div class="empty-txt">Video clips will appear here</div></div>
+                <div class="clip-grid" id="clipGrid" style="display:none;row-gap:28px;"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div><!-- /pipeline-content -->
-  </div>
 
-  <!-- ═══ VID GEN ═══ -->
-  <div class="tab-panel active" id="tab-vidgen">
-    <div class="workspace">
-      <div class="left-col">
-        <div class="zone" id="imgDrop" onclick="document.getElementById('imgInp').click()">
-          <input type="file" id="imgInp" accept="image/*" style="display:none">
-          <span class="zone-icon">🖼</span><div class="zone-title">Image Input <span style="font-size:9px;color:var(--t4);font-weight:400;">(optional)</span></div>
-          <div class="zone-hint">PNG · JPG · WEBP</div><div class="zone-fname" id="imgFnm"></div>
-          <button id="imgRemoveBtn" onclick="event.stopPropagation();clearVidImg()" style="display:none;position:absolute;top:6px;right:6px;background:rgba(255,0,0,0.7);border:none;border-radius:4px;color:#fff;font-size:10px;padding:2px 6px;cursor:pointer;">✕ Remove</button>
+    <!-- VID GEN -->
+    <div class="tab-panel active" id="tab-vidgen">
+      <div class="vidgen-layout">
+        <!-- Left: create -->
+        <div class="create-panel">
+          <span class="tool-cat">AI VIDEO GENERATOR</span>
+          <h1 class="tool-title">Turn Ideas Into <span style="color:var(--y);">Viral Videos</span></h1>
+          <p class="tool-desc">Create stunning videos from text or images using state-of-the-art AI. Perfect for faceless channels, ads, and social media.</p>
+          <div class="tool-badges">
+            <div class="tbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Lightning Fast</div>
+            <div class="tbadge">⚡ Grok, Veo 3, Sora 2</div>
+            <div class="tbadge">✨ HD Quality</div>
+          </div>
+
+          <div class="create-card">
+            <div class="create-card-header">
+              <div class="create-card-title">Create Your Video</div>
+            </div>
+            <div style="padding:16px 18px;">
+              <!-- Mode toggle -->
+              <div class="mode-toggle" style="margin-bottom:14px;">
+                <button class="mode-btn active" id="modeText" onclick="setVidMode('text')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                  Text to Video
+                </button>
+                <button class="mode-btn" id="modeImage" onclick="setVidMode('image')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  Image to Video
+                </button>
+              </div>
+
+              <!-- Image input (hidden by default) -->
+              <div id="vidImgInput" style="display:none;margin-bottom:12px;">
+                <div class="zone" id="imgDrop" onclick="document.getElementById('imgInp').click()">
+                  <input type="file" id="imgInp" accept="image/*" style="display:none">
+                  <span class="zone-icon">🖼</span>
+                  <div class="zone-title">Drop image here</div>
+                  <div class="zone-hint">PNG · JPG · WEBP</div>
+                  <div class="zone-fname" id="imgFnm"></div>
+                  <button id="imgRemoveBtn" onclick="event.stopPropagation();clearVidImg()" style="display:none;position:absolute;top:8px;right:8px;background:rgba(255,61,61,0.85);border:none;border-radius:5px;color:#fff;font-size:10px;padding:3px 8px;cursor:pointer;">✕ Remove</button>
+                </div>
+              </div>
+
+              <!-- Prompt -->
+              <div style="margin-bottom:4px;">
+                <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:8px;">Describe Your Video</div>
+                <div class="prompt-wrap">
+                  <textarea class="prompt-ta" id="vgPrompt" placeholder="Example: A cinematic aerial view of a neon-lit cyberpunk city at night, rain falling, flying cars passing by..." oninput="updateVidCharCount(this)"></textarea>
+                  <span class="prompt-counter" id="vidCharCount">0/2000</span>
+                </div>
+              </div>
+
+              <!-- Settings -->
+              <div class="settings-section">
+                <div class="settings-title">Settings</div>
+                <div class="setting-row">
+                  <label class="setting-label">Model</label>
+                  <select class="setting-sel" id="vidModel" onchange="onModelChange();localStorage.setItem('vm_vidModel',this.value)">
+                    <option value="veo3-lite">Veo 3.1 Lite</option>
+                    <option value="sora2">Sora 2</option>
+                    <option value="grok" selected>Grok</option>
+                  </select>
+                </div>
+                <div class="setting-row2">
+                  <div>
+                    <label class="setting-label" id="durRow">Duration</label>
+                    <select class="setting-sel" id="vidDur" onchange="localStorage.setItem('vm_vidDur',this.value)"></select>
+                  </div>
+                  <div>
+                    <label class="setting-label" id="aspRow">Aspect Ratio</label>
+                    <select class="setting-sel" id="vidAsp" onchange="localStorage.setItem('vm_vidAsp',this.value)"></select>
+                  </div>
+                </div>
+                <div style="display:none;" id="qualRow">
+                  <label class="setting-label">Quality</label>
+                  <select class="setting-sel" id="vidQual" onchange="onQualityChange();localStorage.setItem('vm_vidQual',this.value)"></select>
+                </div>
+              </div>
+
+              <button class="gen-btn" id="vidBtn" onclick="startVidGen()">
+                <span class="gen-btn-left">⚡ Generate Video</span>
+                <span class="gen-btn-right" id="vidCost">15 cr</span>
+              </button>
+
+              <div class="prog" id="vidProg" style="margin-top:12px;"><div class="prog-top"><span class="prog-lbl" id="vpLbl">Submitting…</span><span class="prog-pct" id="vpPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="vpFill"></div></div></div>
+              <div class="err" id="vidErr" style="margin-top:10px;"><div class="err-title">ERROR</div><div class="err-msg" id="vidErrMsg"></div></div>
+            </div>
+          </div>
         </div>
-        <div><label class="fl">Prompt</label><textarea class="ta" id="vgPrompt" rows="3" placeholder="Describe the motion…"></textarea></div>
-        <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="vidModel" onchange="onModelChange();localStorage.setItem('vm_vidModel',this.value)"><option value="veo3-lite">Veo 3.1 Lite</option><option value="sora2">Sora 2</option><option value="grok" selected>Grok</option></select></div>
-          <div class="s-row" id="durRow"><label class="s-lbl">Duration</label><select class="sel" id="vidDur" onchange="localStorage.setItem('vm_vidDur',this.value)"></select></div>
-          <div class="s-row" id="aspRow"><label class="s-lbl">Aspect</label><select class="sel" id="vidAsp" onchange="localStorage.setItem('vm_vidAsp',this.value)"></select></div>
-          <div class="s-row" id="qualRow" style="display:none;"><label class="s-lbl">Quality</label><select class="sel" id="vidQual" onchange="onQualityChange();localStorage.setItem('vm_vidQual',this.value)"></select></div>
-          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="vidCost">15 cr</div></div>
-        </div></div>
-        <button class="btn-y" id="vidBtn" onclick="startVidGen()">⚡ Generate Video</button>
-        <div class="prog" id="vidProg"><div class="prog-top"><span class="prog-lbl" id="vpLbl">Submitting…</span><span class="prog-pct" id="vpPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="vpFill"></div></div></div>
-        <div class="err" id="vidErr"><div class="err-title">ERROR</div><div class="err-msg" id="vidErrMsg"></div></div>
-      </div>
-      <div class="right-col">
-        <div class="phone" id="vidPhone">
-          <div class="phone-empty" id="vidEmpty"><span class="phone-empty-icon">📱</span><div class="phone-empty-txt">Preview here</div></div>
-          <video id="vidVideo" controls playsinline loop style="display:none;"></video>
+
+        <!-- Right: preview + recents -->
+        <div class="preview-panel">
+          <div class="preview-top">
+            <div class="preview-phone" id="vidPhone">
+              <div class="preview-empty" id="vidEmpty">
+                <div class="preview-empty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </div>
+                <div class="preview-empty-title">Your video will appear here</div>
+                <div class="preview-empty-sub">Generate a video to see the preview</div>
+              </div>
+              <video id="vidVideo" controls playsinline loop style="display:none;"></video>
+            </div>
+          </div>
+          <div class="recents-panel">
+            <div class="recents-header">
+              <div class="recents-title">Recent Generations</div>
+              <a class="recents-link" href="#">View All History →</a>
+            </div>
+            <div class="recents-grid" id="recentsGrid">
+              <!-- Populated by JS -->
+              <div class="recent-item" style="background:var(--s3);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;">No generations yet</div>
+            </div>
+          </div>
         </div>
-        <div class="preview-lbl">PREVIEW</div>
-        <a class="dl-btn" id="vidDlBtn" href="#" download="video.mp4" style="display:none;max-width:293px;">⬇ Download Video</a>
       </div>
     </div>
-  </div>
 
-  <!-- ═══ IMAGE GEN ═══ -->
-  <div class="tab-panel" id="tab-imggen">
-    <div class="workspace">
-      <div class="left-col">
-        <div class="zone" id="refDrop" style="position:relative;" onclick="document.getElementById('refInp').click()">
-          <input type="file" id="refInp" accept="image/*" style="display:none">
-          <span class="zone-icon">📷</span><div class="zone-title">Reference Image <span style="font-size:9px;color:var(--t4);font-weight:400;">(optional)</span></div>
-          <div class="zone-hint">PNG · JPG · WEBP</div><div class="zone-fname" id="refFnm"></div>
-          <button id="refRemoveBtn" onclick="event.stopPropagation();clearRefImg()" style="display:none;position:absolute;top:6px;right:6px;background:rgba(255,0,0,0.7);border:none;border-radius:4px;color:#fff;font-size:10px;padding:2px 6px;cursor:pointer;">✕ Remove</button>
+    <!-- IMAGE GEN -->
+    <div class="tab-panel" id="tab-imggen">
+      <div class="vidgen-layout">
+        <div class="create-panel">
+          <span class="tool-cat">AI IMAGE GENERATOR</span>
+          <h1 class="tool-title">Generate <span style="color:var(--y);">Stunning Images</span></h1>
+          <p class="tool-desc">Create high-quality images with reference image support for consistent characters.</p>
+          <div class="tool-badges">
+            <div class="tbadge">✨ Nano Banana Pro</div>
+            <div class="tbadge">✨ Nano Banana 2</div>
+            <div class="tbadge">🖼 1K–4K PNG</div>
+          </div>
+          <div class="create-card">
+            <div class="create-card-header"><div class="create-card-title">Create Your Image</div></div>
+            <div style="padding:16px 18px;">
+              <div class="zone" id="refDrop" style="position:relative;margin-bottom:14px;" onclick="document.getElementById('refInp').click()">
+                <input type="file" id="refInp" accept="image/*" style="display:none">
+                <span class="zone-icon">📷</span>
+                <div class="zone-title">Reference Image <span style="font-size:10px;color:var(--t4);font-weight:400;">(optional)</span></div>
+                <div class="zone-hint">PNG · JPG · WEBP</div>
+                <div class="zone-fname" id="refFnm"></div>
+                <button id="refRemoveBtn" onclick="event.stopPropagation();clearRefImg()" style="display:none;position:absolute;top:8px;right:8px;background:rgba(255,61,61,0.85);border:none;border-radius:5px;color:#fff;font-size:10px;padding:3px 8px;cursor:pointer;">✕ Remove</button>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:8px;">Describe Your Image</div>
+              <div class="prompt-wrap" style="margin-bottom:16px;">
+                <textarea class="prompt-ta" id="imgPrompt" placeholder="Describe the image in detail…"></textarea>
+              </div>
+              <div class="settings-section">
+                <div class="settings-title">Settings</div>
+                <div class="setting-row"><label class="setting-label">Model</label><select class="setting-sel" id="imgModel" onchange="onImgModelChange();localStorage.setItem('vm_imgModel',this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
+                <div class="setting-row"><label class="setting-label">Aspect Ratio</label><select class="setting-sel" id="imgAsp"><option value="9:16" selected>9:16 - Portrait</option><option value="16:9">16:9 - Landscape</option><option value="1:1">1:1 - Square</option></select></div>
+              </div>
+              <button class="gen-btn" id="imgBtn" onclick="startImgGen()">
+                <span class="gen-btn-left">🎨 Generate Image</span>
+                <span class="gen-btn-right" id="imgCost">15 cr</span>
+              </button>
+              <div class="prog" id="imgProg" style="margin-top:12px;"><div class="prog-top"><span class="prog-lbl" id="ipLbl">Generating…</span><span class="prog-pct" id="ipPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="ipFill"></div></div></div>
+              <div class="err" id="imgErr" style="margin-top:10px;"><div class="err-title">ERROR</div><div class="err-msg" id="imgErrMsg"></div></div>
+            </div>
+          </div>
         </div>
-        <div><label class="fl">Prompt</label><textarea class="ta" id="imgPrompt" rows="4" placeholder="Describe the image…"></textarea></div>
-        <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Model</label><select class="sel" id="imgModel" onchange="onImgModelChange();localStorage.setItem('vm_imgModel',this.value)"><option value="nano-banana-pro" selected>Nano Banana Pro</option><option value="nano-banana-2">Nano Banana 2</option></select></div>
-          <div class="s-row"><label class="s-lbl">Aspect Ratio</label><select class="sel" id="imgAsp"><option value="9:16" selected>9:16 Portrait</option><option value="16:9">16:9 Landscape</option><option value="1:1">1:1 Square</option></select></div>
-          
-          <div class="s-row"><label class="s-lbl">Cost</label><div class="s-val" id="imgCost">15 cr</div></div>
-        </div></div>
-        <button class="btn-y" id="imgBtn" onclick="startImgGen()">🎨 Generate Image</button>
-        <div class="prog" id="imgProg"><div class="prog-top"><span class="prog-lbl" id="ipLbl">Generating…</span><span class="prog-pct" id="ipPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="ipFill"></div></div></div>
-        <div class="err" id="imgErr"><div class="err-title">ERROR</div><div class="err-msg" id="imgErrMsg"></div></div>
-      </div>
-      <div class="right-col">
-        <div id="imgPrev" style="width:100%;max-width:300px;border-radius:12px;background:var(--s3);border:1px solid var(--bd);overflow:hidden;aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;position:relative;">
-          <img id="genImgEl" style="width:100%;height:100%;object-fit:cover;display:none;" alt="">
-          <div class="empty" id="imgEmpty" style="padding:30px;"><span class="empty-icon" style="font-size:28px;">🎨</span><div class="empty-txt">Image here</div></div>
+        <div class="preview-panel">
+          <div class="preview-top">
+            <div id="imgPrev" style="width:220px;aspect-ratio:9/16;border-radius:14px;background:var(--s2);border:1.5px solid var(--bd2);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+              <img id="genImgEl" style="width:100%;height:100%;object-fit:cover;display:none;" alt="">
+              <div class="preview-empty" id="imgEmpty" style="position:relative;">
+                <div style="font-size:40px;opacity:0.3;">🎨</div>
+                <div style="font-size:12px;font-weight:500;text-align:center;color:var(--t3);">Image will appear here</div>
+              </div>
+            </div>
+          </div>
+          <div class="recents-panel">
+            <div style="display:flex;justify-content:center;margin-top:8px;">
+              <a class="dl-btn" id="dlImgBtn" href="#" download="image.png" style="display:none;max-width:220px;">⬇ Download Image</a>
+            </div>
+          </div>
         </div>
-        <div class="preview-lbl">PREVIEW</div>
-        <a class="dl-btn" id="dlImgBtn" href="#" download="image.png" style="display:none;max-width:300px;">⬇ Download Image</a>
       </div>
     </div>
-  </div>
 
-  <!-- ═══ VOICE GEN ═══ -->
-  <div class="tab-panel" id="tab-voicegen">
-    <div class="voice-layout">
-      <div class="left-col">
-        <!-- VOICE MODE -->
-        <div id="voiceModePanel">
-          <div class="card"><div class="card-head">Voice</div><div class="card-body">
+    <!-- VOICE GEN -->
+    <div class="tab-panel" id="tab-voicegen">
+      <div class="vidgen-layout">
+        <div class="create-panel">
+          <span class="tool-cat">AI VOICE GENERATOR</span>
+          <h1 class="tool-title">Generate <span style="color:var(--y);">Voiceovers</span></h1>
+          <p class="tool-desc">Clone voices and generate natural speech with ElevenLabs.</p>
+          <div id="voiceModePanel">
+            <div class="create-card" style="margin-bottom:14px;">
+              <div class="create-card-header"><div class="create-card-title">Voice</div></div>
+              <div style="padding:14px;">
+                <div class="s-row" style="margin-bottom:12px;">
+                  <label class="s-lbl">Default Voices</label>
+                  <button onclick="openVoicePicker()" style="width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:9px;padding:11px 13px;color:var(--tx);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)'" onmouseout="this.style.borderColor='var(--bd2)'">
+                    <span id="selectedVoiceLabel">Rachel</span><span style="color:var(--t3);font-size:10px;">▼ Browse</span>
+                  </button>
+                </div>
+                <div style="height:1px;background:var(--bd);margin-bottom:12px;"></div>
+                <div class="s-row">
+                  <label class="s-lbl">Custom Voices</label>
+                  <div style="display:flex;gap:6px;margin-bottom:8px;margin-top:5px;">
+                    <input class="inp" id="customVoiceIdInp" placeholder="Paste ElevenLabs Voice ID" style="flex:1;font-size:11px;">
+                    <button class="btn-sm" onclick="promptSaveCustomVoice()">Save</button>
+                  </div>
+                  <div id="customVoicesList" style="display:flex;flex-direction:column;gap:4px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="create-card" style="margin-bottom:14px;">
+              <div class="card-head" style="cursor:pointer;" onclick="toggleModelCard()">Model<span id="modelCardArrow" style="font-size:10px;color:var(--t3);">▼</span></div>
+              <div class="card-body" id="modelCardBody">
+                <div class="s-row"><label class="s-lbl">ElevenLabs Model</label></div>
+                <select id="voiceModelSelect" class="sel" style="margin-top:4px;" onchange="updateVoiceModel()">
+                  <option value="eleven_multilingual_v2">Multilingual v2 (Best Quality)</option>
+                  <option value="eleven_v3">v3 (Latest)</option>
+                  <option value="eleven_flash_v2_5">Flash v2.5 (Fastest)</option>
+                  <option value="eleven_turbo_v2_5">Turbo v2.5</option>
+                  <option value="eleven_turbo_v2">Turbo v2</option>
+                  <option value="eleven_flash_v2">Flash v2</option>
+                  <option value="eleven_monolingual_v1">English v1 (Legacy)</option>
+                </select>
+              </div>
+            </div>
+            <div class="create-card" style="margin-bottom:14px;">
+              <div class="card-head" style="cursor:pointer;" onclick="toggleSettingsCard()">Settings<span id="settingsCardArrow" style="font-size:10px;color:var(--t3);">▼</span></div>
+              <div class="card-body" id="settingsCardBody">
+                <div class="slider-grp"><label class="s-lbl">Speed</label><div class="slider-labels"><span class="slider-end">Slow</span><span class="slider-val" id="speedVal">1.0</span><span class="slider-end">Fast</span></div><input type="range" class="slider" id="speedSlider" min="0.7" max="1.2" step="0.05" value="1.0" oninput="document.getElementById('speedVal').textContent=this.value;localStorage.setItem('vm_speed',this.value)"></div>
+                <div class="slider-grp"><label class="s-lbl">Stability</label><div class="slider-labels"><span class="slider-end">Variable</span><span class="slider-val" id="stabilityVal">50%</span><span class="slider-end">Stable</span></div><input type="range" class="slider" id="stabilitySlider" min="0" max="100" value="50" oninput="document.getElementById('stabilityVal').textContent=this.value+'%';localStorage.setItem('vm_stability',this.value)"></div>
+                <div class="slider-grp"><label class="s-lbl">Similarity</label><div class="slider-labels"><span class="slider-end">Low</span><span class="slider-val" id="similarityVal">75%</span><span class="slider-end">High</span></div><input type="range" class="slider" id="similaritySlider" min="0" max="100" value="75" oninput="document.getElementById('similarityVal').textContent=this.value+'%';localStorage.setItem('vm_similarity',this.value)"></div>
+                <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="exagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="exagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('exagVal').textContent=this.value;localStorage.setItem('vm_exag',this.value)"></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;margin-bottom:14px;">
+              <span style="font-size:12px;font-weight:500;color:var(--t2);">Cost</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--y);" id="voiceCostDisplay">0 cr</span>
+            </div>
+            <button class="btn-y" id="voiceBtn" onclick="startVoiceGen()">🎙 Generate Speech</button>
+          </div>
+          <div class="prog" id="voiceProg" style="margin-top:12px;"><div class="prog-top"><span class="prog-lbl" id="voiceProgLbl">Generating…</span><span class="prog-pct" id="voiceProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="vrFill"></div></div></div>
+          <div class="err" id="voiceErr" style="margin-top:10px;"><div class="err-title">ERROR</div><div class="err-msg" id="voiceErrMsg"></div></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--bd);">
+          <div style="padding:20px;border-bottom:1px solid var(--bd);flex-shrink:0;">
+            <label class="fl">Script</label>
+            <textarea class="ta" id="voiceScript" rows="6" placeholder="Enter your script…" oninput="updateCharCount()" style="width:100%;"></textarea>
+            <div style="display:flex;justify-content:space-between;margin-top:5px;"><span class="char-count"><span id="charCount">0</span> / 200,000</span></div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px;">
+            <label class="fl">Generated Voiceovers</label>
+            <div id="voiceOutputList"><div class="empty" id="voiceOutputEmpty" style="padding:24px 0;"><span class="empty-icon" style="font-size:28px;">🎙</span><div class="empty-txt">Voiceovers appear here</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <!-- DEFAULT VOICES -->
-            <div class="s-row">
-              <label class="s-lbl">Default Voices</label>
-              <button onclick="openVoicePicker()" style="width:100%;background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;color:var(--tx);font-size:12.5px;font-family:'Inter',sans-serif;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.35)'" onmouseout="this.style.borderColor='var(--bd)'">
-                <span id="selectedVoiceLabel">Rachel</span>
-                <span style="color:var(--t3);font-size:10px;">▼ Browse</span>
+    <!-- SILENCE REMOVER -->
+    <div class="tab-panel" id="tab-deadspace">
+      <div class="vidgen-layout">
+        <div class="create-panel">
+          <span class="tool-cat">AUDIO TOOL</span>
+          <h1 class="tool-title">Remove <span style="color:var(--y);">Silence</span></h1>
+          <p class="tool-desc">Remove dead air and silence from video or audio files automatically.</p>
+          <div class="create-card">
+            <div class="create-card-header"><div class="create-card-title">Upload File</div></div>
+            <div style="padding:16px 18px;">
+              <div class="zone" id="dsZone" onclick="document.getElementById('dsInp').click()" style="margin-bottom:14px;">
+                <input type="file" id="dsInp" accept="video/*,audio/*" style="display:none">
+                <span class="zone-icon">✂️</span>
+                <div class="zone-title">Drop video or audio</div>
+                <div class="zone-hint">MP4 · MOV · WAV · MP3</div>
+                <div class="zone-fname" id="dsFnm"></div>
+              </div>
+              <div class="slider-grp" style="margin-bottom:16px;">
+                <label class="setting-label">Silence Threshold</label>
+                <div class="slider-labels"><span class="slider-end">Sensitive</span><span class="slider-val" id="dbVal">-40 dB</span><span class="slider-end">Aggressive</span></div>
+                <input type="range" class="slider" id="dbSlider" min="-60" max="-10" value="-40" oninput="document.getElementById('dbVal').textContent=this.value+' dB';localStorage.setItem('vm_dbSlider',this.value)">
+              </div>
+              <button class="gen-btn" id="dsBtn" onclick="startDeadspace()" disabled>
+                <span class="gen-btn-left">✂️ Remove Silence</span>
+                <span class="gen-btn-right">Free</span>
               </button>
             </div>
-
-            <div style="height:1px;background:var(--bd);margin:6px 0;"></div>
-
-            <!-- CUSTOM VOICES -->
-            <div class="s-row">
-              <label class="s-lbl">Custom Voices</label>
-              <div style="display:flex;gap:6px;margin-bottom:8px;">
-                <input class="inp" id="customVoiceIdInp" placeholder="Paste ElevenLabs Voice ID" style="flex:1;font-size:11px;">
-                <button class="btn-sm" onclick="promptSaveCustomVoice()">Save</button>
+          </div>
+        </div>
+        <div class="preview-panel">
+          <div class="preview-top">
+            <div class="preview-phone">
+              <div class="preview-empty" id="dsEmpty">
+                <div style="font-size:40px;opacity:0.3;">📁</div>
+                <div class="preview-empty-title">Upload a file</div>
+                <div class="preview-empty-sub">to get started</div>
               </div>
-              <div id="customVoicesList" style="display:flex;flex-direction:column;gap:4px;"></div>
+              <video id="dsVid" controls style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
             </div>
-
-          </div></div>
-          <div class="card"><div class="card-head" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleModelCard()">Model<span id="modelCardArrow" style="font-size:10px;color:var(--t3);transition:transform 0.2s;">▼</span></div><div class="card-body" id="modelCardBody">
-            <div class="s-row" style="margin-bottom:0;">
-              <label class="s-lbl">ElevenLabs Model</label>
-            </div>
-            <select id="voiceModelSelect" class="inp" style="width:100%;margin-top:8px;font-size:12px;" onchange="updateVoiceModel()">
-              <option value="eleven_multilingual_v2">Multilingual v2 (Best Quality)</option>
-              <option value="eleven_v3">v3 (Latest)</option>
-              <option value="eleven_flash_v2_5">Flash v2.5 (Fastest)</option>
-              <option value="eleven_turbo_v2_5">Turbo v2.5 (Fast + High Quality)</option>
-              <option value="eleven_turbo_v2">Turbo v2</option>
-              <option value="eleven_flash_v2">Flash v2</option>
-              <option value="eleven_monolingual_v1">English v1 (Legacy)</option>
-            </select>
-          </div></div>
-          <div class="card"><div class="card-head" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleSettingsCard()">Settings<span id="settingsCardArrow" style="font-size:10px;color:var(--t3);transition:transform 0.2s;">▼</span></div><div class="card-body" id="settingsCardBody">
-            <div class="slider-grp"><label class="s-lbl">Speed</label><div class="slider-labels"><span class="slider-end">Slow</span><span class="slider-val" id="speedVal">1.0</span><span class="slider-end">Fast</span></div><input type="range" class="slider" id="speedSlider" min="0.7" max="1.2" step="0.05" value="1.0" oninput="document.getElementById('speedVal').textContent=this.value;localStorage.setItem('vm_speed',this.value)"></div>
-            <div class="slider-grp"><label class="s-lbl">Stability</label><div class="slider-labels"><span class="slider-end">Variable</span><span class="slider-val" id="stabilityVal">50%</span><span class="slider-end">Stable</span></div><input type="range" class="slider" id="stabilitySlider" min="0" max="100" value="50" oninput="document.getElementById('stabilityVal').textContent=this.value+'%';localStorage.setItem('vm_stability',this.value)"></div>
-            <div class="slider-grp"><label class="s-lbl">Similarity</label><div class="slider-labels"><span class="slider-end">Low</span><span class="slider-val" id="similarityVal">75%</span><span class="slider-end">High</span></div><input type="range" class="slider" id="similaritySlider" min="0" max="100" value="75" oninput="document.getElementById('similarityVal').textContent=this.value+'%';localStorage.setItem('vm_similarity',this.value)"></div>
-            <div class="slider-grp"><label class="s-lbl">Exaggeration</label><div class="slider-labels"><span class="slider-end">Neutral</span><span class="slider-val" id="exagVal">0.5</span><span class="slider-end">Expressive</span></div><input type="range" class="slider" id="exagSlider" min="0" max="1" step="0.05" value="0.5" oninput="document.getElementById('exagVal').textContent=this.value;localStorage.setItem('vm_exag',this.value)"></div>
-          </div></div>
-          <div class="card"><div class="card-body">
-            <div class="s-row">
-              <label class="s-lbl">Cost</label>
-              <div class="s-val" id="voiceCostDisplay">0 cr</div>
-            </div>
-          </div></div>
-          <button class="btn-y" id="voiceBtn" onclick="startVoiceGen()">🎙 Generate Speech</button>
-        </div>
-
-        <div class="prog" id="voiceProg"><div class="prog-top"><span class="prog-lbl" id="voiceProgLbl">Generating…</span><span class="prog-pct" id="voiceProgPct">0%</span></div><div class="prog-track"><div class="prog-fill" id="vrFill"></div></div></div>
-        <div class="err" id="voiceErr"><div class="err-title">ERROR</div><div class="err-msg" id="voiceErrMsg"></div></div>
-      </div>
-      <div class="voice-right">
-        <div class="voice-script-area">
-          <label class="fl">Script</label>
-          <textarea class="ta" id="voiceScript" rows="5" placeholder="Enter your script…" oninput="updateCharCount()" style="width:100%;"></textarea>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;"><span class="char-count"><span id="charCount">0</span> / 200,000</span></div>
-        </div>
-        <div class="voice-output-area">
-          <label class="fl">Generated Voiceovers</label>
-          <div id="voiceOutputList"><div class="empty" id="voiceOutputEmpty" style="padding:24px 0;"><span class="empty-icon" style="font-size:26px;">🎙</span><div class="empty-txt">Voiceovers appear here</div></div></div>
+          </div>
+          <div class="recents-panel">
+            <div id="dsDlWrap" style="display:none;"><a id="dsDlBtn" class="dl-btn" download="trimmed.mp4" style="max-width:220px;margin:0 auto;">⬇ Download Trimmed</a></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ═══ SILENCE REMOVER ═══ -->
-  <div class="tab-panel" id="tab-deadspace">
-    <div class="workspace">
-      <div class="left-col">
-        <div class="zone" id="dsZone" onclick="document.getElementById('dsInp').click()">
-          <input type="file" id="dsInp" accept="video/*,audio/*" style="display:none">
-          <span class="zone-icon">✂️</span><div class="zone-title">Drop video or audio</div>
-          <div class="zone-hint">MP4 · MOV · WAV · MP3</div><div class="zone-fname" id="dsFnm"></div>
+    <!-- YT SCRAPER -->
+    <div class="tab-panel" id="tab-scraper">
+      <div class="vidgen-layout">
+        <div class="create-panel">
+          <span class="tool-cat">RESEARCH TOOL</span>
+          <h1 class="tool-title">YouTube <span style="color:var(--y);">Scraper</span></h1>
+          <p class="tool-desc">Scrape any YouTube channel's top Shorts. Get titles, views, and transcripts.</p>
+          <div class="create-card">
+            <div class="create-card-header"><div class="create-card-title">Scrape Channel</div></div>
+            <div style="padding:16px 18px;">
+              <div style="margin-bottom:12px;">
+                <label class="setting-label">Channel URL</label>
+                <input type="text" class="setting-sel" id="ytUrl" placeholder="https://youtube.com/@channelname" style="background:var(--s3);border:1px solid var(--bd2);color:var(--tx);padding:10px 12px;border-radius:9px;font-size:13px;font-family:'Inter',sans-serif;width:100%;outline:none;appearance:none;transition:border-color 0.15s;" oninput="localStorage.setItem('vm_ytUrl',this.value)">
+              </div>
+              <div class="setting-row2" style="margin-bottom:12px;">
+                <div>
+                  <label class="setting-label">Number of Videos</label>
+                  <select class="setting-sel" id="ytCount" onchange="localStorage.setItem('vm_ytCount',this.value)"><option value="10">10 videos</option><option value="25" selected>25 videos</option><option value="50">50 videos</option><option value="100">100 videos</option></select>
+                </div>
+                <div>
+                  <label class="setting-label">Sort By</label>
+                  <select class="setting-sel" id="ytSort" onchange="localStorage.setItem('vm_ytSort',this.value)"><option value="newest" selected>📅 Newest</option><option value="popular">🔥 Popular</option><option value="trending">📈 Trending</option></select>
+                </div>
+              </div>
+              <button class="gen-btn" id="scrapBtn" onclick="startScrape()">
+                <span class="gen-btn-left">📊 Scrape Channel</span>
+                <span class="gen-btn-right">Free</span>
+              </button>
+              <div class="err" id="scrapErr" style="margin-top:10px;"><div class="err-title">ERROR</div><div class="err-msg" id="scrapErrMsg"></div></div>
+            </div>
+          </div>
         </div>
-        <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="slider-grp"><label class="s-lbl">Silence Threshold</label><div class="slider-labels"><span class="slider-end">Sensitive</span><span class="slider-val" id="dbVal">-40 dB</span><span class="slider-end">Aggressive</span></div><input type="range" class="slider" id="dbSlider" min="-60" max="-10" value="-40" oninput="document.getElementById('dbVal').textContent=this.value+' dB';localStorage.setItem('vm_dbSlider',this.value)"></div>
-          
-        </div></div>
-        <button class="btn-y" id="dsBtn" onclick="startDeadspace()" disabled>✂️ Remove Silence</button>
-      </div>
-      <div class="right-col">
-        <div class="phone">
-          <div class="phone-empty" id="dsEmpty"><span class="phone-empty-icon">📁</span><div class="phone-empty-txt">Upload a file</div></div>
-          <video id="dsVid" controls style="display:none;"></video>
-        </div>
-        <div class="preview-lbl">TRIMMED OUTPUT</div>
-        <div id="dsDlWrap" style="display:none;width:100%;max-width:293px;"><a id="dsDlBtn" class="dl-btn" download="trimmed.mp4">⬇ Download Trimmed</a></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ YT SCRAPER ═══ -->
-  <div class="tab-panel" id="tab-scraper">
-    <div class="workspace">
-      <div class="left-col">
-        <div><label class="fl">Channel URL</label><input type="text" class="inp" id="ytUrl" placeholder="https://youtube.com/@channelname" oninput="localStorage.setItem('vm_ytUrl',this.value)"></div>
-        <div class="card"><div class="card-head">Settings</div><div class="card-body">
-          <div class="s-row"><label class="s-lbl">Number of Videos</label><select class="sel" id="ytCount" onchange="localStorage.setItem('vm_ytCount',this.value)"><option value="10">10 videos</option><option value="25" selected>25 videos</option><option value="50">50 videos</option><option value="100">100 videos</option></select></div>
-          <div class="s-row"><label class="s-lbl">Sort By</label><select class="sel" id="ytSort" onchange="localStorage.setItem('vm_ytSort',this.value)"><option value="newest" selected>📅 Newest</option><option value="popular">🔥 Most Popular</option><option value="trending">📈 Trending</option></select></div>
-          
-        </div></div>
-        <button class="btn-y" id="scrapBtn" onclick="startScrape()">📊 Scrape Channel</button>
-        <div class="err" id="scrapErr"><div class="err-title">ERROR</div><div class="err-msg" id="scrapErrMsg"></div></div>
-      </div>
-      <div class="right-col">
-        <div class="scraper-results" style="width:100%;max-width:500px;">
-          <div class="scraper-head"><div class="scraper-head-title">Scraped Videos</div><button class="btn-sm" id="exportBtn" onclick="exportJson()" style="display:none;">⬇ Export JSON</button></div>
-          <div class="scraper-list" id="scrapList"><div class="empty" style="padding:36px;"><span class="empty-icon" style="font-size:26px;">📊</span><div class="empty-txt">Enter a channel URL and scrape</div></div></div>
+        <div style="flex:1;overflow-y:auto;padding:24px;background:var(--blk);">
+          <div class="scraper-results">
+            <div class="scraper-head">
+              <div class="scraper-head-title">Scraped Videos</div>
+              <button class="btn-sm" id="exportBtn" onclick="exportJson()" style="display:none;">⬇ Export JSON</button>
+            </div>
+            <div class="scraper-list" id="scrapList">
+              <div class="empty" style="padding:36px;"><span class="empty-icon" style="font-size:28px;">📊</span><div class="empty-txt">Enter a channel URL and scrape</div></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ADD VOICE MODAL -->
+  </div><!-- /main -->
+</div><!-- /body-wrap -->
+
+<!-- MODALS -->
 <div class="overlay" id="addVoiceModal" style="display:none;">
   <div class="modal">
     <div class="modal-title">Add Voice</div>
@@ -770,7 +946,6 @@ body{font-family:'Inter',sans-serif;background:var(--blk);color:var(--tx);displa
   </div>
 </div>
 
-<!-- PROMPT EDIT MODAL -->
 <div class="overlay" id="promptModal" style="display:none;" onclick="closePromptModal(event)">
   <div class="prompt-modal" onclick="event.stopPropagation()">
     <div class="modal-title" id="promptModalTitle">Edit Prompt</div>
@@ -779,169 +954,145 @@ body{font-family:'Inter',sans-serif;background:var(--blk);color:var(--tx);displa
   </div>
 </div>
 
-
-
-
-<!-- VOICE PICKER MODAL -->
 <div class="overlay" id="voicePickerModal" style="display:none;" onclick="closeVoicePicker(event)">
   <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:18px;padding:0;width:680px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.7);overflow:hidden;" onclick="event.stopPropagation()">
-    <!-- Header -->
     <div style="padding:22px 24px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
+        <div style="font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
         <button onclick="document.getElementById('voicePickerModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:13px;padding:5px 10px;cursor:pointer;">✕</button>
       </div>
-      <!-- Search -->
       <input class="inp" id="voiceSearch" placeholder="Search voices..." oninput="filterVoices()" style="margin-bottom:12px;">
-      <!-- Filters -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <div>
-          <select class="sel" id="filterGender" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Gender</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-            <option value="neutral">Neutral</option>
-          </select>
-        </div>
-        <div>
-          <select class="sel" id="filterAccent" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Accent</option>
-            <option value="american">American</option>
-            <option value="british">British</option>
-            <option value="australian">Australian</option>
-            <option value="irish">Irish</option>
-          </select>
-        </div>
-        <div>
-          <select class="sel" id="filterAge" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Age</option>
-            <option value="young">Young</option>
-            <option value="middle aged">Middle Aged</option>
-            <option value="old">Old</option>
-          </select>
-        </div>
-        <button onclick="toggleFavoritesFilter()" id="favFilterBtn" style="padding:6px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--s3);color:var(--t2);font-size:11px;cursor:pointer;transition:all 0.15s;">★ Favorites</button>
+        <select class="sel" id="filterGender" onchange="filterVoices()" style="font-size:11px;padding:7px 10px;width:auto;"><option value="">Any Gender</option><option value="female">Female</option><option value="male">Male</option><option value="neutral">Neutral</option></select>
+        <select class="sel" id="filterAccent" onchange="filterVoices()" style="font-size:11px;padding:7px 10px;width:auto;"><option value="">Any Accent</option><option value="american">American</option><option value="british">British</option><option value="australian">Australian</option><option value="irish">Irish</option></select>
+        <select class="sel" id="filterAge" onchange="filterVoices()" style="font-size:11px;padding:7px 10px;width:auto;"><option value="">Any Age</option><option value="young">Young</option><option value="middle aged">Middle Aged</option><option value="old">Old</option></select>
+        <button onclick="toggleFavoritesFilter()" id="favFilterBtn" style="padding:7px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--s3);color:var(--t2);font-size:11px;cursor:pointer;transition:all 0.15s;">★ Favorites</button>
       </div>
     </div>
-    <!-- Voice list -->
     <div id="voicePickerList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
   </div>
 </div>
 
-<!-- CUSTOM VOICE NAME MODAL -->
 <div class="overlay" id="customVoiceNameModal" style="display:none;" onclick="event.stopPropagation()">
   <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
-    <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
+    <div style="font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
     <div><label class="fl">Voice Name</label><input class="inp" id="customVoiceNameInp" placeholder="e.g. My Deep Voice"></div>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="document.getElementById('customVoiceNameModal').style.display='none'">Cancel</button>
-      <button class="modal-save" onclick="confirmSaveCustomVoice()">Save Voice</button>
-    </div>
+    <div class="modal-btns"><button class="modal-cancel" onclick="document.getElementById('customVoiceNameModal').style.display='none'">Cancel</button><button class="modal-save" onclick="confirmSaveCustomVoice()">Save Voice</button></div>
   </div>
 </div>
 
-<!-- VOICE PICKER MODAL -->
-<div class="overlay" id="voicePickerModal" style="display:none;" onclick="closeVoicePicker(event)">
-  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:18px;padding:0;width:680px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.7);overflow:hidden;" onclick="event.stopPropagation()">
-    <!-- Header -->
-    <div style="padding:22px 24px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Select Voice</div>
-        <button onclick="document.getElementById('voicePickerModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:13px;padding:5px 10px;cursor:pointer;">✕</button>
-      </div>
-      <!-- Search -->
-      <input class="inp" id="voiceSearch" placeholder="Search voices..." oninput="filterVoices()" style="margin-bottom:12px;">
-      <!-- Filters -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <div>
-          <select class="sel" id="filterGender" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Gender</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-            <option value="neutral">Neutral</option>
-          </select>
-        </div>
-        <div>
-          <select class="sel" id="filterAccent" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Accent</option>
-            <option value="american">American</option>
-            <option value="british">British</option>
-            <option value="australian">Australian</option>
-            <option value="irish">Irish</option>
-          </select>
-        </div>
-        <div>
-          <select class="sel" id="filterAge" onchange="filterVoices()" style="font-size:11px;padding:6px 10px;">
-            <option value="">Any Age</option>
-            <option value="young">Young</option>
-            <option value="middle aged">Middle Aged</option>
-            <option value="old">Old</option>
-          </select>
-        </div>
-        <button onclick="toggleFavoritesFilter()" id="favFilterBtn" style="padding:6px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--s3);color:var(--t2);font-size:11px;cursor:pointer;transition:all 0.15s;">★ Favorites</button>
-      </div>
-    </div>
-    <!-- Voice list -->
-    <div id="voicePickerList" style="overflow-y:auto;flex:1;padding:8px 0;"></div>
-  </div>
-</div>
-
-<!-- CUSTOM VOICE NAME MODAL -->
-<div class="overlay" id="customVoiceNameModal" style="display:none;" onclick="event.stopPropagation()">
-  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:24px;width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
-    <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--y);">Name Your Voice</div>
-    <div><label class="fl">Voice Name</label><input class="inp" id="customVoiceNameInp" placeholder="e.g. My Deep Voice"></div>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="document.getElementById('customVoiceNameModal').style.display='none'">Cancel</button>
-      <button class="modal-save" onclick="confirmSaveCustomVoice()">Save Voice</button>
-    </div>
-  </div>
-</div>
-<!-- TOP UP MODAL -->
 <div class="overlay" id="topUpModal" style="display:none;" onclick="closeTopUp(event)">
   <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:18px;padding:32px;width:480px;max-width:95vw;display:flex;flex-direction:column;gap:24px;box-shadow:0 24px 60px rgba(0,0,0,0.7);" onclick="event.stopPropagation()">
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:var(--y);letter-spacing:-0.5px;">Top Up Credits</div>
-        <div style="font-size:12px;color:var(--t3);margin-top:3px;">Current balance: <span id="topUpBalance" style="color:var(--y);font-weight:700;">500</span> credits</div>
+        <div style="font-size:22px;font-weight:800;color:var(--y);">Top Up Credits</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:3px;">Current balance: <span id="topUpBalance" style="color:var(--y);font-weight:700;">0</span> credits</div>
       </div>
       <button onclick="document.getElementById('topUpModal').style.display='none'" style="background:var(--s4);border:1px solid var(--bd);border-radius:7px;color:var(--t2);font-size:14px;padding:6px 10px;cursor:pointer;">✕</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-      <div onclick="buyCredits(1200,10)" style="background:var(--s3);border:1px solid var(--bd);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s3)'">
-        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'Inter',sans-serif;letter-spacing:-1px;">1200</div>
+      <div onclick="buyCredits(1200,10)" style="background:var(--s3);border:1px solid var(--bd2);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.5)'" onmouseout="this.style.borderColor='var(--bd2)'">
+        <div style="font-size:28px;font-weight:800;color:var(--y);letter-spacing:-1px;">1200</div>
         <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
-        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'Inter',sans-serif;">$10.00</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;">$10.00</div>
       </div>
-      <div onclick="buyCredits(3500,25)" style="background:var(--s3);border:2px solid rgba(255,230,0,0.35);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;" onmouseover="this.style.borderColor='rgba(255,230,0,0.6)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='rgba(255,230,0,0.35)';this.style.background='var(--s3)'">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;font-size:8px;font-weight:800;padding:2px 8px;border-radius:4px;font-family:'Inter',sans-serif;white-space:nowrap;">BEST VALUE</div>
-        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'Inter',sans-serif;letter-spacing:-1px;">3500</div>
+      <div onclick="buyCredits(3500,25)" style="background:var(--s3);border:2px solid rgba(255,230,0,0.4);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;" onmouseover="this.style.borderColor='rgba(255,230,0,0.7)'" onmouseout="this.style.borderColor='rgba(255,230,0,0.4)'">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--y);color:#000;font-size:8px;font-weight:800;padding:2px 8px;border-radius:4px;white-space:nowrap;font-family:'JetBrains Mono',monospace;">BEST VALUE</div>
+        <div style="font-size:28px;font-weight:800;color:var(--y);letter-spacing:-1px;">3500</div>
         <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
-        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'Inter',sans-serif;">$25.00</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;">$25.00</div>
       </div>
-      <div onclick="buyCredits(7500,50)" style="background:var(--s3);border:1px solid var(--bd);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.4)';this.style.background='var(--s4)'" onmouseout="this.style.borderColor='var(--bd)';this.style.background='var(--s3)'">
-        <div style="font-size:28px;font-weight:800;color:var(--y);font-family:'Inter',sans-serif;letter-spacing:-1px;">7500</div>
+      <div onclick="buyCredits(7500,50)" style="background:var(--s3);border:1px solid var(--bd2);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,230,0,0.5)'" onmouseout="this.style.borderColor='var(--bd2)'">
+        <div style="font-size:28px;font-weight:800;color:var(--y);letter-spacing:-1px;">7500</div>
         <div style="font-size:11px;color:var(--t2);margin:4px 0 12px;">credits</div>
-        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;font-family:'Inter',sans-serif;">$50.00</div>
+        <div style="background:var(--y);color:#000;font-size:13px;font-weight:800;padding:8px;border-radius:7px;">$50.00</div>
       </div>
     </div>
     <div style="font-size:11px;color:var(--t3);text-align:center;">Payments processed securely by Stripe · Credits never expire</div>
   </div>
 </div>
+
+<div id="scriptPopupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:400;align-items:center;justify-content:center;">
+  <div style="background:var(--s2);border:1px solid var(--bd2);border-radius:14px;padding:28px;max-width:480px;width:90%;position:relative;max-height:70vh;overflow-y:auto;">
+    <button onclick="document.getElementById('scriptPopupModal').style.display='none'" style="position:absolute;top:14px;right:14px;background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:28px;height:28px;font-size:14px;cursor:pointer;">✕</button>
+    <div id="scriptPopupText" style="font-size:13px;line-height:1.7;color:var(--tx);padding-right:8px;white-space:pre-wrap;"></div>
+  </div>
+</div>
+
 <script>
+// Instant tab restore
 (function(){
-  try {
-    var validTabs = ['vidgen','imggen','voicegen','deadspace','scraper'];
-    var last = localStorage.getItem('vm_lastTab') || 'vidgen';
-    var tab = validTabs.indexOf(last) !== -1 ? last : 'vidgen';
-    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
-    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
-    var panel = document.getElementById('tab-'+tab);
-    if(panel) panel.classList.add('active');
-    var nav = document.getElementById('nav-'+tab);
-    if(nav) nav.classList.add('active');
-  } catch(e){}
+  try{
+    var validTabs=['vidgen','imggen','voicegen','deadspace','scraper'];
+    var last=localStorage.getItem('vm_lastTab')||'vidgen';
+    var tab=validTabs.indexOf(last)!==-1?last:'vidgen';
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+    var panel=document.getElementById('tab-'+tab);
+    if(panel)panel.classList.add('active');
+    // Mark sidebar item
+    document.querySelectorAll('.sidebar-item').forEach(function(n){n.classList.remove('active');});
+    var si=document.getElementById('sitem-'+tab);
+    if(si)si.classList.add('active');
+  }catch(e){}
 })();
+
+// Vid mode toggle
+function setVidMode(mode){
+  document.getElementById('modeText').classList.toggle('active',mode==='text');
+  document.getElementById('modeImage').classList.toggle('active',mode==='image');
+  document.getElementById('vidImgInput').style.display=mode==='image'?'block':'none';
+}
+
+// Char counter
+function updateVidCharCount(el){
+  const n=el.value.length;
+  document.getElementById('vidCharCount').textContent=n+'/2000';
+}
+
+// Recent generations (placeholder)
+function renderRecents(){
+  const grid=document.getElementById('recentsGrid');
+  if(!grid)return;
+  const stored=JSON.parse(localStorage.getItem('vm_recents')||'[]');
+  if(!stored.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;font-size:12px;color:var(--t3);">No generations yet — generate your first video!</div>';
+    return;
+  }
+  grid.innerHTML='';
+  stored.slice(0,7).forEach(function(item){
+    const div=document.createElement('div');
+    div.className='recent-item';
+    if(item.url){
+      if(item.type==='video'){
+        div.innerHTML='<video src="'+item.url+'" muted playsinline loop style="width:100%;height:100%;object-fit:cover;"></video>';
+      } else {
+        div.innerHTML='<img src="'+item.url+'" style="width:100%;height:100%;object-fit:cover;" alt="">';
+      }
+    }
+    if(item.duration){
+      const dur=document.createElement('div');
+      dur.className='recent-duration';
+      dur.textContent=item.duration;
+      div.appendChild(dur);
+    }
+    const menu=document.createElement('div');
+    menu.className='recent-menu';
+    menu.textContent='⋮';
+    div.appendChild(menu);
+    grid.appendChild(div);
+  });
+}
+renderRecents();
+
+// Add to recents when video/image generated
+function addToRecents(url,type,duration){
+  try{
+    const stored=JSON.parse(localStorage.getItem('vm_recents')||'[]');
+    stored.unshift({url,type,duration,ts:Date.now()});
+    localStorage.setItem('vm_recents',JSON.stringify(stored.slice(0,20)));
+    renderRecents();
+  }catch(e){}
+}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/js/config.js"></script>

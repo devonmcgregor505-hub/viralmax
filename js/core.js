@@ -1,45 +1,46 @@
 // ── QUEUE POLL ──
 setInterval(async()=>{
-  try{const r=await fetch('/queue');const d=await r.json();document.getElementById('queuePill').textContent=`Queue: ${d.active} active, ${d.waiting} waiting`;}catch(e){}
+  try{const r=await fetch('/queue');const d=await r.json();const el=document.getElementById('queuePill');if(el)el.textContent=`Queue: ${d.active} active, ${d.waiting} waiting`;}catch(e){}
 },10000);
 
-// ── TAB SWITCHING ──
+// ── TAB META ──
 const tabMeta={
   pipeline:['Automation','Scenes → Images → Clips'],
   vidgen:['Video Gen','AI video generation'],
   imggen:['Image Gen','AI image generation'],
-  voicegen:['Voice Gen','Clone and generate voiceovers'],
-  deadspace:['Silence Remover','Remove dead air from audio/video'],
-  scraper:['YT Scraper','Scrape channel data for analysis'],
+  voicegen:['Voice Gen','Generate voiceovers'],
+  deadspace:['Silence Remover','Remove dead air'],
+  scraper:['YT Scraper','Scrape channel data'],
 };
 
+// ── SWITCH TAB ──
 function switchTab(tab){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item,.nav-tab').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item,.nav-item,.nav-tab,.nav-btn').forEach(n=>n.classList.remove('active'));
   const panel=document.getElementById('tab-'+tab);if(panel)panel.classList.add('active');
+  const si=document.getElementById('sitem-'+tab);if(si)si.classList.add('active');
   const el=document.getElementById('nav-'+tab);if(el)el.classList.add('active');
-  const navtab=document.getElementById('navtab-'+tab);if(navtab)navtab.classList.add('active');
   const t=tabMeta[tab]||['Viralmax',''];
   const tt=document.getElementById('topTitle');if(tt)tt.textContent=t[0];
   const ts=document.getElementById('topSub');if(ts)ts.textContent=t[1];
   document.querySelectorAll('.nav-sub-item').forEach((el,i)=>el.classList.toggle('active',tab==='pipeline'&&i===pipe.step));
-  try { localStorage.setItem('vm_lastTab', tab); } catch(e) {}
-  // close user menu if open
+  try{localStorage.setItem('vm_lastTab',tab);}catch(e){}
   const dd=document.getElementById('userDropdown');if(dd)dd.classList.remove('open');
 }
+
 function toggleUserMenu(){
   const dd=document.getElementById('userDropdown');
   if(dd)dd.classList.toggle('open');
 }
 document.addEventListener('click',function(e){
-  const menu=document.querySelector('.user-menu');
-  if(menu&&!menu.contains(e.target)){
+  const area=document.querySelector('.user-row');
+  if(area&&!area.contains(e.target)){
     const dd=document.getElementById('userDropdown');
     if(dd)dd.classList.remove('open');
   }
 });
 
-// ── PIPELINE STEP NAV ──
+// ── PIPELINE ──
 function goPipeStep(step){
   if(!pipe.unlocked.has(step))return;
   pipe.step=step;
@@ -54,7 +55,7 @@ function goPipeStep(step){
   if(step===1&&typeof renderImgGrid==='function'){renderImgGrid();setTimeout(updateImgAllCost,100);}
   if(step===2&&typeof renderClipGrid==='function'){renderClipGrid();setTimeout(updateClipAllCost,100);}
 }
-function unlockStep(s){pipe.unlocked.add(s);const el=document.getElementById('pstep-'+s);if(el)el.classList.remove('locked')}
+function unlockStep(s){pipe.unlocked.add(s);const el=document.getElementById('pstep-'+s);if(el)el.classList.remove('locked');}
 
 function animProg(fillId,pctId,lblId,target,lbl){
   const fill=document.getElementById(fillId),pctEl=document.getElementById(pctId);
