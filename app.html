@@ -430,7 +430,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 
   <nav class="nav">
     
-    <button class="nav-item active" id="nav-pipeline" onclick="switchTab('pipeline')" style="display:none;">
+    <button class="nav-item" id="nav-pipeline" onclick="switchTab('pipeline')" style="display:none;">
       <span class="nav-icon">⚡</span>Automation<span class="nav-badge b-hot">HOT</span>
     </button>
     <div class="nav-sub" id="pipe-sub" style="display:none;">
@@ -440,7 +440,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
     </div>
 
     <span class="nav-sec-lbl">Generation</span>
-    <button class="nav-item" id="nav-vidgen" onclick="switchTab('vidgen')"><span class="nav-icon">🎬</span>Vid Gen<span class="nav-badge b-live">LIVE</span></button>
+    <button class="nav-item active" id="nav-vidgen" onclick="switchTab('vidgen')"><span class="nav-icon">🎬</span>Vid Gen<span class="nav-badge b-live">LIVE</span></button>
     <button class="nav-item" id="nav-imggen" onclick="switchTab('imggen')"><span class="nav-icon">🖼</span>Image Gen<span class="nav-badge b-live">LIVE</span></button>
     <button class="nav-item" id="nav-voicegen" onclick="switchTab('voicegen')"><span class="nav-icon">🎙</span>Voice Gen<span class="nav-badge b-live">LIVE</span></button>
 
@@ -460,9 +460,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--blk);color:var(--tx);disp
 <!-- ═══ MAIN ═══ -->
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title" id="topTitle">Automation</div>
+    <div class="topbar-title" id="topTitle">Video Gen</div>
     <span class="topbar-sep" id="topSep">—</span>
-    <div class="topbar-sub" id="topSub">Scenes → Images → Clips</div>
+    <div class="topbar-sub" id="topSub">AI video generation</div>
     <div class="topbar-right">
       <div class="topbar-pill" id="queuePill">Queue: 0 active</div>
     </div>
