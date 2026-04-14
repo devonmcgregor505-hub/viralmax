@@ -23,6 +23,8 @@ function switchTab(tab){
   document.getElementById('topSub').textContent=t[1];
   document.querySelectorAll('.nav-sub-item').forEach((el,i)=>el.classList.toggle('active',tab==='pipeline'&&i===pipe.step));
   try { localStorage.setItem('vm_lastTab', tab); } catch(e) {}
+  // Update URL hash without triggering a page reload
+  try { history.replaceState(null, '', '/app#' + tab); } catch(e) {}
 }
 
 // ── PIPELINE STEP NAV ──
