@@ -359,7 +359,7 @@ app.post('/pipeline/generate-scene-video', express.json(), async (req, res) => {
         const taskId = submitRes.data?.data?.taskId || submitRes.data?.data?.task_id;
         if (!taskId) throw new Error('No taskId from Kie.ai: ' + JSON.stringify(submitRes.data).slice(0, 200));
         videoUrl = await kieAiPoll(taskId, KIE_KEY);
-      } else if (model === 'veo3' || model === 'sora2') {
+      } else if (model === 'veo3') {
         if (!ML_KEY) throw new Error('MODELSLAB_API_KEY not configured');
         const modelIdMap = { 'veo3': 'veo-3.1-lite-t2v', 'sora2': 'sora-2' };
         const duration_val = model === 'sora2' ? '15' : '6';
