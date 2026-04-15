@@ -31,7 +31,7 @@ async function startVidGen(){
   const stages=['Submitting…','Queued…','Rendering…','Finalising…'];let si=0;lbl.textContent=stages[0];
   const tick=setInterval(()=>{if(pct<85){pct+=Math.random()*1.2;if(pct>85)pct=85;fill.style.width=pct+'%';pctLbl.textContent=Math.round(pct)+'%';if(pct>20&&si<1){si=1;lbl.textContent=stages[1]}if(pct>50&&si<2){si=2;lbl.textContent=stages[2]}if(pct>75&&si<3){si=3;lbl.textContent=stages[3]}}},1000);
   try{
-    const fd=new FormData();if(selImg)fd.append('image',selImg);fd.append('model',model);fd.append('prompt',prompt);fd.append('duration',dur);fd.append('aspectRatio',asp);fd.append('quality',quality);
+    const fd=new FormData();if(selImg)fd.append('image',selImg);fd.append('model',model);fd.append('prompt',prompt);fd.append('duration',dur);fd.append('aspectRatio',asp);fd.append('quality',model==='grok'?'480p':quality);
     const res=await fetch('/generate-video',{method:'POST',body:fd});
     const initData=await res.json();
     if(!initData.success||!initData.jobId)throw new Error(initData.error||'Failed to start');
