@@ -394,7 +394,7 @@ app.post('/pipeline/generate-scene-video', express.json(), async (req, res) => {
 app.post('/generate-video', upload.single('image'), async (req, res) => {
   const imagePath = req.file ? path.resolve(req.file.path) : null;
   const timestamp = Date.now();
-  const { model = 'veo3-lite', prompt = '', duration = '8', aspectRatio = '9:16', quality = '720p' } = req.body;
+  const { model = 'veo3-lite', prompt = '', duration = '8', aspectRatio = '9:16', quality = '480p' } = req.body;
   const ML_KEY = process.env.MODELSLAB_API_KEY;
   const KIE_KEY = process.env.KIE_API_KEY;
   const jobId = createJob();
