@@ -1,3 +1,13 @@
+
+var selRefImg = null;
+function setImgMode(mode){
+  document.getElementById('modeImgText').classList.toggle('active',mode==='text');
+  document.getElementById('modeImgImage').classList.toggle('active',mode==='image');
+  document.getElementById('imgImgInput').style.display=mode==='image'?'block':'none';
+}
+function updateImgCharCount(el){
+  document.getElementById('imgCharCount').textContent=el.value.length+'/2000';
+}
 // ── IMAGE GEN ──
 document.getElementById('refDrop').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('refDrop').classList.add('drag')});
 document.getElementById('refDrop').addEventListener('dragleave',()=>document.getElementById('refDrop').classList.remove('drag'));
