@@ -417,16 +417,16 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
         const taskId = submitRes.data?.data?.taskId || submitRes.data?.data?.task_id;
         if (!taskId) throw new Error('No taskId from Kie.ai: ' + JSON.stringify(submitRes.data).slice(0, 200));
         videoUrl = await kieAiPoll(taskId, KIE_KEY);
-      } else if (model === 'sora2-12s') {
-        if (!ML_KEY) throw new Error('MODELSLAB_API_KEY not configured');
-        const body12 = { key: ML_KEY, model_id: 'sora-2', prompt: prompt || 'Cinematic motion', aspect_ratio: aspectRatio === '9:16' ? '720x1280' : '1280x720', duration: '12', enhance_prompt: true, negative_prompt: null, webhook: null, track_id: null };
-        const submitRes12 = await axios.post('https://modelslab.com/api/v7/video-fusion/text-to-video', body12, { headers: { 'Content-Type': 'application/json' }, timeout: 60000 });
-        const d12 = submitRes12.data;
-        if (d12.status === 'success' && d12.output && d12.output[0]) videoUrl = d12.output[0];
-        else if (d12.status === 'processing' && d12.fetch_result) videoUrl = await modelsLabPoll(d12.fetch_result, ML_KEY);
-        else throw new Error('Unexpected ModelsLab response: ' + JSON.stringify(d12).slice(0, 300));
       } else if (model === 'sora2') {
-        if (!KIE_KEY) throw new Error('KIE_API_KEY not configured in .env');
+        if (parseInt(duration) === 12) {
+          if (!ML_KEY) throw new Error('MODELSLAB_API_KEY not configured');
+          const body12 = { key: ML_KEY, model_id: 'sora-2', prompt: prompt || 'Cinematic motion', aspect_ratio: aspectRatio === '9:16' ? '720x1280' : '1280x720', duration: '12', enhance_prompt: true, negative_prompt: null, webhook: null, track_id: null };
+          const submitRes12 = await axios.post('https://modelslab.com/api/v7/video-fusion/text-to-video', body12, { headers: { 'Content-Type': 'application/json' }, timeout: 60000 });
+          const d12 = submitRes12.data;
+          if (d12.status === 'success' && d12.output && d12.output[0]) videoUrl = d12.output[0];
+          else if (d12.status === 'processing' && d12.fetch_result) videoUrl = await modelsLabPoll(d12.fetch_result, ML_KEY);
+          else throw new Error('Unexpected ModelsLab response: ' + JSON.stringify(d12).slice(0, 300));
+        } else {
         const hasImage = imagePath && fs.existsSync(imagePath);
         const soraModel = hasImage ? 'sora-2-image-to-video' : 'sora-2-text-to-video';
         const soraAspect = (aspectRatio === '9:16' || aspectRatio === 'portrait') ? 'portrait' : 'landscape';
@@ -442,6 +442,7 @@ app.post('/generate-video', upload.single('image'), async (req, res) => {
         const taskId = submitRes.data?.data?.taskId || submitRes.data?.data?.task_id;
         if (!taskId) throw new Error('No taskId from Kie.ai (sora2): ' + JSON.stringify(submitRes.data).slice(0, 200));
         videoUrl = await kieAiPoll(taskId, KIE_KEY);
+        }
       } else {
         if (!ML_KEY) throw new Error('MODELSLAB_API_KEY not configured in .env');
         const hasImage = imagePath && fs.existsSync(imagePath);
