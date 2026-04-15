@@ -50,7 +50,7 @@ async function startVidGen(){
 ;
     creds-=cfg.qualities?cfg.creditsByQ[quality]:cfg.credits;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('vidErr').classList.add('vis');document.getElementById('vidErrMsg').textContent=err.message}
-  var _b=document.getElementById('vidBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.innerHTML='<span style="flex:1;text-align:center;">Generate Video</span>';btn.style.position='';btn.style.overflow='';},400);setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
+  var _b=document.getElementById('vidBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.style.background='';btn.style.border='';btn.innerHTML='<span style="flex:1;text-align:center;">Generate Video</span>';btn.style.position='';btn.style.overflow='';},400);setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
 }
 
 // Auto-init dropdowns as soon as this script loads
