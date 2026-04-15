@@ -15,7 +15,7 @@ document.getElementById('refDrop').addEventListener('drop',e=>{e.preventDefault(
 document.getElementById('refInp').addEventListener('change',()=>{if(document.getElementById('refInp').files[0]){selRefImg=document.getElementById('refInp').files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has');const rb=document.getElementById('refRemoveBtn');if(rb)rb.style.display='block';}});
 
 function onImgModelChange(){onImgResChange()}
-function onImgResChange(){const m=document.getElementById('imgModel').value;document.getElementById('imgCost').textContent=(IMG_CFG[m]?.credits||0)+' cr'}
+function onImgResChange(){const m=document.getElementById('imgModel').value;const _ic=document.getElementById('imgCostNum');if(_ic)_ic.textContent=(IMG_CFG[m]?.credits||0)}
 
 async function startImgGen(){
   const model=document.getElementById('imgModel')?.value||'nano-banana-pro';
