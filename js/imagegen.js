@@ -37,7 +37,7 @@ async function startImgGen(){
     const dl=document.getElementById('dlImgBtn');dl.href=data.imageUrl;dl.style.display='block';
     creds-=IMG_CFG[model]?.credits||0;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('imgErr').classList.add('vis');document.getElementById('imgErrMsg').textContent=err.message}
-  var _b=document.getElementById('imgBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.style.background='';btn.style.border='';btn.innerHTML='<span style="flex:1;text-align:center;">Generate Image</span><div class="credits-pill" id="imgCost"><img src="/public/credits-icon.png" style="width:18px;height:18px;object-fit:contain;flex-shrink:0;"><span style="color:#FFAA00;font-weight:800;font-size:13px;" id="imgCostNum">15</span></div>';btn.style.position='';btn.style.overflow='';},400);setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
+  var _b=document.getElementById('imgBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.style.background='';btn.style.border='';btn.innerHTML='<span style="flex:1;text-align:center;">Generate Image</span><div class="credits-pill" id="imgCost"><img src="/public/credits-icon.png" style="width:18px;height:18px;object-fit:contain;flex-shrink:0;"><span style="color:#FFAA00;font-weight:800;font-size:13px;" id="imgCostNum">'+(document.getElementById('imgCostNum')?document.getElementById('imgCostNum').textContent:'15')+'</span></div>';btn.style.position='';btn.style.overflow='';},400);setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
 }
 
 // Auto-init dropdowns as soon as this script loads
