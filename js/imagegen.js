@@ -23,7 +23,7 @@ async function startImgGen(){
   if(!await requireCredits(cost))return;
   const prompt=document.getElementById('imgPrompt').value.trim();if(!prompt){alert('Enter a prompt');return}
   const model=document.getElementById('imgModel').value,asp=document.getElementById('imgAsp').value,res='2K';
-  const btn=document.getElementById('imgBtn');btn.disabled=true;btn.textContent='⏳ Generating…';
+  const btn=document.getElementById('imgBtn');btn.disabled=true;btn.style.background='#1a1a2e';btn.style.border='1px solid rgba(255,180,0,0.3)';btn.innerHTML='<span style="flex:1;text-align:center;background:linear-gradient(90deg,#FFCC00,#FF6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:17px;">Generating…</span><div id="imgBtnBar" style="position:absolute;bottom:0;left:0;height:4px;width:0%;background:linear-gradient(90deg,#FFCC00,#FF6600);border-radius:0 0 12px 12px;box-shadow:0 0 8px rgba(255,160,0,0.6);"></div>';btn.style.position='relative';btn.style.overflow='hidden';var _barPct=0;btn._barTick=setInterval(function(){if(_barPct<90){_barPct+=Math.random()*2;var b=document.getElementById('imgBtnBar');if(b)b.style.width=Math.min(_barPct,90)+'%';}},1000);
   document.getElementById('imgProg').classList.add('vis');document.getElementById('imgErr').classList.remove('vis');
   document.getElementById('dlImgBtn').style.display='none';
   let pct=0;const fill=document.getElementById('ipFill'),pctLbl=document.getElementById('ipPct');
@@ -37,7 +37,7 @@ async function startImgGen(){
     const dl=document.getElementById('dlImgBtn');dl.href=data.imageUrl;dl.style.display='block';
     creds-=IMG_CFG[model]?.credits||0;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('imgErr').classList.add('vis');document.getElementById('imgErrMsg').textContent=err.message}
-  btn.disabled=false;btn.textContent='🎨 Generate Image';setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
+  var _b=document.getElementById('imgBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.style.background='';btn.style.border='';btn.innerHTML='<span style="flex:1;text-align:center;">Generate Image</span><div class="credits-pill" id="imgCost"><img src="/public/credits-icon.png" style="width:18px;height:18px;object-fit:contain;flex-shrink:0;"><span style="color:#FFAA00;font-weight:800;font-size:13px;" id="imgCostNum">15</span></div>';btn.style.position='';btn.style.overflow='';},400);setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
 }
 
 // Auto-init dropdowns as soon as this script loads
