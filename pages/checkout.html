@@ -8,47 +8,46 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --y: #FFE600; --blk: #050505; --blk2: #0a0a0a;
-  --g1: #1a1a1a; --g2: #222; --g3: #2e2e2e;
-  --tx: #f5f5f0; --tx2: #999; --tx3: #555;
-  --grn: #00E676; --red: #FF3D3D;
+  --y: #FFCC00; --blk: #07070e; --blk2: #0d0d18;
+  --g1: #12121f; --g2: rgba(255,255,255,0.07); --g3: rgba(255,255,255,0.12);
+  --tx: #f0f0ff; --tx2: #8888aa; --tx3: #46466a;
 }
-body { font-family: 'Manrope', sans-serif; background: var(--blk); color: var(--tx); min-height: 100vh; padding: 60px 20px; }
-.wrap { max-width: 1000px; margin: 0 auto; }
-.logo { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; color: var(--y); text-decoration: none; display: flex; align-items: center; gap: 8px; margin-bottom: 48px; }
-.logo span { width: 7px; height: 7px; background: var(--y); border-radius: 50%; }
-.header { text-align: center; margin-bottom: 48px; }
-.header h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--blk); color: var(--tx); min-height: 100vh; padding: 60px 20px; }
+.wrap { max-width: 1020px; margin: 0 auto; }
+.logo { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; color: var(--tx); text-decoration: none; display: flex; align-items: center; gap: 10px; margin-bottom: 48px; }
+.logo img { width: 32px; height: 32px; object-fit: contain; }
+.header { text-align: center; margin-bottom: 52px; }
+.header h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 38px; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 10px; background: linear-gradient(90deg, #fff 60%, #FFCC00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .header p { font-size: 15px; color: var(--tx2); }
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.card { background: var(--blk2); border: 1px solid var(--g2); border-radius: 16px; padding: 32px; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: border-color 0.2s; }
-.card:hover { border-color: var(--g3); }
-.card.featured { border-color: rgba(255,230,0,0.3); }
-.card.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--y), transparent); }
-.badge { display: inline-block; background: var(--y); color: #000; font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 3px 10px; border-radius: 4px; text-transform: uppercase; margin-bottom: 16px; font-family: 'Plus Jakarta Sans', sans-serif; }
-.plan-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 8px; }
-.plan-price { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--tx); margin-bottom: 4px; }
-.plan-price sup { font-size: 22px; vertical-align: top; margin-top: 8px; margin-right: 2px; }
+.card { background: var(--blk2); border: 1px solid var(--g2); border-radius: 18px; padding: 32px; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: all 0.2s; }
+.card:hover { border-color: rgba(255,160,0,0.3); transform: translateY(-2px); }
+.card.featured { border-color: rgba(255,160,0,0.35); background: #0f0f1c; }
+.card.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #FFCC00, #FF6600, transparent); }
+.badge { display: inline-block; background: linear-gradient(90deg,#FFCC00,#FF6600); color: #000; font-size: 9px; font-weight: 900; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 5px; text-transform: uppercase; margin-bottom: 16px; font-family: 'Plus Jakarta Sans', sans-serif; }
+.plan-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--tx); }
+.plan-price { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 52px; font-weight: 900; letter-spacing: -2px; line-height: 1; background: linear-gradient(135deg,#FFCC00,#FF6600); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+.plan-price sup { font-size: 22px; vertical-align: top; margin-top: 10px; margin-right: 2px; }
 .plan-period { font-size: 13px; color: var(--tx2); margin-bottom: 24px; }
 .divider { height: 1px; background: var(--g2); margin-bottom: 24px; }
 .features { list-style: none; display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 28px; }
 .features li { font-size: 13px; color: var(--tx2); display: flex; align-items: center; gap: 8px; }
-.features li::before { content: '✓'; color: var(--y); font-weight: 800; font-size: 12px; flex-shrink: 0; }
+.features li::before { content: '✓'; color: #FFAA00; font-weight: 900; font-size: 12px; flex-shrink: 0; }
 .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all 0.2s; }
 .btn-ghost { background: transparent; border: 1px solid var(--g3); color: var(--tx); }
-.btn-ghost:hover { border-color: var(--tx2); }
-.btn-primary { background: var(--y); color: #000; }
-.btn-primary:hover { background: #FFF176; }
+.btn-ghost:hover { border-color: rgba(255,160,0,0.4); color: #FFCC00; }
+.btn-primary { background: linear-gradient(90deg,#FFCC00,#FF9900); color: #000; box-shadow: 0 4px 20px rgba(255,160,0,0.3); }
+.btn-primary:hover { box-shadow: 0 6px 28px rgba(255,160,0,0.5); transform: translateY(-1px); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.footer-note { text-align: center; margin-top: 24px; font-size: 12px; color: var(--tx3); }
-.back { display: inline-flex; align-items: center; gap: 6px; color: var(--tx3); text-decoration: none; font-size: 13px; margin-bottom: 32px; }
+.footer-note { text-align: center; margin-top: 28px; font-size: 12px; color: var(--tx3); }
+.back { display: inline-flex; align-items: center; gap: 6px; color: var(--tx3); text-decoration: none; font-size: 13px; margin-bottom: 32px; transition: color 0.15s; }
 .back:hover { color: var(--tx2); }
 @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <a class="logo" href="/"><span></span>Viralmax</a>
+  <a class="logo" href="/"><img src="/public/viralmax-logo.png" onerror="this.style.display='none'"><span style="background:linear-gradient(90deg,#FFCC00,#FF9900);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Viralmax</span></a>
   <a class="back" href="/app">← Back to app</a>
 
   <div class="header">
