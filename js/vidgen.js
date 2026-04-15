@@ -23,7 +23,8 @@ async function startVidGen(){
   const model=document.getElementById('vidModel').value,cfg=MODEL_CFG[model];
   const dur=document.getElementById('vidDur').value,asp=document.getElementById('vidAsp').value;
   const quality=cfg.qualities?document.getElementById('vidQual').value:'720p';
-  const btn=document.getElementById('vidBtn');btn.disabled=true;btn.innerHTML='Generating…';
+  const btn=document.getElementById('vidBtn');btn.disabled=true;btn.innerHTML='<span style="flex:1;text-align:center;">Generating…</span><div id="vidBtnBar" style="position:absolute;bottom:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#FFCC00,#FF6600);border-radius:0 0 12px 12px;transition:width 0.5s ease;"></div>';btn.style.position='relative';btn.style.overflow='hidden';
+  var _barPct=0;var _barTick=setInterval(function(){if(_barPct<90){_barPct+=Math.random()*2;var b=document.getElementById('vidBtnBar');if(b)b.style.width=Math.min(_barPct,90)+'%';}},1000);btn._barTick=_barTick;
   document.getElementById('vidProg').classList.add('vis');document.getElementById('vidErr').classList.remove('vis');
   document.getElementById('vidDlBtn').style.display='none';
   let pct=0;const fill=document.getElementById('vpFill'),lbl=document.getElementById('vpLbl'),pctLbl=document.getElementById('vpPct');
@@ -49,7 +50,7 @@ async function startVidGen(){
 ;
     creds-=cfg.qualities?cfg.creditsByQ[quality]:cfg.credits;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('vidErr').classList.add('vis');document.getElementById('vidErrMsg').textContent=err.message}
-  btn.disabled=false;btn.innerHTML='Generate Video';setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
+  var _b=document.getElementById('vidBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.innerHTML='<span style="flex:1;text-align:center;">Generate Video</span>';btn.style.position='';btn.style.overflow='';},400);setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
 }
 
 // Auto-init dropdowns as soon as this script loads
