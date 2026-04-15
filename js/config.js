@@ -3,7 +3,7 @@ const MODEL_CFG = {
   'veo3-lite':{credits:15,durations:[8],defaultDur:8,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
   'sora2':{credits:20,durations:[12],defaultDur:12,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
   'sora2-12s':{credits:25,durations:[12],defaultDur:12,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'}],defaultAsp:'9:16'},
-  'grok':{credits:10,durations:[6],defaultDur:6,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'},{v:'1:1',l:'1:1 Square'}],defaultAsp:'9:16'},
+  'grok':{credits:10,durations:[6],defaultDur:6,aspects:[{v:'9:16',l:'9:16 Portrait'},{v:'16:9',l:'16:9 Landscape'},{v:'1:1',l:'1:1 Square'}],defaultAsp:'9:16',defaultQ:'480p'},
 };
 const IMG_CFG = {
   'nano-banana-pro':{credits:15},

@@ -23,7 +23,7 @@ async function startVidGen(){
   const model=document.getElementById('vidModel').value,cfg=MODEL_CFG[model];
   const dur=document.getElementById('vidDur').value,asp=document.getElementById('vidAsp').value;
   const quality=cfg.qualities?document.getElementById('vidQual').value:'720p';
-  const btn=document.getElementById('vidBtn');btn.disabled=true;btn.textContent='⏳ Generating…';
+  const btn=document.getElementById('vidBtn');btn.disabled=true;btn.innerHTML='Generating…';
   document.getElementById('vidProg').classList.add('vis');document.getElementById('vidErr').classList.remove('vis');
   document.getElementById('vidDlBtn').style.display='none';
   let pct=0;const fill=document.getElementById('vpFill'),lbl=document.getElementById('vpLbl'),pctLbl=document.getElementById('vpPct');
@@ -49,7 +49,7 @@ async function startVidGen(){
 ;
     creds-=cfg.qualities?cfg.creditsByQ[quality]:cfg.credits;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('vidErr').classList.add('vis');document.getElementById('vidErrMsg').textContent=err.message}
-  btn.disabled=false;btn.textContent='⚡ Generate Video';setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
+  btn.disabled=false;btn.innerHTML='Generate Video';setTimeout(()=>document.getElementById('vidProg').classList.remove('vis'),2000);
 }
 
 // Auto-init dropdowns as soon as this script loads
