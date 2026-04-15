@@ -430,4 +430,4 @@ function renderVoiceOutputs(){
     list.appendChild(card);
   });
 }
-function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>190000?'var(--red)':n>150000?'var(--y)':'var(--t3)';const costEl=document.getElementById('voiceCostDisplay');if(costEl)costEl.textContent=n===0?'0 cr':(Math.ceil(n/1000)||1)+' cr';}
+function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>190000?'var(--red)':n>150000?'var(--y)':'var(--t3)';const costEl=document.getElementById('voiceCostDisplay');if(costEl)const _cn=document.getElementById('voiceCostNum');if(_cn)_cn.textContent=n===0?'0':(Math.ceil(n/1000)||1);}
