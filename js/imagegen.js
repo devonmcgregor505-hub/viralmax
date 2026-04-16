@@ -1,5 +1,4 @@
 
-var selRefImg = null;
 function setImgMode(mode){
   document.getElementById('modeImgText').classList.toggle('active',mode==='text');
   document.getElementById('modeImgImage').classList.toggle('active',mode==='image');
