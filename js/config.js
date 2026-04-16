@@ -7,7 +7,7 @@ const MODEL_CFG = {
 };
 const IMG_CFG = {
   'nano-banana-pro':{credits:15},
-  'nano-banana-2':{credits:10},
+  'nano-banana-2':{credits:8},
 };
 
 // ── STATE ──
