@@ -348,7 +348,7 @@ async function startVoiceGen() {
   document.getElementById('voiceErr').classList.remove('vis');
   let pct = 0;
   const fill = document.getElementById('vrFill'), pctLbl = document.getElementById('voiceProgPct'), lbl = document.getElementById('voiceProgLbl');
-  const tick = setInterval(() => { if (pct < 90) { pct += Math.random() * 3; if (pct > 90) pct = 90; fill.style.width = pct + '%'; pctLbl.textContent = Math.round(pct) + '%'; if (pct > 20) lbl.textContent = 'Generating…'; } }, 600);
+  const tick = setInterval(() => { if (pct < 90) { pct += Math.random() * 3; if (pct > 90) pct = 90; fill.style.width = pct + '%'; pctLbl.textContent = Math.round(pct) + '%'; if (pct > 20) lbl.textContent = 'Generating…'; var _bb=document.getElementById('voiceBtnBar');if(_bb)_bb.style.width=Math.min(pct,90)+'%'; } }, 600);
   try {
     const res = await fetch('/generate-voice', {
       method: 'POST',
@@ -374,7 +374,7 @@ async function startVoiceGen() {
     document.getElementById('voiceErr').classList.add('vis');
     document.getElementById('voiceErrMsg').textContent = err.message;
   }
-  btn.disabled=false;btn.style.cssText='';btn.className='generate-btn';if(btn._origHTML)btn.innerHTML=btn._origHTML;
+  btn.disabled=false;btn.style.cssText='';btn.className='generate-btn';if(btn._origHTML)btn.innerHTML=btn._origHTML;try{updateCharCount();}catch(e){}
   setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
 }
 
@@ -389,7 +389,7 @@ async function startCloneGen() {
   document.getElementById('voiceErr').classList.remove('vis');
   let pct = 0;
   const fill = document.getElementById('vrFill'), pctLbl = document.getElementById('voiceProgPct'), lbl = document.getElementById('voiceProgLbl');
-  const tick = setInterval(() => { if (pct < 95) { const inc = pct < 30 ? 2 : pct < 60 ? .8 : .2; pct += Math.random() * inc; if (pct > 95) pct = 95; fill.style.width = pct + '%'; pctLbl.textContent = Math.round(pct) + '%'; if (pct > 15) lbl.textContent = 'Waiting for GPU…'; if (pct > 40) lbl.textContent = 'Generating audio…'; } }, 800);
+  const tick = setInterval(() => { if (pct < 95) { const inc = pct < 30 ? 2 : pct < 60 ? .8 : .2; pct += Math.random() * inc; if (pct > 95) pct = 95; fill.style.width = pct + '%'; pctLbl.textContent = Math.round(pct) + '%'; if (pct > 15) lbl.textContent = 'Waiting for GPU…'; if (pct > 40) lbl.textContent = 'Generating audio…'; var _bb=document.getElementById('voiceBtnBar');if(_bb)_bb.style.width=Math.min(pct,95)+'%'; } }, 800);
   try {
     const voices = loadVoices(); const v = voices.find(x => x.id === selVoiceId); if (!v) throw new Error('Voice not found');
     const byteStr = atob(v.audioB64), ab = new ArrayBuffer(byteStr.length), ia = new Uint8Array(ab);
@@ -408,7 +408,7 @@ async function startCloneGen() {
     document.getElementById('voiceErr').classList.add('vis');
     document.getElementById('voiceErrMsg').textContent = err.message;
   }
-  btn.disabled=false;btn.style.cssText='';btn.className='generate-btn';if(btn._origHTML)btn.innerHTML=btn._origHTML;
+  btn.disabled=false;btn.style.cssText='';btn.className='generate-btn';if(btn._origHTML)btn.innerHTML=btn._origHTML;try{updateCharCount();}catch(e){}
   setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
 }
 
