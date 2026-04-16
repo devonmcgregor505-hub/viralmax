@@ -343,7 +343,7 @@ async function startVoiceGen() {
   const voiceId = selectedVoiceId;
   if (!voiceId) { alert('Select a voice'); return; }
   const btn = document.getElementById('voiceBtn');
-  btn.disabled = true; btn.textContent = '⏳ Generating…';
+  btn.disabled=true;btn.style.cssText='';btn.className='generate-btn';btn.style.position='relative';btn.style.overflow='hidden';btn.style.minHeight='44px';btn.style.padding='10px 20px';btn.innerHTML='<span style="flex:1;text-align:center;background:linear-gradient(90deg,#FFCC00,#FF6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">Generating…</span><div id="voiceBtnBar" style="position:absolute;bottom:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#FFCC00,#FF6600);border-radius:0 0 12px 12px;transition:width 0.5s ease;"></div>';
   document.getElementById('voiceProg').classList.add('vis');
   document.getElementById('voiceErr').classList.remove('vis');
   let pct = 0;
@@ -374,7 +374,7 @@ async function startVoiceGen() {
     document.getElementById('voiceErr').classList.add('vis');
     document.getElementById('voiceErrMsg').textContent = err.message;
   }
-  btn.disabled=false;btn.innerHTML='<div class="gen-left" style="flex:1;justify-content:center;font-size:17px;font-weight:800;letter-spacing:-.02em;">Generate Speech</div><div class="credits-pill" id="voiceCostDisplay" style="background:rgba(20,14,4,0.75);border:1px solid rgba(255,160,0,0.25);"><img src="/public/credits-icon.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;"><span id="voiceCostNum" style="color:#FFAA00;font-weight:800;font-size:13px;">0</span></div>';
+  btn.disabled=false;btn.style.cssText='';btn.className='generate-btn';if(btn._origHTML)btn.innerHTML=btn._origHTML;
   setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
 }
 
@@ -384,7 +384,7 @@ async function startCloneGen() {
   if (!script) { alert('Enter a script'); return; }
   if (!selVoiceId) { alert('Select a voice first'); return; }
   const btn = document.getElementById('cloneVoiceBtn');
-  btn.disabled = true; btn.textContent = '⏳ Generating…';
+  btn.disabled=true;btn.style.cssText='';btn.className='generate-btn';btn.style.position='relative';btn.style.overflow='hidden';btn.style.minHeight='44px';btn.style.padding='10px 20px';btn.innerHTML='<span style="flex:1;text-align:center;background:linear-gradient(90deg,#FFCC00,#FF6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">Generating…</span><div id="voiceBtnBar" style="position:absolute;bottom:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#FFCC00,#FF6600);border-radius:0 0 12px 12px;transition:width 0.5s ease;"></div>';
   document.getElementById('voiceProg').classList.add('vis');
   document.getElementById('voiceErr').classList.remove('vis');
   let pct = 0;
@@ -408,7 +408,7 @@ async function startCloneGen() {
     document.getElementById('voiceErr').classList.add('vis');
     document.getElementById('voiceErrMsg').textContent = err.message;
   }
-  btn.disabled=false;btn.innerHTML='<div class="gen-left" style="flex:1;justify-content:center;font-size:17px;font-weight:800;letter-spacing:-.02em;">Generate Speech</div><div class="credits-pill" id="voiceCostDisplay" style="background:rgba(20,14,4,0.75);border:1px solid rgba(255,160,0,0.25);"><img src="/public/credits-icon.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;"><span id="voiceCostNum" style="color:#FFAA00;font-weight:800;font-size:13px;">0</span></div>';
+  btn.disabled=false;btn.style.cssText='';btn.className='generate-btn';if(btn._origHTML)btn.innerHTML=btn._origHTML;
   setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
 }
 
@@ -431,3 +431,4 @@ function renderVoiceOutputs(){
   });
 }
 function updateCharCount(){const n=document.getElementById('voiceScript').value.length;const el=document.getElementById('charCount');el.textContent=n;el.style.color=n>190000?'var(--red)':n>150000?'var(--y)':'var(--t3)';const costEl=document.getElementById('voiceCostDisplay');const _cn=document.getElementById('voiceCostNum');if(_cn)_cn.textContent=n===0?'0':(Math.ceil(n/1000)||1);}
+try{document.getElementById('voiceBtn')._origHTML=document.getElementById('voiceBtn').innerHTML;}catch(e){}
