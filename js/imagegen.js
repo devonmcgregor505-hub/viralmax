@@ -32,7 +32,7 @@ async function startImgGen(){
     const r=await fetch('/generate-image',{method:'POST',body:fd});const data=await r.json();
     clearInterval(tick);fill.style.width='100%';pctLbl.textContent='100%';
     if(!data.success)throw new Error(data.error||'Unknown error');
-    const prev=document.getElementById('genImgEl');prev.src=data.imageUrl;prev.style.display='block';document.getElementById('imgEmpty').style.display='none';document.getElementById('imgPrev').style.display='block';document.getElementById('imgEmptyIcon').style.display='none';document.getElementById('imgEmptyTitle').style.display='none';document.getElementById('imgEmptySub').style.display='none';
+    showImgPreview(data.imageUrl);
     const dl=document.getElementById('dlImgBtn');dl.href=data.imageUrl;dl.style.display='block';
     creds-=IMG_CFG[model]?.credits||0;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('imgErr').classList.add('vis');document.getElementById('imgErrMsg').textContent=err.message}
