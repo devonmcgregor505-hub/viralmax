@@ -36,10 +36,10 @@ async function startImgGen(){
     const dl=document.getElementById('dlImgBtn');dl.href=data.imageUrl;dl.style.display='block';
     creds-=IMG_CFG[model]?.credits||0;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('imgErr').classList.add('vis');document.getElementById('imgErrMsg').textContent=err.message}
-  var _b=document.getElementById('imgBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.style.background='';btn.style.border='';btn.style.cssText='';btn.className='generate-btn';try{onImgModelChange();}catch(e){}btn.style.position='';btn.style.overflow='';},400);setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
+  var _b=document.getElementById('imgBtnBar');if(_b)_b.style.width='100%';clearInterval(btn._barTick);setTimeout(function(){btn.disabled=false;btn.style.cssText='';btn.className='generate-btn';if(btn._origHTML)btn.innerHTML=btn._origHTML;try{onImgModelChange();}catch(e){}},400);setTimeout(()=>document.getElementById('imgProg').classList.remove('vis'),2000);
 }
 
 // Auto-init dropdowns as soon as this script loads
 try { onImgModelChange(); } catch(e) {}
 
-try{onImgModelChange();}catch(e){}
+try{onImgModelChange();}catch(e){}try{document.getElementById('imgBtn')._origHTML=document.getElementById('imgBtn').innerHTML;}catch(e){}
