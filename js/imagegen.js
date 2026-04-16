@@ -13,12 +13,12 @@ document.getElementById('refDrop').addEventListener('dragleave',()=>document.get
 document.getElementById('refDrop').addEventListener('drop',e=>{e.preventDefault();document.getElementById('refDrop').classList.remove('drag');if(e.dataTransfer.files[0]){selRefImg=e.dataTransfer.files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has')}});
 document.getElementById('refInp').addEventListener('change',()=>{if(document.getElementById('refInp').files[0]){selRefImg=document.getElementById('refInp').files[0];document.getElementById('refFnm').textContent='📎 '+selRefImg.name;document.getElementById('refDrop').classList.add('has');const rb=document.getElementById('refRemoveBtn');if(rb)rb.style.display='block';}});
 
-function onImgModelChange(){const m=document.getElementById('imgModel').value;const _ic=document.getElementById('imgCostNum');if(_ic)_ic.textContent=(IMG_CFG[m]?.credits||15);}
+function onImgModelChange(){const m=document.getElementById('imgModel').value;const _ic=document.getElementById('imgCostNum');if(_ic)_ic.textContent=(IMG_CFG[m]?.credits||0);}
 function onImgResChange(){const m=document.getElementById('imgModel').value;const _ic=document.getElementById('imgCostNum');if(_ic)_ic.textContent=(IMG_CFG[m]?.credits||0)}
 
 async function startImgGen(){
   const model=document.getElementById('imgModel')?.value||'nano-banana-pro';
-  const cost=IMG_CFG[model]?.credits||15;
+  const cost=IMG_CFG[model]?.credits||0;
   if(!await requireCredits(cost))return;
   const prompt=document.getElementById('imgPrompt').value.trim();if(!prompt){alert('Enter a prompt');return}
   const asp=document.getElementById('imgAsp').value,res='2K';
