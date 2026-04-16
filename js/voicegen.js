@@ -374,7 +374,7 @@ async function startVoiceGen() {
     document.getElementById('voiceErr').classList.add('vis');
     document.getElementById('voiceErrMsg').textContent = err.message;
   }
-  btn.disabled = false; btn.textContent = '🎙 Generate Speech';
+  btn.disabled=false;btn.innerHTML='<div class="gen-left" style="flex:1;justify-content:center;font-size:17px;font-weight:800;letter-spacing:-.02em;">Generate Speech</div><div class="credits-pill" id="voiceCostDisplay" style="background:rgba(20,14,4,0.75);border:1px solid rgba(255,160,0,0.25);"><img src="/public/credits-icon.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;"><span id="voiceCostNum" style="color:#FFAA00;font-weight:800;font-size:13px;">0</span></div>';
   setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
 }
 
@@ -408,7 +408,7 @@ async function startCloneGen() {
     document.getElementById('voiceErr').classList.add('vis');
     document.getElementById('voiceErrMsg').textContent = err.message;
   }
-  btn.disabled = false; btn.textContent = '🎙 Generate Speech';
+  btn.disabled=false;btn.innerHTML='<div class="gen-left" style="flex:1;justify-content:center;font-size:17px;font-weight:800;letter-spacing:-.02em;">Generate Speech</div><div class="credits-pill" id="voiceCostDisplay" style="background:rgba(20,14,4,0.75);border:1px solid rgba(255,160,0,0.25);"><img src="/public/credits-icon.png" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;"><span id="voiceCostNum" style="color:#FFAA00;font-weight:800;font-size:13px;">0</span></div>';
   setTimeout(() => document.getElementById('voiceProg').classList.remove('vis'), 2000);
 }
 
