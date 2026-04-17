@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Restore last tab FIRST before anything else
   try {
-    const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper'];
+    const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper','history'];
     const lastTab = localStorage.getItem('vm_lastTab') || 'vidgen';
     switchTab(validTabs.includes(lastTab) ? lastTab : 'vidgen');
   } catch(e) { try { switchTab('vidgen'); } catch(e2) {} }
@@ -72,16 +72,14 @@ document.addEventListener('DOMContentLoaded', function() {
   try { onImgModelChange(); } catch(e) {}
   try { renderVoiceSel(); } catch(e) {}
 
-  // Restore vid dur/asp/qual after onModelChange populates them
+  // Restore cached dur/asp/qual immediately after onModelChange populates the selects
   try {
     const vd = localStorage.getItem('vm_vidDur');
     const va = localStorage.getItem('vm_vidAsp');
     const vq = localStorage.getItem('vm_vidQual');
-    setTimeout(() => {
-      if (vd) { const el = document.getElementById('vidDur'); if(el) el.value = vd; }
-      if (va) { const el = document.getElementById('vidAsp'); if(el) el.value = va; }
-      if (vq) { const el = document.getElementById('vidQual'); if(el) el.value = vq; onQualityChange(); }
-    }, 50);
+    if (vd) { const el = document.getElementById('vidDur'); if(el) el.value = vd; }
+    if (va) { const el = document.getElementById('vidAsp'); if(el) el.value = va; }
+    if (vq) { const el = document.getElementById('vidQual'); if(el) { el.value = vq; onQualityChange(); } }
   } catch(e) {}
 });
 
@@ -165,9 +163,8 @@ async function logout() {
     creds = cachedCreds ? parseInt(cachedCreds) : 0;
   }
 
-  // Init UI
+  // Init UI (onModelChange already called in DOMContentLoaded)
   renderCustomVoicesList();
-  onModelChange();
   updCreds();
   onImgModelChange();
   renderVoiceSel();
