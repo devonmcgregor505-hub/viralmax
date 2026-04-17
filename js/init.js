@@ -1,6 +1,8 @@
 // ── INIT ──
 // Initialise UI instantly on DOMContentLoaded - no async needed
 document.addEventListener('DOMContentLoaded', function() {
+  // Show cached plan
+  try { const lp = localStorage.getItem('vm_plan_last'); const pe = document.getElementById('userPlanSidebar'); if(pe && lp) pe.textContent = lp.charAt(0).toUpperCase() + lp.slice(1) + ' Plan'; } catch(e) {}
   // Show cached credits
   try {
     const lastKnown = localStorage.getItem('vm_credits_last');
@@ -111,6 +113,8 @@ async function logout() {
   const sideName = document.getElementById('userEmailSidebar');
   if (sideName) sideName.textContent = email.split('@')[0];
 
+  // Show cached plan
+  try { const lp = localStorage.getItem('vm_plan_last'); const pe = document.getElementById('userPlanSidebar'); if(pe && lp) pe.textContent = lp.charAt(0).toUpperCase() + lp.slice(1) + ' Plan'; } catch(e) {}
   // Show cached credits instantly, then fetch real value
   const cachedCreds = localStorage.getItem('vm_credits_' + currentUser.id);
   if (cachedCreds !== null) { creds = parseInt(cachedCreds); updCreds(); }
@@ -126,6 +130,7 @@ async function logout() {
     if (data.plan) {
       localStorage.setItem('vm_plan_' + currentUser.id, data.plan);
       localStorage.setItem('vm_plan_last', data.plan);
+      const _pe = document.getElementById('userPlanSidebar'); if(_pe) _pe.textContent = data.plan.charAt(0).toUpperCase() + data.plan.slice(1) + ' Plan';
     }
   } catch(e) {
     creds = cachedCreds ? parseInt(cachedCreds) : 0;
