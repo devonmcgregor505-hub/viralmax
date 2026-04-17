@@ -4,7 +4,7 @@ function saveVoices(v){localStorage.setItem('viralmax_voices',JSON.stringify(v))
 
 function renderVoiceSel(){
   restoreVoicePrefs();
-  const sel=document.getElementById('cloneVoiceSel');const voices=loadVoices();
+  const sel=document.getElementById('cloneVoiceSel');if(!sel)return;const voices=loadVoices();
   sel.innerHTML=voices.length?'':'<option value="">No voices added</option>';
   voices.forEach(v=>{const o=document.createElement('option');o.value=v.id;o.textContent=v.name;sel.appendChild(o)});
   sel.value=selVoiceId||'';updateDelBtn();
