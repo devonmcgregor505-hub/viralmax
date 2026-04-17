@@ -417,7 +417,7 @@ function saveVoiceOutputs(o){localStorage.setItem('viralmax_vo_outputs',JSON.str
 function addVoiceOutput(audioUrl,preview,voiceName){
   const outputs=loadVoiceOutputs();outputs.unshift({id:'vo_'+Date.now(),audioUrl,scriptPreview:preview,voiceName,ts:Date.now()});
   saveVoiceOutputs(outputs);renderVoiceOutputs();
-  try{saveToHistory('audio',audioUrl,voiceName);}catch(e){}
+  
   try{addToRecents(audioUrl,'audio',voiceName);}catch(e){}
 }
 function deleteVoiceOutput(id,e){e.stopPropagation();saveVoiceOutputs(loadVoiceOutputs().filter(o=>o.id!==id));renderVoiceOutputs()}
