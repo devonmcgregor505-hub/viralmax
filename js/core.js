@@ -69,3 +69,26 @@ function animProg(fillId,pctId,lblId,target,lbl){
     else clearInterval(tick);
   },200);return tick;
 }
+
+function showHistoryPage() {
+  var hp = document.getElementById('historyPage');
+  var mn = document.querySelector('.main');
+  if(hp) hp.style.display = 'flex';
+  if(mn) mn.style.display = 'none';
+  var h = document.getElementById('topnav-history');
+  var c = document.getElementById('topnav-create');
+  if(h) h.classList.add('active');
+  if(c) c.classList.remove('active');
+  try { renderHistory(); } catch(e) {}
+}
+
+function showCreatePage() {
+  var hp = document.getElementById('historyPage');
+  var mn = document.querySelector('.main');
+  if(hp) hp.style.display = 'none';
+  if(mn) mn.style.display = 'flex';
+  var h = document.getElementById('topnav-history');
+  var c = document.getElementById('topnav-create');
+  if(h) h.classList.remove('active');
+  if(c) c.classList.add('active');
+}
