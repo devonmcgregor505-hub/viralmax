@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try { if(localStorage.getItem('vm_lastPage')==='history') showHistoryPage(); } catch(e) {}
   // Restore last tab FIRST before anything else
   try {
-    const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper','history'];
+    const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper'];
     const lastTab = localStorage.getItem('vm_lastTab') || 'vidgen';
     switchTab(validTabs.includes(lastTab) ? lastTab : 'vidgen');
   } catch(e) { try { switchTab('vidgen'); } catch(e2) {} }
