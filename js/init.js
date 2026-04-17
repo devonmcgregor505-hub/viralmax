@@ -1,7 +1,11 @@
 // ── INIT ──
 // Initialise UI instantly on DOMContentLoaded - no async needed
 document.addEventListener('DOMContentLoaded', function() {
-  // Show cached email/avatar/name instantly
+  // Show cached email/avatar/name instantly (also try reading direct from supabase session in localStorage)
+  try {
+    const _keys = Object.keys(localStorage).filter(k => k.includes('supabase') && k.includes('auth'));
+    if (_keys.length) { const _sd = JSON.parse(localStorage.getItem(_keys[0])); const _se = _sd?.user?.email || _sd?.session?.user?.email; if(_se) localStorage.setItem('vm_email_last', _se); }
+  } catch(e) {}
   try {
     const ce = localStorage.getItem('vm_email_last');
     if (ce) {
@@ -124,7 +128,11 @@ async function logout() {
   const sideName = document.getElementById('userEmailSidebar');
   if (sideName) sideName.textContent = email.split('@')[0];
 
-  // Show cached email/avatar/name instantly
+  // Show cached email/avatar/name instantly (also try reading direct from supabase session in localStorage)
+  try {
+    const _keys = Object.keys(localStorage).filter(k => k.includes('supabase') && k.includes('auth'));
+    if (_keys.length) { const _sd = JSON.parse(localStorage.getItem(_keys[0])); const _se = _sd?.user?.email || _sd?.session?.user?.email; if(_se) localStorage.setItem('vm_email_last', _se); }
+  } catch(e) {}
   try {
     const ce = localStorage.getItem('vm_email_last');
     if (ce) {
