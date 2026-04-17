@@ -92,4 +92,5 @@ function showCreatePage() {
   var c = document.getElementById('topnav-create');
   if(h) h.classList.remove('active');
   if(c) c.classList.add('active');
+  try { localStorage.setItem('vm_lastPage', 'create'); } catch(e) {}
 }
