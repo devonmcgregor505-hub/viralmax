@@ -5,17 +5,17 @@
 <link rel="icon" type="image/png" href="/viralmaxlogo.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign Up — Viralmax</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --y: #FFE600; --blk: #050505; --blk2: #0a0a0a;
+  --y: #FFE600; --o: #FF6B00; --blk: #050505; --blk2: #0a0a0a;
   --g1: #1a1a1a; --g2: #222; --g3: #2e2e2e;
   --tx: #f5f5f0; --tx2: #999; --tx3: #555;
   --grn: #00E676; --red: #FF3D3D;
 }
 body {
-  font-family: 'Manrope', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   background: var(--blk);
   color: var(--tx);
   min-height: 100vh;
@@ -37,10 +37,10 @@ body {
 .card::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--y), transparent);
+  background: linear-gradient(90deg, transparent, var(--o), var(--y), transparent);
 }
 .logo {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-weight: 800; font-size: 20px;
   color: var(--y); text-decoration: none;
   display: flex; align-items: center; gap: 8px;
@@ -48,7 +48,7 @@ body {
 }
 .logo span { width: 7px; height: 7px; background: var(--y); border-radius: 50%; }
 h1 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 28px; font-weight: 800;
   letter-spacing: -1px; margin-bottom: 8px;
 }
@@ -58,7 +58,7 @@ h1 {
   background: var(--g1); border: 1px solid var(--g2);
   border-radius: 10px; color: var(--tx);
   font-size: 14px; font-weight: 600;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   cursor: pointer; display: flex; align-items: center;
   justify-content: center; gap: 10px;
   transition: border-color 0.2s, background 0.2s;
@@ -79,7 +79,7 @@ h1 {
   background: var(--g1); border: 1px solid var(--g2);
   border-radius: 10px; padding: 13px 16px;
   color: var(--tx); font-size: 14px;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   outline: none; transition: border-color 0.2s; width: 100%;
 }
 .form-input:focus { border-color: rgba(255,230,0,0.4); }
@@ -89,7 +89,7 @@ h1 {
   background: var(--y); border: none;
   border-radius: 10px; color: #000;
   font-size: 15px; font-weight: 800;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   cursor: pointer; margin-top: 6px;
   transition: background 0.2s;
 }
@@ -108,7 +108,7 @@ h1 {
 </head>
 <body>
 <div class="card">
-  <a class="logo" href="/"><span></span>Viralmax</a>
+  <a class="logo" href="/"><img src="/viralmaxlogo.png" style="height:28px;width:auto;"></a>
   <h1>Create your account</h1>
   <p class="sub">No credit card required.</p>
 
