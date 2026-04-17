@@ -1,6 +1,16 @@
 // ── INIT ──
 // Initialise UI instantly on DOMContentLoaded - no async needed
 document.addEventListener('DOMContentLoaded', function() {
+  // Show cached email/avatar/name instantly
+  try {
+    const ce = localStorage.getItem('vm_email_last');
+    if (ce) {
+      const _tl = document.getElementById('topbarAvatarLetter'); if(_tl) _tl.textContent = ce.charAt(0).toUpperCase();
+      const _sa = document.getElementById('userAvatarSidebar'); if(_sa) _sa.textContent = ce.charAt(0).toUpperCase();
+      const _sn = document.getElementById('userEmailSidebar'); if(_sn) _sn.textContent = ce.split('@')[0];
+      const _te = document.getElementById('topbarEmailFull'); if(_te) _te.textContent = ce;
+    }
+  } catch(e) {}
   // Show cached plan
   try { const lp = localStorage.getItem('vm_plan_last'); const pe = document.getElementById('userPlanSidebar'); if(pe && lp) pe.textContent = lp.charAt(0).toUpperCase() + lp.slice(1) + ' Plan'; } catch(e) {}
   // Show cached credits
@@ -105,6 +115,7 @@ async function logout() {
   // Topbar avatar letter + dropdown email
   const topLetter = document.getElementById('topbarAvatarLetter');
   if (topLetter) topLetter.textContent = email.charAt(0).toUpperCase();
+  try { localStorage.setItem('vm_email_last', email); } catch(e) {}
   const topEmail = document.getElementById('topbarEmailFull');
   if (topEmail) topEmail.textContent = email;
   // Sidebar user info
@@ -113,6 +124,16 @@ async function logout() {
   const sideName = document.getElementById('userEmailSidebar');
   if (sideName) sideName.textContent = email.split('@')[0];
 
+  // Show cached email/avatar/name instantly
+  try {
+    const ce = localStorage.getItem('vm_email_last');
+    if (ce) {
+      const _tl = document.getElementById('topbarAvatarLetter'); if(_tl) _tl.textContent = ce.charAt(0).toUpperCase();
+      const _sa = document.getElementById('userAvatarSidebar'); if(_sa) _sa.textContent = ce.charAt(0).toUpperCase();
+      const _sn = document.getElementById('userEmailSidebar'); if(_sn) _sn.textContent = ce.split('@')[0];
+      const _te = document.getElementById('topbarEmailFull'); if(_te) _te.textContent = ce;
+    }
+  } catch(e) {}
   // Show cached plan
   try { const lp = localStorage.getItem('vm_plan_last'); const pe = document.getElementById('userPlanSidebar'); if(pe && lp) pe.textContent = lp.charAt(0).toUpperCase() + lp.slice(1) + ' Plan'; } catch(e) {}
   // Show cached credits instantly, then fetch real value
