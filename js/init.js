@@ -142,7 +142,7 @@ async function logout() {
   // Handle hash routing
   const hash = window.location.hash.replace('#','');
   if (hash && document.getElementById('tab-'+hash)) switchTab(hash);
-  else switchTab('vidgen');
+  else { const _lt = localStorage.getItem('vm_lastTab'); const _vt = ['vidgen','imggen','voicegen','deadspace','scraper']; switchTab(_vt.includes(_lt) ? _lt : 'vidgen'); }
 
   // Refresh credits from server every 30 seconds
   setInterval(async () => {
