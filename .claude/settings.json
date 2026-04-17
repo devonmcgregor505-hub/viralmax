@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk 'NR>=1158 && NR<=1162' /Users/kanemcgregor/Downloads/Viralmax/app.html)",
+      "Bash(awk 'NR==1013' /Users/kanemcgregor/Downloads/Viralmax/app.html)",
+      "Bash(python3)"
+    ]
+  }
+}

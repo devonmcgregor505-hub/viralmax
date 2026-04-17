@@ -986,6 +986,31 @@ app.post('/api/portal', async (req, res) => {
   }
 });
 
+// R2 Upload endpoint
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const r2 = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: { accessKeyId: process.env.R2_ACCESS_KEY_ID, secretAccessKey: process.env.R2_SECRET_ACCESS_KEY }
+});
+app.post("/api/save-to-r2", express.json(), async (req, res) => {
+  const { url, type, userId } = req.body;
+  if (!url) return res.json({ ok: false, error: "no url" });
+  try {
+    const resp = await axios.get(url, { responseType: "arraybuffer", timeout: 60000 });
+    const ext = type === "video" ? "mp4" : type === "audio" ? "wav" : "png";
+    const key = `${type}/${userId||"anon"}/${Date.now()}.${ext}`;
+    await r2.send(new PutObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: key,
+      Body: Buffer.from(resp.data),
+      ContentType: resp.headers["content-type"] || "application/octet-stream"
+    }));
+    const r2Url = `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${process.env.R2_BUCKET_NAME}/${key}`;
+    res.json({ ok: true, url: r2Url, key });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
 app.listen(PORT, () => {
   console.log('\n✅ Viralmax running at http://localhost:' + PORT);
   console.log('   Routes: / (home)  /app (tools)  /login  /signup  /legal  /checkout');

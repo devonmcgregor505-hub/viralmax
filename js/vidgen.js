@@ -47,6 +47,7 @@ async function startVidGen(){
     clearInterval(tick);fill.style.width='100%';pctLbl.textContent='100%';lbl.textContent='Done!';
     if(!data.success)throw new Error(data.error||'Unknown error');
     showVidPreview(data.videoUrl);
+    try{fetch("/api/save-to-r2",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:data.videoUrl,type:"video",userId:currentUser?.id})});}catch(e){}
 ;
     creds-=cfg.qualities?cfg.creditsByQ[quality]:cfg.credits;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('vidErr').classList.add('vis');document.getElementById('vidErrMsg').textContent=err.message}

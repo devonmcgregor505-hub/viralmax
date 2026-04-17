@@ -415,6 +415,7 @@ async function startCloneGen() {
 function loadVoiceOutputs(){try{return JSON.parse(localStorage.getItem('viralmax_vo_outputs')||'[]')}catch{return[]}}
 function saveVoiceOutputs(o){localStorage.setItem('viralmax_vo_outputs',JSON.stringify(o))}
 function addVoiceOutput(audioUrl,preview,voiceName){
+  try{fetch("/api/save-to-r2",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:audioUrl,type:"audio",userId:currentUser?.id})});}catch(e){}
   const outputs=loadVoiceOutputs();outputs.unshift({id:'vo_'+Date.now(),audioUrl,scriptPreview:preview,voiceName,ts:Date.now()});
   saveVoiceOutputs(outputs);renderVoiceOutputs();
   

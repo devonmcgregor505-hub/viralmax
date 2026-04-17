@@ -33,6 +33,7 @@ async function startImgGen(){
     clearInterval(tick);fill.style.width='100%';pctLbl.textContent='100%';
     if(!data.success)throw new Error(data.error||'Unknown error');
     showImgPreview(data.imageUrl);
+    try{fetch("/api/save-to-r2",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:data.imageUrl,type:"image",userId:currentUser?.id})});}catch(e){}
     const dl=document.getElementById('dlImgBtn');dl.href=data.imageUrl;dl.style.display='block';
     creds-=IMG_CFG[model]?.credits||0;updCreds();
   }catch(err){clearInterval(tick);document.getElementById('imgErr').classList.add('vis');document.getElementById('imgErrMsg').textContent=err.message}
