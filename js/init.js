@@ -3,8 +3,8 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Show cached email/avatar/name instantly (also try reading direct from supabase session in localStorage)
   try {
-    const _keys = Object.keys(localStorage).filter(k => k.includes('supabase') && k.includes('auth'));
-    if (_keys.length) { const _sd = JSON.parse(localStorage.getItem(_keys[0])); const _se = _sd?.user?.email || _sd?.session?.user?.email; if(_se) localStorage.setItem('vm_email_last', _se); }
+    const _sd2 = JSON.parse(localStorage.getItem("sb-asvpzsnncbxkpycsgfnj-auth-token") || "null");
+    const _sd = JSON.parse(localStorage.getItem("sb-asvpzsnncbxkpycsgfnj-auth-token") || "{}"); const _se = _sd?.user?.email; if(_se) localStorage.setItem("vm_email_last", _se);
   } catch(e) {}
   try {
     const ce = localStorage.getItem('vm_email_last');
