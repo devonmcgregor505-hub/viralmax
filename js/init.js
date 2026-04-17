@@ -61,6 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   } catch(e) {}
 
+  // Restore last page (history vs create)
+  try { if(localStorage.getItem('vm_lastPage')==='history') showHistoryPage(); } catch(e) {}
   // Restore last tab FIRST before anything else
   try {
     const validTabs = ['vidgen','imggen','voicegen','deadspace','scraper','history'];

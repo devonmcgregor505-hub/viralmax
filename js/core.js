@@ -80,6 +80,7 @@ function showHistoryPage() {
   if(h) h.classList.add('active');
   if(c) c.classList.remove('active');
   try { renderHistory(); } catch(e) {}
+  try { localStorage.setItem('vm_lastPage', 'history'); } catch(e) {}
 }
 
 function showCreatePage() {
