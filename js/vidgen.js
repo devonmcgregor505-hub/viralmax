@@ -56,3 +56,8 @@ async function startVidGen(){
 // Auto-init dropdowns as soon as this script loads
 try { onModelChange(); } catch(e) {}
 try { document.getElementById('vidBtn')._origHTML = document.getElementById('vidBtn').innerHTML; } catch(e) {}
+
+function updateVidCharCount(el){
+  var c=document.getElementById("vidCharCount");
+  if(c)c.textContent=el.value.length+"/2000";
+}
