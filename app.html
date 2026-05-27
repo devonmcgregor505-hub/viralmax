@@ -682,25 +682,19 @@ async function sendAiMessage(){
   appendThinking();
   aiHistory.push({role:'user',content:msg});
   try{
-    const systemPrompt=`You are Ascend AI, a sharp, practical health and appearance coach for a 19-year-old male (Devon) based in New Zealand. His goals: look better, improve appearance, build physique. Focus areas: skincare, grooming, hair styling, body & physique, diet & nutrition, sleep quality, jaw/posture/frame, fitness & training. Training style: mixed (gym, sport, cardio). Wake time: 7–8am. Accountability style: flexible and encouraging. Be direct, specific, and actionable. No fluff. Keep responses concise but complete. Use plain text, no markdown headers.`;
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('/api/chat',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:800,
-        system:systemPrompt,
-        messages:aiHistory
-      })
+      body:JSON.stringify({messages:aiHistory,profile:profile})
     });
     const data=await res.json();
-    const reply=data.content?.[0]?.text||'Something went wrong — try again.';
+    const reply=data.reply||data.error||'Something went wrong — try again.';
     removeThinking();
     appendMsg('ai',reply);
     aiHistory.push({role:'assistant',content:reply});
   }catch(e){
     removeThinking();
-    appendMsg('ai','Connection issue — make sure the API key is configured on the server.');
+    appendMsg('ai','Could not reach the server.');
   }
 }
 
