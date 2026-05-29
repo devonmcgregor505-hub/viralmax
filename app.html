@@ -291,8 +291,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .cl-section{font-size:16px;font-weight:800;letter-spacing:.04em;color:var(--y);padding:24px 0 10px;border-bottom:1px solid var(--border-y);margin-bottom:8px;}
 .cl-section:first-child{padding-top:4px;}
 .cl-subheader{font-size:12px;font-weight:700;color:var(--t2);padding:12px 0 4px;letter-spacing:.03em;}
-.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
-.check-item:last-child{border-bottom:none;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;}
+.check-item:last-child .check-text{border-bottom:none!important;}
 
 .cl-steps{margin-top:6px;padding-left:4px;}
 .cl-step{font-size:13px;color:var(--text);opacity:0.75;padding:3px 0;line-height:1.6;}
@@ -323,6 +323,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <a href="#" onclick="showPage('progress',this);return false;">Progress</a>
   </nav>
   <div class="topbar-right">
+    <div class="streak-badge" id="dayBadge" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:var(--t2);">Mon</div>
+    <div class="streak-badge" id="scoreBadge" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:var(--text);">0%</div>
     <div class="streak-badge" id="streakBadge">
       <svg viewBox="0 0 16 16" style="width:14px;height:14px;fill:#FFCC00"><path d="M8 1C8 1 3 6 3 10a5 5 0 0010 0C13 6 8 1 8 1z"/></svg>
       <span id="streakCount">0</span> day streak
@@ -817,11 +819,11 @@ function renderChecklist(){
   el.innerHTML=allItems.map((item,i)=>{
     if(item.type==='section') return `<div class="cl-section">${item.label}</div>`;
     const isDone=checked.has(i);
-    const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map(s=>`<div class="cl-step">— ${s}</div>`).join('')}</div>`:'';
-    return `<div class="check-item" onclick="toggleCheck(${i})">
-      <div class="check-box${isDone?' done':''}"></div>
-      <div class="check-text">
-        <div class="check-name${isDone?' done':''}">${item.label}</div>
+    const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map((s,si)=>`<div class="cl-step" contenteditable="true" onclick="event.stopPropagation()" onblur="saveClStep(${i},${si},this.innerText)">— ${s}</div>`).join('')}</div>`:'';
+    return `<div class="check-item">
+      <div class="check-box${isDone?' done':''}" onclick="toggleCheck(${i})"></div>
+      <div class="check-text" style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:2px;">
+        <div class="check-name${isDone?' done':''}" contenteditable="true" onclick="event.stopPropagation()" onblur="saveClLabel(${i},this.innerText)">${item.label}</div>
         ${stepsHtml}
       </div>
     </div>`;
@@ -831,6 +833,11 @@ function renderChecklist(){
   const score=tasks.length?Math.round(done/tasks.length*100):0;
   const sn=document.getElementById('scoreNum');
   if(sn)sn.textContent=score;
+  const sb=document.getElementById('scoreBadge');
+  if(sb)sb.textContent=score+'%';
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const db=document.getElementById('dayBadge');
+  if(db)db.textContent=days[new Date().getDay()];
 }
 
 function toggleCheck(i){checked.has(i)?checked.delete(i):checked.add(i);renderChecklist();}
@@ -999,6 +1006,40 @@ function persistRoutine(cid){
   const keyMap={morningBlocks:'morning',nightBlocks:'night',nutritionBlocks:'nutrition'};
   const key=keyMap[cid];
   if(key){saved[key]=window._routineData[cid];localStorage.setItem('ascend_profile',JSON.stringify(saved));}
+}
+
+function saveClLabel(i,val){
+  if(!window._allChecklistItems?.[i])return;
+  window._allChecklistItems[i].label=val.trim();
+  // Find which block this belongs to and save back
+  syncChecklistToRoutine();
+}
+function saveClStep(i,si,val){
+  if(!window._allChecklistItems?.[i]?.steps)return;
+  window._allChecklistItems[i].steps[si]=val.replace(/^—\s*/,'').trim();
+  syncChecklistToRoutine();
+}
+function syncChecklistToRoutine(){
+  // Rebuild morningBlocks and nightBlocks from _allChecklistItems
+  if(!window._allChecklistItems||!window._routineData)return;
+  const items=window._allChecklistItems;
+  let section='';
+  let mIdx=-1;let nIdx=-1;
+  const morning=window._routineData.morningBlocks;
+  const night=window._routineData.nightBlocks;
+  items.forEach((item,i)=>{
+    if(item.type==='section'){section=item.label;return;}
+    if(item.type!=='task')return;
+    if(section.includes('Morning')){
+      mIdx++;
+      if(morning[mIdx]){morning[mIdx].title=item.label.split('·')[0].trim();morning[mIdx].items=item.steps||[];}
+    } else if(section.includes('Night')){
+      nIdx++;
+      if(night[nIdx]){night[nIdx].title=item.label.split('·')[0].trim();night[nIdx].items=item.steps||[];}
+    }
+  });
+  persistRoutine('morningBlocks');
+  persistRoutine('nightBlocks');
 }
 </script>
 </body>
