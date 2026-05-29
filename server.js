@@ -279,6 +279,47 @@ app.post('/api/training/workout', async (req, res) => {
   }
 });
 
+
+// ── Save daily score ──
+app.post('/api/scores/save', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  if (!userId) return res.json({ ok: true });
+  const { date, score, completed_items, total_items } = req.body;
+  try {
+    const { error } = await supabase.from('daily_scores').upsert({
+      user_id: userId,
+      date: date || new Date().toISOString().split('T')[0],
+      score,
+      completed_items: completed_items || [],
+      total_items: total_items || 0,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id,date' });
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch(err) {
+    console.error('[scores/save]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Get score history ──
+app.get('/api/scores/history', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  if (!userId) return res.json({ scores: [] });
+  try {
+    const { data, error } = await supabase
+      .from('daily_scores')
+      .select('date, score, completed_items, total_items')
+      .eq('user_id', userId)
+      .order('date', { ascending: false })
+      .limit(90);
+    if (error) throw error;
+    res.json({ scores: data || [] });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════════════════
 // AUTH + USER ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
