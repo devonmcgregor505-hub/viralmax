@@ -1283,6 +1283,16 @@ function closeDayPlanner(){
   renderChecklist();
 }
 
+function getDefaultDayPlan(){
+  const morning = (window._routineData && window._routineData.morningBlocks) ? JSON.parse(JSON.stringify(window._routineData.morningBlocks)) : JSON.parse(JSON.stringify(MORNING));
+  const night = (window._routineData && window._routineData.nightBlocks) ? JSON.parse(JSON.stringify(window._routineData.nightBlocks)) : JSON.parse(JSON.stringify(NIGHT));
+  return {
+    morning: morning,
+    day: [{title:'Drink 3L water',items:[]},{title:'Training or movement',items:[]}],
+    night: night
+  };
+}
+
 function renderDayPlanner(){
   const short=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   document.getElementById('dayPlannerTabs').innerHTML=short.map((d,i)=>
