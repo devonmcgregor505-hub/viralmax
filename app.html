@@ -313,7 +313,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .cal-nav:hover{color:var(--text);}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;width:100%;}
 .cal-dow{font-size:11px;font-weight:700;color:var(--t3);text-align:center;padding:6px 0 10px;letter-spacing:.05em;}
-.cal-day{width:100%;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--t2);cursor:default;max-width:52px;margin:0 auto;}
+.cal-day{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--t2);cursor:default;margin:0 auto;}
 .cal-day.empty{background:none;}
 .cal-day.today{box-shadow:0 0 0 2px #84cc16;color:#84cc16;}
 .cal-day.completed{background:rgba(249,115,22,0.15);box-shadow:0 0 0 2px #f97316;color:#f97316;}
@@ -447,7 +447,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 <!-- CALENDAR POPUP -->
 <div class="popup-overlay" id="calendarPopup" style="display:none" onclick="if(event.target===this)closeCalendar()">
-  <div class="popup-box">
+  <div class="popup-box" style="max-width:580px;width:92%;">
     <button class="popup-close" onclick="closeCalendar()">✕</button>
     <div class="popup-title">Streak Calendar</div>
     <div class="popup-sub">Your daily completion history</div>
@@ -457,13 +457,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <button class="cal-nav" onclick="calNav(1)">›</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
-    <div class="cal-legend">
-      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#84cc16;box-shadow:0 0 0 2px #84cc16"></div>Today</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#f97316"></div>100%</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--y)"></div>75%</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#94a3b8"></div>50%</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#3b82f6"></div>25%</div>
-      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--red)"></div>0%</div>
     </div>
   </div>
 </div>
