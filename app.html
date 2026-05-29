@@ -878,12 +878,7 @@ function renderProgressPhotos(){
   }).join('');
 }
 
-function updateGreeting(){
-  const h=new Date().getHours();
-  const g=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
-  const name=profile?.age?'Devon':'there';
-  document.getElementById('checklistGreeting').textContent=`${g}, ${name} 👋`;
-}
+function updateGreeting(){ /* greeting removed */ }
 
 function loadStreak(){
   const s=parseInt(localStorage.getItem('ascend_streak')||'3');
