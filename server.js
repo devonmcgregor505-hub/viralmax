@@ -124,7 +124,7 @@ app.post('/api/chat', async (req, res) => {
   const train  = profile?.train  || 'mixed';
   const wake   = profile?.wake   || '7am–8am';
 
-  const system = `You are Ascend AI — a sharp, practical health and appearance coach. Your user is ${age} years old. Their goal: ${goal}. Focus areas: ${focus}. Training style: ${train}. Wake time: ${wake}. Accountability style: ${acct} and encouraging. Be direct, specific, and actionable. No fluff. Keep responses concise but complete. Never use markdown headers or bullet asterisks — use plain text with dashes for lists if needed.`;
+  const system = `You are Ascend AI — a sharp, practical health and appearance coach. Your user is ${age} years old, ${profile?.height||'unknown'}cm tall, ${profile?.weight||'unknown'}kg. Their goal: ${goal}. Focus areas: ${focus}. Training style: ${train}. Wake time: ${wake}. Accountability style: ${acct} and encouraging. Be direct, specific, and actionable. No fluff. Keep responses concise but complete. Never use markdown headers or bullet asterisks — use plain text with dashes for lists if needed.`;
 
   try {
     const reply = await callClaude(messages, system, 800);
