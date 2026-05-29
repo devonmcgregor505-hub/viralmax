@@ -101,10 +101,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .tag-mind{background:rgba(34,197,94,0.1);color:var(--grn);}
 .tag-hair{background:rgba(255,255,255,0.06);color:var(--t2);}
 .tag-frame{background:rgba(249,115,22,0.1);color:#f97316;}
-.routine-chevron{color:var(--t3);font-size:12px;transition:transform .2s;}
-.routine-item.open .routine-chevron{transform:rotate(180deg);}
-.routine-body{display:none;padding:0 16px 14px 72px;}
-.routine-item.open .routine-body{display:block;}
+
+.routine-body{display:block;padding:0 16px 14px 72px;}
+
 .routine-body ul{list-style:none;}
 .routine-body li{font-size:13px;color:var(--t2);padding:4px 0;display:flex;gap:8px;line-height:1.6;}
 .routine-body li::before{content:'—';color:var(--t3);flex-shrink:0;}
@@ -534,7 +533,7 @@ const HABITS = [
 
 const MORNING = [
   {time:'7:00',title:'Wake & hydrate',tag:'mind',tagLabel:'Foundation',items:['500ml water immediately — before anything else','Open blinds, get natural light within first 5 minutes','No phone for the first 15 minutes']},
-  {time:'7:10',title:'Face & skin',tag:'skin',tagLabel:'Skincare',items:['Rinse with cold water — tightens pores, reduces puffiness','Gentle cleanser (CeraVe or similar)','Vitamin C serum or niacinamide','Moisturiser with SPF 30+ — every single day'],note:'4 minutes. Consistency beats expensive products every time.'},
+  {time:'7:10',title:'Face & skin',tag:'skin',tagLabel:'Skincare',items:['Rinse with cold water — tightens pores, reduces puffiness','Gentle cleanser (CeraVe or similar)','Vitamin C serum or niacinamide','Moisturiser with SPF 30+ — every single day'],note:''},
   {time:'7:20',title:'Grooming & hair',tag:'hair',tagLabel:'Styling',items:['Brush teeth 2 min, tongue scrape, mouthwash','Shower — cold finish for the last 30s','Towel dry hair gently, apply product while damp','Style toward your natural texture','Deodorant, fragrance']},
   {time:'7:45',title:'Posture & jaw activation',tag:'frame',tagLabel:'Frame',items:['Chin tucks — 3 sets × 10 reps','Neck stretches — 30s each side','Mew consciously — tongue on roof of mouth','Wall posture check — heels, glutes, shoulders, head touching'],note:'5 minutes. Daily repetition is what builds results here.'},
   {time:'8:00',title:'Breakfast',tag:'body',tagLabel:'Nutrition',items:['30–40g protein breakfast — eggs, Greek yogurt, cottage cheese, or similar','Eat within 1h of waking']},
@@ -874,7 +873,6 @@ function renderRoutine(containerId,data){
         ${item.time?`<span class="routine-time">${item.time}</span>`:''}
         <span class="routine-title">${item.title}</span>
         <span class="routine-tag tag-${item.tag}">${item.tagLabel}</span>
-        <span class="routine-chevron">▼</span>
       </div>
       <div class="routine-body">
         <ul>${item.items.map(it=>`<li>${it}</li>`).join('')}</ul>
