@@ -566,14 +566,12 @@ let aiHistory = [];
 // ─── ONBOARDING ───
 const OB_STEPS = [
   {type:'single',label:'Primary goal',q:'What\'s your main goal?',sub:'We\'ll build your routine around this.',opts:['Look better & improve my appearance','Get fitter & build muscle','Improve my health & energy','All of the above']},
-  {type:'single',label:'Your level',q:'Where are you starting from?',sub:'Be honest — this shapes everything.',opts:['Complete beginner','Some habits, inconsistent','Decent base, want to level up','Already disciplined, want structure']},
   {type:'input',label:'Your age',q:'How old are you?',sub:'',ph:'19',unit:'years old',key:'age'},
   {type:'multi',label:'Focus areas',q:'What do you want to improve?',sub:'Select all that apply.',opts:['Skincare & grooming','Hair & styling','Body & physique','Diet & nutrition','Sleep quality','Jaw / posture / frame','Fitness & training','Everything']},
-  {type:'single',label:'Training',q:'How do you currently train?',sub:'',opts:['Gym (weights)','Running / cardio','Sports','Mix of everything','Nothing yet']},
+  {type:'multi',label:'Training',q:'How do you currently train?',sub:'Select all that apply.',opts:['Gym (weights)','Walking','Biking','Sport','Nothing yet','Everything']},
   {type:'single',label:'Wake time',q:'When do you wake up?',sub:'We\'ll time your morning routine.',opts:['Before 6am','6am – 7am','7am – 8am','After 8am','It varies']},
   {type:'input',label:'Your height',q:'How tall are you?',sub:'',ph:'178',unit:'cm',key:'height'},
   {type:'input',label:'Your weight',q:'How much do you weigh?',sub:'',ph:'75',unit:'kg',key:'weight'},
-  {type:'single',label:'Accountability',q:'How do you want accountability?',sub:'This drives your daily check-in style.',opts:['Strict — call me out if I slip','Motivating — keep me encouraged','Neutral — just show me the data','Flexible — adapt to my mood']},
   {type:'photos',label:'Your photos',q:'Upload your starting photos',sub:'Used by AI to personalise your routine. Stored privately on your device.'},
 ];
 let obStep = 0;
@@ -610,12 +608,12 @@ function renderOB() {
   if(step.type==='photos'){
     html+=`
     <div class="ob-photo-instructions">
-      <div class="ob-photo-req">Upload 4 photos in this order:</div>
+      <div class="ob-photo-req">Upload up to 4 photos of yourself:</div>
       <div class="ob-photo-req-list">
-        <span>1. Face — front on</span>
-        <span>2. Face — side on</span>
-        <span>3. Body — front on (shirtless)</span>
-        <span>4. Body — side on (shirtless)</span>
+        <span>📷 Face — front on</span>
+        <span>📷 Face — side on</span>
+        <span>📷 Body — front on</span>
+        <span>📷 Body — side on</span>
       </div>
     </div>
     <div class="ob-upload-zone" onclick="document.getElementById('photoFileInput').click()">
@@ -750,7 +748,7 @@ async function generateRoutineFromAI(){
         content.push({type:'text',text:labels[i]+' photo above.'});
       }
     });
-    content.push({type:'text',text:'Generate a full personalised daily routine. Profile: Age '+profile.age+', Height '+profile.height+'cm, Weight '+profile.weight+'kg, Goal: '+profile.goal+', Level: '+profile.level+', Focus: '+profile.focus+', Training: '+profile.train+', Wake: '+profile.wake+', Accountability: '+profile.acct+'.'+(obPhotos.some(p=>p)?' Factor in what you observe in the photos about physique, facial structure, skin, and posture.':'')+' Return ONLY valid JSON with these keys: morning (array of {time,title,tag,tagLabel,items[],note}), night (array of same), habits (array of {name,desc,cat}), nutrition (array of {title,tag,tagLabel,items[],note}), training (array of {day,name,tag,tagLabel}). Tags: mind/skin/hair/body/frame. 4-5 morning, 4-5 night, 7-8 habits, 3 nutrition blocks, 7 training days.'});
+    content.push({type:'text',text:'Generate a full personalised daily routine. Profile: Age '+profile.age+', Height '+profile.height+'cm, Weight '+profile.weight+'kg, Goal: '+profile.goal+', Level: '+profile.level+', Focus: '+profile.focus+', Training: '+profile.train+', Wake: '+profile.wake+', Accountability: '+profile.acct+'.'+(obPhotos.some(p=>p)?' I have included photos of myself — analyse them yourself to determine my physique, facial structure, skin condition, posture, and any areas needing improvement. Use this to personalise my routine.':'')+' Return ONLY valid JSON with these keys: morning (array of {time,title,tag,tagLabel,items[],note}), night (array of same), habits (array of {name,desc,cat}), nutrition (array of {title,tag,tagLabel,items[],note}), training (array of {day,name,tag,tagLabel}). Tags: mind/skin/hair/body/frame. 4-5 morning, 4-5 night, 7-8 habits, 3 nutrition blocks, 7 training days.'});
     const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content}],profile,returnJson:true})});
     const data=await res.json();
     const clean=(data.reply||'').replace(/```json|```/g,'').trim();
@@ -765,7 +763,7 @@ async function generateRoutineFromAI(){
     }
   }catch(e){console.warn('AI routine gen failed:',e.message);}
   localStorage.setItem('ascend_profile',JSON.stringify(profile));
-  const rows=[['Goal',profile.goal],['Age',profile.age+'yrs'],['Height',profile.height+'cm'],['Weight',profile.weight+'kg'],['Focus',profile.focus],['Training',profile.train],['Wake',profile.wake]];
+  const rows=[['Goal',profile.goal],['Age',profile.age+'yrs'],['Height',profile.height+'cm'],['Weight',profile.weight+'kg'],['Training',profile.train],['Wake',profile.wake]];
   document.getElementById('obContent').innerHTML=`
     <div class="ob-complete">
       <div class="ob-complete-icon">✦</div>
