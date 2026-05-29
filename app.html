@@ -553,7 +553,7 @@ const OB_STEPS = [
   {type:'single',label:'Primary goal',q:'What\'s your main goal?',sub:'We\'ll build your routine around this.',opts:['Look better & improve my appearance','Get fitter & build muscle','Improve my health & energy','All of the above']},
   {type:'single',label:'Your level',q:'Where are you starting from?',sub:'Be honest — this shapes everything.',opts:['Complete beginner','Some habits, inconsistent','Decent base, want to level up','Already disciplined, want structure']},
   {type:'input',label:'Your age',q:'How old are you?',sub:'',ph:'19',unit:'years old',key:'age'},
-  {type:'multi',label:'Focus areas',q:'What do you want to improve?',sub:'Select all that apply.',opts:['Skincare & grooming','Hair & styling','Body & physique','Diet & nutrition','Sleep quality','Jaw / posture / frame','Fitness & training']},
+  {type:'multi',label:'Focus areas',q:'What do you want to improve?',sub:'Select all that apply.',opts:['Skincare & grooming','Hair & styling','Body & physique','Diet & nutrition','Sleep quality','Jaw / posture / frame','Fitness & training','Everything']},
   {type:'single',label:'Training',q:'How do you currently train?',sub:'',opts:['Gym (weights)','Running / cardio','Sports','Mix of everything','Nothing yet']},
   {type:'single',label:'Wake time',q:'When do you wake up?',sub:'We\'ll time your morning routine.',opts:['Before 6am','6am – 7am','7am – 8am','After 8am','It varies']},
   {type:'input',label:'Your height',q:'How tall are you?',sub:'',ph:'178',unit:'cm',key:'height'},
@@ -620,7 +620,20 @@ function handlePhotoFile(e){
   reader.onload=ev=>{obPhotos[activePhotoSlot]=ev.target.result;renderOB();};
   reader.readAsDataURL(file);e.target.value='';
 }
-function obMultiToggle(i){if(!obMulti[obStep])obMulti[obStep]=new Set();const s=obMulti[obStep];s.has(i)?s.delete(i):s.add(i);renderOB();}
+function obMultiToggle(i){
+  if(!obMulti[obStep])obMulti[obStep]=new Set();
+  const s=obMulti[obStep];
+  const step=OB_STEPS[obStep];
+  const lastIdx=step.opts.length-1;
+  if(i===lastIdx){
+    if(s.has(i)){s.clear();}
+    else{step.opts.forEach((_,idx)=>s.add(idx));}
+  } else {
+    s.has(i)?s.delete(i):s.add(i);
+    s.delete(lastIdx);
+  }
+  renderOB();
+}
 function obInputChange(v){obAnswers[obStep]=v;document.getElementById('obNext').disabled=!v.trim();}
 function obBack(){if(obStep>0){obStep--;renderOB();}}
 function obNext(){
@@ -634,8 +647,17 @@ function obComplete(){
   const trainMap=['Gym','Running','Sports','Mixed','Not yet'];
   const wakeMap=['Before 6am','6am–7am','7am–8am','After 8am','Varies'];
   const acctMap=['Strict','Motivating','Neutral','Flexible'];
-  const focus=obMulti[5]?[...obMulti[5]].map(i=>OB_STEPS[5].opts[i]).join(', '):'—';
-  profile={goal:goalMap[obAnswers[0]],level:levelMap[obAnswers[1]],age:obAnswers[2]||'—',height:obAnswers[3]||'—',weight:obAnswers[4]||'—',focus,train:trainMap[obAnswers[6]],wake:wakeMap[obAnswers[7]],acct:acctMap[obAnswers[8]]};
+  const focusIdx=OB_STEPS.findIndex(s=>s.label==='Focus areas');
+  const trainIdx=OB_STEPS.findIndex(s=>s.label==='Training');
+  const wakeIdx=OB_STEPS.findIndex(s=>s.label==='Wake time');
+  const acctIdx=OB_STEPS.findIndex(s=>s.label==='Accountability');
+  const ageIdx=OB_STEPS.findIndex(s=>s.key==='age');
+  const heightIdx=OB_STEPS.findIndex(s=>s.key==='height');
+  const weightIdx=OB_STEPS.findIndex(s=>s.key==='weight');
+  const focusOpts=OB_STEPS[focusIdx].opts;
+  const rawFocus=obMulti[focusIdx]?[...obMulti[focusIdx]].map(i=>focusOpts[i]).filter(o=>o!=='Everything').join(', '):'—';
+  const focus=rawFocus||'—';
+  profile={goal:goalMap[obAnswers[0]],level:levelMap[obAnswers[1]],age:obAnswers[ageIdx]||'—',height:obAnswers[heightIdx]||'—',weight:obAnswers[weightIdx]||'—',focus,train:trainMap[obAnswers[trainIdx]],wake:wakeMap[obAnswers[wakeIdx]],acct:acctMap[obAnswers[acctIdx]]};
   if(obPhotos.some(p=>p)){
     const checkin={date:new Date().toISOString(),photos:obPhotos};
     const existing=JSON.parse(localStorage.getItem('ascend_checkins')||'[]');
