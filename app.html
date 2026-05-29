@@ -1322,13 +1322,18 @@ function maybeSaveScore(){
   const score = tasks.length ? Math.round(done/tasks.length*100) : 0;
   if(score === _lastSavedScore) return;
   _lastSavedScore = score;
+  updateStreakBadge();
+  // If 100% today, refresh calendar if open
+  if(score===100){
+    const cal=document.getElementById('calendarPopup');
+    if(cal && cal.style.display!=='none') renderCalendar();
+  }
   const today = new Date().toISOString().split('T')[0];
   // Save to localStorage for guests
   const hist = JSON.parse(localStorage.getItem('ascend_score_history')||'{}');
   hist[today] = score;
   localStorage.setItem('ascend_score_history', JSON.stringify(hist));
-  updateStreakBadge();
-  // If 100% today, update calendar if open
+  // already has updateStreakBadge, update calendar if open
   if(score===100 && document.getElementById('calendarPopup').style.display!=='none'){
     renderCalendar();
   }
@@ -1587,6 +1592,25 @@ function calculateStreak(){
   return streak;
 }
 
+function updateStreakBadge(){
+  const streak = calculateStreak();
+  const el = document.getElementById('streakCount');
+  if(el) el.textContent = streak;
+}
+
+function calculateStreak(){
+  const hist = JSON.parse(localStorage.getItem('ascend_score_history')||'{}');
+  const today = new Date();
+  let streak = 0;
+  for(let i=0; i<365; i++){
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    if(hist[key]===100) streak++;
+    else if(i>0) break;
+  }
+  return streak;
+}
 function updateStreakBadge(){
   const streak = calculateStreak();
   const el = document.getElementById('streakCount');
