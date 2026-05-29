@@ -679,6 +679,8 @@ function obMultiToggle(i){
 function obInputChange(v){obAnswers[obStep]=v;document.getElementById('obNext').disabled=!v.trim();}
 function obBack(){if(obStep>0){obStep--;renderOB();}}
 function obNext(){
+  // If photos step (last step), go straight to complete
+  if(OB_STEPS[obStep].type==='photos'){obComplete();return;}
   if(obStep<OB_STEPS.length-1){obStep++;renderOB();}
   else{obComplete();}
 }
