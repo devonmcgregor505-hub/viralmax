@@ -1288,7 +1288,13 @@ function renderDayPlanner(){
   document.getElementById('dayPlannerTabs').innerHTML=short.map((d,i)=>
     `<div class="day-tab${i===_activePlanDay?' active':''}" onclick="switchPlanDay(${i})">${d}</div>`
   ).join('');
-  const plan=_dayPlans[_activePlanDay];
+  let plan=_dayPlans[_activePlanDay];
+  if(!plan || !plan.morning){
+    console.error('Bad plan structure:', JSON.stringify(plan));
+    plan = getDefaultDayPlan();
+    _dayPlans[_activePlanDay] = plan;
+    saveDayPlans();
+  }
   let html='';
   html+=`<div class="dp-section">☀️ Morning</div>`;
   plan.morning.forEach((block,bi)=>{ html+=renderDpBlock('morning',bi,block); });
