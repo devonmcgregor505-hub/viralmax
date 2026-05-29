@@ -339,6 +339,25 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .day-task-toggle.on::after{left:19px;}
 .dp-copy-btn{width:100%;padding:10px;background:var(--yd);border:1px solid var(--border-y);border-radius:var(--rs);color:var(--y);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .15s;}
 .dp-copy-btn:hover{background:rgba(255,200,0,0.15);}
+
+.dp-section{font-size:15px;font-weight:800;letter-spacing:.04em;color:var(--y);padding:16px 0 8px;border-bottom:1px solid var(--border-y);margin-bottom:8px;}
+.dp-block{margin-bottom:16px;background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;}
+.dp-block-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.dp-block-title{flex:1;font-size:14px;font-weight:700;color:var(--text);background:transparent;border:none;border-bottom:1px solid transparent;outline:none;font-family:inherit;transition:border-color .15s;padding:2px 0;}
+.dp-block-title:focus{border-bottom-color:var(--t3);}
+.dp-del-block{background:none;border:none;color:var(--t4);font-size:13px;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s;}
+.dp-del-block:hover{color:var(--red);}
+.dp-step-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+.dp-step-row:last-child{border-bottom:none;}
+.dp-step-dash{color:var(--t3);font-size:13px;flex-shrink:0;}
+.dp-step-input{flex:1;background:transparent;border:none;border-bottom:1px solid transparent;outline:none;font-family:inherit;font-size:13px;color:var(--text);padding:2px 0;transition:border-color .15s;}
+.dp-step-input:focus{border-bottom-color:var(--t3);}
+.dp-del-step{background:none;border:none;color:var(--t4);font-size:11px;cursor:pointer;padding:2px 4px;flex-shrink:0;transition:color .15s;}
+.dp-del-step:hover{color:var(--red);}
+.dp-add-step{background:none;border:1px dashed var(--t4);border-radius:var(--rxs);color:var(--t3);font-size:11px;padding:4px 10px;cursor:pointer;margin-top:8px;font-family:inherit;transition:all .15s;width:100%;}
+.dp-add-step:hover{border-color:var(--y);color:var(--y);}
+.dp-add-block{width:100%;padding:10px;background:transparent;border:1px dashed var(--t3);border-radius:var(--rs);color:var(--t2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:12px;transition:all .15s;}
+.dp-add-block:hover{border-color:var(--y);color:var(--y);}
 </style>
 </head>
 <body>
@@ -368,13 +387,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 <!-- DAY PLANNER POPUP -->
 <div class="popup-overlay" id="dayPlannerPopup" style="display:none" onclick="if(event.target===this)closeDayPlanner()">
-  <div class="popup-box">
+  <div class="popup-box" style="max-width:600px;">
     <button class="popup-close" onclick="closeDayPlanner()">✕</button>
     <div class="popup-title">Day Planner</div>
-    <div class="popup-sub">Customise each day's routine</div>
+    <div class="popup-sub">Edit each day's routine — changes show on your checklist</div>
     <div class="day-tabs" id="dayPlannerTabs"></div>
-    <div class="day-task-list" id="dayPlannerTasks"></div>
-    <button class="dp-copy-btn" onclick="copyDayToAll()">Apply this day's routine to every day</button>
+    <div id="dayPlannerContent"></div>
+    <button class="dp-copy-btn" onclick="copyDayToAll()">Set for all days</button>
   </div>
 </div>
 
@@ -875,18 +894,35 @@ function loadStreak(){
 function renderChecklist(){
   const el=document.getElementById('bigChecklist');
   if(!el)return;
-  const morning=window._routineData?.morningBlocks||MORNING;
-  const night=window._routineData?.nightBlocks||NIGHT;
+  // Use today's day plan if available
+  let morning, night, dayTasks;
+  const todayIdx = new Date().getDay()-1<0?6:new Date().getDay()-1;
+  const savedPlans = localStorage.getItem('ascend_day_plans');
+  if(savedPlans){
+    const plans = JSON.parse(savedPlans);
+    const todayPlan = plans[todayIdx];
+    morning   = todayPlan?.morning   || window._routineData?.morningBlocks || MORNING;
+    night     = todayPlan?.night     || window._routineData?.nightBlocks   || NIGHT;
+    dayTasks  = todayPlan?.day       || null;
+  } else {
+    morning   = window._routineData?.morningBlocks || MORNING;
+    night     = window._routineData?.nightBlocks   || NIGHT;
+    dayTasks  = null;
+  }
   const allItems=[];
   // Morning — one checkbox per block
   allItems.push({type:'section',label:'☀️  Morning'});
   morning.forEach(block=>{
     allItems.push({type:'task',label:block.title+(block.time?' · '+block.time:''),steps:block.items});
   });
-  // Day habits
+  // Day habits — use day plan or defaults
   allItems.push({type:'section',label:'⚡  During the day'});
-  allItems.push({type:'task',label:'Drink 3L water'});
-  allItems.push({type:'task',label:'Training or movement'});
+  if(dayTasks && dayTasks.length){
+    dayTasks.forEach(t=>allItems.push({type:'task',label:t.title,steps:t.items?.length?t.items:undefined}));
+  } else {
+    allItems.push({type:'task',label:'Drink 3L water'});
+    allItems.push({type:'task',label:'Training or movement'});
+  }
   // Night — one checkbox per block
   allItems.push({type:'section',label:'🌙  Night'});
   night.forEach(block=>{
