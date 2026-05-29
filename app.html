@@ -1057,9 +1057,9 @@ function renderChecklist(){
     el.appendChild(div);
   });
   // Early return since we handled rendering above
-  const tasks=allItems.filter(it=>it.type==='task');
+  const tasks2=allItems.filter(it=>it.type==='task');
   const done2=[...checked].filter(i=>allItems[i]?.type==='task').length;
-  const score2=tasks.length?Math.round(done2/tasks.length*100):0;
+  const score2=tasks2.length?Math.round(done2/tasks2.length*100):0;
   const sb=document.getElementById('scoreBadge'); if(sb)sb.textContent=score2+'%';
   const sn=document.getElementById('scoreNum'); if(sn)sn.textContent=score2;
   const days2=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
