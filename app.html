@@ -573,8 +573,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
 
         <div class="card">
-          <div class="card-label">Daily habits</div>
-          <div class="checklist-wrap" id="checklistItems"></div>
+          
         </div>
       </div>
 
@@ -1022,8 +1021,13 @@ function renderChecklist(){
     }
   });
   if(currentSection) sections.push(currentSection);
-  // Reorder: after midday put night first
-  const orderedSections = isMorning ? sections : [sections[2], sections[1], sections[0]].filter(Boolean);
+  // Order: During the day always first, then morning/night based on time
+  const morningSection = sections.find(s=>s.key==='morning');
+  const daySection = sections.find(s=>s.key==='day');
+  const nightSection = sections.find(s=>s.key==='night');
+  const orderedSections = isMorning
+    ? [daySection, morningSection, nightSection].filter(Boolean)
+    : [daySection, nightSection, morningSection].filter(Boolean);
   orderedSections.forEach(section=>{
     const collapsed = window._sectionCollapsed[section.key];
     const sectionHtml = `<div class="cl-section-header" onclick="toggleSection('${section.key}')">
