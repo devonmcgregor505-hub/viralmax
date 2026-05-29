@@ -300,20 +300,20 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 /* ── POPUPS ── */
 .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:998;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.popup-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:28px;width:95%;max-width:720px;max-height:92vh;overflow-y:auto;position:relative;z-index:999;}
+.popup-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:32px;width:90%;max-width:540px;max-height:92vh;overflow-y:auto;position:relative;z-index:999;}
 .popup-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px;}
 .popup-sub{font-size:12px;color:var(--t2);margin-bottom:20px;}
 .popup-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--t2);font-size:18px;cursor:pointer;line-height:1;}
 .popup-close:hover{color:var(--text);}
 
 /* ── CALENDAR ── */
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.cal-month{font-size:14px;font-weight:700;color:var(--text);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.cal-month{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.01em;}
 .cal-nav{background:none;border:1px solid var(--border);border-radius:6px;color:var(--t2);width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
 .cal-nav:hover{color:var(--text);}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
-.cal-dow{font-size:12px;font-weight:700;color:var(--t3);text-align:center;padding:8px 0;letter-spacing:.06em;}
-.cal-day{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--t2);cursor:default;margin:0 auto;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;width:100%;}
+.cal-dow{font-size:11px;font-weight:700;color:var(--t3);text-align:center;padding:6px 0 10px;letter-spacing:.05em;}
+.cal-day{width:100%;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--t2);cursor:default;max-width:52px;margin:0 auto;}
 .cal-day.empty{background:none;}
 .cal-day.today{box-shadow:0 0 0 1.5px #84cc16;color:#84cc16;}
 .cal-day.score-100{background:rgba(249,115,22,0.15);box-shadow:0 0 0 1.5px #f97316;color:#f97316;}
@@ -321,9 +321,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .cal-day.score-50{background:rgba(148,163,184,0.12);box-shadow:0 0 0 1.5px #94a3b8;color:#94a3b8;}
 .cal-day.score-25{background:rgba(59,130,246,0.12);box-shadow:0 0 0 1.5px #3b82f6;color:#3b82f6;}
 .cal-day.score-low{background:rgba(239,68,68,0.12);box-shadow:0 0 0 1.5px var(--red);color:var(--red);}
-.cal-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
-.cal-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);}
-.cal-legend-dot{width:10px;height:10px;border-radius:50%;}
+.cal-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.cal-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);font-weight:500;}
+.cal-legend-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
 
 /* ── DAY PLANNER ── */
 .day-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;}
