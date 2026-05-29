@@ -1060,11 +1060,11 @@ function renderChecklist(){
   const tasks2=allItems.filter(it=>it.type==='task');
   const done2=[...checked].filter(i=>allItems[i]?.type==='task').length;
   const score2=tasks2.length?Math.round(done2/tasks2.length*100):0;
-  const sb=document.getElementById('scoreBadge'); if(sb)sb.textContent=score2+'%';
-  const sn=document.getElementById('scoreNum'); if(sn)sn.textContent=score2;
-  const days2=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const db=document.getElementById('dayBadge'); if(db)db.textContent=days2[new Date().getDay()];
-  if(!window._dayTimer) window._dayTimer=setInterval(()=>{const d=document.getElementById('dayBadge');if(d)d.textContent=days2[new Date().getDay()];},60000);
+  const _sb=document.getElementById('scoreBadge'); if(_sb)_sb.textContent=score2+'%';
+  const _sn=document.getElementById('scoreNum'); if(_sn)_sn.textContent=score2;
+  const _days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const _db=document.getElementById('dayBadge'); if(_db)_db.textContent=_days[new Date().getDay()];
+  if(!window._dayTimer) window._dayTimer=setInterval(()=>{const _d=document.getElementById('dayBadge');if(_d)_d.textContent=_days[new Date().getDay()];},60000);
   return; // skip old rendering below
   el.innerHTML=allItems.map((item,i)=>{
     if(item.type==='section') return `<div class="cl-section">${item.label}</div>`;
