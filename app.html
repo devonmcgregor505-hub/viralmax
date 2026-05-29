@@ -284,6 +284,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .ri-add:hover{border-color:var(--t2);color:var(--t2);}
 .routine-title[contenteditable]{outline:none;}
 .routine-title[contenteditable]:focus{border-bottom:1px solid var(--t3);}
+
+.ri-add-inline{background:none;border:1px dashed var(--t4);border-radius:var(--rxs);color:var(--t3);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.ri-add-inline:hover{border-color:var(--y);color:var(--y);}
 </style>
 </head>
 <body>
@@ -872,11 +875,11 @@ function renderRoutine(containerId,data){
       <div class="routine-head" onclick="toggleRoutine('${containerId}',${idx})">
         ${item.time?`<span class="routine-time">${item.time}</span>`:''}
         <span class="routine-title" contenteditable="true" onblur="saveRoutineTitle(containerId,idx,this.innerText)">${item.title}</span>
+        <button class="ri-add-inline" onclick="addRoutineItem(containerId,${idx})">+ Add step</button>
         <span class="routine-tag tag-${item.tag}">${item.tagLabel}</span>
       </div>
       <div class="routine-body">
         <ul id="rul-${containerId}-${idx}">${item.items.map((it,li)=>`<li><span contenteditable="true" onblur="saveRoutineItem(containerId,idx,li,this.innerText)">${it}</span><button class="ri-del" onclick="deleteRoutineItem(containerId,${idx},${li})">✕</button></li>`).join('')}</ul>
-        <button class="ri-add" onclick="addRoutineItem(containerId,${idx})">+ Add step</button>
 
       </div>
     </div>`).join('');
@@ -1010,7 +1013,9 @@ function deleteRoutineItem(cid,idx,li){
   renderRoutine(cid,window._routineData[cid]);
 }
 function addRoutineItem(cid,idx){
-  if(!window._routineData?.[cid]?.[idx]) return;
+  if(!window._routineData) window._routineData={};
+  if(!window._routineData[cid]) return;
+  if(!window._routineData[cid][idx]) return;
   window._routineData[cid][idx].items.push('Tap to edit');
   persistRoutine(cid);
   renderRoutine(cid,window._routineData[cid]);
