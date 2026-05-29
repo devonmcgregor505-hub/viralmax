@@ -749,7 +749,9 @@ function initApp(){
   window._customHabits   = habits;
   window._customTraining = training;
   renderChecklist(); // must come after _routineData is set
-  // morningBlocks/nightBlocks no longer in DOM — data lives in _routineData only
+  // Load morning/night into _routineData directly (no DOM elements needed)
+  window._routineData['morningBlocks'] = JSON.parse(JSON.stringify(morning));
+  window._routineData['nightBlocks']   = JSON.parse(JSON.stringify(night));
   renderRoutine('nutritionBlocks', nutrition);
   renderTrainingFromData(training);
   updateGreeting();
