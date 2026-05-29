@@ -287,6 +287,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 .ri-add-inline{background:none;border:1px dashed var(--t4);border-radius:var(--rxs);color:var(--t3);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .ri-add-inline:hover{border-color:var(--y);color:var(--y);}
+
+.cl-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--y);padding:20px 0 8px;border-bottom:1px solid var(--border-y);margin-bottom:4px;}
+.cl-section:first-child{padding-top:4px;}
+.cl-subheader{font-size:12px;font-weight:700;color:var(--t2);padding:12px 0 4px;letter-spacing:.03em;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.check-item:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -742,9 +748,8 @@ function initApp(){
   };
   window._customHabits   = habits;
   window._customTraining = training;
-  renderChecklist();
-  renderRoutine('morningBlocks',   morning);
-  renderRoutine('nightBlocks',     night);
+  renderChecklist(); // must come after _routineData is set
+  // morningBlocks/nightBlocks no longer in DOM — data lives in _routineData only
   renderRoutine('nutritionBlocks', nutrition);
   renderTrainingFromData(training);
   updateGreeting();
@@ -780,20 +785,45 @@ function loadStreak(){
 
 // ─── CHECKLIST ───
 function renderChecklist(){
-  const habitsToUse=window._customHabits||HABITS;
-  const el=document.getElementById('checklistItems');
-  el.innerHTML=habitsToUse.map((h,i)=>`
-    <div class="check-item" onclick="toggleCheck(${i})">
+  const el=document.getElementById('bigChecklist');
+  if(!el)return;
+  const morning=window._routineData?.morningBlocks||MORNING;
+  const night=window._routineData?.nightBlocks||NIGHT;
+  // Build flat item list: morning steps + day habits + night steps
+  const allItems=[];
+  // Morning
+  allItems.push({type:'section',label:'☀️  Morning'});
+  morning.forEach(block=>{
+    allItems.push({type:'subheader',label:block.title+(block.time?' · '+block.time:'')});
+    block.items.forEach(item=>allItems.push({type:'task',label:item}));
+  });
+  // Day habits
+  allItems.push({type:'section',label:'⚡  During the day'});
+  allItems.push({type:'task',label:'Drink 3L water'});
+  allItems.push({type:'task',label:'Training or movement'});
+  // Night
+  allItems.push({type:'section',label:'🌙  Night'});
+  night.forEach(block=>{
+    allItems.push({type:'subheader',label:block.title+(block.time?' · '+block.time:'')});
+    block.items.forEach(item=>allItems.push({type:'task',label:item}));
+  });
+  window._allChecklistItems=allItems;
+  el.innerHTML=allItems.map((item,i)=>{
+    if(item.type==='section') return `<div class="cl-section">${item.label}</div>`;
+    if(item.type==='subheader') return `<div class="cl-subheader">${item.label}</div>`;
+    return `<div class="check-item" onclick="toggleCheck(${i})">
       <div class="check-box${checked.has(i)?' done':''}"></div>
       <div class="check-text">
-        <div class="check-name${checked.has(i)?' done':''}">${h.name}</div>
-        <div class="check-desc">${h.desc}</div>
+        <div class="check-name${checked.has(i)?' done':''}">${item.label}</div>
       </div>
-    </div>`).join('');
-  const score=Math.round(checked.size/(window._customHabits||HABITS).length*100);
-  document.getElementById('scoreNum').textContent=score;
-  const prog=document.getElementById('page-progress');
-  if(prog) prog.querySelectorAll('.stat-val')[1].textContent=score;
+    </div>`;
+  }).join('');
+  // Score based on tasks only
+  const tasks=allItems.filter(it=>it.type==='task');
+  const done=[...checked].filter(i=>allItems[i]?.type==='task').length;
+  const score=tasks.length?Math.round(done/tasks.length*100):0;
+  const sn=document.getElementById('scoreNum');
+  if(sn)sn.textContent=score;
 }
 
 function toggleCheck(i){checked.has(i)?checked.delete(i):checked.add(i);renderChecklist();}
