@@ -568,7 +568,7 @@ const OB_STEPS = [
   {type:'single',label:'Primary goal',q:'What\'s your main goal?',sub:'We\'ll build your routine around this.',opts:['Look better & improve my appearance','Get fitter & build muscle','Improve my health & energy','All of the above']},
   {type:'input',label:'Your age',q:'How old are you?',sub:'',ph:'19',unit:'years old',key:'age'},
   {type:'multi',label:'Focus areas',q:'What do you want to improve?',sub:'Select all that apply.',opts:['Skincare & grooming','Hair & styling','Body & physique','Diet & nutrition','Sleep quality','Jaw / posture / frame','Fitness & training','Everything']},
-  {type:'multi',label:'Training',q:'How do you currently train?',sub:'Select all that apply.',opts:['Gym (weights)','Walking','Biking','Sport','Nothing yet','Everything']},
+  {type:'multi',label:'Training',q:'How do you currently train?',sub:'Select all that apply.',opts:['Gym (weights)','Walking','Biking','Sport','Everything','Nothing yet']},
   {type:'single',label:'Wake time',q:'When do you wake up?',sub:'We\'ll time your morning routine.',opts:['Before 6am','6am – 7am','7am – 8am','After 8am','It varies']},
   {type:'input',label:'Your height',q:'How tall are you?',sub:'',ph:'178',unit:'cm',key:'height'},
   {type:'input',label:'Your weight',q:'How much do you weigh?',sub:'',ph:'75',unit:'kg',key:'weight'},
@@ -664,13 +664,22 @@ function obMultiToggle(i){
   if(!obMulti[obStep])obMulti[obStep]=new Set();
   const s=obMulti[obStep];
   const step=OB_STEPS[obStep];
-  const lastIdx=step.opts.length-1;
-  if(i===lastIdx){
+  const opts=step.opts;
+  const everythingIdx=opts.indexOf('Everything');
+  const nothingIdx=opts.indexOf('Nothing yet');
+  if(i===everythingIdx){
+    // Toggle Everything — select all except Nothing yet
     if(s.has(i)){s.clear();}
-    else{step.opts.forEach((_,idx)=>s.add(idx));}
+    else{opts.forEach((_,idx)=>{if(idx!==nothingIdx)s.add(idx);});}
+  } else if(i===nothingIdx){
+    // Toggle Nothing yet — clear everything else
+    if(s.has(i)){s.delete(i);}
+    else{s.clear();s.add(i);}
   } else {
+    // Regular option — deselect Everything and Nothing yet
     s.has(i)?s.delete(i):s.add(i);
-    s.delete(lastIdx);
+    s.delete(everythingIdx);
+    s.delete(nothingIdx);
   }
   renderOB();
 }
