@@ -275,6 +275,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .ob-preview-item img{width:100%;height:100%;object-fit:cover;}
 .ob-preview-remove{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,0.8);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
 .ob-preview-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);font-size:9px;color:#fff;text-align:center;padding:3px;letter-spacing:.03em;}
+
+.routine-body li{display:flex;align-items:flex-start;gap:6px;padding:4px 0;}
+.routine-body li span[contenteditable]{flex:1;outline:none;border-bottom:1px solid transparent;transition:border-color .15s;border-radius:2px;padding:1px 2px;}
+.routine-body li span[contenteditable]:focus{border-bottom-color:var(--t3);background:rgba(255,255,255,0.02);}
+.ri-del{background:none;border:none;color:var(--t4);font-size:10px;cursor:pointer;padding:2px 4px;border-radius:4px;flex-shrink:0;margin-top:2px;transition:color .15s;}
+.ri-del:hover{color:var(--red);}
+.ri-add{background:none;border:1px dashed var(--t4);border-radius:var(--rxs);color:var(--t3);font-size:11px;padding:5px 12px;cursor:pointer;margin-top:8px;font-family:inherit;transition:all .15s;width:100%;}
+.ri-add:hover{border-color:var(--t2);color:var(--t2);}
+.routine-title[contenteditable]{outline:none;}
+.routine-title[contenteditable]:focus{border-bottom:1px solid var(--t3);}
 </style>
 </head>
 <body>
@@ -514,14 +524,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <script>
 // ─── DATA ───
 const HABITS = [
-  {name:'Morning skincare',desc:'Cleanser · vitamin C · SPF moisturiser',cat:'skin'},
-  {name:'Drink 3L water',desc:'Track across the day',cat:'body'},
-  {name:'Hit protein target',desc:'160g minimum',cat:'body'},
-  {name:'Posture & jaw work',desc:'Chin tucks + mewing throughout day',cat:'frame'},
-  {name:'Training or movement',desc:'Gym, walk, sport or mobility',cat:'body'},
-  {name:'Night skincare',desc:'Cleanse · treatment · moisturise',cat:'skin'},
-  {name:'In bed by 10:30pm',desc:'7.5–9h sleep target',cat:'sleep'},
-  {name:'No phone first 15 min',desc:'Morning clarity — no scrolling on wake',cat:'mind'},
+  {name:'Awake by ' + (JSON.parse(localStorage.getItem('ascend_profile')||'{}').wake||'7am'), desc:'Start your day on time', cat:'mind'},
+  {name:'Morning routine', desc:'Complete your full morning routine', cat:'skin'},
+  {name:'Training or movement', desc:'Gym, walk, sport or mobility', cat:'body'},
+  {name:'Drink 3L water', desc:'Track across the day', cat:'body'},
+  {name:'Night routine', desc:'Complete your full night routine', cat:'skin'},
+  {name:'Sleep by 10:30pm', desc:'7.5–9h sleep target', cat:'sleep'},
 ];
 
 const MORNING = [
@@ -529,7 +537,7 @@ const MORNING = [
   {time:'7:10',title:'Face & skin',tag:'skin',tagLabel:'Skincare',items:['Rinse with cold water — tightens pores, reduces puffiness','Gentle cleanser (CeraVe or similar)','Vitamin C serum or niacinamide','Moisturiser with SPF 30+ — every single day'],note:'4 minutes. Consistency beats expensive products every time.'},
   {time:'7:20',title:'Grooming & hair',tag:'hair',tagLabel:'Styling',items:['Brush teeth 2 min, tongue scrape, mouthwash','Shower — cold finish for the last 30s','Towel dry hair gently, apply product while damp','Style toward your natural texture','Deodorant, fragrance']},
   {time:'7:45',title:'Posture & jaw activation',tag:'frame',tagLabel:'Frame',items:['Chin tucks — 3 sets × 10 reps','Neck stretches — 30s each side','Mew consciously — tongue on roof of mouth','Wall posture check — heels, glutes, shoulders, head touching'],note:'5 minutes. Daily repetition is what builds results here.'},
-  {time:'8:00',title:'Breakfast & supplements',tag:'body',tagLabel:'Nutrition',items:['30–40g protein breakfast (eggs, Greek yogurt, cottage cheese)','Creatine 5g daily — most evidence-backed supplement you can take','Coffee after food, not before — stabilises cortisol']},
+  {time:'8:00',title:'Breakfast',tag:'body',tagLabel:'Nutrition',items:['30–40g protein breakfast — eggs, Greek yogurt, cottage cheese, or similar','Eat within 1h of waking']},
 ];
 
 const NIGHT = [
@@ -870,15 +878,12 @@ function renderRoutine(containerId,data){
       </div>
       <div class="routine-body">
         <ul>${item.items.map(it=>`<li>${it}</li>`).join('')}</ul>
-        ${item.note?`<div class="routine-note">${item.note}</div>`:''}
+
       </div>
     </div>`).join('');
 }
 
-function toggleRoutine(cid,idx){
-  const el=document.getElementById(`ri-${cid}-${idx}`);
-  el.classList.toggle('open');
-}
+
 
 // ─── TRAINING ───
 function renderTraining(){
