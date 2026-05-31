@@ -1661,7 +1661,7 @@ function renderCalendar(){
   document.getElementById('calMonthLabel').textContent = months[calMonth]+' '+calYear;
   const grid = document.getElementById('calGrid');
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const _t=new Date(); const todayStr=_t.getFullYear()+'-'+String(_t.getMonth()+1).padStart(2,'0')+'-'+String(_t.getDate()).padStart(2,'0');
   const dows = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   let html = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
   // First day of month (0=Sun, shift to Mon=0)
@@ -1874,7 +1874,7 @@ function calculateStreak(){
   for(let i=0; i<365; i++){
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    const key = d.toISOString().split('T')[0];
+    const _dd=new Date(d); const key=_dd.getFullYear()+'-'+String(_dd.getMonth()+1).padStart(2,'0')+'-'+String(_dd.getDate()).padStart(2,'0');
     if(hist[key]===100) streak++;
     else if(i>0) break; // gap — stop counting
   }
@@ -1894,7 +1894,7 @@ function calculateStreak(){
   for(let i=0; i<365; i++){
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    const key = d.toISOString().split('T')[0];
+    const _dd=new Date(d); const key=_dd.getFullYear()+'-'+String(_dd.getMonth()+1).padStart(2,'0')+'-'+String(_dd.getDate()).padStart(2,'0');
     if(hist[key]===100) streak++;
     else if(i>0) break;
   }
