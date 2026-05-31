@@ -584,6 +584,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* Bottom nav hidden on desktop */
 .bottom-nav{display:none;}
 
+
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;transition:background .15s;margin-left:auto;}
+.hamburger:hover{background:rgba(255,255,255,0.06);}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:150;backdrop-filter:blur(3px);}
+@media(max-width:600px){
+  .hamburger{display:flex;}
+  .topbar-right{margin-left:0;}
+  .sidebar{
+    position:fixed;left:-220px;top:0;bottom:0;z-index:200;
+    width:220px;transition:left .25s cubic-bezier(.4,0,.2,1);
+    box-shadow:none;
+  }
+  .sidebar.open{left:0;box-shadow:4px 0 32px rgba(0,0,0,0.5);}
+  .sidebar-backdrop.open{display:block;}
+}
 </style>
 </head>
 <body>
@@ -691,6 +707,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     </div>
     <div class="topbar-logo-text">ASCEND</div>
   </a>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
   <div class="topbar-right">
     <div class="tb-badge tb-badge-day" id="dayBadge" onclick="openDayPlanner()" style="cursor:pointer">Mon</div>
     <div class="tb-badge tb-badge-score" id="scoreBadge">0%</div>
@@ -757,6 +776,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </button>
 </nav>
 
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 <!-- APP BODY -->
 <div class="app-body">
   <aside class="sidebar">
@@ -1363,6 +1383,7 @@ function renderTrainingFromData(days){
 function showPage(name,linkEl){
   localStorage.setItem('ascend_page', name);
   updateBottomNav(name);
+  closeSidebar();
   if(name==='nutrition') setTimeout(renderMealsSection,10);
   if(name==='training'){setTimeout(renderTrainingSection,10);setTimeout(renderWeightCards,10);}
   if(name==='progress'){setTimeout(renderProgressPhotos,10);}
@@ -2700,6 +2721,19 @@ function updateBottomNav(name){
   document.querySelectorAll('.bottom-nav-item').forEach(function(b){
     b.classList.toggle('active', b.id === 'bnav-'+name);
   });
+}
+
+
+function toggleSidebar(){
+  var sb=document.querySelector('.sidebar');
+  var bd=document.getElementById('sidebarBackdrop');
+  var isOpen=sb.classList.contains('open');
+  sb.classList.toggle('open',!isOpen);
+  bd.classList.toggle('open',!isOpen);
+}
+function closeSidebar(){
+  document.querySelector('.sidebar')?.classList.remove('open');
+  document.getElementById('sidebarBackdrop')?.classList.remove('open');
 }
 
 </script>
