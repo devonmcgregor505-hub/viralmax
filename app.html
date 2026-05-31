@@ -942,6 +942,7 @@ function initApp(){
   window._routineData['nightBlocks']   = JSON.parse(JSON.stringify(night));
   renderRoutine('nutritionBlocks', nutrition);
   renderMacros();
+  renderMacros();
   renderTrainingFromData(training);
   updateGreeting();
   loadStreak();
@@ -1795,6 +1796,49 @@ function saveMacroEdit(key){
   var inp=document.getElementById("macroEditInput"); if(!inp)return;
   var val=parseInt(inp.value); if(isNaN(val)||val<0)return;
   var m=loadMacros(); m[key]=val; saveMacros(m); renderMacros();
+}
+
+
+// MACROS
+function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||'{"calories":2600,"protein":160}'); }
+function saveMacros(m){ localStorage.setItem("ascend_macros",JSON.stringify(m)); }
+function renderMacros(){
+  var el=document.getElementById("macroGrid"); if(!el)return;
+  var m=loadMacros();
+  el.innerHTML=
+    "<div class=\"macro-card\">"
+      +"<div class=\"macro-lbl\">Calories</div>"
+      +"<div class=\"macro-val-wrap\" onclick=\"editMacro('calories')\">"
+        +"<span class=\"macro-val\" id=\"macro-calories\">"+m.calories.toLocaleString()+"</span>"
+        +"<span style=\"font-size:16px;color:var(--t2);font-weight:600;\">kcal</span>"
+      +"</div>"
+      +"<div class=\"macro-hint\">Tap to edit</div>"
+    +"</div>"
+    +"<div class=\"macro-card\">"
+      +"<div class=\"macro-lbl\">Protein</div>"
+      +"<div class=\"macro-val-wrap\" onclick=\"editMacro('protein')\">"
+        +"<span class=\"macro-val\" id=\"macro-protein\">"+m.protein+"</span>"
+        +"<span style=\"font-size:16px;color:var(--t2);font-weight:600;\">g</span>"
+      +"</div>"
+      +"<div class=\"macro-hint\">Tap to edit</div>"
+    +"</div>";
+}
+function editMacro(key){
+  var wrap=document.querySelector("#macro-"+key)?.parentElement; if(!wrap)return;
+  var m=loadMacros();
+  var cur=m[key];
+  var unit=key==="calories"?"kcal":"g";
+  wrap.innerHTML="<input class=\"macro-inline-input\" id=\"macro-inp-"+key+"\" type=\"number\" value=\""+cur+"\" /><span style=\"font-size:16px;color:var(--t2);font-weight:600;\">"+unit+"</span>";
+  wrap.style.cursor="default";
+  var inp=document.getElementById("macro-inp-"+key);
+  inp.focus(); inp.select();
+  function commit(){
+    var val=parseInt(inp.value);
+    if(!isNaN(val)&&val>0){ m[key]=val; saveMacros(m); }
+    renderMacros();
+  }
+  inp.addEventListener("blur",commit);
+  inp.addEventListener("keydown",function(e){ if(e.key==="Enter")inp.blur(); if(e.key==="Escape"){renderMacros();} });
 }
 
 </script>
