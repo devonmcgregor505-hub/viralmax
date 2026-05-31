@@ -247,6 +247,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .dp-block-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .dp-block-title{flex:1;font-size:14px;font-weight:700;color:var(--text);background:transparent;border:none;border-bottom:1px solid transparent;outline:none;font-family:inherit;transition:border-color .15s;padding:2px 0;}
 .dp-block-title:focus{border-bottom-color:var(--t3);}
+.dp-block-reorder{display:flex;gap:2px;flex-shrink:0;}
+.dp-reorder-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:5px;color:var(--t2);font-size:12px;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0;line-height:1;}
+.dp-reorder-btn:hover:not([disabled]){background:rgba(255,200,0,0.1);border-color:rgba(255,200,0,0.25);color:var(--y);}
+.dp-reorder-btn[disabled]{opacity:.2;cursor:not-allowed;}
 .dp-del-block{background:none;border:none;color:var(--t4);font-size:13px;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s;}
 .dp-del-block:hover{color:var(--red);}
 .dp-step-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
@@ -1449,14 +1453,14 @@ function renderDayPlanner(){
     saveDayPlans();
   }
   let html='';
-  html+=`<div class="dp-section">☀️ Morning</div>`;
-  plan.morning.forEach((block,bi)=>{ html+=renderDpBlock('morning',bi,block); });
-  html+=`<button class="dp-add-block" onclick="dpAddBlock('morning')">+ Add morning block</button>`;
   html+=`<div class="dp-section">⚡ During the day</div>`;
-  plan.day.forEach((block,bi)=>{ html+=renderDpBlock('day',bi,block); });
+  plan.day.forEach((block,bi)=>{ html+=renderDpBlock('day',bi,block,plan.day.length); });
   html+=`<button class="dp-add-block" onclick="dpAddBlock('day')">+ Add task</button>`;
+  html+=`<div class="dp-section">☀️ Morning</div>`;
+  plan.morning.forEach((block,bi)=>{ html+=renderDpBlock('morning',bi,block,plan.morning.length); });
+  html+=`<button class="dp-add-block" onclick="dpAddBlock('morning')">+ Add morning block</button>`;
   html+=`<div class="dp-section">🌙 Night</div>`;
-  plan.night.forEach((block,bi)=>{ html+=renderDpBlock('night',bi,block); });
+  plan.night.forEach((block,bi)=>{ html+=renderDpBlock('night',bi,block,plan.night.length); });
   html+=`<button class="dp-add-block" onclick="dpAddBlock('night')">+ Add night block</button>`;
   document.getElementById('dayPlannerContent').innerHTML=html;
 }
@@ -1479,10 +1483,15 @@ function copyDayToAll(){
   renderDayPlanner();
 }
 
-function renderDpBlock(section,bi,block){
+function renderDpBlock(section,bi,block,total){
   const steps=block.items||[];
+  const len=total||_dayPlans[_activePlanDay][section].length;
   return `<div class="dp-block" id="dpblock-${section}-${bi}">
     <div class="dp-block-head">
+      <div class="dp-block-reorder">
+        <button class="dp-reorder-btn" onclick="dpMoveBlock('${section}',${bi},-1)" ${bi===0?'disabled':''} title="Move up">↑</button>
+        <button class="dp-reorder-btn" onclick="dpMoveBlock('${section}',${bi},1)" ${bi===len-1?'disabled':''} title="Move down">↓</button>
+      </div>
       <input class="dp-block-title" value="${(block.title||'').replace(/"/g,'&quot;')}" placeholder="Block title"
         onchange="dpSaveTitle('${section}',${bi},this.value)"/>
       <button class="dp-del-block" onclick="dpDelBlock('${section}',${bi})">✕</button>
@@ -1496,6 +1505,15 @@ function renderDpBlock(section,bi,block){
       </div>`).join('')}
     <button class="dp-add-step" onclick="dpAddStep('${section}',${bi})">+ Add step</button>
   </div>`;
+}
+
+function dpMoveBlock(section,bi,dir){
+  const arr=_dayPlans[_activePlanDay][section];
+  const newIdx=bi+dir;
+  if(newIdx<0||newIdx>=arr.length)return;
+  const tmp=arr[bi]; arr[bi]=arr[newIdx]; arr[newIdx]=tmp;
+  saveDayPlans();
+  renderDayPlanner();
 }
 function dpSaveTitle(section,bi,val){
   if(!_dayPlans[_activePlanDay][section]) return;
