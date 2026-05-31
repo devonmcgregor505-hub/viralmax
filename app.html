@@ -722,9 +722,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
       <!-- TRAINING PAGE -->
       <div class="panel-page" id="page-training">
-        <div class="section-header">
-          <div class="section-title">Training</div>
-          <div class="section-sub">Your workout split — tap exercises to log starting weight.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;">
+          <div>
+            <div class="section-title">Training</div>
+            <div class="section-sub">Your workout split — tap exercises to log starting weight.</div>
+          </div>
+          <div id="weightCards" style="display:flex;gap:8px;flex-shrink:0;"></div>
         </div>
         <div id="trainingSection"></div>
       </div>
