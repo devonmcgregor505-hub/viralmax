@@ -1075,6 +1075,7 @@ function initApp(){
   renderMacros();
   renderMacros();
   renderTrainingSection();
+  renderWeightCards();
   updateGreeting();
   loadStreak();
   renderProgressPhotos();
@@ -1269,7 +1270,7 @@ function renderTrainingFromData(days){
 function showPage(name,linkEl){
   localStorage.setItem('ascend_page', name);
   if(name==='nutrition') setTimeout(renderMealsSection,10);
-  if(name==='training') setTimeout(renderTrainingSection,10);
+  if(name==='training'){setTimeout(renderTrainingSection,10);setTimeout(renderWeightCards,10);}
   if(name==='progress'){setTimeout(renderProgressPhotos,10);}
   document.querySelectorAll('.panel-page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name)?.classList.add('active');
@@ -2355,6 +2356,40 @@ function renderProgressPhotos(){
       }).join("")
       +"</div></div>";
   }).join("");
+}
+
+
+// BODY WEIGHT
+function loadBodyWeight(){ return JSON.parse(localStorage.getItem("ascend_bodyweight")||'{"current":75,"goal":80}'); }
+function saveBodyWeight(w){ localStorage.setItem("ascend_bodyweight",JSON.stringify(w)); }
+function renderWeightCards(){
+  var el=document.getElementById("weightCards"); if(!el)return;
+  var w=loadBodyWeight();
+  el.innerHTML=
+    "<div class=\"macro-card\" onclick=\"editBodyWeight('current')\">"
+      +"<div class=\"macro-lbl\">Current</div>"
+      +"<span class=\"macro-val\" id=\"bw-current\">"+w.current+"</span>"
+      +"<span class=\"macro-val-unit\">kg</span>"
+    +"</div>"
+    +"<div class=\"macro-card\" onclick=\"editBodyWeight('goal')\">"
+      +"<div class=\"macro-lbl\">Goal</div>"
+      +"<span class=\"macro-val\" style=\"color:#22c55e\" id=\"bw-goal\">"+w.goal+"</span>"
+      +"<span class=\"macro-val-unit\">kg</span>"
+    +"</div>";
+}
+function editBodyWeight(key){
+  var card=document.getElementById("bw-"+key)?.closest(".macro-card"); if(!card)return;
+  var w=loadBodyWeight(); var label=key==="current"?"Current":"Goal";
+  var col=key==="current"?"var(--y)":"#22c55e";
+  card.innerHTML="<div class=\"macro-lbl\">"+label+"</div>"
+    +"<div style=\"display:flex;align-items:baseline;gap:3px;\">"
+    +"<input class=\"macro-inline-input\" style=\"color:"+col+";border-bottom-color:"+col+";\" id=\"bwinp-"+key+"\" type=\"number\" value=\""+w[key]+"\" />"
+    +"<span class=\"macro-val-unit\">kg</span></div>";
+  card.onclick=null;
+  var inp=document.getElementById("bwinp-"+key); inp.focus(); inp.select();
+  function done(){var v=parseFloat(inp.value);if(!isNaN(v)&&v>0){w[key]=v;saveBodyWeight(w);}renderWeightCards();}
+  inp.addEventListener("blur",done);
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")inp.blur();if(e.key==="Escape")renderWeightCards();});
 }
 
 </script>
