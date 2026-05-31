@@ -1294,7 +1294,7 @@ function renderChecklist(){
         if(item.type==='section') return '';
         const i=item.globalIdx;
         const isDone=checked.has(i);
-        const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map(s=>`<div class="cl-step">— ${s}</div>`).join('')}</div>`:'';
+        const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map(s=>`<div class="cl-step">${s.replace(/^[\u2014\u2013\-]+\s*/,'')}</div>`).join('')}</div>`:'';
         return `<div class="check-item" onclick="toggleCheck(${i})">
           <div class="check-box${isDone?' done':''}"></div>
           <div class="check-text" style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:2px;">
@@ -1324,7 +1324,7 @@ function renderChecklist(){
   el.innerHTML=allItems.map((item,i)=>{
     if(item.type==='section') return `<div class="cl-section">${item.label}</div>`;
     const isDone=checked.has(i);
-    const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map(s=>`<div class="cl-step">— ${s}</div>`).join('')}</div>`:'';
+    const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map(s=>`<div class="cl-step">${s.replace(/^[\u2014\u2013\-]+\s*/,'')}</div>`).join('')}</div>`:'';
     return `<div class="check-item" onclick="toggleCheck(${i})">
       <div class="check-box${isDone?' done':''}"></div>
       <div class="check-text" style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:2px;">
