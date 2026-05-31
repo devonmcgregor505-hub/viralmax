@@ -2513,6 +2513,7 @@ function closeLMGDetail(){
 
 
 // ── SUPABASE SESSION ──
+// restore session from login.html
 (function initSupabaseSession(){
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(function(mod){
     var sb = mod.createClient(
@@ -2520,11 +2521,15 @@ function closeLMGDetail(){
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0'
     );
     window._sb = sb;
+    var _ss = localStorage.getItem('ascend_session');
+    if(_ss){ try{ var _sp=JSON.parse(_ss); sb.auth.setSession({access_token:_sp.access_token,refresh_token:_sp.refresh_token}).catch(function(){}); }catch(e){} }
     sb.auth.getSession().then(function(res){
       var user = res.data.session?.user;
       if(user){
         localStorage.setItem('ascend_user_id', user.id);
+        localStorage.setItem('ascend_session', JSON.stringify(res.data.session));
         console.log('[auth] session found:', user.id);
+        pullFromCloud().then(function(ok){ if(ok) console.log('[sync] cloud data loaded'); });
       } else {
         console.log('[auth] no session');
       }

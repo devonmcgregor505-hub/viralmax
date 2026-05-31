@@ -137,6 +137,7 @@ window.doLogin = async function(){
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if(error){ showMsg(error.message, 'error'); setLoading(false); return; }
   localStorage.setItem('ascend_user_id', data.user.id);
+  localStorage.setItem('ascend_session', JSON.stringify(data.session));
   window.location.href = '/app';
 };
 
