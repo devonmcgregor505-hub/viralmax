@@ -615,12 +615,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
       <!-- NUTRITION PAGE -->
       <div class="panel-page" id="page-nutrition">
-        <div class="section-header">
-          <div class="section-title">Nutrition</div>
-          <div class="section-sub">Daily targets built around your goals.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px;flex-wrap:nowrap;">
+          <div style="flex:1;min-width:0;">
+            <div class="section-title">Nutrition</div>
+            <div class="section-sub">Daily targets built around your goals.</div>
+          </div>
+          <div id="macroGrid" style="display:flex;gap:8px;flex-shrink:0;"></div>
         </div>
-        <div class="macro-grid" id="macroGrid"></div>
-        <div id="todayMeals" style="margin-bottom:20px;"></div>
         <div id="nutritionBlocks"></div>
       </div>
 
