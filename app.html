@@ -1196,6 +1196,7 @@ function renderTrainingFromData(days){
 
 // ─── PAGE SWITCHING ───
 function showPage(name,linkEl){
+  if(name==='nutrition') setTimeout(renderMealsSection,10);
   document.querySelectorAll('.panel-page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name)?.classList.add('active');
   document.querySelectorAll('.topbar-nav a').forEach(a=>a.classList.remove('active'));
