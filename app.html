@@ -1395,7 +1395,7 @@ function redoQuiz(){
   renderOB();
 }
 function openPricing(){ document.getElementById('avatarDropdown').classList.remove('open'); window.location.href='/checkout'; }
-function signOut(){ document.getElementById('avatarDropdown').classList.remove('open'); window.location.href='/login'; }
+function signOut(){ document.getElementById('avatarDropdown').classList.remove('open'); sb && sb.auth.signOut(); localStorage.removeItem('ascend_user_id'); window.location.href='/login'; }
 
 function saveRoutineTitle(cid,idx,val){
   if(!window._routineData) window._routineData={};
