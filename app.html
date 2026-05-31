@@ -601,11 +601,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
           <div class="section-title">Nutrition</div>
           <div class="section-sub">Daily targets built around your goals.</div>
         </div>
-        <div class="macro-grid">
-          <div class="macro-card"><div class="macro-val">2,600</div><div class="macro-lbl">Calories</div></div>
-          <div class="macro-card"><div class="macro-val">160g</div><div class="macro-lbl">Protein</div></div>
-          <div class="macro-card"><div class="macro-val">3L</div><div class="macro-lbl">Water</div></div>
-        </div>
+        <div class="macro-grid" id="macroGrid"></div>
         <div id="todayMeals" style="margin-bottom:20px;"></div>
         <div id="nutritionBlocks"></div>
       </div>
@@ -945,6 +941,7 @@ function initApp(){
   window._routineData['morningBlocks'] = JSON.parse(JSON.stringify(morning));
   window._routineData['nightBlocks']   = JSON.parse(JSON.stringify(night));
   renderRoutine('nutritionBlocks', nutrition);
+  renderMacros();
   renderTrainingFromData(training);
   updateGreeting();
   loadStreak();
@@ -1755,6 +1752,50 @@ function checkScheduledNotifs(){
   renderNotifBadge();
   setInterval(checkScheduledNotifs, 3600000);
 })();
+
+
+
+
+// MACROS
+var MACRO_DEFAULTS = {calories:2600,protein:160};
+function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||JSON.stringify(MACRO_DEFAULTS)); }
+function saveMacros(m){ localStorage.setItem("ascend_macros",JSON.stringify(m)); }
+function renderMacros(){
+  var el=document.getElementById("macroGrid"); if(!el)return;
+  var m=loadMacros();
+  el.innerHTML=macroCard("calories",m.calories,"Calories","kcal")+macroCard("protein",m.protein,"Protein","g");
+}
+function macroCard(key,val,label,unit){
+  var dispVal = key==="calories" ? val.toLocaleString() : val;
+  var dispUnit = key==="calories" ? " kcal" : "g";
+  return "<div class=\"macro-card\">"
+    +"<div class=\"macro-card-left\">"
+    +"<div class=\"macro-lbl\">"+label+"</div>"
+    +"<div class=\"macro-val\" id=\"macroval-"+key+"\">"+dispVal+"<span style=\"font-size:14px;opacity:.6\">"+dispUnit+"</span></div>"
+    +"</div>"
+    +"<button class=\"macro-edit-btn\" onclick=\"startMacroEdit(&quot;"+key+"&quot;,"+val+",&quot;"+unit+"&quot;)\">Edit</button>"
+    +"</div>";
+}
+function startMacroEdit(key,current,unit){
+  var el=document.getElementById("macroGrid"); if(!el)return;
+  var label=key==="calories"?"Calories":"Protein";
+  el.innerHTML="<div class=\"macro-card\" style=\"grid-column:1/-1;flex-direction:column;align-items:flex-start;gap:10px;\">"
+    +"<div class=\"macro-lbl\">Set "+label+" target</div>"
+    +"<div class=\"macro-edit-row\">"
+    +"<input class=\"macro-input\" id=\"macroEditInput\" type=\"number\" value=\""+current+"\" min=\"0\" />"
+    +"<span class=\"macro-input-unit\">"+unit+"</span>"
+    +"</div>"
+    +"<div style=\"display:flex;gap:8px;\">"
+    +"<button class=\"macro-edit-btn\" style=\"background:var(--yd);border-color:var(--border-y);color:var(--y);\" onclick=\"saveMacroEdit(&quot;"+key+"&quot;)\">Save</button>"
+    +"<button class=\"macro-edit-btn\" onclick=\"renderMacros()\">Cancel</button>"
+    +"</div></div>";
+  setTimeout(function(){var inp=document.getElementById("macroEditInput");if(inp){inp.focus();inp.select();}},50);
+}
+function saveMacroEdit(key){
+  var inp=document.getElementById("macroEditInput"); if(!inp)return;
+  var val=parseInt(inp.value); if(isNaN(val)||val<0)return;
+  var m=loadMacros(); m[key]=val; saveMacros(m); renderMacros();
+}
 
 </script>
 </body>
