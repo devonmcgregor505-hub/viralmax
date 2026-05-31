@@ -1196,6 +1196,7 @@ function renderTrainingFromData(days){
 
 // ─── PAGE SWITCHING ───
 function showPage(name,linkEl){
+  localStorage.setItem('ascend_page', name);
   if(name==='nutrition') setTimeout(renderMealsSection,10);
   document.querySelectorAll('.panel-page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name)?.classList.add('active');
@@ -1268,6 +1269,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     profile=JSON.parse(saved);
     document.getElementById('onboardingOverlay').style.display='none';
     initApp();
+    var lastPage=localStorage.getItem('ascend_page');
+    if(lastPage && lastPage!=='checklist') showPage(lastPage, null);
   } else {
     renderOB();
   }
