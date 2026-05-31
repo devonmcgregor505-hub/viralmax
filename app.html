@@ -1018,7 +1018,8 @@ function renderChecklist(){
   const _settings=JSON.parse(localStorage.getItem('ascend_settings')||'{}');
   const _middayStr=_settings.middayTime||'12:00';
   const _middayHour=parseInt(_middayStr.split(':')[0]);
-  const hour = new Date().getHours();
+  const _tz=_settings.timezone||Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const hour=parseInt(new Intl.DateTimeFormat('en-GB',{hour:'numeric',hour12:false,timeZone:_tz}).format(new Date()));
   const isMorning = hour < _middayHour;
   if(window._sectionCollapsed===undefined){
     window._sectionCollapsed = {morning: !isMorning, night: isMorning};
