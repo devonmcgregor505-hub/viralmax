@@ -218,8 +218,7 @@ app.post('/api/profile/save', async (req, res) => {
   const { profile } = req.body;
   try {
     const { error } = await supabase.from('users')
-      .update({ profile, updated_at: new Date().toISOString() })
-      .eq('id', userId);
+      .upsert({ id: userId, profile, updated_at: new Date().toISOString() }, { onConflict: 'id' });
     if (error) throw error;
     res.json({ ok: true });
   } catch(err) {
