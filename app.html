@@ -601,6 +601,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   .sidebar.open{left:0;box-shadow:4px 0 32px rgba(0,0,0,0.5);}
   .sidebar-backdrop.open{display:block;}
 }
+
+@media(max-width:600px){
+  .exercise-row{flex-wrap:nowrap;gap:6px;align-items:center;}
+  .exercise-name{font-size:13px;min-width:0;flex:1;}
+  .exercise-weight{gap:3px;}
+  .exercise-weight-label{display:none;}
+  .exercise-weight-input{width:44px;font-size:16px;padding:3px 4px;}
+  .exercise-weight-unit{font-size:10px;}
+}
 </style>
 </head>
 <body>
