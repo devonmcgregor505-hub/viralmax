@@ -1200,7 +1200,11 @@ function showPage(name,linkEl){
   document.getElementById('page-'+name)?.classList.add('active');
   document.querySelectorAll('.topbar-nav a').forEach(a=>a.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(a=>a.classList.remove('active'));
-  if(linkEl) linkEl.classList.add('active');
+  if(linkEl){ linkEl.classList.add('active'); }
+  // Always sync sidebar by matching onclick attribute
+  document.querySelectorAll('.nav-item').forEach(function(a){
+    if(a.getAttribute('onclick') && a.getAttribute('onclick').includes("'"+name+"'")) a.classList.add('active');
+  });
 }
 
 // ─── AI CHAT ───
