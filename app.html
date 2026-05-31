@@ -1363,7 +1363,7 @@ function renderChecklist(){
   },60000);
 }
 
-function toggleCheck(i){checked.has(i)?checked.delete(i):checked.add(i);renderChecklist();maybeSaveScore();}
+function toggleCheck(i){checked.has(i)?checked.delete(i):checked.add(i);renderChecklist();maybeSaveScore();pushToCloud();}
 
 // ─── ROUTINE RENDERER ───
 function renderRoutine(containerId,data){
@@ -2736,7 +2736,14 @@ setInterval(function(){
 
 // Push on page hide (tab close / switch)
 document.addEventListener('visibilitychange', function(){
-  if(document.visibilityState === 'hidden') pushToCloud();
+  if(document.visibilityState === 'hidden'){
+    pushToCloud();
+  } else {
+    // Pull latest when tab becomes visible
+    pullFromCloud().then(function(ok){
+      if(ok){ renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderProgressPhotos(); }
+    });
+  }
 });
 
 
