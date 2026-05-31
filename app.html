@@ -130,12 +130,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .cl-section-body.collapsed{max-height:0!important;}
 
 /* ─── CHECK ITEMS ─── */
-.check-item{display:flex;align-items:flex-start;gap:13px;padding:14px 16px;border-radius:12px;margin-bottom:6px;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.09);cursor:pointer;transition:all .18s ease;position:relative;overflow:hidden;}
+.check-item{display:flex;align-items:flex-start;gap:13px;padding:14px 16px;border-radius:12px;margin-bottom:6px;background:rgba(255,255,255,0.045);border:none;outline:1px solid rgba(255,255,255,0.09);cursor:pointer;transition:all .18s ease;position:relative;overflow:hidden;}
 .check-item::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px;opacity:0;transition:opacity .2s;}
 .cl-morning-body .check-item::after{background:var(--morning);}
 .cl-day-body .check-item::after{background:var(--day);}
 .cl-night-body .check-item::after{background:var(--night);}
-.check-item:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.14);transform:translateX(2px);}
+.check-item:hover{background:rgba(255,255,255,0.07);outline-color:rgba(255,255,255,0.14);transform:translateX(2px);}
 .check-item:hover::after{opacity:1;}
 .check-item:last-child{margin-bottom:0;}
 
