@@ -1259,7 +1259,7 @@ function renderChecklist(){
     allItems.push({type:'task',label:block.title+(block.time?' · '+block.time:''),steps:block.items});
   });
   // Day habits — use day plan or defaults
-  allItems.push({type:'section',label:'⚡  During the day'});
+  allItems.push({type:'section',key:'day',label:'⚡  During the day'});
   if(dayTasks && dayTasks.length){
     dayTasks.forEach(t=>allItems.push({type:'task',label:t.title,steps:t.items?.length?t.items:undefined}));
   } else {
@@ -1267,7 +1267,7 @@ function renderChecklist(){
     allItems.push({type:'task',label:'Training or movement'});
   }
   // Night — one checkbox per block
-  allItems.push({type:'section',label:'🌙  Night'});
+  allItems.push({type:'section',key:'night',label:'🌙  Night'});
   night.forEach(block=>{
     allItems.push({type:'task',label:block.title+(block.time?' · '+block.time:''),steps:block.items});
   });
