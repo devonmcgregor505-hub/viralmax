@@ -1195,10 +1195,6 @@ function launchApp(){
 
 // ─── APP INIT ───
 function initApp(){
-  // Load today's checklist from Supabase
-  loadChecklistFromServer().then(function(loaded){
-    if(loaded) renderChecklist();
-  });
   const saved = JSON.parse(localStorage.getItem('ascend_profile')||'{}');
   const morning   = saved.morning   || MORNING;
   const night     = saved.night     || NIGHT;
@@ -1213,7 +1209,10 @@ function initApp(){
   };
   window._customHabits   = habits;
   window._customTraining = training;
-  renderChecklist(); // must come after _routineData is set
+  // Load checklist from server then render
+  loadChecklistFromServer().then(function(){
+    renderChecklist();
+  });
   // Load morning/night into _routineData directly (no DOM elements needed)
   window._routineData['morningBlocks'] = JSON.parse(JSON.stringify(morning));
   window._routineData['nightBlocks']   = JSON.parse(JSON.stringify(night));
