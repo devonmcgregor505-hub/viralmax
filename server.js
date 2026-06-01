@@ -184,7 +184,7 @@ app.post('/api/checklist/save', async (req, res) => {
       date: date || new Date().toISOString().split('T')[0],
       checked: checked,
       updated_at: new Date().toISOString()
-    });
+    }, { onConflict: 'user_id,date' });
     if (error) throw error;
     res.json({ ok: true });
   } catch(err) {
