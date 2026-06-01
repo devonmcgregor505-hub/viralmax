@@ -957,7 +957,7 @@ const TRAINING_DAYS = [
 const FRAME_ITEMS = ['Face pulls or band pull-aparts — 3×15 (rear delts + posture)','Dead hangs — 3×30s (decompresses spine, shoulder health)','Mewing + chin tucks throughout the day — make it automatic','Walk tall — shoulders back, chest open, eyes forward'];
 
 // ─── STATE ───
-let checked = new Set();
+let checked=(function(){try{var s=localStorage.getItem('ascend_checked_today'),d=localStorage.getItem('ascend_checked_date'),n=new Date(),k=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');if(s&&d===k)return new Set(JSON.parse(s));}catch(e){}return new Set();})();
 let profile = null;
 let aiHistory = [];
 
@@ -1365,7 +1365,13 @@ function renderChecklist(){
   },60000);
 }
 
-function toggleCheck(i){checked.has(i)?checked.delete(i):checked.add(i);renderChecklist();maybeSaveScore();pushToCloud();}
+function toggleCheck(i){
+  checked.has(i)?checked.delete(i):checked.add(i);
+  var _n=new Date(),_dk=_n.getFullYear()+'-'+String(_n.getMonth()+1).padStart(2,'0')+'-'+String(_n.getDate()).padStart(2,'0');
+  localStorage.setItem('ascend_checked_today',JSON.stringify([...checked]));
+  localStorage.setItem('ascend_checked_date',_dk);
+  renderChecklist();maybeSaveScore();pushToCloud();
+}
 
 // ─── ROUTINE RENDERER ───
 function renderRoutine(containerId,data){
@@ -2684,7 +2690,7 @@ function closeLMGDetail(){
 var SYNC_KEYS = [
   'ascend_profile','ascend_day_plans','ascend_meal_plans','ascend_macros',
   'ascend_meals','ascend_workouts','ascend_bodyweight','ascend_lmg',
-  'ascend_checkins','ascend_score_history','ascend_settings','ascend_notifications',
+  'ascend_checkins','ascend_score_history','ascend_settings','ascend_notifications','ascend_checked_today','ascend_checked_date',
   'ascend_notif_seen','ascend_macros'
 ];
 
@@ -2743,7 +2749,8 @@ document.addEventListener('visibilitychange', function(){
   } else {
     // Pull latest when tab becomes visible
     pullFromCloud().then(function(ok){
-      if(ok){ renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderProgressPhotos(); }
+      if(ok){ try{var _sc=localStorage.getItem('ascend_checked_today'),_sd=localStorage.getItem('ascend_checked_date'),_n2=new Date(),_k2=_n2.getFullYear()+'-'+String(_n2.getMonth()+1).padStart(2,'0')+'-'+String(_n2.getDate()).padStart(2,'0');if(_sc&&_sd===_k2)checked=new Set(JSON.parse(_sc));}catch(e){}
+  renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderProgressPhotos(); }
     });
   }
 });
