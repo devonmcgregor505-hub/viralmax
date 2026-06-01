@@ -1254,7 +1254,7 @@ function renderChecklist(){
   }
   const allItems=[];
   // Morning — one checkbox per block
-  allItems.push({type:'section',key:section.key,label:'☀️  Morning'});
+  allItems.push({type:'section',key:'morning',label:'☀️  Morning'});
   morning.forEach(block=>{
     allItems.push({type:'task',label:block.title+(block.time?' · '+block.time:''),steps:block.items});
   });
