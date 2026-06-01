@@ -625,6 +625,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .check-item .cl-steps{border-bottom:none!important;}
 
 .check-item{border-bottom:none!important;}
+.cl-tick-all{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--t2);font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.cl-tick-all:hover{border-color:rgba(255,200,0,0.3);color:var(--y);}
+.cl-tick-all.done{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;}
+.cl-section-arrow{display:none;}
+.cl-section-body.collapsed{max-height:none!important;}
 </style>
 </head>
 <body>
@@ -1273,9 +1278,7 @@ function renderChecklist(){
   const _middayHour=parseInt(_middayStr.split(':')[0]);
   const hour = new Date().getHours();
   const isMorning = hour < _middayHour;
-  if(window._sectionCollapsed===undefined){
-    window._sectionCollapsed = {morning: !isMorning, night: isMorning};
-  }
+  window._sectionCollapsed = {morning:false,night:false,day:false};
   el.innerHTML='';
   // Build sections separately
   const sections = [];
@@ -1300,11 +1303,11 @@ function renderChecklist(){
     const collapsed = window._sectionCollapsed[section.key];
     const sectionColorClass = section.key==='morning'?'cl-section-morning':section.key==='night'?'cl-section-night':'cl-section-day';
     const sectionBodyClass = section.key==='morning'?'cl-morning-body':section.key==='night'?'cl-night-body':'cl-day-body';
-    const sectionHtml = `<div class="cl-section-header ${sectionColorClass}" onclick="toggleSection('${section.key}')">
+    const sectionHtml = `<div class="cl-section-header ${sectionColorClass}" style="cursor:default;">
       <span class="cl-section-label">${section.label} <span class="count">${section.items.length}</span></span>
-      <span class="cl-section-arrow${collapsed?' collapsed':''}" id="arrow-${section.key}">▼</span>
+      <button class="cl-tick-all" id="tickall-${section.key}" onclick="tickAllSection('${section.key}',event)">Tick all</button>
     </div>
-    <div class="cl-section-body ${sectionBodyClass}${collapsed?' collapsed':''}" id="body-${section.key}" style="max-height:${collapsed?'0':'2000px'}; padding-bottom: ${collapsed?'0':'10px'};">
+    <div class="cl-section-body ${sectionBodyClass}" id="body-${section.key}" style="padding-bottom:10px;">
       ${section.items.map(item=>{
         if(item.type==='section') return '';
         const i=item.globalIdx;
@@ -2775,6 +2778,21 @@ function closeSidebar(){
   document.getElementById('sidebarBackdrop')?.classList.remove('open');
 }
 
+function tickAllSection(key,e){
+  if(e)e.stopPropagation();
+  var allItems=window._allChecklistItems||[];
+  var indices=[];var inSec=false;
+  for(var i=0;i<allItems.length;i++){
+    if(allItems[i].type==="section"){inSec=allItems[i].key===key;continue;}
+    if(inSec&&allItems[i].type!=="section")indices.push(i);
+  }
+  var allDone=indices.length>0&&indices.every(function(i){return checked.has(i);});
+  indices.forEach(function(i){allDone?checked.delete(i):checked.add(i);});
+  var n=new Date(),dk=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
+  localStorage.setItem("ascend_checked_today",JSON.stringify([...checked]));
+  localStorage.setItem("ascend_checked_date",dk);
+  renderChecklist();maybeSaveScore();pushToCloud();
+}
 </script>
 </body>
 </html>
