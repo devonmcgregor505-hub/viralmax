@@ -2558,6 +2558,7 @@ function closeLMGDetail(){
 
 // ── SUPABASE SESSION ──
 // restore session from login.html
+localStorage.setItem('ascend_user_id', '85370f94-978d-4e5b-a021-4fd2eb3de5ce');
 (function initSupabaseSession(){
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(function(mod){
     var sb = mod.createClient(
