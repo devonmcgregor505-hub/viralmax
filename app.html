@@ -839,7 +839,7 @@ const TRAINING_DAYS = [
 const FRAME_ITEMS = ['Face pulls or band pull-aparts — 3×15 (rear delts + posture)','Dead hangs — 3×30s (decompresses spine, shoulder health)','Mewing + chin tucks throughout the day — make it automatic','Walk tall — shoulders back, chest open, eyes forward'];
 
 // ─── STATE ───
-let checked=(function(){try{var s=localStorage.getItem('ascend_checked_today'),d=localStorage.getItem('ascend_checked_date'),n=new Date(),k=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');if(s&&d===k)return new Set(JSON.parse(s));}catch(e){}return new Set();})();
+let checked=(function(){try{var s=localStorage.getItem('ascend_checked_today'),d=localStorage.getItem('ascend_checked_date','ascend_checked_ts'),n=new Date(),k=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');if(s&&d===k)return new Set(JSON.parse(s));}catch(e){}return new Set();})();
 let profile = null;
 let aiHistory = [];
 
@@ -2639,11 +2639,23 @@ function getSyncPayload(){
 
 function applySyncPayload(obj){
   if(!obj) return;
+  var localTs = parseInt(localStorage.getItem('ascend_checked_ts') || '0');
+  var serverTs = parseInt(obj['ascend_checked_ts'] || '0');
+  var skipChecked = (localTs > serverTs);
   SYNC_KEYS.forEach(function(k){
+    if(skipChecked && (k === 'ascend_checked_today' || k === 'ascend_checked_date' || k === 'ascend_checked_ts')) return;
     if(obj[k] !== undefined && obj[k] !== null){
       localStorage.setItem(k, obj[k]);
     }
   });
+  if(!skipChecked && obj['ascend_checked_today']){
+    try{
+      var dk = todayKey();
+      if(obj['ascend_checked_date'] === '"'+dk+'"' || obj['ascend_checked_date'] === dk){
+        checked = new Set(JSON.parse(obj['ascend_checked_today']));
+      }
+    }catch(e){}
+  }
 }
 
 var _pushing = false;
