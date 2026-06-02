@@ -2624,8 +2624,8 @@ function _bumpAction(){ _lastAction = Date.now(); }
 var SYNC_KEYS = [
   'ascend_profile','ascend_day_plans','ascend_meal_plans','ascend_macros',
   'ascend_meals','ascend_workouts','ascend_bodyweight','ascend_lmg',
-  'ascend_checkins','ascend_score_history','ascend_settings','ascend_notifications','ascend_checked_today','ascend_checked_date',
-  'ascend_notif_seen','ascend_macros'
+  'ascend_checkins','ascend_score_history','ascend_settings','ascend_notifications',
+  'ascend_notif_seen'
 ];
 
 function getSyncPayload(){
@@ -2639,42 +2639,32 @@ function getSyncPayload(){
 
 function applySyncPayload(obj){
   if(!obj) return;
-  var localTs = parseInt(localStorage.getItem('ascend_checked_ts') || '0');
-  var serverTs = parseInt(obj['ascend_checked_ts'] || '0');
-  var skipChecked = (localTs > serverTs);
   SYNC_KEYS.forEach(function(k){
-    if(skipChecked && (k === 'ascend_checked_today' || k === 'ascend_checked_date' || k === 'ascend_checked_ts')) return;
     if(obj[k] !== undefined && obj[k] !== null){
       localStorage.setItem(k, obj[k]);
     }
   });
-  if(!skipChecked && obj['ascend_checked_today']){
-    try{
-      var dk = todayKey();
-      if(obj['ascend_checked_date'] === '"'+dk+'"' || obj['ascend_checked_date'] === dk){
-        checked = new Set(JSON.parse(obj['ascend_checked_today']));
-      }
-    }catch(e){}
-  }
 }
 
-var _pushing = false;
-async function pushToCloud(){
-  var userId = localStorage.getItem('ascend_user_id');
-  if(!userId) return;
-  var payload = getSyncPayload();
-  fetch('/api/profile/save', {
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-user-id':userId},
-    body:JSON.stringify({profile: payload})
-  }).catch(function(){});
+var _syncTimer = null;
+function pushToCloud(){
+  if(_syncTimer) clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(function(){
+    var userId = localStorage.getItem('ascend_user_id');
+    if(!userId) return;
+    fetch('/api/profile/save',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-user-id':userId},
+      body:JSON.stringify({profile:getSyncPayload()})
+    }).catch(function(){});
+  }, 1000);
 }
 
 async function pullFromCloud(){
   var userId = localStorage.getItem('ascend_user_id');
   if(!userId) return false;
   try{
-    var res = await fetch('/api/credits', {headers:{'x-user-id':userId}});
+    var res = await fetch('/api/credits',{headers:{'x-user-id':userId}});
     var data = await res.json();
     if(data.profile && typeof data.profile === 'object'){
       applySyncPayload(data.profile);
@@ -2684,32 +2674,54 @@ async function pullFromCloud(){
   return false;
 }
 
-// Auto-push every 30 seconds + auto-pull every 15 seconds
-setInterval(function(){
-  if(localStorage.getItem('ascend_user_id')) pushToCloud();
-}, 30000);
+// Pull non-checklist data every 10s
 setInterval(function(){
   if(!localStorage.getItem('ascend_user_id')) return;
-  if(_pushing) return;
   pullFromCloud().then(function(ok){
     if(!ok) return;
-    renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
+    renderMacros(); renderMealsSection(); renderTrainingSection();
+    renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
   });
-}, 15000);
+}, 10000);
 
-// Push on page hide (tab close / switch)
+// Pull checklist from dedicated table every 10s, only update if server differs
+setInterval(async function(){
+  var userId = localStorage.getItem('ascend_user_id');
+  if(!userId) return;
+  try{
+    var n=new Date(), dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+    var res = await fetch('/api/checklist/history',{headers:{'x-user-id':userId}});
+    var data = await res.json();
+    if(data.logs && data.logs.length){
+      var todayLog = data.logs.find(function(l){ return l.date===dk; });
+      if(todayLog && todayLog.checked){
+        var serverChecked = new Set(todayLog.checked);
+        var localStr = JSON.stringify([...checked].sort(function(a,b){return a-b;}));
+        var serverStr = JSON.stringify([...serverChecked].sort(function(a,b){return a-b;}));
+        if(localStr !== serverStr){
+          checked = serverChecked;
+          localStorage.setItem('ascend_checked_today', JSON.stringify([...checked]));
+          localStorage.setItem('ascend_checked_date', dk);
+          renderChecklist();
+        }
+      }
+    }
+  }catch(e){}
+}, 10000);
+
+// Push on tab hide, pull on tab show
 document.addEventListener('visibilitychange', function(){
   if(document.visibilityState === 'hidden'){
     pushToCloud();
   } else {
-    // Pull latest when tab becomes visible
     pullFromCloud().then(function(ok){
-      if(ok){ try{var _sc=localStorage.getItem('ascend_checked_today'),_sd=localStorage.getItem('ascend_checked_date'),_n2=new Date(),_k2=_n2.getFullYear()+'-'+String(_n2.getMonth()+1).padStart(2,'0')+'-'+String(_n2.getDate()).padStart(2,'0');if(_sc&&_sd===_k2)checked=new Set(JSON.parse(_sc));}catch(e){}
-  renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge(); }
+      if(ok){ renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge(); }
+    });
+    loadChecklistFromServer().then(function(ok){
+      if(ok) renderChecklist();
     });
   }
 });
-
 
 function updateBottomNav(name){
   document.querySelectorAll('.bottom-nav-item').forEach(function(b){
