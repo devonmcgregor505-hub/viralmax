@@ -2680,7 +2680,7 @@ setInterval(function(){
     try{var _sc=localStorage.getItem('ascend_checked_today'),_sd=localStorage.getItem('ascend_checked_date'),_n2=new Date(),_k2=_n2.getFullYear()+'-'+String(_n2.getMonth()+1).padStart(2,'0')+'-'+String(_n2.getDate()).padStart(2,'0');if(_sc&&_sd===_k2)checked=new Set(JSON.parse(_sc));}catch(e){}
     renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
   });
-}, 5000);
+}, 3000);
 
 // Push on page hide (tab close / switch)
 document.addEventListener('visibilitychange', function(){
