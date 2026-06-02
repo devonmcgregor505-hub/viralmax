@@ -2646,6 +2646,7 @@ function applySyncPayload(obj){
   });
 }
 
+var _pushing = false;
 async function pushToCloud(){
   var userId = localStorage.getItem('ascend_user_id');
   if(!userId) return;
@@ -2677,6 +2678,7 @@ setInterval(function(){
 }, 30000);
 setInterval(function(){
   if(!localStorage.getItem('ascend_user_id')) return;
+  if(_pushing) return;
   if(Date.now() - _lastAction < 8000) return;
   pullFromCloud().then(function(ok){
     if(!ok) return;
