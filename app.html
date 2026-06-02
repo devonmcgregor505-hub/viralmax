@@ -2653,10 +2653,18 @@ async function pullFromCloud(){
   return false;
 }
 
-// Auto-push every 30 seconds if logged in
+// Auto-push every 30 seconds + auto-pull every 15 seconds
 setInterval(function(){
   if(localStorage.getItem('ascend_user_id')) pushToCloud();
 }, 30000);
+setInterval(function(){
+  if(!localStorage.getItem('ascend_user_id')) return;
+  pullFromCloud().then(function(ok){
+    if(!ok) return;
+    try{var _sc=localStorage.getItem('ascend_checked_today'),_sd=localStorage.getItem('ascend_checked_date'),_n2=new Date(),_k2=_n2.getFullYear()+'-'+String(_n2.getMonth()+1).padStart(2,'0')+'-'+String(_n2.getDate()).padStart(2,'0');if(_sc&&_sd===_k2)checked=new Set(JSON.parse(_sc));}catch(e){}
+    renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
+  });
+}, 15000);
 
 // Push on page hide (tab close / switch)
 document.addEventListener('visibilitychange', function(){
@@ -2666,7 +2674,7 @@ document.addEventListener('visibilitychange', function(){
     // Pull latest when tab becomes visible
     pullFromCloud().then(function(ok){
       if(ok){ try{var _sc=localStorage.getItem('ascend_checked_today'),_sd=localStorage.getItem('ascend_checked_date'),_n2=new Date(),_k2=_n2.getFullYear()+'-'+String(_n2.getMonth()+1).padStart(2,'0')+'-'+String(_n2.getDate()).padStart(2,'0');if(_sc&&_sd===_k2)checked=new Set(JSON.parse(_sc));}catch(e){}
-  renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderProgressPhotos(); }
+  renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge(); }
     });
   }
 });
