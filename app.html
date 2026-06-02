@@ -2756,7 +2756,8 @@ function tickAllSection(key,e){
   var n=new Date(),dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
   localStorage.setItem('ascend_checked_today',JSON.stringify([...checked]));
   localStorage.setItem('ascend_checked_date',dk);
-  renderChecklist();maybeSaveScore();pushToCloud();
+  var dk2=new Date();var dks=dk2.getFullYear()+'-'+String(dk2.getMonth()+1).padStart(2,'0')+'-'+String(dk2.getDate()).padStart(2,'0');
+  renderChecklist();maybeSaveScore();saveChecklistToServer(dks);pushToCloud();
 }
 
 // Save checked state to Supabase directly
