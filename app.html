@@ -1248,7 +1248,7 @@ function renderChecklist(){
   },60000);
 }
 
-function toggleCheck(i){ _lastAction = Date.now() + 12000;
+function toggleCheck(i){ _lastAction = Date.now() + 27000;
   checked.has(i)?checked.delete(i):checked.add(i);
   var n=new Date(),dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
   localStorage.setItem('ascend_checked_today',JSON.stringify([...checked]));
@@ -2679,7 +2679,7 @@ setInterval(function(){
 setInterval(function(){
   if(!localStorage.getItem('ascend_user_id')) return;
   if(_pushing) return;
-  if(Date.now() - _lastAction < 8000) return;
+  if(Date.now() - _lastAction < 30000) return;
   pullFromCloud().then(function(ok){
     if(!ok) return;
     try{var _sc=localStorage.getItem('ascend_checked_today'),_sd=localStorage.getItem('ascend_checked_date'),_n2=new Date(),_k2=_n2.getFullYear()+'-'+String(_n2.getMonth()+1).padStart(2,'0')+'-'+String(_n2.getDate()).padStart(2,'0');if(_sc&&_sd===_k2)checked=new Set(JSON.parse(_sc));}catch(e){}
