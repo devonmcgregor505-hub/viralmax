@@ -2597,19 +2597,17 @@ function closeLMGDetail(){
     sb.auth.onAuthStateChange(function(event, session){
       if(session?.user){
         localStorage.setItem('ascend_user_id', session.user.id);
+        localStorage.setItem('ascend_session', JSON.stringify(session));
         console.log('[auth] state change:', event, session.user.id);
-        // Pull cloud data if just signed in
         if(event === 'SIGNED_IN'){
           pullFromCloud().then(function(synced){
             console.log('[sync] SIGNED_IN pull:', synced);
-            var saved=localStorage.getItem('ascend_profile');
-            if(saved && synced){
-              profile=JSON.parse(saved);
-              document.getElementById('onboardingOverlay').style.display='none';
-              initApp();
-              var lp=localStorage.getItem('ascend_page');
-              if(lp&&lp!=='checklist') showPage(lp,null);
+            if(synced){
+              var saved=localStorage.getItem('ascend_profile');
+              if(saved) profile=JSON.parse(saved);
+              renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
             }
+            setTimeout(pushToCloud, 1000);
           });
         }
       } else {
