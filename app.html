@@ -1248,7 +1248,7 @@ function renderChecklist(){
   },60000);
 }
 
-function toggleCheck(i){ _bumpAction();
+function toggleCheck(i){ _lastAction = Date.now() + 12000;
   checked.has(i)?checked.delete(i):checked.add(i);
   var n=new Date(),dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
   localStorage.setItem('ascend_checked_today',JSON.stringify([...checked]));
