@@ -2566,7 +2566,21 @@ function closeLMGDetail(){
     );
     window._sb = sb;
     var _ss = localStorage.getItem('ascend_session');
-    if(_ss){ try{ var _sp=JSON.parse(_ss); sb.auth.setSession({access_token:_sp.access_token,refresh_token:_sp.refresh_token}).catch(function(){}); if(_sp.user && _sp.user.id) localStorage.setItem('ascend_user_id', _sp.user.id); }catch(e){} }
+    if(_ss){ try{
+      var _sp=JSON.parse(_ss);
+      console.log('[auth] restoring session, user:', _sp.user?.id);
+      sb.auth.setSession({access_token:_sp.access_token,refresh_token:_sp.refresh_token}).then(function(r){
+        var uid = r.data?.session?.user?.id || _sp.user?.id;
+        console.log('[auth] session restored, uid:', uid);
+        if(uid){
+          localStorage.setItem('ascend_user_id', uid);
+          pullFromCloud().then(function(ok){
+            console.log('[sync] initial pull:', ok);
+            if(ok){ renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); }
+          });
+        }
+      }).catch(function(e){ console.log('[auth] setSession error:', e.message); if(_sp.user?.id) localStorage.setItem('ascend_user_id', _sp.user.id); });
+    }catch(e){ console.log('[auth] parse error:', e.message); } }
     sb.auth.getSession().then(function(res){
       var user = res.data.session?.user;
       if(user){
