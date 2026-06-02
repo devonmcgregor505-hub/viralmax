@@ -2639,7 +2639,9 @@ function getSyncPayload(){
 
 function applySyncPayload(obj){
   if(!obj) return;
+  var skip = ['ascend_checked_today','ascend_checked_date'];
   SYNC_KEYS.forEach(function(k){
+    if(skip.indexOf(k) !== -1) return;
     if(obj[k] !== undefined && obj[k] !== null){
       localStorage.setItem(k, obj[k]);
     }
