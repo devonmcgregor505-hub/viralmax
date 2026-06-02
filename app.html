@@ -1762,10 +1762,6 @@ function dpAddBlock(section){
   _dayPlans[_activePlanDay][section].push({title:'New block',items:[]});
   saveDayPlans();
   renderDayPlanner();
-  setTimeout(()=>{
-    const blocks=document.querySelectorAll('.dp-block');
-    blocks[blocks.length-1]?.querySelector('.dp-block-title')?.focus();
-  },50);
 }
 function dpDelStep(section,bi,si){
   _dayPlans[_activePlanDay][section][bi].items.splice(si,1);
