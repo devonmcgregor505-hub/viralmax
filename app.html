@@ -2136,11 +2136,21 @@ function mealBulletKey(e,el){
 function addMealBullet(id){
   var meals=loadMeals();
   var m=meals.find(function(x){return x.id===id;}); if(!m)return;
-  var items=getMealItems(m); items.push('');
-  m.desc=items.join('\n'); saveMeals(meals); renderMealsSection();
+  var items=getMealItems(m);
+  items.push('new item');
+  m.desc=items.join('\n');
+  saveMeals(meals);
+  renderMealsSection();
   setTimeout(function(){
     var rows=document.querySelectorAll('[data-mid="'+id+'"]');
-    if(rows.length) rows[rows.length-1].focus();
+    if(rows.length){
+      var last=rows[rows.length-1];
+      last.focus();
+      var range=document.createRange();
+      range.selectNodeContents(last);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    }
   },50);
 }
 function delMealBullet(id,bi){
@@ -2162,7 +2172,7 @@ function renderMealsSection(){
   meals.forEach(function(meal){
     html+="<div class=\"meal-row\">"
       +"<div class=\"meal-row-head\">"
-      +"<span class=\"meal-row-emoji\">"+meal.emoji+"</span>"
+      
       +"<div class=\"meal-row-info\">"
       +"<input class=\"meal-name-input\" value=\""+meal.name+"\" placeholder=\"Meal name\" onchange=\"updateMeal("+meal.id+",'name',this.value)\"/>"
       +(function(){
