@@ -2012,7 +2012,7 @@ document.addEventListener('click', function(e){
 // ── REMINDER SETTINGS ──
 var REMINDER_ICONS = ['📸','💪','🧴','🍽️','💊','🧘','📖','💧','🏋️','🌙','☀️','🔔','⚡','🎯','🛌'];
 var FREQ_LABELS = {daily:'Daily', weekly:'Weekly', monthly:'Monthly', once:'One time'};
-var DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var SHORT_DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 function openReminderSettings(){
   document.getElementById('notifDropdown').classList.remove('open');
@@ -2032,7 +2032,7 @@ function renderReminderList(){
   }
   el.innerHTML = reminders.map(function(r){
     var freqLabel = FREQ_LABELS[r.freq] || r.freq;
-    if(r.freq==='weekly') freqLabel += ' · '+DAY_NAMES[r.day||0];
+    if(r.freq==='weekly') freqLabel += ' · '+SHORT_DAY_NAMES[r.day||0];
     if(r.freq==='monthly') freqLabel += ' · Day '+r.monthDay;
     if(r.time) freqLabel += ' · '+r.time;
     return '<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">'
