@@ -2372,7 +2372,7 @@ function addMealBullet(id){
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
   var items = (m.desc||'').split('\n').filter(function(s){ return s.trim(); });
-  items.push('');
+  items.push('New item');
   m.desc = items.join('\n');
   saveMeals(meals);
   renderMealsSection();
@@ -2381,6 +2381,10 @@ function addMealBullet(id){
     if(rows.length){
       var last = rows[rows.length-1];
       last.focus();
+      var range = document.createRange();
+      range.selectNodeContents(last);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
     }
   }, 30);
 }
