@@ -1442,41 +1442,12 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Wait for Supabase session before booting
   function bootApp(){
     var saved=localStorage.getItem('ascend_profile');
-    if(saved){
-      profile=JSON.parse(saved);
-      document.getElementById('onboardingOverlay').style.display='none';
-      initApp();
-      var lastPage=localStorage.getItem('ascend_page');
-      if(lastPage && lastPage!=='checklist') showPage(lastPage,null);
-    } else {
-      renderOB();
-    }
+    if(saved){ try{ profile=JSON.parse(saved); }catch(e){} }
+    initApp();
+    var lastPage=localStorage.getItem('ascend_page');
+    if(lastPage && lastPage!=='checklist') showPage(lastPage,null);
   }
-  // Give Supabase 2s to set session, then boot regardless
-  var booted=false;
-  function tryBoot(fromCloud){
-    if(booted)return; booted=true;
-    if(fromCloud){
-      var saved=localStorage.getItem('ascend_profile');
-      if(saved){
-        profile=JSON.parse(saved);
-        document.getElementById('onboardingOverlay').style.display='none';
-        initApp();
-        var lastPage=localStorage.getItem('ascend_page');
-        if(lastPage && lastPage!=='checklist') showPage(lastPage,null);
-        return;
-      }
-    }
-    bootApp();
-  }
-  // If already have user id, pull immediately
-  var uid=localStorage.getItem('ascend_user_id');
-  if(uid){
-    pullFromCloud().then(function(ok){ tryBoot(ok); });
-  } else {
-    // Wait up to 3s for auth
-    setTimeout(function(){ tryBoot(false); }, 3000);
-  }
+  bootApp();
 });
 
 function toggleDropdown(){
