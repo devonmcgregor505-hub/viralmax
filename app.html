@@ -2341,7 +2341,7 @@ function loadMeals(){
   });
   return meals;
 }
-function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); syncSection("meals",m); }
+function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); if(typeof syncSection==="function") syncSection("meals",m); }
 
 function saveMealBullet(id, bi, val){
   var meals = loadMeals();
