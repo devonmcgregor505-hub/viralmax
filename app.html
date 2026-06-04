@@ -1138,7 +1138,7 @@ function launchApp(){
 // ─── APP INIT ───
 function loadChecklistFromServer(){ return Promise.resolve(); }
 
-function initApp(){
+function initApp(){ console.log("[boot] initApp started");
   const saved = JSON.parse(localStorage.getItem('ascend_profile')||'{}');
   const morning   = saved.morning   || MORNING;
   const night     = saved.night     || NIGHT;
