@@ -670,10 +670,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </div>
 </div>
 
-<!-- ONBOARDING OVERLAY -->
-<div class="onboarding-overlay" id="onboardingOverlay" style="display:none">
-  <div class="onboarding-box">
-    <div class="ob-wordmark">ASCEND</div>
     <div id="obContent"></div>
   </div>
 </div>
@@ -1134,7 +1130,6 @@ async function generateRoutineFromAI(){
 }
 
 function launchApp(){
-  document.getElementById('onboardingOverlay').style.display='none';
   localStorage.setItem('ascend_profile',JSON.stringify(profile));
   initApp();
   pushToCloud();
@@ -1441,7 +1436,6 @@ function clearChat(){document.getElementById('aiMessages').innerHTML='<div class
 window.addEventListener('DOMContentLoaded',()=>{
   // Wait for Supabase session before booting
   function bootApp(){
-    var oo=document.getElementById('onboardingOverlay'); if(oo) oo.style.display='none';
     var saved=localStorage.getItem('ascend_profile');
     if(saved){ try{ profile=JSON.parse(saved); }catch(e){} }
     initApp();
@@ -1484,7 +1478,7 @@ function redoQuiz(){
   document.getElementById('avatarDropdown').classList.remove('open');
   localStorage.removeItem('ascend_profile');
   profile=null; obStep=0; obAnswers={}; obMulti={};
-  document.getElementById('onboardingOverlay').style.display='flex';
+  
   renderOB();
 }
 function openPricing(){ document.getElementById('avatarDropdown').classList.remove('open'); window.location.href='/checkout'; }
