@@ -671,7 +671,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <!-- ONBOARDING OVERLAY -->
-<div class="onboarding-overlay" id="onboardingOverlay">
+<div class="onboarding-overlay" id="onboardingOverlay" style="display:none">
   <div class="onboarding-box">
     <div class="ob-wordmark">ASCEND</div>
     <div id="obContent"></div>
@@ -1441,6 +1441,7 @@ function clearChat(){document.getElementById('aiMessages').innerHTML='<div class
 window.addEventListener('DOMContentLoaded',()=>{
   // Wait for Supabase session before booting
   function bootApp(){
+    var oo=document.getElementById('onboardingOverlay'); if(oo) oo.style.display='none';
     var saved=localStorage.getItem('ascend_profile');
     if(saved){ try{ profile=JSON.parse(saved); }catch(e){} }
     initApp();
