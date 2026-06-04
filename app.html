@@ -860,2215 +860,1019 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   </main>
 </div>
 <script>
-
-// ─── DATA ───
-const HABITS = [
-  {name:'Awake by ' + (JSON.parse(localStorage.getItem('ascend_profile')||'{}').wake||'7am'), desc:'Start your day on time', cat:'mind'},
-  {name:'Morning routine', desc:'Complete your full morning routine', cat:'skin'},
-  {name:'Training or movement', desc:'Gym, walk, sport or mobility', cat:'body'},
-  {name:'Drink 3L water', desc:'Track across the day', cat:'body'},
-  {name:'Night routine', desc:'Complete your full night routine', cat:'skin'},
-  {name:'Sleep by 10:30pm', desc:'7.5–9h sleep target', cat:'sleep'},
-];
-
+// ─── DATA DEFAULTS ───
 const MORNING = [
-  {time:'7:00',title:'Wake & hydrate',tag:'mind',tagLabel:'Foundation',items:['500ml water immediately — before anything else','Open blinds, get natural light within first 5 minutes','No phone for the first 15 minutes']},
-  {time:'7:10',title:'Face & skin',tag:'skin',tagLabel:'Skincare',items:['Rinse with cold water — tightens pores, reduces puffiness','Gentle cleanser (CeraVe or similar)','Vitamin C serum or niacinamide','Moisturiser with SPF 30+ — every single day'],note:''},
-  {time:'7:20',title:'Grooming & hair',tag:'hair',tagLabel:'Styling',items:['Brush teeth 2 min, tongue scrape, mouthwash','Shower — cold finish for the last 30s','Towel dry hair gently, apply product while damp','Style toward your natural texture','Deodorant, fragrance']},
-  {time:'7:45',title:'Posture & jaw activation',tag:'frame',tagLabel:'Frame',items:['Chin tucks — 3 sets × 10 reps','Neck stretches — 30s each side','Mew consciously — tongue on roof of mouth','Wall posture check — heels, glutes, shoulders, head touching'],note:'5 minutes. Daily repetition is what builds results here.'},
-  {time:'8:00',title:'Breakfast',tag:'body',tagLabel:'Nutrition',items:['30–40g protein breakfast — eggs, Greek yogurt, cottage cheese, or similar','Eat within 1h of waking']},
+  {time:'7:00',title:'Wake & hydrate',tag:'mind',tagLabel:'Foundation',items:['500ml water immediately','Open blinds, get natural light within 5 minutes','No phone for first 15 minutes']},
+  {time:'7:10',title:'Face & skin',tag:'skin',tagLabel:'Skincare',items:['Rinse with cold water','Gentle cleanser (CeraVe or similar)','Vitamin C serum or niacinamide','Moisturiser with SPF 30+']},
+  {time:'7:20',title:'Grooming & hair',tag:'hair',tagLabel:'Styling',items:['Brush teeth 2 min, tongue scrape, mouthwash','Shower — cold finish for last 30s','Towel dry hair gently, apply product while damp','Style toward your natural texture','Deodorant, fragrance']},
+  {time:'7:45',title:'Posture & jaw',tag:'frame',tagLabel:'Frame',items:['Chin tucks — 3 sets × 10 reps','Neck stretches — 30s each side','Mew consciously — tongue on roof of mouth','Wall posture check']},
+  {time:'8:00',title:'Breakfast',tag:'body',tagLabel:'Nutrition',items:['30–40g protein breakfast','Eat within 1h of waking']},
 ];
-
 const NIGHT = [
-  {time:'9:00',title:'Wind down begins',tag:'mind',tagLabel:'Sleep',items:['Screens to night mode / warm light — blue light tanks melatonin','Last meal at least 2h before bed','No caffeine after 2pm']},
-  {time:'9:30',title:'Night skin routine',tag:'skin',tagLabel:'Skincare',items:['Double cleanse if you wore SPF or were outdoors','Retinol 2–3x per week (start at 0.025%, build slowly)','Non-retinol nights: niacinamide or hyaluronic acid','Rich moisturiser — skin repairs overnight'],note:'Retinol at 19 is one of the highest ROI things you can do for your skin long term.'},
-  {time:'9:45',title:'Body & recovery work',tag:'body',tagLabel:'Frame',items:['10 min stretch — hips, chest, thoracic spine','Foam roll if trained today','Jaw relaxation — unclench, massage masseter muscle']},
-  {time:'10:00',title:'Sleep optimisation',tag:'mind',tagLabel:'Sleep',items:['Room cool — 17–19°C is optimal for deep sleep','Phone out of reach or in another room','Target 7.5–9h — you\'re 19, growth hormone peaks during sleep','Magnesium glycinate 200–400mg — relaxes muscles, improves sleep quality']},
-  {time:'10:15',title:'Daily review',tag:'mind',tagLabel:'Mind',items:['Did you hit your checklist today? Quick mental note, no guilt','One thing you did well','One thing to improve tomorrow'],note:'Flexible accountability — awareness builds consistency without pressure.'},
+  {time:'9:00',title:'Wind down begins',tag:'mind',tagLabel:'Sleep',items:['Screens to night mode / warm light','Last meal at least 2h before bed','No caffeine after 2pm']},
+  {time:'9:30',title:'Night skin routine',tag:'skin',tagLabel:'Skincare',items:['Double cleanse if you wore SPF or were outdoors','Retinol 2–3x per week (start at 0.025%)','Non-retinol nights: niacinamide or hyaluronic acid','Rich moisturiser']},
+  {time:'9:45',title:'Body & recovery',tag:'body',tagLabel:'Frame',items:['10 min stretch — hips, chest, thoracic spine','Foam roll if trained today','Jaw relaxation — unclench, massage masseter']},
+  {time:'10:00',title:'Sleep optimisation',tag:'mind',tagLabel:'Sleep',items:['Room cool — 17–19°C','Phone out of reach','Target 7.5–9h sleep','Magnesium glycinate 200–400mg']},
+  {time:'10:15',title:'Daily review',tag:'mind',tagLabel:'Mind',items:['Did you hit your checklist today?','One thing you did well','One thing to improve tomorrow']},
 ];
-
-const NUTRITION_BLOCKS = [
-  {title:'Protein first',tag:'body',tagLabel:'Priority',items:['2× your bodyweight in kg = daily protein grams (75kg → 150g)','Best sources: eggs, chicken, beef mince, Greek yogurt, tuna','Spread across 3–4 meals — don\'t try to hit 160g at once']},
-  {title:'Skin & appearance foods',tag:'skin',tagLabel:'Looks',items:['Fatty fish or omega-3s 2–3x/week — skin hydration, reduces inflammation','Colourful vegetables daily — antioxidants protect against UV damage','Limit ultra-processed food and seed oils — acne link is real','Test cutting dairy and sugar for 30 days if acne-prone']},
-  {title:'Meal timing',tag:'mind',tagLabel:'Energy',items:['Eat within 1–2h of waking','Pre-workout: carbs 1h before (banana, rice, oats)','Post-workout: protein + carbs within 2h','Stop eating 2h before bed']},
+const DEFAULT_MEALS = [
+  {id:1, name:'Breakfast', items:['6x eggs, 300g cooked rice, 20g tallow'], cals:1040, protein:44},
+  {id:2, name:'Lunch',     items:['300g chuck steak, 300g cooked rice, 50g blueberries, 20g tallow'], cals:1100, protein:57},
+  {id:3, name:'Dinner',    items:['300g chuck steak, 300g cooked rice, 20g tallow'], cals:1070, protein:57},
 ];
-
-const TRAINING_DAYS = [
-  {day:'Mon',name:'Upper body push — chest, shoulders, triceps',tag:'body',tagLabel:'Gym'},
-  {day:'Tue',name:'Zone 2 cardio — 30–45 min walk, jog or sport',tag:'mind',tagLabel:'Cardio'},
-  {day:'Wed',name:'Upper body pull — back, biceps, rear delts',tag:'body',tagLabel:'Gym'},
-  {day:'Thu',name:'Active rest — walk, stretch, mobility',tag:'hair',tagLabel:'Rest'},
-  {day:'Fri',name:'Legs — squat, hinge, calves',tag:'body',tagLabel:'Gym'},
-  {day:'Sat',name:'Sport / outdoor / football',tag:'mind',tagLabel:'Sport'},
-  {day:'Sun',name:'Full rest — sleep in, recover',tag:'hair',tagLabel:'Rest'},
+const DEFAULT_MACROS = {calories:3200, protein:160};
+const DEFAULT_WORKOUTS = [
+  {id:'a', label:'A', name:'Push — chest, shoulders, triceps', tag:'push', open:false, exercises:[
+    {name:'Bench press',weight:60,goal:100},{name:'Overhead press',weight:40,goal:70},
+    {name:'Incline dumbbell press',weight:20,goal:35},{name:'Lateral raises',weight:10,goal:18},
+    {name:'Tricep pushdown',weight:30,goal:50}
+  ]},
+  {id:'b', label:'B', name:'Pull — back, biceps, rear delts', tag:'pull', open:false, exercises:[
+    {name:'Deadlift',weight:80,goal:140},{name:'Pull-ups',weight:0,goal:0},
+    {name:'Barbell row',weight:50,goal:90},{name:'Face pulls',weight:15,goal:25},
+    {name:'Barbell curl',weight:25,goal:40}
+  ]},
+  {id:'c', label:'C', name:'Arms & accessories', tag:'arms', open:false, exercises:[
+    {name:'Hammer curl',weight:14,goal:22},{name:'Skull crushers',weight:20,goal:35},
+    {name:'Cable curl',weight:15,goal:25},{name:'Overhead tricep',weight:20,goal:35}
+  ]},
 ];
-
-const FRAME_ITEMS = ['Face pulls or band pull-aparts — 3×15 (rear delts + posture)','Dead hangs — 3×30s (decompresses spine, shoulder health)','Mewing + chin tucks throughout the day — make it automatic','Walk tall — shoulders back, chest open, eyes forward'];
-
-// ─── STATE ───
-let checked=(function(){try{var s=localStorage.getItem('ascend_checked_today'),d=localStorage.getItem('ascend_checked_date','ascend_checked_ts'),n=new Date(),k=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');if(s&&d===k)return new Set(JSON.parse(s));}catch(e){}return new Set();})();
-let profile = null;
-let aiHistory = [];
-
-// ─── ONBOARDING ───
-const OB_STEPS = [
-  {type:'single',label:'Primary goal',q:'What\'s your main goal?',sub:'We\'ll build your routine around this.',opts:['Look better & improve my appearance','Get fitter & build muscle','Improve my health & energy','All of the above']},
-  {type:'input',label:'Your age',q:'How old are you?',sub:'',ph:'19',unit:'years old',key:'age'},
-  {type:'multi',label:'Focus areas',q:'What do you want to improve?',sub:'Select all that apply.',opts:['Skincare & grooming','Hair & styling','Body & physique','Diet & nutrition','Sleep quality','Jaw / posture / frame','Fitness & training','Everything']},
-  {type:'multi',label:'Training',q:'How do you currently train?',sub:'Select all that apply.',opts:['Gym (weights)','Walking','Biking','Sport','Everything','Nothing yet']},
-  {type:'single',label:'Wake time',q:'When do you wake up?',sub:'We\'ll time your morning routine.',opts:['Before 6am','6am – 7am','7am – 8am','After 8am','It varies']},
-  {type:'input',label:'Your height',q:'How tall are you?',sub:'',ph:'178',unit:'cm',key:'height'},
-  {type:'input',label:'Your weight',q:'How much do you weigh?',sub:'',ph:'75',unit:'kg',key:'weight'},
-  {type:'photos',label:'Your photos',q:'Upload your starting photos',sub:'Used by AI to personalise your routine. Stored privately on your device.'},
+const DEFAULT_LMG = [
+  {id:1,text:'Hair',done:false,notes:'',images:[]},
+  {id:2,text:'Skin',done:false,notes:'',images:[]},
+  {id:3,text:'Bloating',done:false,notes:'',images:[]},
+  {id:4,text:'Teeth',done:false,notes:'',images:[]},
+  {id:5,text:'Eyebrows',done:false,notes:'',images:[]},
+  {id:6,text:'Posture',done:false,notes:'',images:[]},
+  {id:7,text:'Physique',done:false,notes:'',images:[]},
+  {id:8,text:'Smell',done:false,notes:'',images:[]},
+  {id:9,text:'Voice',done:false,notes:'',images:[]},
 ];
-let obStep = 0;
-let obAnswers = {};
-let obMulti = {};
-
-function renderOB() {
-  const step = OB_STEPS[obStep];
-  const total = OB_STEPS.length;
-  const pct = ((obStep+1)/total*100).toFixed(0);
-  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-    <div class="ob-wordmark" style="margin:0;">ASCEND</div>
-    <div class="ob-step-counter">${String(obStep+1).padStart(2,'0')} / ${String(total).padStart(2,'0')}</div>
-  </div>
-  <div class="ob-progress"><div class="ob-progress-fill" style="width:${pct}%"></div></div>
-  <div class="ob-step-label">${step.label}</div>
-  <div class="ob-q">${step.q}</div>
-  ${step.sub?`<div class="ob-q-sub">${step.sub}</div>`:''}`;
-
-  if(step.type==='single'){
-    const sel = obAnswers[obStep]??null;
-    html+=`<div class="ob-options">${step.opts.map((o,i)=>`<button class="ob-opt${sel===i?' selected':''}" onclick="obSelect(${i})">${o}</button>`).join('')}</div>`;
-    html+=`<div class="ob-nav">${obStep>0?'<button class="ob-back" onclick="obBack()">← back</button>':'<span></span>'}<button class="ob-next" id="obNext" ${sel===null?'disabled':''} onclick="obNext()">Continue</button></div>`;
-  } else if(step.type==='multi'){
-    if(!obMulti[obStep]) obMulti[obStep]=new Set();
-    const sel=obMulti[obStep];
-    html+=`<div class="ob-options">${step.opts.map((o,i)=>`<button class="ob-opt${sel.has(i)?' selected':''}" onclick="obMultiToggle(${i})">${o}</button>`).join('')}</div>`;
-    html+=`<div class="ob-nav"><button class="ob-back" onclick="obBack()">← back</button><button class="ob-next" id="obNext" ${sel.size===0?'disabled':''} onclick="obNext()">Continue</button></div>`;
-  } else if(step.type==='input'){
-    const val=obAnswers[obStep]||'';
-    html+=`<div class="ob-input-wrap"><input class="ob-text-input" type="number" placeholder="${step.ph}" value="${val}" id="obInput" oninput="obInputChange(this.value)"/><div class="ob-text-unit">${step.unit}</div></div>`;
-    html+=`<div class="ob-nav"><button class="ob-back" onclick="obBack()">← back</button><button class="ob-next" id="obNext" ${!val?'disabled':''} onclick="obNext()">Continue</button></div>`;
-  }
-  if(step.type==='photos'){
-    html+=`
-    <div class="ob-photo-instructions">
-      <div class="ob-photo-req">Upload up to 4 photos of yourself:</div>
-      <div class="ob-photo-req-list">
-        <span>📷 Face — front on</span>
-        <span>📷 Face — side on</span>
-        <span>📷 Body — front on</span>
-        <span>📷 Body — side on</span>
-      </div>
-    </div>
-    <div class="ob-upload-zone" onclick="document.getElementById('photoFileInput').click()">
-      <div class="ob-upload-icon">📷</div>
-      <div class="ob-upload-text">Tap to select photos</div>
-      <div class="ob-upload-sub">Select all 4 at once or add one at a time</div>
-    </div>
-    <input type="file" accept="image/*" multiple id="photoFileInput" style="display:none" onchange="handlePhotoFiles(event)"/>
-    ${obPhotos.filter(p=>p).length>0?`
-    <div class="ob-photo-preview-row">
-      ${obPhotos.map((p,i)=>p?`
-        <div class="ob-preview-item">
-          <img src="${p}" />
-          <button class="ob-preview-remove" onclick="removePhoto(event,${i})">✕</button>
-          <div class="ob-preview-label">${['Face front','Face side','Body front','Body side'][i]}</div>
-        </div>`:'').join('')}
-    </div>`:''}
-    <div class="ob-nav" style="margin-top:20px"><button class="ob-back" onclick="obBack()">← back</button><button class="ob-next" id="obNext" onclick="obNext()">${obPhotos.filter(p=>p).length>0?'Generate my routine ✦':'Skip for now →'}</button></div>`;
-  }
-  document.getElementById('obContent').innerHTML=html;
-  if(step.type==='input') setTimeout(()=>document.getElementById('obInput')?.focus(),50);
-}
-
-let obPhotos=[null,null,null,null];
-let activePhotoSlot=0;
-function obSelect(i){obAnswers[obStep]=i;renderOB();}
-function triggerPhoto(i){activePhotoSlot=i;document.getElementById('photoFileInput').click();}
-function removePhoto(e,i){e.stopPropagation();obPhotos[i]=null;renderOB();}
-function handlePhotoFiles(e){
-  const files=Array.from(e.target.files).slice(0,4);
-  if(!files.length)return;
-  let loaded=0;
-  files.forEach((file,i)=>{
-    const slot=obPhotos.findIndex((p,idx)=>!p&&idx>=i)||i;
-    const targetSlot=i<4?i:obPhotos.findIndex(p=>!p);
-    if(targetSlot===-1)return;
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      obPhotos[targetSlot]=ev.target.result;
-      loaded++;
-      if(loaded===files.length)renderOB();
-    };
-    reader.readAsDataURL(file);
-  });
-  e.target.value='';
-}
-function obMultiToggle(i){
-  if(!obMulti[obStep])obMulti[obStep]=new Set();
-  const s=obMulti[obStep];
-  const step=OB_STEPS[obStep];
-  const opts=step.opts;
-  const everythingIdx=opts.indexOf('Everything');
-  const nothingIdx=opts.indexOf('Nothing yet');
-  if(i===everythingIdx){
-    // Toggle Everything — select all except Nothing yet
-    if(s.has(i)){s.clear();}
-    else{opts.forEach((_,idx)=>{if(idx!==nothingIdx)s.add(idx);});}
-  } else if(i===nothingIdx){
-    // Toggle Nothing yet — clear everything else
-    if(s.has(i)){s.delete(i);}
-    else{s.clear();s.add(i);}
-  } else {
-    // Regular option — deselect Everything and Nothing yet
-    s.has(i)?s.delete(i):s.add(i);
-    s.delete(everythingIdx);
-    s.delete(nothingIdx);
-  }
-  renderOB();
-}
-function obInputChange(v){obAnswers[obStep]=v;document.getElementById('obNext').disabled=!v.trim();}
-function obBack(){if(obStep>0){obStep--;renderOB();}}
-function obNext(){
-  // If photos step (last step), go straight to complete
-  if(OB_STEPS[obStep].type==='photos'){obComplete();return;}
-  if(obStep<OB_STEPS.length-1){obStep++;renderOB();}
-  else{obComplete();}
-}
-
-function compressImage(dataUrl, maxWidth, quality){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.onload=()=>{
-      const scale=Math.min(1,maxWidth/img.width);
-      const canvas=document.createElement('canvas');
-      canvas.width=img.width*scale;
-      canvas.height=img.height*scale;
-      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-      resolve(canvas.toDataURL('image/jpeg',quality));
-    };
-    img.src=dataUrl;
-  });
-}
-
-async function compressAndSavePhotos(photos){
-  try{
-    const compressed=await Promise.all(photos.map(p=>compressImage(p,600,0.5)));
-    const checkin={date:new Date().toISOString(),photos:compressed};
-    const existing=JSON.parse(localStorage.getItem('ascend_checkins')||'[]');
-    existing.unshift(checkin);
-    localStorage.setItem('ascend_checkins',JSON.stringify(existing.slice(0,5)));
-  }catch(e){console.warn('Photo save failed:',e.message);}
-}
-
-function obComplete(){
-  const goalMap=['Look better','Build muscle','Improve health','All of the above'];
-  const levelMap=['Beginner','Inconsistent','Decent base','Disciplined'];
-  const trainMap=['Gym','Running','Sports','Mixed','Not yet'];
-  const wakeMap=['Before 6am','6am–7am','7am–8am','After 8am','Varies'];
-  const acctMap=['Strict','Motivating','Neutral','Flexible'];
-  const focusIdx=OB_STEPS.findIndex(s=>s.label==='Focus areas');
-  const trainIdx=OB_STEPS.findIndex(s=>s.label==='Training');
-  const wakeIdx=OB_STEPS.findIndex(s=>s.label==='Wake time');
-  const acctIdx=OB_STEPS.findIndex(s=>s.label==='Accountability');
-  const ageIdx=OB_STEPS.findIndex(s=>s.key==='age');
-  const heightIdx=OB_STEPS.findIndex(s=>s.key==='height');
-  const weightIdx=OB_STEPS.findIndex(s=>s.key==='weight');
-  const focusOpts=OB_STEPS[focusIdx].opts;
-  const rawFocus=obMulti[focusIdx]?[...obMulti[focusIdx]].map(i=>focusOpts[i]).filter(o=>o!=='Everything').join(', '):'—';
-  const focus=rawFocus||'—';
-  profile={goal:goalMap[obAnswers[0]],level:levelMap[obAnswers[1]],age:obAnswers[ageIdx]||'—',height:obAnswers[heightIdx]||'—',weight:obAnswers[weightIdx]||'—',focus,train:trainMap[obAnswers[trainIdx]],wake:wakeMap[obAnswers[wakeIdx]],acct:acctMap[obAnswers[acctIdx]]};
-  if(obPhotos.some(p=>p)){
-    compressAndSavePhotos(obPhotos.filter(p=>p));
-  }
-  document.getElementById('obContent').innerHTML=`
-    <div class="ob-generating">
-      <div class="ob-gen-spinner"></div>
-      <div class="ob-gen-title">Building your routine</div>
-      <div class="ob-gen-sub">Analysing your profile${obPhotos.some(p=>p)?' and photos':''}...<br>This takes about 15 seconds.</div>
-    </div>`;
-  generateRoutineFromAI();
-}
-
-async function generateRoutineFromAI(){
-  try{
-    const content=[];
-    const labels=['Face front','Face side','Body front','Body side'];
-    const compressedForAI=await Promise.all(obPhotos.map(p=>p?compressImage(p,800,0.7):null));
-    compressedForAI.forEach((p,i)=>{
-      if(p){
-        content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:p.split(',')[1]}});
-        content.push({type:'text',text:labels[i]+' photo above.'});
-      }
-    });
-    content.push({type:'text',text:'Generate a full personalised daily routine. Profile: Age '+profile.age+', Height '+profile.height+'cm, Weight '+profile.weight+'kg, Goal: '+profile.goal+', Level: '+profile.level+', Focus: '+profile.focus+', Training: '+profile.train+', Wake: '+profile.wake+', Accountability: '+profile.acct+'.'+(obPhotos.some(p=>p)?' I have included photos of myself — analyse them yourself to determine my physique, facial structure, skin condition, posture, and any areas needing improvement. Use this to personalise my routine.':'')+' Return ONLY valid JSON with these keys: morning (array of {time,title,tag,tagLabel,items[],note}), night (array of same), habits (array of {name,desc,cat}), nutrition (array of {title,tag,tagLabel,items[],note}), training (array of {day,name,tag,tagLabel}). Tags: mind/skin/hair/body/frame. 4-5 morning, 4-5 night, 7-8 habits, 3 nutrition blocks, 7 training days.'});
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content}],profile,returnJson:true})});
-    const data=await res.json();
-    const clean=(data.reply||'').replace(/```json|```/g,'').trim();
-    const match=clean.match(/{[sS]*}/);
-    if(match){
-      const routine=JSON.parse(match[0]);
-      if(routine.morning)   profile.morning=routine.morning;
-      if(routine.night)     profile.night=routine.night;
-      if(routine.habits)    profile.habits=routine.habits;
-      if(routine.nutrition) profile.nutrition=routine.nutrition;
-      if(routine.training)  profile.training=routine.training;
-    }
-  }catch(e){console.warn('AI routine gen failed:',e.message);}
-  localStorage.setItem('ascend_profile',JSON.stringify(profile));
-  const rows=[['Goal',profile.goal],['Age',profile.age+'yrs'],['Height',profile.height+'cm'],['Weight',profile.weight+'kg'],['Training',profile.train],['Wake',profile.wake]];
-  document.getElementById('obContent').innerHTML=`
-    <div class="ob-complete">
-      <div class="ob-complete-icon">✦</div>
-      <div class="ob-complete-title">YOU'RE SET</div>
-      <div class="ob-complete-sub">Your personalised routine is ready.<br>Check in daily to build the streak.</div>
-      <div class="ob-summary">${rows.map(([l,v])=>`<div class="ob-summary-row"><span class="ob-summary-lbl">${l}</span><span class="ob-summary-val">${v}</span></div>`).join('')}</div>
-      <button class="ob-launch" onclick="launchApp()">Launch my routine →</button>
-    </div>`;
-}
-
-function launchApp(){
-    localStorage.setItem('ascend_profile',JSON.stringify(profile));
-  initApp();
-  pushToCloud();
-}
-
-// ─── APP INIT ───
-function initApp(){
-  const saved = JSON.parse(localStorage.getItem('ascend_profile')||'{}');
-  const morning   = saved.morning   || MORNING;
-  const night     = saved.night     || NIGHT;
-  const nutrition = saved.nutrition || NUTRITION_BLOCKS;
-  const training  = saved.training  || TRAINING_DAYS;
-  const habits    = saved.habits    || HABITS;
-  // Init _routineData globally so edit functions can always access it
-  window._routineData = {
-    morningBlocks:   JSON.parse(JSON.stringify(morning)),
-    nightBlocks:     JSON.parse(JSON.stringify(night)),
-    nutritionBlocks: JSON.parse(JSON.stringify(nutrition)),
-  };
-  window._customHabits   = habits;
-  window._customTraining = training;
-  // Load checklist from server then render
-  loadChecklistFromServer().then(function(){
-    renderChecklist();
-  });
-  // Load morning/night into _routineData directly (no DOM elements needed)
-  window._routineData['morningBlocks'] = JSON.parse(JSON.stringify(morning));
-  window._routineData['nightBlocks']   = JSON.parse(JSON.stringify(night));
-  renderMealsSection();
-  renderMacros();
-  renderMacros();
-  renderMacros();
-  renderTrainingSection();
-  renderWeightCards();
-  updateGreeting();
-  loadStreak();
-  renderProgressPhotos();
-  // lmg loaded on open
-}
-
-// renderProgressPhotos replaced above
-
-function updateGreeting(){ /* greeting removed */ }
-
-function loadStreak(){
-  updateStreakBadge();
-}
-
-// ─── CHECKLIST ───
-function renderChecklist(){
-  const el=document.getElementById('bigChecklist');
-  if(!el)return;
-  // Use today's day plan if available
-  let morning, night, dayTasks;
-  const todayIdx = new Date().getDay()-1<0?6:new Date().getDay()-1;
-  const savedPlans = localStorage.getItem('ascend_day_plans');
-  if(savedPlans){
-    const plans = JSON.parse(savedPlans);
-    const todayPlan = plans[todayIdx];
-    morning   = todayPlan?.morning   || window._routineData?.morningBlocks || MORNING;
-    night     = todayPlan?.night     || window._routineData?.nightBlocks   || NIGHT;
-    dayTasks  = todayPlan?.day       || null;
-  } else {
-    morning   = window._routineData?.morningBlocks || MORNING;
-    night     = window._routineData?.nightBlocks   || NIGHT;
-    dayTasks  = null;
-  }
-  const allItems=[];
-  // Morning — one checkbox per block
-  allItems.push({type:'section',key:'morning',label:'☀️  Morning'});
-  morning.forEach(block=>{
-    allItems.push({type:'task',label:block.title+(block.time?' · '+block.time:''),steps:block.items});
-  });
-  // Day habits — use day plan or defaults
-  allItems.push({type:'section',key:'day',label:'⚡  During the day'});
-  if(dayTasks && dayTasks.length){
-    dayTasks.forEach(t=>allItems.push({type:'task',label:t.title,steps:t.items?.length?t.items:undefined}));
-  } else {
-    allItems.push({type:'task',label:'Drink 3L water'});
-    allItems.push({type:'task',label:'Training or movement'});
-  }
-  // Night — one checkbox per block
-  allItems.push({type:'section',key:'night',label:'🌙  Night'});
-  night.forEach(block=>{
-    allItems.push({type:'task',label:block.title+(block.time?' · '+block.time:''),steps:block.items});
-  });
-  window._allChecklistItems=allItems;
-  // Determine which sections are collapsed based on time
-  const _settings=JSON.parse(localStorage.getItem('ascend_settings')||'{}');
-  const _middayStr=_settings.middayTime||'12:00';
-  const _middayHour=parseInt(_middayStr.split(':')[0]);
-  const hour = new Date().getHours();
-  const isMorning = hour < _middayHour;
-  window._sectionCollapsed = {morning:false,night:false,day:false};
-  el.innerHTML='';
-  // Build sections separately
-  const sections = [];
-  let currentSection = null;
-  allItems.forEach((item,i)=>{
-    if(item.type==='section'){
-      if(currentSection) sections.push(currentSection);
-      currentSection={label:item.label, key:item.label.includes('Morning')?'morning':item.label.includes('Night')?'night':'day', items:[], startIdx:i};
-    } else if(currentSection){
-      currentSection.items.push({...item, globalIdx:i});
-    }
-  });
-  if(currentSection) sections.push(currentSection);
-  // Order: During the day always first, then morning/night based on time
-  const morningSection = sections.find(s=>s.key==='morning');
-  const daySection = sections.find(s=>s.key==='day');
-  const nightSection = sections.find(s=>s.key==='night');
-  const orderedSections = isMorning
-    ? [daySection, morningSection, nightSection].filter(Boolean)
-    : [daySection, nightSection, morningSection].filter(Boolean);
-  orderedSections.forEach(section=>{
-    const collapsed = window._sectionCollapsed[section.key];
-    const sectionColorClass = section.key==='morning'?'cl-section-morning':section.key==='night'?'cl-section-night':'cl-section-day';
-    const sectionBodyClass = section.key==='morning'?'cl-morning-body':section.key==='night'?'cl-night-body':'cl-day-body';
-    const sectionHtml = `<div class="cl-section-header ${sectionColorClass}" style="cursor:default;">
-      <span class="cl-section-label">${section.label} <span class="count">${section.items.length}</span></span>
-      <button class="cl-tick-all" id="tickall-${section.key}" onclick="tickAllSection('${section.key}',event)">Tick all</button>
-    </div>
-    <div class="cl-section-body ${sectionBodyClass}" id="body-${section.key}" style="padding-bottom:10px;">
-      ${section.items.map(item=>{
-        if(item.type==='section') return '';
-        const i=item.globalIdx;
-        const isDone=checked.has(i);
-        const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map(s=>`<div class="cl-step">${s.replace(/^[\u2014\u2013\-]+\s*/,'')}</div>`).join('')}</div>`:'';
-        return `<div class="check-item" onclick="toggleCheck(${i})">
-          <div class="check-box${isDone?' done':''}"></div>
-          <div class="check-text">
-            <div class="check-name${isDone?' done':''}">${item.label}</div>
-            ${stepsHtml}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-    const div=document.createElement('div');
-    div.innerHTML=sectionHtml;
-    el.appendChild(div);
-  });
-  // Early return since we handled rendering above
-  const tasks2=allItems.filter(it=>it.type==='task');
-  const done2=[...checked].filter(i=>allItems[i]?.type==='task').length;
-  const score2=tasks2.length?Math.round(done2/tasks2.length*100):0;
-  const _sb=document.getElementById('scoreBadge'); if(_sb)_sb.textContent=score2+'%';
-  const _ring=document.querySelector('.cl-score-ring-fill'); if(_ring){ const offset=150.8*(1-score2/100); _ring.style.strokeDashoffset=offset; }
-  const _rt=document.querySelector('.cl-score-ring-text'); if(_rt) _rt.textContent=score2+'%';
-  const _sl=document.querySelector('.cl-score-label'); if(_sl){ const _h2=new Date().getHours(); const _sn=(JSON.parse(localStorage.getItem('ascend_settings')||'{}').name)||'Devon'; _sl.textContent=_h2<12?'Good morning, '+_sn:_h2<17?'Good afternoon, '+_sn:'Good evening, '+_sn; }
-  const _sn=document.getElementById('scoreNum'); if(_sn)_sn.textContent=score2;
-  const _days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const _db=document.getElementById('dayBadge'); if(_db)_db.textContent=_days[new Date().getDay()];
-  if(!window._dayTimer) window._dayTimer=setInterval(()=>{const _d=document.getElementById('dayBadge');if(_d)_d.textContent=_days[new Date().getDay()];},60000);
-  return; // skip old rendering below
-  el.innerHTML=allItems.map((item,i)=>{
-    if(item.type==='section') return `<div class="cl-section">${item.label}</div>`;
-    const isDone=checked.has(i);
-    const stepsHtml=item.steps?.length?`<div class="cl-steps${isDone?' cl-steps-done':''}">${item.steps.map(s=>`<div class="cl-step">${s.replace(/^[\u2014\u2013\-]+\s*/,'')}</div>`).join('')}</div>`:'';
-    return `<div class="check-item" onclick="toggleCheck(${i})">
-      <div class="check-box${isDone?' done':''}"></div>
-      <div class="check-text" style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:2px;">
-        <div class="check-name${isDone?' done':''}">${item.label}</div>
-        ${stepsHtml}
-      </div>
-    </div>`;
-  }).join('');
-  const tasks=allItems.filter(it=>it.type==='task');
-  const done=[...checked].filter(i=>allItems[i]?.type==='task').length;
-  const score=tasks.length?Math.round(done/tasks.length*100):0;
-  const sn=document.getElementById('scoreNum');
-  if(sn)sn.textContent=score;
-  const sb=document.getElementById('scoreBadge');
-  if(sb)sb.textContent=score+'%';
-  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const db=document.getElementById('dayBadge');
-  if(db)db.textContent=days[new Date().getDay()];
-  // Update day every minute in case app is left open overnight
-  if(!window._dayTimer) window._dayTimer=setInterval(()=>{
-    const d=document.getElementById('dayBadge');
-    if(d)d.textContent=days[new Date().getDay()];
-  },60000);
-}
-
-function toggleCheck(i){ _lastAction = Date.now() + 27000;
-  checked.has(i)?checked.delete(i):checked.add(i);
-  var n=new Date(),dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
-  localStorage.setItem('ascend_checked_today',JSON.stringify([...checked]));
-  localStorage.setItem('ascend_checked_date',dk);
-  renderChecklist();
-  maybeSaveScore();
-  saveChecklistToServer(dk);
-}
-
-// ─── ROUTINE RENDERER ───
-function renderRoutine(containerId,data){
-  const el=document.getElementById(containerId);
-  if(!el)return;
-  el.innerHTML=data.map((item,idx)=>`
-    <div class="routine-item" id="ri-${containerId}-${idx}">
-      <div class="routine-head" onclick="toggleRoutine('${containerId}',${idx})">
-        ${item.time?`<span class="routine-time">${item.time}</span>`:''}
-        <span class="routine-title" contenteditable="true" onblur="saveRoutineTitle('${containerId}',${idx},this.innerText)">${item.title}</span>
-        <button class="ri-add-inline" onclick="addRoutineItem('${containerId}',${idx})">+ Add step</button>
-        <span class="routine-tag tag-${item.tag}">${item.tagLabel}</span>
-      </div>
-      <div class="routine-body">
-        <ul id="rul-${containerId}-${idx}">${item.items.map((it,li)=>`<li><span contenteditable="true" onblur="saveRoutineItem('${containerId}',${idx},${li},this.innerText)">${it}</span><button class="ri-del" onclick="deleteRoutineItem('${containerId}',${idx},${li})">✕</button></li>`).join('')}</ul>
-
-      </div>
-    </div>`).join('');
-}
-
-
-
-// ─── TRAINING ───
-function renderTraining(){
-  renderTrainingFromData(window._customTraining||TRAINING_DAYS);
-}
-function renderTrainingFromData(days){
-  const el=document.getElementById('trainingDays');
-  if(el) el.innerHTML=days.map(d=>`
-    <div class="training-row">
-      <span class="tr-day">${d.day||''}</span>
-      <span class="tr-name">${d.name||d.title||''}</span>
-      <span class="routine-tag tag-${d.tag||'body'}">${d.tagLabel||d.tag||''}</span>
-    </div>`).join('');
-  const fe=document.getElementById('frameBlocks');
-  if(fe) fe.innerHTML=`<ul style="list-style:none;">${FRAME_ITEMS.map(it=>`<li style="font-size:13px;color:var(--t2);padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;"><span style="color:var(--t3);">—</span>${it}</li>`).join('')}</ul>`;
-}
-
-// ─── PAGE SWITCHING ───
-function showPage(name,linkEl){
-  localStorage.setItem('ascend_page', name);
-  updateBottomNav(name);
-  closeSidebar();
-  if(name==='nutrition') setTimeout(renderMealsSection,10);
-  if(name==='training'){setTimeout(renderTrainingSection,10);setTimeout(renderWeightCards,10);}
-  if(name==='progress'){setTimeout(renderProgressPhotos,10);}
-  document.querySelectorAll('.panel-page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+name)?.classList.add('active');
-  document.querySelectorAll('.topbar-nav a').forEach(a=>a.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(a=>a.classList.remove('active'));
-  if(linkEl){ linkEl.classList.add('active'); }
-  // Always sync sidebar by matching onclick attribute
-  document.querySelectorAll('.nav-item').forEach(function(a){
-    if(a.getAttribute('onclick') && a.getAttribute('onclick').includes("'"+name+"'")) a.classList.add('active');
-  });
-}
-
-// ─── AI CHAT ───
-async function sendAiMessage(){
-  const input=document.getElementById('aiInput');
-  const msg=input.value.trim();
-  if(!msg)return;
-  input.value='';
-  appendMsg('user',msg);
-  appendThinking();
-  aiHistory.push({role:'user',content:msg});
-  try{
-    const res=await fetch('/api/chat',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:aiHistory,profile:profile})
-    });
-    const data=await res.json();
-    const reply=data.reply||data.error||'Something went wrong — try again.';
-    removeThinking();
-    appendMsg('ai',reply);
-    aiHistory.push({role:'assistant',content:reply});
-  }catch(e){
-    removeThinking();
-    appendMsg('ai','Could not reach the server.');
-  }
-}
-
-function askAI(prompt){
-  document.getElementById('aiInput').value=prompt;
-  sendAiMessage();
-}
-
-function handleAiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiMessage();}}
-
-function appendMsg(role,text){
-  const wrap=document.getElementById('aiMessages');
-  const div=document.createElement('div');
-  div.className=`ai-msg ai-msg-${role==='user'?'user':'ai'}`;
-  div.innerHTML=`${role==='ai'?'<div class="ai-msg-label">Ascend AI</div>':''}<div class="ai-msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
-  wrap.appendChild(div);
-  wrap.scrollTop=wrap.scrollHeight;
-}
-
-function appendThinking(){
-  const wrap=document.getElementById('aiMessages');
-  const div=document.createElement('div');
-  div.className='ai-msg ai-msg-ai';div.id='ai-thinking';
-  div.innerHTML='<div class="ai-msg-label">Ascend AI</div><div class="ai-msg-bubble"><div class="ai-thinking"><span></span><span></span><span></span></div></div>';
-  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
-}
-
-function removeThinking(){document.getElementById('ai-thinking')?.remove();}
-function clearChat(){document.getElementById('aiMessages').innerHTML='<div class="ai-msg ai-msg-ai"><div class="ai-msg-label">Ascend AI</div><div class="ai-msg-bubble">Chat cleared. What do you want to work on?</div></div>';aiHistory=[];}
-
-// ─── BOOT ───
-window.addEventListener('DOMContentLoaded',()=>{
-  // Wait for Supabase session before booting
-  function bootApp(){
-    var saved=localStorage.getItem('ascend_profile');
-    if(saved){
-      profile=JSON.parse(saved);
-            initApp();
-      var lastPage=localStorage.getItem('ascend_page');
-      if(lastPage && lastPage!=='checklist') showPage(lastPage,null);
-    } else {
-      renderOB();
-    }
-  }
-  // Give Supabase 2s to set session, then boot regardless
-  var booted=false;
-  function tryBoot(fromCloud){
-    if(booted)return; booted=true;
-    if(fromCloud){
-      var saved=localStorage.getItem('ascend_profile');
-      if(saved){
-        profile=JSON.parse(saved);
-                initApp();
-        var lastPage=localStorage.getItem('ascend_page');
-        if(lastPage && lastPage!=='checklist') showPage(lastPage,null);
-        return;
-      }
-    }
-    bootApp();
-  }
-  // If already have user id, pull immediately
-  var uid=localStorage.getItem('ascend_user_id');
-  if(uid){
-    pullFromCloud().then(function(ok){ tryBoot(ok); });
-  } else {
-    // Wait up to 3s for auth
-    setTimeout(function(){ tryBoot(false); }, 3000);
-  }
-});
-
-function toggleDropdown(){
-  document.getElementById('avatarDropdown').classList.toggle('open');
-}
-document.addEventListener('click', function(e){
-  const wrap = document.querySelector('.avatar-wrap');
-  if(wrap && !wrap.contains(e.target)) document.getElementById('avatarDropdown').classList.remove('open');
-});
-function openSettings(){
-  document.getElementById('avatarDropdown').classList.remove('open');
-  // Load saved settings into form
-  const s=JSON.parse(localStorage.getItem('ascend_settings')||'{}');
-  const tz=document.getElementById('settingTimezone'); if(tz) tz.value=s.timezone||'auto';
-  const wt=document.getElementById('settingWakeTime'); if(wt) wt.value=s.wakeTime||'07:00';
-  const st=document.getElementById('settingSleepTime'); if(st) st.value=s.sleepTime||'22:30';
-  const mt=document.getElementById('settingMidday'); if(mt) mt.value=s.middayTime||'12:00';
-  const nm=document.getElementById('settingName'); if(nm) nm.value=s.name||'';
-  const rm=document.getElementById('settingReminder'); if(rm) rm.value=s.reminder||'off';
-  document.getElementById('settingsPopup').style.display='flex';
-}
-function closeSettings(){
-  document.getElementById('settingsPopup').style.display='none';
-  renderChecklist();
-}
-function saveSetting(key,val){
-  const s=JSON.parse(localStorage.getItem('ascend_settings')||'{}');
-  s[key]=val;
-  localStorage.setItem('ascend_settings',JSON.stringify(s));
-  pushToCloud();
-}
-function redoQuiz(){
-  document.getElementById('avatarDropdown').classList.remove('open');
-  localStorage.removeItem('ascend_profile');
-  profile=null; obStep=0; obAnswers={}; obMulti={};
-  
-  renderOB();
-}
-function openPricing(){ document.getElementById('avatarDropdown').classList.remove('open'); window.location.href='/checkout'; }
-function signOut(){ document.getElementById('avatarDropdown').classList.remove('open'); if(window._sb) window._sb.auth.signOut(); localStorage.removeItem('ascend_user_id'); window.location.href='/login'; }
-
-function saveRoutineTitle(cid,idx,val){
-  if(!window._routineData) window._routineData={};
-  if(!window._routineData[cid]?.[idx]) return;
-  window._routineData[cid][idx].title=val.trim();
-  persistRoutine(cid);
-}
-function saveRoutineItem(cid,idx,li,val){
-  if(!window._routineData?.[cid]?.[idx]?.items) return;
-  window._routineData[cid][idx].items[li]=val.trim();
-  persistRoutine(cid);
-}
-function deleteRoutineItem(cid,idx,li){
-  if(!window._routineData?.[cid]?.[idx]?.items) return;
-  window._routineData[cid][idx].items.splice(li,1);
-  persistRoutine(cid);
-  renderRoutine(cid,window._routineData[cid]);
-}
-function addRoutineItem(cid,idx){
-  if(!window._routineData) window._routineData={};
-  if(!window._routineData[cid]) return;
-  if(!window._routineData[cid][idx]) return;
-  window._routineData[cid][idx].items.push('Tap to edit');
-  persistRoutine(cid);
-  renderRoutine(cid,window._routineData[cid]);
-  setTimeout(()=>{
-    const ul=document.getElementById('rul-'+cid+'-'+idx);
-    const spans=ul?.querySelectorAll('li span[contenteditable]');
-    if(spans?.length) spans[spans.length-1].focus();
-  },50);
-}
-function persistRoutine(cid){
-  const saved=JSON.parse(localStorage.getItem('ascend_profile')||'{}');
-  const keyMap={morningBlocks:'morning',nightBlocks:'night',nutritionBlocks:'nutrition'};
-  const key=keyMap[cid];
-  if(key){saved[key]=window._routineData[cid];localStorage.setItem('ascend_profile',JSON.stringify(saved));}
-}
-
-function saveClLabel(i,val){
-  if(!window._allChecklistItems?.[i])return;
-  window._allChecklistItems[i].label=val.trim();
-  // Find which block this belongs to and save back
-  syncChecklistToRoutine();
-}
-function saveClStep(i,si,val){
-  if(!window._allChecklistItems?.[i]?.steps)return;
-  window._allChecklistItems[i].steps[si]=val.replace(/^—\s*/,'').trim();
-  syncChecklistToRoutine();
-}
-function syncChecklistToRoutine(){
-  // Rebuild morningBlocks and nightBlocks from _allChecklistItems
-  if(!window._allChecklistItems||!window._routineData)return;
-  const items=window._allChecklistItems;
-  let section='';
-  let mIdx=-1;let nIdx=-1;
-  const morning=window._routineData.morningBlocks;
-  const night=window._routineData.nightBlocks;
-  items.forEach((item,i)=>{
-    if(item.type==='section'){section=item.label;return;}
-    if(item.type!=='task')return;
-    if(section.includes('Morning')){
-      mIdx++;
-      if(morning[mIdx]){morning[mIdx].title=item.label.split('·')[0].trim();morning[mIdx].items=item.steps||[];}
-    } else if(section.includes('Night')){
-      nIdx++;
-      if(night[nIdx]){night[nIdx].title=item.label.split('·')[0].trim();night[nIdx].items=item.steps||[];}
-    }
-  });
-  persistRoutine('morningBlocks');
-  persistRoutine('nightBlocks');
-}
-
-// ── SCORE SAVING ──
-let _lastSavedScore = -1;
-function maybeSaveScore(){
-  const items = window._allChecklistItems||[];
-  const tasks = items.filter(it=>it.type==='task');
-  const done = [...checked].filter(i=>items[i]?.type==='task').length;
-  const score = tasks.length ? Math.round(done/tasks.length*100) : 0;
-  if(score === _lastSavedScore) return;
-  _lastSavedScore = score;
-  updateStreakBadge();
-  // If 100% today, refresh calendar if open
-  if(score===100){
-    const cal=document.getElementById('calendarPopup');
-    if(cal && cal.style.display!=='none') renderCalendar();
-  }
-  const _now = new Date(); const today = _now.getFullYear()+'-'+String(_now.getMonth()+1).padStart(2,'0')+'-'+String(_now.getDate()).padStart(2,'0');
-  // Save to localStorage for guests
-  const hist = JSON.parse(localStorage.getItem('ascend_score_history')||'{}');
-  hist[today] = score;
-  localStorage.setItem('ascend_score_history', JSON.stringify(hist));
-  // already has updateStreakBadge, update calendar if open
-  if(score===100 && document.getElementById('calendarPopup').style.display!=='none'){
-    renderCalendar();
-  }
-  // Save to server if logged in
-  const userId = localStorage.getItem('ascend_user_id');
-  if(userId){
-    fetch('/api/scores/save',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-user-id':userId},
-      body:JSON.stringify({date:today,score,completed_items:[...checked],total_items:tasks.length})
-    }).catch(()=>{});
-  }
-}
-
-// ── CALENDAR ──
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-let _scoreHistory = {};
-
-async function openCalendar(){
-  // Load score history
-  const local = JSON.parse(localStorage.getItem('ascend_score_history')||'{}');
-  _scoreHistory = {...local};
-  const userId = localStorage.getItem('ascend_user_id');
-  if(userId){
-    try{
-      const res = await fetch('/api/scores/history',{headers:{'x-user-id':userId}});
-      const data = await res.json();
-      (data.scores||[]).forEach(s=>{ _scoreHistory[s.date]=s.score; });
-    }catch(e){}
-  }
-  calYear = new Date().getFullYear();
-  calMonth = new Date().getMonth();
-  renderCalendar();
-  document.getElementById('calendarPopup').style.display='flex';
-}
-
-function closeCalendar(){
-  document.getElementById('calendarPopup').style.display='none';
-}
-
-function calNav(dir){
-  calMonth += dir;
-  if(calMonth > 11){calMonth=0;calYear++;}
-  if(calMonth < 0){calMonth=11;calYear--;}
-  renderCalendar();
-}
-
-function renderCalendar(){
-  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('calMonthLabel').textContent = months[calMonth]+' '+calYear;
-  const grid = document.getElementById('calGrid');
-  const today = new Date();
-  const _t=new Date(); const todayStr=_t.getFullYear()+'-'+String(_t.getMonth()+1).padStart(2,'0')+'-'+String(_t.getDate()).padStart(2,'0');
-  const dows = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  let html = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
-  // First day of month (0=Sun, shift to Mon=0)
-  const first = new Date(calYear, calMonth, 1);
-  let startDow = first.getDay()-1; if(startDow<0)startDow=6;
-  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-  for(let i=0;i<startDow;i++) html+=`<div class="cal-day empty"></div>`;
-  for(let d=1;d<=daysInMonth;d++){
-    const dateStr = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const score = _scoreHistory[dateStr];
-    const isToday = dateStr===todayStr;
-    const isPast = new Date(dateStr) < new Date(todayStr);
-    let cls = 'cal-day';
-    if(isToday && score===100) cls+=' completed';
-    else if(isToday) cls+=' today';
-    else if(score===100) cls+=' completed';
-    else if(isPast) cls+=' incomplete';
-    html+=`<div class="${cls}">${d}</div>`;
-  }
-  grid.innerHTML = html;
-}
-
-// ── DAY PLANNER ──
-const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const DEFAULT_TASKS = [
-  {name:'Morning routine',daily:true},
-  {name:'Gym',daily:false},
-  {name:'Walking',daily:false},
-  {name:'Biking',daily:false},
-  {name:'Sport',daily:false},
-  {name:'Microneedling',daily:false},
-  {name:'Drink 3L water',daily:true},
-  {name:'Night routine',daily:true},
-  {name:'Stretching',daily:false},
-];
-let _dayPlans = null;
-let _activePlanDay = 0;
-
-function loadDayPlans(){
-  const saved = localStorage.getItem('ascend_day_plans');
-  if(saved){ _dayPlans=JSON.parse(saved); return; }
-  // Default — daily tasks on every day, optional tasks off
-  _dayPlans = DAY_NAMES.map(()=>DEFAULT_TASKS.map(t=>({name:t.name,on:t.daily})));
-}
-
-function saveDayPlans(){
-  localStorage.setItem('ascend_day_plans',JSON.stringify(_dayPlans));
-  _bumpAction(); pushToCloud();
-}
-
-function openDayPlanner(){
-  loadDayPlans();
-  _activePlanDay = new Date().getDay()-1; if(_activePlanDay<0)_activePlanDay=6;
-  renderDayPlanner();
-  document.getElementById('dayPlannerPopup').style.display='flex';
-}
-
-function closeDayPlanner(){
-  document.getElementById('dayPlannerPopup').style.display='none';
-  // Refresh checklist to reflect any changes for today
-  renderChecklist();
-}
-
-function getDefaultDayPlan(){
-  const morning = (window._routineData && window._routineData.morningBlocks) ? JSON.parse(JSON.stringify(window._routineData.morningBlocks)) : JSON.parse(JSON.stringify(MORNING));
-  const night = (window._routineData && window._routineData.nightBlocks) ? JSON.parse(JSON.stringify(window._routineData.nightBlocks)) : JSON.parse(JSON.stringify(NIGHT));
-  return {
-    morning: morning,
-    day: [{title:'Drink 3L water',items:[]},{title:'Training or movement',items:[]}],
-    night: night
-  };
-}
-
-function renderDayPlanner(){
-  const short=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  document.getElementById('dayPlannerTabs').innerHTML=short.map((d,i)=>
-    `<div class="day-tab${i===_activePlanDay?' active':''}" onclick="switchPlanDay(${i})">${d}</div>`
-  ).join('');
-  let plan=_dayPlans[_activePlanDay];
-  if(!plan || !plan.morning){
-    console.error('Bad plan structure:', JSON.stringify(plan));
-    plan = getDefaultDayPlan();
-    _dayPlans[_activePlanDay] = plan;
-    saveDayPlans();
-  }
-  let html='';
-  html+=`<div class="dp-section">⚡ During the day</div>`;
-  plan.day.forEach((block,bi)=>{ html+=renderDpBlock('day',bi,block,plan.day.length); });
-  html+=`<button class="dp-add-block" onclick="dpAddBlock('day')">+ Add task</button>`;
-  html+=`<div class="dp-section">☀️ Morning</div>`;
-  plan.morning.forEach((block,bi)=>{ html+=renderDpBlock('morning',bi,block,plan.morning.length); });
-  html+=`<button class="dp-add-block" onclick="dpAddBlock('morning')">+ Add morning block</button>`;
-  html+=`<div class="dp-section">🌙 Night</div>`;
-  plan.night.forEach((block,bi)=>{ html+=renderDpBlock('night',bi,block,plan.night.length); });
-  html+=`<button class="dp-add-block" onclick="dpAddBlock('night')">+ Add night block</button>`;
-  document.getElementById('dayPlannerContent').innerHTML=html;
-}
-
-function switchPlanDay(i){
-  _activePlanDay=i;
-  renderDayPlanner();
-}
-
-function toggleDayTask(i){
-  _dayPlans[_activePlanDay][i].on=!_dayPlans[_activePlanDay][i].on;
-  saveDayPlans();
-  renderDayPlanner();
-}
-
-function copyDayToAll(){
-  const current = JSON.parse(JSON.stringify(_dayPlans[_activePlanDay]));
-  _dayPlans = DAY_NAMES.map(()=>JSON.parse(JSON.stringify(current)));
-  saveDayPlans();
-  renderDayPlanner();
-}
-
-function renderDpBlock(section,bi,block,total){
-  const steps=block.items||[];
-  const len=total||_dayPlans[_activePlanDay][section].length;
-  return `<div class="dp-block" id="dpblock-${section}-${bi}">
-    <div class="dp-block-head">
-      <div class="dp-block-reorder">
-        <button class="dp-reorder-btn" onclick="dpMoveBlock('${section}',${bi},-1)" ${bi===0?'disabled':''} title="Move up">↑</button>
-        <button class="dp-reorder-btn" onclick="dpMoveBlock('${section}',${bi},1)" ${bi===len-1?'disabled':''} title="Move down">↓</button>
-      </div>
-      <input class="dp-block-title" value="${(block.title||'').replace(/"/g,'&quot;')}" placeholder="Block title"
-        onchange="dpSaveTitle('${section}',${bi},this.value)"/>
-      <button class="dp-del-block" onclick="dpDelBlock('${section}',${bi})">✕</button>
-    </div>
-    ${steps.map((s,si)=>`
-      <div class="dp-step-row">
-        <span class="dp-step-dash">—</span>
-        <input class="dp-step-input" value="${(s||'').replace(/"/g,'&quot;')}" placeholder="Step..."
-          onchange="dpSaveStep('${section}',${bi},${si},this.value)"/>
-        <button class="dp-del-step" onclick="dpDelStep('${section}',${bi},${si})">✕</button>
-      </div>`).join('')}
-    <button class="dp-add-step" onclick="dpAddStep('${section}',${bi})">+ Add step</button>
-  </div>`;
-}
-
-function dpMoveBlock(section,bi,dir){
-  const arr=_dayPlans[_activePlanDay][section];
-  const newIdx=bi+dir;
-  if(newIdx<0||newIdx>=arr.length)return;
-  const tmp=arr[bi]; arr[bi]=arr[newIdx]; arr[newIdx]=tmp;
-  saveDayPlans();
-  renderDayPlanner();
-}
-function dpSaveTitle(section,bi,val){
-  if(!_dayPlans[_activePlanDay][section]) return;
-  _dayPlans[_activePlanDay][section][bi].title=val.trim();
-  saveDayPlans();
-}
-function dpSaveStep(section,bi,si,val){
-  if(!_dayPlans[_activePlanDay][section]) return;
-  _dayPlans[_activePlanDay][section][bi].items[si]=val.trim();
-  saveDayPlans();
-}
-function dpDelBlock(section,bi){
-  _dayPlans[_activePlanDay][section].splice(bi,1);
-  saveDayPlans();
-  renderDayPlanner();
-}
-function dpAddBlock(section){
-  _dayPlans[_activePlanDay][section].push({title:'New block',items:[]});
-  saveDayPlans();
-  renderDayPlanner();
-}
-function dpDelStep(section,bi,si){
-  _dayPlans[_activePlanDay][section][bi].items.splice(si,1);
-  saveDayPlans();
-  renderDayPlanner();
-}
-function dpAddStep(section,bi){
-  _dayPlans[_activePlanDay][section][bi].items.push('');
-  saveDayPlans();
-  renderDayPlanner();
-  setTimeout(()=>{
-    const block=document.getElementById('dpblock-'+section+'-'+bi);
-    const inputs=block?.querySelectorAll('.dp-step-input');
-    if(inputs?.length) inputs[inputs.length-1].focus();
-  },50);
-}
-function copyDayToAll(){
-  const current=JSON.parse(JSON.stringify(_dayPlans[_activePlanDay]));
-  _dayPlans=Array.from({length:7},()=>JSON.parse(JSON.stringify(current)));
-  saveDayPlans();
-  alert('Applied to all days.');
-}
-
-function toggleSection(key){
-  if(window._sectionCollapsed===undefined) window._sectionCollapsed={};
-  window._sectionCollapsed[key]=!window._sectionCollapsed[key];
-  const body=document.getElementById('body-'+key);
-  const arrow=document.getElementById('arrow-'+key);
-  if(body){
-    body.classList.toggle('collapsed');
-    body.style.maxHeight=body.classList.contains('collapsed')?'0':'2000px';
-  }
-  if(arrow) arrow.classList.toggle('collapsed');
-}
-
-function calculateStreak(){
-  const hist = JSON.parse(localStorage.getItem('ascend_score_history')||'{}');
-  const today = new Date();
-  let streak = 0;
-  for(let i=0; i<365; i++){
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const _dd=new Date(d); const key=_dd.getFullYear()+'-'+String(_dd.getMonth()+1).padStart(2,'0')+'-'+String(_dd.getDate()).padStart(2,'0');
-    if(hist[key]===100) streak++;
-    else if(i>0) break; // gap — stop counting
-  }
-  return streak;
-}
-
-function updateStreakBadge(){
-  const streak = calculateStreak();
-  const el = document.getElementById('streakCount');
-  if(el) el.textContent = streak;
-}
-
-function calculateStreak(){
-  const hist = JSON.parse(localStorage.getItem('ascend_score_history')||'{}');
-  const today = new Date();
-  let streak = 0;
-  for(let i=0; i<365; i++){
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const _dd=new Date(d); const key=_dd.getFullYear()+'-'+String(_dd.getMonth()+1).padStart(2,'0')+'-'+String(_dd.getDate()).padStart(2,'0');
-    if(hist[key]===100) streak++;
-    else if(i>0) break;
-  }
-  return streak;
-}
-function updateStreakBadge(){
-  const streak = calculateStreak();
-  const el = document.getElementById('streakCount');
-  if(el) el.textContent = streak;
-}
-
-
-// Score ring updater on init
-(function patchScoreRingGreeting(){
-  const _orig = window.renderChecklist;
-  // greeting in score bar
-  function updateGreetingBar(){
-    const sl = document.querySelector('.cl-score-label');
-    if(!sl) return;
-    const h = new Date().getHours();
-    const s = JSON.parse(localStorage.getItem('ascend_settings')||'{}');
-    const n = s.name || (JSON.parse(localStorage.getItem('ascend_profile')||'{}').name) || 'Devon';
-    sl.textContent = h < 12 ? 'Good morning, '+n : h < 17 ? 'Good afternoon, '+n : 'Good evening, '+n;
-  }
-  setTimeout(updateGreetingBar, 100);
-  setInterval(updateGreetingBar, 60000);
-})();
-
-
-
-
-// NOTIFICATIONS
 const NOTIF_KEY = 'ascend_notifications';
 const NOTIF_SEEN_KEY = 'ascend_notif_seen';
 const REMINDERS_KEY = 'ascend_reminders';
-var _reminderEditId = null;
 
-// ── DEFAULT REMINDERS ──
-function getReminders(){
-  var stored = localStorage.getItem(REMINDERS_KEY);
-  if(stored) return JSON.parse(stored);
-  // Pre-load the progress photos reminder
-  var defaults = [
-    {id:1, msg:'Time to add your weekly progress photos — keep the streak going.', icon:'📸', freq:'weekly', day:5, time:'09:00', enabled:true}
-  ];
-  localStorage.setItem(REMINDERS_KEY, JSON.stringify(defaults));
-  return defaults;
-}
-function saveReminders(arr){ localStorage.setItem(REMINDERS_KEY, JSON.stringify(arr)); }
-
-// ── NOTIFS ──
-function getNotifs(){ return JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]'); }
-function saveNotifs(arr){ localStorage.setItem(NOTIF_KEY, JSON.stringify(arr)); }
-function addNotif(msg, icon, iconClass){
-  const notifs = getNotifs();
-  notifs.unshift({id:Date.now(), msg:msg, icon:icon||'🔔', iconClass:iconClass||'', time:new Date().toISOString(), read:false});
-  saveNotifs(notifs);
-  renderNotifBadge();
-}
-function dismissNotif(id){
-  saveNotifs(getNotifs().filter(function(n){return n.id!==id;}));
-  renderNotifBadge(); renderNotifList();
-}
-function clearAllNotifs(){ saveNotifs([]); renderNotifBadge(); renderNotifList(); }
-function markAllRead(){
-  saveNotifs(getNotifs().map(function(n){return Object.assign({},n,{read:true});}));
-  renderNotifBadge();
-}
-function renderNotifBadge(){
-  var unread = getNotifs().filter(function(n){return !n.read;}).length;
-  var badge = document.getElementById('notifBadge');
-  var btn = document.getElementById('notifBtn');
-  if(!badge||!btn) return;
-  if(unread > 0){
-    badge.style.display = 'flex';
-    badge.textContent = unread > 9 ? '9+' : unread;
-    btn.classList.add('has-notifs');
-  } else {
-    badge.style.display = 'none';
-    btn.classList.remove('has-notifs');
-  }
-}
-function renderNotifList(){
-  var list = document.getElementById('notifList');
-  if(!list) return;
-  var notifs = getNotifs();
-  if(notifs.length === 0){ list.innerHTML = '<div class="notif-empty">All caught up ✓</div>'; return; }
-  list.innerHTML = notifs.map(function(n){
-    var d = new Date(n.time);
-    var diffMs = Date.now() - d;
-    var diffMins = Math.floor(diffMs/60000);
-    var diffHrs = Math.floor(diffMs/3600000);
-    var diffDays = Math.floor(diffMs/86400000);
-    var t = diffMins<1?'Just now':diffMins<60?diffMins+'m ago':diffHrs<24?diffHrs+'h ago':diffDays===1?'Yesterday':d.toLocaleDateString('en-NZ',{day:'numeric',month:'short'});
-    return '<div class="notif-item'+(n.read?'':' unread')+'">'
-      +'<div class="notif-icon '+n.iconClass+'">'+n.icon+'</div>'
-      +'<div class="notif-body"><div class="notif-msg">'+n.msg+'</div><div class="notif-time">'+t+'</div></div>'
-      +'<button class="notif-dismiss" onclick="dismissNotif('+n.id+')">&#x2715;</button>'
-      +'</div>';
-  }).join('');
-}
-function toggleNotifs(){
-  var dd = document.getElementById('notifDropdown');
-  if(!dd) return;
-  var isOpen = dd.classList.contains('open');
-  document.getElementById('avatarDropdown') && document.getElementById('avatarDropdown').classList.remove('open');
-  if(isOpen){ dd.classList.remove('open'); }
-  else { dd.classList.add('open'); renderNotifList(); markAllRead(); }
-}
-document.addEventListener('click', function(e){
-  var wrap = document.getElementById('notifWrap');
-  if(wrap && !wrap.contains(e.target)) document.getElementById('notifDropdown') && document.getElementById('notifDropdown').classList.remove('open');
-});
-
-// ── REMINDER SETTINGS ──
-var REMINDER_ICONS = ['📸','💪','🧴','🍽️','💊','🧘','📖','💧','🏋️','🌙','☀️','🔔','⚡','🎯','🛌'];
-var FREQ_LABELS = {daily:'Daily', weekly:'Weekly', monthly:'Monthly', once:'One time'};
-var SHORT_DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-function openReminderSettings(){
-  document.getElementById('notifDropdown').classList.remove('open');
-  renderReminderList();
-  document.getElementById('reminderSettingsPopup').style.display='flex';
-}
-function closeReminderSettings(){
-  document.getElementById('reminderSettingsPopup').style.display='none';
-}
-function renderReminderList(){
-  var reminders = getReminders();
-  var el = document.getElementById('reminderList');
-  if(!el) return;
-  if(!reminders.length){
-    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--t3);font-size:13px;">No reminders yet</div>';
-    return;
-  }
-  el.innerHTML = reminders.map(function(r){
-    var freqLabel = FREQ_LABELS[r.freq] || r.freq;
-    if(r.freq==='weekly') freqLabel += ' · '+SHORT_DAY_NAMES[r.day||0];
-    if(r.freq==='monthly') freqLabel += ' · Day '+r.monthDay;
-    if(r.time) freqLabel += ' · '+r.time;
-    return '<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">'
-      +'<div style="font-size:20px;flex-shrink:0;">'+r.icon+'</div>'
-      +'<div style="flex:1;min-width:0;">'
-        +'<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.msg+'</div>'
-        +'<div style="font-size:11px;color:var(--t3);">'+freqLabel+'</div>'
-      +'</div>'
-      +'<div style="display:flex;gap:6px;flex-shrink:0;">'
-        +'<button onclick="editReminder('+r.id+')" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;font-family:inherit;transition:all .15s;">Edit</button>'
-        +'<button onclick="deleteReminder('+r.id+')" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:7px;color:var(--red);font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;font-family:inherit;transition:all .15s;">Delete</button>'
-      +'</div>'
-      +'</div>';
-  }).join('');
-}
-function addReminder(){
-  _reminderEditId = null;
-  document.getElementById('reminderEditTitle').textContent = 'New Reminder';
-  document.getElementById('reminderEditMsg').value = '';
-  document.getElementById('reminderEditFreq').value = 'daily';
-  document.getElementById('reminderEditTime').value = '09:00';
-  document.getElementById('reminderEditDay').value = '5';
-  document.getElementById('reminderEditMonthDay').value = '1';
-  var today = new Date(); var dd=String(today.getDate()).padStart(2,'0'); var mm=String(today.getMonth()+1).padStart(2,'0');
-  document.getElementById('reminderEditDate').value = today.getFullYear()+'-'+mm+'-'+dd;
-  renderIconPicker('📸');
-  reminderFreqChange();
-  document.getElementById('reminderEditPopup').style.display='flex';
-}
-function editReminder(id){
-  var r = getReminders().find(function(x){return x.id===id;}); if(!r) return;
-  _reminderEditId = id;
-  document.getElementById('reminderEditTitle').textContent = 'Edit Reminder';
-  document.getElementById('reminderEditMsg').value = r.msg;
-  document.getElementById('reminderEditFreq').value = r.freq||'daily';
-  document.getElementById('reminderEditTime').value = r.time||'09:00';
-  document.getElementById('reminderEditDay').value = r.day||5;
-  document.getElementById('reminderEditMonthDay').value = r.monthDay||1;
-  if(r.date) document.getElementById('reminderEditDate').value = r.date;
-  renderIconPicker(r.icon||'📸');
-  reminderFreqChange();
-  document.getElementById('reminderEditPopup').style.display='flex';
-}
-function deleteReminder(id){
-  if(!confirm('Delete this reminder?')) return;
-  saveReminders(getReminders().filter(function(r){return r.id!==id;}));
-  renderReminderList();
-}
-function closeReminderEdit(){
-  document.getElementById('reminderEditPopup').style.display='none';
-}
-function reminderFreqChange(){
-  var freq = document.getElementById('reminderEditFreq').value;
-  document.getElementById('reminderEditDayWrap').style.display = freq==='weekly'?'block':'none';
-  document.getElementById('reminderEditMonthDayWrap').style.display = freq==='monthly'?'block':'none';
-  document.getElementById('reminderEditDateWrap').style.display = freq==='once'?'block':'none';
-}
-function renderIconPicker(selected){
-  var el = document.getElementById('reminderIconPicker'); if(!el) return;
-  el.innerHTML = REMINDER_ICONS.map(function(ic){
-    return '<span onclick="selectReminderIcon(this,\''+ic+'\')" style="font-size:22px;cursor:pointer;padding:6px;border-radius:8px;border:2px solid '+(ic===selected?'var(--y)':'transparent')+';transition:all .15s;">'+ic+'</span>';
-  }).join('');
-}
-function selectReminderIcon(el, icon){
-  document.querySelectorAll('#reminderIconPicker span').forEach(function(s){ s.style.borderColor='transparent'; });
-  el.style.borderColor='var(--y)';
-  el.dataset.selected='true';
-}
-function getSelectedIcon(){
-  var spans = document.querySelectorAll('#reminderIconPicker span');
-  for(var i=0;i<spans.length;i++){ if(spans[i].style.borderColor.includes('255')||spans[i].style.borderColor==='var(--y)') return spans[i].textContent; }
-  return '🔔';
-}
-function saveReminderEdit(){
-  var msg = document.getElementById('reminderEditMsg').value.trim();
-  if(!msg){ alert('Please enter a message'); return; }
-  var freq = document.getElementById('reminderEditFreq').value;
-  var r = {
-    id: _reminderEditId || Date.now(),
-    msg: msg,
-    icon: getSelectedIcon(),
-    freq: freq,
-    day: parseInt(document.getElementById('reminderEditDay').value),
-    monthDay: parseInt(document.getElementById('reminderEditMonthDay').value),
-    date: document.getElementById('reminderEditDate').value,
-    time: document.getElementById('reminderEditTime').value,
-    enabled: true
-  };
-  var reminders = getReminders();
-  if(_reminderEditId){
-    var idx = reminders.findIndex(function(x){return x.id===_reminderEditId;});
-    if(idx>-1) reminders[idx]=r; else reminders.push(r);
-  } else {
-    reminders.push(r);
-  }
-  saveReminders(reminders);
-  closeReminderEdit();
-  renderReminderList();
-}
-
-// ── CHECK SCHEDULED REMINDERS ──
-function getWeekNumber(d){
-  var date = new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
-  date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));
-  var yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-  return Math.ceil((((date-yearStart)/86400000)+1)/7);
-}
-function checkScheduledNotifs(){
-  var now = new Date();
-  var seen = JSON.parse(localStorage.getItem(NOTIF_SEEN_KEY)||'{}');
-  var reminders = getReminders();
-  var nowHour = now.getHours();
-  var nowMin = now.getMinutes();
-  reminders.forEach(function(r){
-    if(!r.enabled) return;
-    var rHour = 9, rMin = 0;
-    if(r.time){ var parts=r.time.split(':'); rHour=parseInt(parts[0]); rMin=parseInt(parts[1]||0); }
-    if(nowHour < rHour || (nowHour===rHour && nowMin < rMin)) return;
-    var key = 'r_'+r.id+'_';
-    if(r.freq==='daily'){
-      key += now.getFullYear()+'_'+now.getMonth()+'_'+now.getDate();
-    } else if(r.freq==='weekly'){
-      key += now.getFullYear()+'_'+getWeekNumber(now);
-      if(now.getDay() !== (r.day||5)) return;
-    } else if(r.freq==='monthly'){
-      key += now.getFullYear()+'_'+now.getMonth();
-      if(now.getDate() !== (r.monthDay||1)) return;
-    } else if(r.freq==='once'){
-      if(!r.date) return;
-      var rd=new Date(r.date); if(now.toDateString()!==rd.toDateString()) return;
-      key += r.date;
-    }
-    if(!seen[key]){
-      addNotif(r.msg, r.icon, 'notif-icon-photo');
-      seen[key]=true;
-      localStorage.setItem(NOTIF_SEEN_KEY, JSON.stringify(seen));
-    }
-  });
-}
-(function initNotifs(){
-  getReminders(); // ensure defaults are seeded
-  checkScheduledNotifs();
-  renderNotifBadge();
-  setInterval(checkScheduledNotifs, 60000);
+// ─── STATE ───
+let checked = (function(){
+  try {
+    var s=localStorage.getItem('ascend_checked_today');
+    var d=localStorage.getItem('ascend_checked_date');
+    var n=new Date();
+    var k=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+    if(s && d===k) return new Set(JSON.parse(s));
+  } catch(e) {}
+  return new Set();
 })();
+let profile = null;
+let aiHistory = [];
 
+// ─── STORAGE HELPERS ───
+function load(key, def) {
+  try { var v=localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
 
-
-
-// MACROS
-var MACRO_DEFAULTS = {calories:2600,protein:160};
-function saveMacros(m){ localStorage.setItem("ascend_macros",JSON.stringify(m)); }
-function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||JSON.stringify(MACRO_DEFAULTS)); }
-function renderMacros(){
-  var el=document.getElementById("macroGrid"); if(!el)return;
+// ─── MACROS ───
+function loadMacros() { return load('ascend_macros', DEFAULT_MACROS); }
+function saveMacros(m) { save('ascend_macros', m); syncSection('macros', m); }
+function renderMacros() {
+  var el=document.getElementById('macroGrid'); if(!el) return;
   var m=loadMacros();
-  el.innerHTML=macroCard("calories",m.calories,"Calories","kcal")+macroCard("protein",m.protein,"Protein","g");
+  el.innerHTML =
+    '<div class="macro-card" onclick="editMacro(\'calories\')">'
+      +'<div class="macro-lbl">CALORIES</div>'
+      +'<div><span class="macro-val" id="macro-calories">'+m.calories.toLocaleString()+'</span><span class="macro-val-unit"> kcal</span></div>'
+    +'</div>'
+    +'<div class="macro-card" onclick="editMacro(\'protein\')">'
+      +'<div class="macro-lbl">PROTEIN</div>'
+      +'<div><span class="macro-val" id="macro-protein">'+m.protein+'</span><span class="macro-val-unit">g</span></div>'
+    +'</div>';
 }
-function macroCard(key,val,label,unit){
-  var dispVal = key==="calories" ? val.toLocaleString() : val;
-  var dispUnit = key==="calories" ? " kcal" : "g";
-  return "<div class=\"macro-card\">"
-    +"<div class=\"macro-card-left\">"
-    +"<div class=\"macro-lbl\">"+label+"</div>"
-    +"<div class=\"macro-val\" id=\"macroval-"+key+"\">"+dispVal+"<span style=\"font-size:14px;opacity:.6\">"+dispUnit+"</span></div>"
-    +"</div>"
-    +"<button class=\"macro-edit-btn\" onclick=\"startMacroEdit(&quot;"+key+"&quot;,"+val+",&quot;"+unit+"&quot;)\">Edit</button>"
-    +"</div>";
-}
-function startMacroEdit(key,current,unit){
-  var el=document.getElementById("macroGrid"); if(!el)return;
-  var label=key==="calories"?"Calories":"Protein";
-  el.innerHTML="<div class=\"macro-card\" style=\"grid-column:1/-1;flex-direction:column;align-items:flex-start;gap:10px;\">"
-    +"<div class=\"macro-lbl\">Set "+label+" target</div>"
-    +"<div class=\"macro-edit-row\">"
-    +"<input class=\"macro-input\" id=\"macroEditInput\" type=\"number\" value=\""+current+"\" min=\"0\" />"
-    +"<span class=\"macro-input-unit\">"+unit+"</span>"
-    +"</div>"
-    +"<div style=\"display:flex;gap:8px;\">"
-    +"<button class=\"macro-edit-btn\" style=\"background:var(--yd);border-color:var(--border-y);color:var(--y);\" onclick=\"saveMacroEdit(&quot;"+key+"&quot;)\">Save</button>"
-    +"<button class=\"macro-edit-btn\" onclick=\"renderMacros()\">Cancel</button>"
-    +"</div></div>";
-  setTimeout(function(){var inp=document.getElementById("macroEditInput");if(inp){inp.focus();inp.select();}},50);
-}
-function saveMacroEdit(key){
-  var inp=document.getElementById("macroEditInput"); if(!inp)return;
-  var val=parseInt(inp.value); if(isNaN(val)||val<0)return;
-  var m=loadMacros(); m[key]=val; saveMacros(m); renderMacros();
-}
-
-
-// MACROS
-function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||'{"calories":2600,"protein":160}'); }
-function renderMacros(){
-  var el=document.getElementById("macroGrid"); if(!el)return;
-  var m=loadMacros();
-  el.innerHTML=
-    "<div class=\"macro-card\">"
-      +"<div class=\"macro-lbl\">Calories</div>"
-      +"<div class=\"macro-val-wrap\" onclick=\"editMacro('calories')\">"
-        +"<span class=\"macro-val\" id=\"macro-calories\">"+m.calories.toLocaleString()+"</span>"
-        +"<span style=\"font-size:16px;color:var(--t2);font-weight:600;\">kcal</span>"
-      +"</div>"
-      +"<div class=\"macro-hint\">Tap to edit</div>"
-    +"</div>"
-    +"<div class=\"macro-card\">"
-      +"<div class=\"macro-lbl\">Protein</div>"
-      +"<div class=\"macro-val-wrap\" onclick=\"editMacro('protein')\">"
-        +"<span class=\"macro-val\" id=\"macro-protein\">"+m.protein+"</span>"
-        +"<span style=\"font-size:16px;color:var(--t2);font-weight:600;\">g</span>"
-      +"</div>"
-      +"<div class=\"macro-hint\">Tap to edit</div>"
-    +"</div>";
-}
-function editMacro(key){
-  var wrap=document.querySelector("#macro-"+key)?.parentElement; if(!wrap)return;
-  var m=loadMacros();
-  var cur=m[key];
-  var unit=key==="calories"?"kcal":"g";
-  wrap.innerHTML="<input class=\"macro-inline-input\" id=\"macro-inp-"+key+"\" type=\"number\" value=\""+cur+"\" /><span style=\"font-size:16px;color:var(--t2);font-weight:600;\">"+unit+"</span>";
-  wrap.style.cursor="default";
-  var inp=document.getElementById("macro-inp-"+key);
-  inp.focus(); inp.select();
-  function commit(){
-    var val=parseInt(inp.value);
-    if(!isNaN(val)&&val>0){ m[key]=val; saveMacros(m); }
-    renderMacros();
-  }
-  inp.addEventListener("blur",commit);
-  inp.addEventListener("keydown",function(e){ if(e.key==="Enter")inp.blur(); if(e.key==="Escape"){renderMacros();} });
-}
-
-
-// MACROS
-function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||'{"calories":2600,"protein":160}'); }
-function renderMacros(){
-  var el=document.getElementById("macroGrid"); if(!el)return;
-  var m=loadMacros();
-  el.innerHTML=
-    "<div class=\"macro-card\" onclick=\"editMacro('calories')\">"
-      +"<div class=\"macro-lbl\">Calories</div>"
-      +"<div><span class=\"macro-val\" id=\"macro-calories\">"+m.calories.toLocaleString()+"</span><span class=\"macro-val-unit\"> kcal</span></div>"
-    +"</div>"
-    +"<div class=\"macro-card\" onclick=\"editMacro('protein')\">"
-      +"<div class=\"macro-lbl\">Protein</div>"
-      +"<div><span class=\"macro-val\" id=\"macro-protein\">"+m.protein+"</span><span class=\"macro-val-unit\">g</span></div>"
-    +"</div>";
-}
-function editMacro(key){
-  var card=document.getElementById("macro-"+key)?.closest(".macro-card"); if(!card)return;
-  var m=loadMacros(); var cur=m[key]; var unit=key==="calories"?"kcal":"g";
-  card.innerHTML="<div class=\"macro-lbl\">"+(key==="calories"?"Calories":"Protein")+"</div>"
-    +"<div style=\"display:flex;align-items:baseline;gap:3px;justify-content:center;\">"
-    +"<input class=\"macro-inline-input\" id=\"macro-inp-"+key+"\" type=\"number\" value=\""+cur+"\" />"
-    +"<span class=\"macro-val-unit\">"+unit+"</span></div>";
+function editMacro(key) {
+  var card=document.getElementById('macro-'+key)?.closest('.macro-card'); if(!card) return;
+  var m=loadMacros(); var cur=m[key]; var unit=key==='calories'?'kcal':'g';
+  card.innerHTML='<div class="macro-lbl">'+(key==='calories'?'CALORIES':'PROTEIN')+'</div>'
+    +'<div style="display:flex;align-items:baseline;gap:3px;justify-content:center;">'
+    +'<input class="macro-inline-input" id="macro-inp-'+key+'" type="number" value="'+cur+'" />'
+    +'<span class="macro-val-unit">'+unit+'</span></div>';
   card.onclick=null;
-  var inp=document.getElementById("macro-inp-"+key); inp.focus(); inp.select();
-  function commit(){
-    var val=parseInt(inp.value);
-    if(!isNaN(val)&&val>0){m[key]=val;saveMacros(m);}
-    renderMacros();
-  }
-  inp.addEventListener("blur",commit);
-  inp.addEventListener("keydown",function(e){if(e.key==="Enter")inp.blur();if(e.key==="Escape")renderMacros();});
+  var inp=document.getElementById('macro-inp-'+key); inp.focus(); inp.select();
+  function commit(){ var val=parseInt(inp.value); if(!isNaN(val)&&val>0){m[key]=val;saveMacros(m);} renderMacros(); }
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', function(e){ if(e.key==='Enter') inp.blur(); if(e.key==='Escape') renderMacros(); });
 }
 
-
-// MACROS
-function loadMacros(){return JSON.parse(localStorage.getItem("ascend_macros")||'{"calories":2600,"protein":160}');}
-function saveMacros(m){localStorage.setItem("ascend_macros",JSON.stringify(m));_bumpAction();pushToCloud();}
-function renderMacros(){
-  var el=document.getElementById("macroGrid");if(!el)return;
-  var m=loadMacros();
-  el.innerHTML=
-    "<div class=\"macro-card\" onclick=\"editMacro('calories')\">"
-      +"<div class=\"macro-lbl\">Calories</div>"
-      +"<span class=\"macro-val\">"+m.calories.toLocaleString()+"</span>"
-      +"<span class=\"macro-val-unit\">kcal</span>"
-    +"</div>"
-    +"<div class=\"macro-card\" onclick=\"editMacro('protein')\">"
-      +"<div class=\"macro-lbl\">Protein</div>"
-      +"<span class=\"macro-val\">"+m.protein+"</span>"
-      +"<span class=\"macro-val-unit\">g</span>"
-    +"</div>";
-}
-function editMacro(key){
-  var card=document.querySelector("[onclick=\"editMacro('"+key+"')\"]");if(!card)return;
-  var m=loadMacros();var unit=key==="calories"?"kcal":"g";var label=key==="calories"?"Calories":"Protein";
-  card.onclick=null;
-  card.innerHTML="<div class=\"macro-lbl\">"+label+"</div>"
-    +"<input class=\"macro-inline-input\" id=\"minp-"+key+"\" type=\"number\" value=\""+m[key]+"\" />"
-    +"<span class=\"macro-val-unit\">"+unit+"</span>";
-  var inp=document.getElementById("minp-"+key);inp.focus();inp.select();
-  function done(){var v=parseInt(inp.value);if(!isNaN(v)&&v>0){m[key]=v;saveMacros(m);}renderMacros();}
-  inp.addEventListener("blur",done);
-  inp.addEventListener("keydown",function(e){if(e.key==="Enter")inp.blur();if(e.key==="Escape")renderMacros();});
-}
-
-// MEALS
-var DEFAULT_MEALS = [
-  {id:1, name:"Breakfast", items:["Eggs, Greek yogurt, fruit"], cals:450, protein:35},
-  {id:2, name:"Lunch", items:["Chicken & rice bowl"], cals:650, protein:50},
-  {id:3, name:"Dinner", items:["Beef mince & vegetables"], cals:750, protein:55}
-];
-function loadMeals(){
-  var meals = JSON.parse(localStorage.getItem("ascend_meals")||JSON.stringify(DEFAULT_MEALS));
-  // migrate old desc string format to items array
-  meals.forEach(function(m){
-    if(!m.items){
+// ─── MEALS ───
+function loadMeals() {
+  var meals = load('ascend_meals', DEFAULT_MEALS);
+  // migrate old desc string format
+  meals.forEach(function(m) {
+    if (!m.items) {
       m.items = m.desc ? m.desc.split('\n').filter(function(s){return s.trim();}) : [];
       delete m.desc;
     }
   });
   return meals;
 }
-function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); }
-
-function saveMealBullet(id, bi, val){
-  var meals = loadMeals();
-  var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  m.items[bi] = val.trim();
+function saveMeals(m) { save('ascend_meals', m); syncSection('meals', m); }
+function renderMealsSection() {
+  var el=document.getElementById('mealsSection'); if(!el) return;
+  var meals=loadMeals();
+  var totalCals=meals.reduce(function(s,m){return s+(m.cals||0);},0);
+  var totalProt=meals.reduce(function(s,m){return s+(m.protein||0);},0);
+  var html='<div class="meals-header">'
+    +'<div class="meals-title">Daily Diet</div>'
+    +'<div style="font-size:11px;color:var(--t3);">'+totalCals.toLocaleString()+' kcal &nbsp;·&nbsp; '+totalProt+'g protein</div>'
+    +'</div>';
+  meals.forEach(function(meal) {
+    var items = meal.items && meal.items.length ? meal.items : [''];
+    var bullets = items.map(function(item, bi) {
+      return '<div class="meal-bullet-row">'
+        +'<span class="meal-bullet-dash">—</span>'
+        +'<input class="meal-bullet-input" type="text" value="'+item.replace(/"/g,'&quot;')+'"'
+        +' onblur="saveMealItem('+meal.id+','+bi+',this.value)"'
+        +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();addMealItem('+meal.id+');}if(event.key===\'Backspace\'&&this.value===\'\'){event.preventDefault();delMealItem('+meal.id+','+bi+');}" />'
+        +'<button class="meal-bullet-del" onclick="delMealItem('+meal.id+','+bi+')">✕</button>'
+        +'</div>';
+    }).join('');
+    html+='<div class="meal-row">'
+      +'<div class="meal-row-head">'
+      +'<div class="meal-row-info">'
+      +'<input class="meal-name-input" value="'+meal.name+'" placeholder="Meal name" onblur="saveMealName('+meal.id+',this.value)"/>'
+      +bullets
+      +'<button class="meal-bullet-add" onclick="addMealItem('+meal.id+')">+ add item</button>'
+      +'</div>'
+      +'<div class="meal-macros">'
+      +'<span class="meal-macro-pill" onclick="openMacroEdit('+meal.id+')">'+meal.cals+' kcal</span>'
+      +'<span class="meal-macro-pill" onclick="openMacroEdit('+meal.id+')">'+meal.protein+'g</span>'
+      +'</div>'
+      +'<button class="meal-del-btn" onclick="deleteMeal('+meal.id+')">✕</button>'
+      +'</div>'
+      +'</div>';
+  });
+  html+='<button class="meal-add-btn" onclick="addMeal()">+ Add meal</button>';
+  el.innerHTML=html;
+}
+function saveMealName(id, val) {
+  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
+  m.name=val.trim()||m.name; saveMeals(meals);
+}
+function saveMealItem(id, bi, val) {
+  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
+  if(!m.items) m.items=[];
+  m.items[bi]=val.trim();
+  m.items=m.items.filter(function(s){return s;});
   saveMeals(meals);
 }
-function addMealBullet(id){
-  var meals = loadMeals();
-  var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
+function addMealItem(id) {
+  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
+  if(!m.items) m.items=[];
   m.items.push('New item');
   saveMeals(meals);
   renderMealsSection();
   setTimeout(function(){
-    var all = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
-    if(all.length){ all[all.length-1].focus(); all[all.length-1].select(); }
+    var all=document.querySelectorAll('.meal-bullet-input');
+    // find inputs for this meal
+    var mealInputs=[];
+    document.querySelectorAll('.meal-row').forEach(function(row,ri){
+      if(meals[ri] && meals[ri].id===id) {
+        mealInputs=Array.from(row.querySelectorAll('.meal-bullet-input'));
+      }
+    });
+    if(mealInputs.length){ mealInputs[mealInputs.length-1].focus(); mealInputs[mealInputs.length-1].select(); }
   }, 50);
 }
-function delMealBullet(id, bi){
-  var meals = loadMeals();
-  var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  m.items.splice(bi, 1);
+function delMealItem(id, bi) {
+  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
+  if(!m.items) return;
+  m.items.splice(bi,1);
   saveMeals(meals);
   renderMealsSection();
 }
-function mealBulletKeyHandler(e,id,bi){
-  if(e.key==="Enter"){e.preventDefault();addMealBullet(id);}
-  if(e.key==="Backspace"&&e.target.value===""){e.preventDefault();delMealBullet(id,bi);}
-}
-function renderMealsSection(){
-  var el=document.getElementById("mealsSection"); if(!el)return;
-  var meals=loadMeals();
-  var totalCals=meals.reduce(function(s,m){return s+(m.cals||0);},0);
-  var totalProt=meals.reduce(function(s,m){return s+(m.protein||0);},0);
-  var html="<div class=\"meals-header\">"
-    +"<div class=\"meals-title\">Daily Diet</div>"
-    +"<div style=\"font-size:11px;color:var(--t3);\">"+totalCals.toLocaleString()+" kcal &nbsp;·&nbsp; "+totalProt+"g protein</div>"
-    +"</div>";
-  meals.forEach(function(meal){
-    html+="<div class=\"meal-row\">"
-      +"<div class=\"meal-row-head\">"
-      
-      +"<div class=\"meal-row-info\">"
-      +"<input class=\"meal-name-input\" value=\""+meal.name+"\" placeholder=\"Meal name\" onchange=\"updateMeal("+meal.id+",'name',this.value)\"/>"
-      +(function(){
-        var items = meal.items && meal.items.length ? meal.items : [''];
-        var bullets = items.map(function(item, bi){
-          return '<div class="meal-bullet-row">'
-            +'<span class="meal-bullet-dash">—</span>'
-            +'<input class="meal-bullet-input" type="text" data-mid="'+meal.id+'" data-bi="'+bi+'" value="'+item.replace(/"/g,'&quot;')+'" onchange="saveMealBullet('+meal.id+','+bi+',this.value)" onkeydown="mealBulletKeyHandler(event,'+meal.id+','+bi+')" />'
-            +'<button class="meal-bullet-del" onclick="delMealBullet('+meal.id+','+bi+')">✕</button>'
-            +'</div>';
-        }).join('');
-        return bullets + '<button class="meal-bullet-add" onclick="addMealBullet('+meal.id+')">+ add item</button>';
-      }())
-      +"</div>"
-      +"<div class=\"meal-macros\">"
-      +"<span class=\"meal-macro-pill\" onclick=\"openMacroEdit("+meal.id+")\">"+meal.cals+" kcal</span>"
-      +"<span class=\"meal-macro-pill\" onclick=\"openMacroEdit("+meal.id+")\">"+meal.protein+"g</span>"
-      +"</div>"
-      +"<button class=\"meal-del-btn\" onclick=\"deleteMeal("+meal.id+")\">✕</button>"
-      +"</div>"
-      +"</div>";
-  });
-  html+="<button class=\"meal-add-btn\" onclick=\"addMeal()\">+ Add meal</button>";
-  el.innerHTML=html;
-}
-function updateMeal(id,field,val){
-  var meals=loadMeals();
-  var m=meals.find(function(x){return x.id===id;}); if(!m)return;
-  m[field]=val; saveMeals(meals);
-}
-function deleteMeal(id){
+function deleteMeal(id) {
   var meals=loadMeals().filter(function(m){return m.id!==id;});
   saveMeals(meals); renderMealsSection();
 }
-function addMeal(){
+function addMeal() {
   var meals=loadMeals();
-  var emojis=["🥗","🍳","🥩","🍱","🥤","🍚","🥪"];
   var newId=Date.now();
-  meals.push({id:newId,name:"New meal",items:[],cals:0,protein:0});
+  meals.push({id:newId, name:'New meal', items:[], cals:0, protein:0});
   saveMeals(meals); renderMealsSection();
   setTimeout(function(){
-    var inputs=document.querySelectorAll(".meal-name-input");
+    var inputs=document.querySelectorAll('.meal-name-input');
     if(inputs.length) inputs[inputs.length-1].focus();
   },50);
 }
-function openMacroEdit(id){
-  var meals=loadMeals();
-  var m=meals.find(function(x){return x.id===id;}); if(!m)return;
-  var popup=document.createElement("div");
-  popup.className="macro-edit-popup";
-  popup.id="macroEditPopup";
-  popup.innerHTML="<div class=\"macro-edit-box\">"
-    +"<div class=\"macro-edit-box-title\">"+m.name+" macros</div>"
-    +"<div class=\"macro-edit-field\"><label>Calories</label><input id=\"mep-cals\" type=\"number\" value=\""+m.cals+"\" /></div>"
-    +"<div class=\"macro-edit-field\"><label>Protein (g)</label><input id=\"mep-prot\" type=\"number\" value=\""+m.protein+"\" /></div>"
-    +"<div class=\"macro-edit-actions\">"
-    +"<button class=\"macro-edit-cancel\" onclick=\"closeMacroEdit()\">Cancel</button>"
-    +"<button class=\"macro-edit-save\" onclick=\"saveMacroEdit("+id+")\">Save</button>"
-    +"</div></div>";
+function openMacroEdit(id) {
+  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
+  var popup=document.createElement('div');
+  popup.className='macro-edit-popup'; popup.id='macroEditPopup';
+  popup.innerHTML='<div class="macro-edit-box">'
+    +'<div class="macro-edit-box-title">'+m.name+' macros</div>'
+    +'<div class="macro-edit-field"><label>Calories</label><input id="mep-cals" type="number" value="'+m.cals+'" /></div>'
+    +'<div class="macro-edit-field"><label>Protein (g)</label><input id="mep-prot" type="number" value="'+m.protein+'" /></div>'
+    +'<div class="macro-edit-actions">'
+    +'<button class="macro-edit-save" onclick="saveMacroEditPopup('+id+')">Save</button>'
+    +'<button class="macro-edit-cancel" onclick="closeMacroEdit()">Cancel</button>'
+    +'</div></div>';
   document.body.appendChild(popup);
-  document.getElementById("mep-cals").focus();
+  popup.addEventListener('click', function(e){ if(e.target===popup) closeMacroEdit(); });
 }
-function closeMacroEdit(){
-  var p=document.getElementById("macroEditPopup"); if(p)p.remove();
-}
-function saveMacroEdit(id){
-  var meals=loadMeals();
-  var m=meals.find(function(x){return x.id===id;}); if(!m)return;
-  m.cals=parseInt(document.getElementById("mep-cals").value)||0;
-  m.protein=parseInt(document.getElementById("mep-prot").value)||0;
-  saveMeals(meals); closeMacroEdit(); renderMealsSection();
+function closeMacroEdit() { var p=document.getElementById('macroEditPopup'); if(p) p.remove(); }
+function saveMacroEditPopup(id) {
+  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
+  var c=parseInt(document.getElementById('mep-cals').value);
+  var p=parseInt(document.getElementById('mep-prot').value);
+  if(!isNaN(c)) m.cals=c; if(!isNaN(p)) m.protein=p;
+  saveMeals(meals); closeMacroEdit(); renderMealsSection(); renderMacros();
 }
 
-// TRAINING
-var DEFAULT_WORKOUTS = [
-  {id:'A', label:'Day A', name:'Push', tag:'push', open:false, exercises:[
-    {name:'Chest Press', weight:25, goal:60},
-    {name:'Chest Flys', weight:30, goal:50},
-    {name:'Tricep Pulldowns', weight:20, goal:45},
-    {name:'Overhead Extensions', weight:10, goal:30}
-  ]},
-  {id:'B', label:'Day B', name:'Pull', tag:'pull', open:false, exercises:[
-    {name:'Lat Pull Downs', weight:40, goal:80},
-    {name:'Rows', weight:40, goal:75},
-    {name:'Bar Bicep Curls', weight:20, goal:40},
-    {name:'Hammer Curls', weight:6, goal:16}
-  ]},
-  {id:'C', label:'Day C', name:'Arms', tag:'arms', open:false, exercises:[
-    {name:'Lateral Raises', weight:6, goal:16},
-    {name:'Shoulder Press', weight:20, goal:50},
-    {name:'Bar Bicep Curls', weight:20, goal:40},
-    {name:'Tricep Pulldowns', weight:20, goal:45}
-  ]}
-];
-function loadWorkouts(){ return JSON.parse(localStorage.getItem("ascend_workouts")||JSON.stringify(DEFAULT_WORKOUTS)); }
-function saveWorkouts(w){ localStorage.setItem("ascend_workouts",JSON.stringify(w)); }
-
-function renderTrainingSection(){
-  var el=document.getElementById("trainingSection"); if(!el)return;
+// ─── WORKOUTS ───
+function loadWorkouts() { return load('ascend_workouts', DEFAULT_WORKOUTS); }
+function saveWorkouts(w) { save('ascend_workouts', w); syncSection('workouts', w); }
+function renderTrainingSection() {
+  var el=document.getElementById('trainingSection'); if(!el) return;
   var workouts=loadWorkouts();
-  var html="";
-  workouts.forEach(function(day){
-    html+="<div class=\"workout-day\">"
-      +"<div class=\"workout-day-head\" onclick=\"toggleWorkoutDay('"+day.id+"')\">"
-      +"<span class=\"workout-day-label\">"+day.label+"</span>"
-      +"<span class=\"workout-day-name\">"+day.name+"</span>"
-      +"<span class=\"workout-day-tag wtag-"+day.tag+"\">"+day.tag.toUpperCase()+"</span>"
-      +"<span class=\"workout-day-arrow"+(day.open?" open":"")+"\">▼</span>"
-      +"</div>";
-    if(day.open){
-      html+="<div class=\"workout-exercises\">";
-      day.exercises.forEach(function(ex,ei){
-        var pct = ex.goal ? Math.min(100, Math.round((ex.weight/ex.goal)*100)) : 0;
-        var barColor = pct>=100 ? '#22c55e' : pct>=60 ? 'var(--y)' : '#60a5fa';
-        html+="<div class=\"exercise-row\">"
-          +"<div style=\"flex:1;min-width:0;\">"
-          +"<input class=\"exercise-name\" value=\""+ex.name+"\" style=\"background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:100%;\" onchange=\"updateExercise('"+day.id+"',"+ei+",'name',this.value)\"/>"
-          +(ex.goal ? "<div style=\"display:flex;align-items:center;gap:6px;margin-top:5px;\">"
-            +"<div style=\"flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;\">"
-            +"<div style=\"width:"+pct+"%;height:100%;background:"+barColor+";border-radius:2px;transition:width .3s;\"></div></div>"
-            +"<span style=\"font-size:10px;color:var(--t3);white-space:nowrap;\">"+ex.weight+"→"+ex.goal+"kg</span>"
-            +"</div>" : "")
-          +"</div>"
-          +"<div class=\"exercise-weight\">"
-          +"<span class=\"exercise-weight-label\">Now</span>"
-          +"<input class=\"exercise-weight-input\" type=\"number\" value=\""+ex.weight+"\" onchange=\"updateExercise('"+day.id+"',"+ei+",'weight',+this.value)\"/>"
-          +"<span class=\"exercise-weight-unit\">kg</span>"
-          +"</div>"
-          +"<div class=\"exercise-weight\" style=\"margin-left:4px;\">"
-          +"<span class=\"exercise-weight-label\">Goal</span>"
-          +"<input class=\"exercise-weight-input\" style=\"border-color:rgba(34,197,94,0.25);color:#22c55e;\" type=\"number\" value=\""+( ex.goal||0)+"\" onchange=\"updateExercise('"+day.id+"',"+ei+",'goal',+this.value)\"/>"
-          +"<span class=\"exercise-weight-unit\">kg</span>"
-          +"</div>"
-          +"<button style=\"background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;\" onmouseover=\"this.style.color='#ef4444'\" onmouseout=\"this.style.color='var(--t4)'\" onclick=\"deleteExercise('"+day.id+"',"+ei+")\" >✕</button>"
-          +"</div>";
+  var html='';
+  workouts.forEach(function(day) {
+    html+='<div class="workout-day">'
+      +'<div class="workout-day-head" onclick="toggleWorkoutDay(\''+day.id+'\')">'
+      +'<span class="workout-day-label">'+day.label+'</span>'
+      +'<span class="workout-day-name">'+day.name+'</span>'
+      +'<span class="workout-day-tag wtag-'+day.tag+'">'+day.tag.toUpperCase()+'</span>'
+      +'<span class="workout-day-arrow'+(day.open?' open':'')+'">▼</span>'
+      +'</div>';
+    if(day.open) {
+      html+='<div class="workout-exercises">';
+      day.exercises.forEach(function(ex,ei) {
+        var pct=ex.goal ? Math.min(100,Math.round((ex.weight/ex.goal)*100)) : 0;
+        var barColor=pct>=100?'#22c55e':pct>=60?'var(--y)':'#60a5fa';
+        html+='<div class="exercise-row">'
+          +'<div style="flex:1;min-width:0;">'
+          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:100%;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
+          +(ex.goal?'<div style="display:flex;align-items:center;gap:6px;margin-top:5px;">'
+            +'<div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;">'
+            +'<div style="width:'+pct+'%;height:100%;background:'+barColor+';border-radius:2px;transition:width .3s;"></div></div>'
+            +'<span style="font-size:10px;color:var(--t3);white-space:nowrap;">'+ex.weight+'→'+ex.goal+'kg</span>'
+            +'</div>':'')
+          +'</div>'
+          +'<div class="exercise-weight">'
+          +'<span class="exercise-weight-label">Now</span>'
+          +'<input class="exercise-weight-input" type="number" value="'+ex.weight+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',+this.value)"/>'
+          +'<span class="exercise-weight-unit">kg</span>'
+          +'</div>'
+          +'<div class="exercise-weight" style="margin-left:4px;">'
+          +'<span class="exercise-weight-label">Goal</span>'
+          +'<input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+(ex.goal||0)+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',+this.value)"/>'
+          +'<span class="exercise-weight-unit">kg</span>'
+          +'</div>'
+          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
+          +'</div>';
       });
-      html+="<button class=\"workout-add-btn\" onclick=\"addExercise('"+day.id+"')\">+ Add exercise</button>"
-        +"</div>";
+      html+='<button class="workout-add-btn" onclick="addExercise(\''+day.id+'\')">+ Add exercise</button></div>';
     }
-    html+="</div>";
+    html+='</div>';
   });
   el.innerHTML=html;
 }
-function toggleWorkoutDay(id){
-  var w=loadWorkouts();
-  var day=w.find(function(d){return d.id===id;}); if(!day)return;
+function toggleWorkoutDay(id) {
+  var w=loadWorkouts(); var day=w.find(function(d){return d.id===id;}); if(!day) return;
   day.open=!day.open; saveWorkouts(w); renderTrainingSection();
 }
-function updateExercise(dayId,ei,field,val){
-  var w=loadWorkouts();
-  var day=w.find(function(d){return d.id===dayId;}); if(!day)return;
+function updateExercise(dayId,ei,field,val) {
+  var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
   day.exercises[ei][field]=val; saveWorkouts(w);
 }
-function deleteExercise(dayId,ei){
-  var w=loadWorkouts();
-  var day=w.find(function(d){return d.id===dayId;}); if(!day)return;
+function deleteExercise(dayId,ei) {
+  var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
   day.exercises.splice(ei,1); saveWorkouts(w); renderTrainingSection();
 }
-function addExercise(dayId){
-  var w=loadWorkouts();
-  var day=w.find(function(d){return d.id===dayId;}); if(!day)return;
-  day.exercises.push({name:"New exercise",weight:0,goal:0}); saveWorkouts(w); renderTrainingSection();
+function addExercise(dayId) {
+  var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
+  day.exercises.push({name:'New exercise',weight:0,goal:0}); saveWorkouts(w); renderTrainingSection();
+  setTimeout(function(){ var inputs=document.querySelectorAll('.exercise-name'); if(inputs.length) inputs[inputs.length-1].focus(); },50);
+}
+
+// ─── WEIGHT CARDS ───
+function loadBodyWeight() { return load('ascend_bodyweight', {current:75,goal:80}); }
+function saveBodyWeight(w) { save('ascend_bodyweight', w); syncSection('bodyweight', w); }
+function renderWeightCards() {
+  var el=document.getElementById('weightCards'); if(!el) return;
+  var bw=loadBodyWeight();
+  el.innerHTML=
+    '<div class="macro-card" onclick="editWeight(\'current\')">'
+      +'<div class="macro-lbl">CURRENT</div>'
+      +'<div><span class="macro-val" id="wcard-current">'+bw.current+'</span><span class="macro-val-unit">kg</span></div>'
+    +'</div>'
+    +'<div class="macro-card" onclick="editWeight(\'goal\')" style="border-color:rgba(34,197,94,0.2);">'
+      +'<div class="macro-lbl" style="color:#22c55e;">GOAL</div>'
+      +'<div><span class="macro-val" id="wcard-goal" style="color:#22c55e;">'+bw.goal+'</span><span class="macro-val-unit" style="color:#22c55e;">kg</span></div>'
+    +'</div>';
+}
+function editWeight(key) {
+  var card=document.getElementById('wcard-'+key)?.closest('.macro-card'); if(!card) return;
+  var bw=loadBodyWeight(); var cur=bw[key]; var isGoal=key==='goal';
+  card.innerHTML='<div class="macro-lbl"'+(isGoal?' style="color:#22c55e;"':'')+'>'+key.toUpperCase()+'</div>'
+    +'<div style="display:flex;align-items:baseline;gap:3px;justify-content:center;">'
+    +'<input class="macro-inline-input" id="winp-'+key+'" type="number" value="'+cur+'"'+(isGoal?' style="color:#22c55e;"':'')+'/>'
+    +'<span class="macro-val-unit"'+(isGoal?' style="color:#22c55e;"':'')+'>kg</span></div>';
+  card.onclick=null;
+  var inp=document.getElementById('winp-'+key); inp.focus(); inp.select();
+  function commit(){ var val=parseFloat(inp.value); if(!isNaN(val)&&val>0){bw[key]=val;saveBodyWeight(bw);} renderWeightCards(); }
+  inp.addEventListener('blur',commit);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')inp.blur();if(e.key==='Escape')renderWeightCards();});
+}
+
+// ─── LMG ───
+function loadLMG() { return load('ascend_lmg', DEFAULT_LMG); }
+function saveLMG(g) { save('ascend_lmg', g); syncSection('lmg', g); }
+function toggleLMG() {
+  var body=document.getElementById('lmgBody');
+  var arrow=document.getElementById('lmgArrow');
+  if(!body) return;
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(arrow) arrow.classList.toggle('open',!open);
+  if(!open) renderLMG();
+}
+function renderLMG() {
+  var el=document.getElementById('lmgList'); if(!el) return;
+  var goals=loadLMG();
+  el.innerHTML=goals.map(function(g) {
+    return '<div class="lmg-item">'
+      +'<div class="lmg-check'+(g.done?' done':'')+'" onclick="toggleLMGoal('+g.id+')"></div>'
+      +'<div class="lmg-item-body" onclick="openLMGDetail('+g.id+')">'
+      +'<span class="lmg-item-text'+(g.done?' done':'')+'">'+g.text+'</span>'
+      +(g.notes?'<span class="lmg-item-meta">'+g.notes.substring(0,40)+'...</span>':'')
+      +'</div>'
+      +'<button class="lmg-del" onclick="deleteLMGoal('+g.id+')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function toggleLMGoal(id) {
+  var g=loadLMG(); var goal=g.find(function(x){return x.id===id;}); if(!goal) return;
+  goal.done=!goal.done; saveLMG(g); renderLMG();
+}
+function deleteLMGoal(id) {
+  var g=loadLMG().filter(function(x){return x.id!==id;});
+  saveLMG(g); renderLMG();
+}
+function addLMGoal() {
+  var g=loadLMG();
+  g.push({id:Date.now(),text:'New goal',done:false,notes:'',images:[]});
+  saveLMG(g); renderLMG();
   setTimeout(function(){
-    var inputs=document.querySelectorAll(".exercise-name");
-    if(inputs.length) inputs[inputs.length-1].focus();
+    var items=document.querySelectorAll('.lmg-item-text');
+    if(items.length) items[items.length-1].focus?.();
   },50);
 }
 
-// LOOKSMAX GOALS
-var DEFAULT_LMG = [
-  {id:1, text:'Hair', done:false, notes:'', images:[]},
-  {id:2, text:'Skin', done:false, notes:'', images:[]},
-  {id:3, text:'Bloating', done:false, notes:'', images:[]},
-  {id:4, text:'Teeth', done:false, notes:'', images:[]},
-  {id:5, text:'Eyebrows', done:false, notes:'', images:[]},
-  {id:6, text:'Posture', done:false, notes:'', images:[]},
-  {id:7, text:'Physique', done:false, notes:'', images:[]},
-  {id:8, text:'Smell', done:false, notes:'', images:[]},
-  {id:9, text:'Voice', done:false, notes:'', images:[]},
-];
-function loadLMG(){ return JSON.parse(localStorage.getItem("ascend_lmg")||JSON.stringify(DEFAULT_LMG)); }
-function saveLMG(g){ localStorage.setItem("ascend_lmg",JSON.stringify(g)); }
-function toggleLMG(){
-  var body=document.getElementById("lmgBody");
-  var arrow=document.getElementById("lmgArrow");
-  if(!body)return;
-  var open=body.style.display!=="none";
-  body.style.display=open?"none":"block";
-  if(arrow) arrow.classList.toggle("open",!open);
-  if(!open) renderLMG();
+// ─── SETTINGS ───
+function saveSetting(key,val) {
+  var s=load('ascend_settings',{});
+  s[key]=val;
+  save('ascend_settings',s);
+  syncSection('settings',s);
 }
-function renderLMG(){
-  var el=document.getElementById("lmgList"); if(!el)return;
-  var goals=loadLMG();
-  el.innerHTML=goals.map(function(g){
-    var hasNotes=g.notes&&g.notes.trim().length>0;
-    var imgCount=(g.images||[]).filter(Boolean).length;
-    return "<div class=\"lmg-item\">"
-      +"<div class=\"lmg-check"+(g.done?" done":"")+"\" onclick=\"toggleLMGoal("+g.id+")\" ></div>"
-      +"<div class=\"lmg-item-body\" onclick=\"openLMGDetail("+g.id+")\">"
-      +"<span class=\"lmg-item-text"+(g.done?" done":"")+"\" >"+g.text+"</span>"
-      +(hasNotes||imgCount?"<span class=\"lmg-item-meta\">"+(hasNotes?"📝 ":"")+( imgCount?imgCount+" 🖼":"")+"</span>":"")
-      +"</div>"
-      +"<button class=\"lmg-del\" onclick=\"deleteLMGoal("+g.id+")\">✕</button>"
-      +"</div>";
-  }).join("");
+function loadSettings() { return load('ascend_settings',{}); }
+function applySettings() {
+  var s=loadSettings();
+  var tz=document.getElementById('settingTimezone'); if(tz) tz.value=s.timezone||'auto';
+  var wt=document.getElementById('settingWakeTime'); if(wt) wt.value=s.wakeTime||'07:00';
+  var st=document.getElementById('settingSleepTime'); if(st) st.value=s.sleepTime||'22:30';
+  var md=document.getElementById('settingMidday'); if(md) md.value=s.middayTime||'12:00';
+  var nm=document.getElementById('settingName'); if(nm) nm.value=s.name||'';
+  var rm=document.getElementById('settingReminder'); if(rm) rm.value=s.reminder||'off';
 }
-function toggleLMGoal(id){
-  var g=loadLMG(); var item=g.find(function(x){return x.id===id;}); if(!item)return;
-  item.done=!item.done; saveLMG(g); renderLMG();
+function openSettings() {
+  document.getElementById('avatarDropdown').classList.remove('open');
+  document.getElementById('settingsPopup').style.display='flex';
+  applySettings();
 }
-function updateLMGoal(id,val){
-  var g=loadLMG(); var item=g.find(function(x){return x.id===id;}); if(!item)return;
-  item.text=val; saveLMG(g);
+function closeSettings() { document.getElementById('settingsPopup').style.display='none'; }
+
+// ─── CHECKLIST ───
+function todayKey() {
+  var n=new Date();
+  return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
 }
-function deleteLMGoal(id){
-  saveLMG(loadLMG().filter(function(x){return x.id!==id;})); renderLMG();
+function saveChecked() {
+  var dk=todayKey();
+  localStorage.setItem('ascend_checked_today', JSON.stringify([...checked]));
+  localStorage.setItem('ascend_checked_date', dk);
+  saveChecklistToServer(dk);
 }
-function addLMGoal(){
-  var g=loadLMG();
-  g.push({id:Date.now(),text:"New goal",done:false,notes:"",images:[]});
-  saveLMG(g); renderLMG();
-  setTimeout(function(){ openLMGDetail(g[g.length-1].id); },50);
+function renderChecklist() {
+  var el=document.getElementById('bigChecklist'); if(!el) return;
+  var s=loadSettings();
+  var middayHour=parseInt((s.middayTime||'12:00').split(':')[0]);
+  var nowHour=new Date().getHours();
+  var dayPlans=load('ascend_day_plans',null);
+  var todayIdx=new Date().getDay()-1<0?6:new Date().getDay()-1;
+  var morning, night, dayTasks;
+  if(dayPlans && dayPlans[todayIdx]) {
+    morning=dayPlans[todayIdx].morning||MORNING;
+    night=dayPlans[todayIdx].night||NIGHT;
+    dayTasks=dayPlans[todayIdx].day||null;
+  } else {
+    morning=MORNING; night=NIGHT; dayTasks=null;
+  }
+  var allItems=[];
+  var isNight=nowHour>=middayHour;
+  if(!isNight) allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
+  allItems.push({type:'section',key:'day',label:'⚡ During the day',color:'day'});
+  if(isNight) allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
+  morning.forEach(function(b){ allItems.push({type:'item',section:'morning',title:b.title,time:b.time,items:b.items||[]}); });
+  if(dayTasks) dayTasks.forEach(function(t){ allItems.push({type:'item',section:'day',title:t.name||t.title,items:[]}); });
+  else { allItems.push({type:'item',section:'day',title:'Drink 3L water',items:[]}); allItems.push({type:'item',section:'day',title:'Training or movement',items:[]}); }
+  night.forEach(function(b){ allItems.push({type:'item',section:'night',title:b.title,time:b.time,items:b.items||[]}); });
+  window._allChecklistItems=allItems;
+  var itemIdx=0;
+  var html='';
+  var sectionItems={morning:[],day:[],night:[]};
+  allItems.forEach(function(x,i){if(x.type==='item') sectionItems[x.section].push(i);});
+  allItems.forEach(function(x,i) {
+    if(x.type==='section') {
+      var secItems=sectionItems[x.key];
+      var doneCount=secItems.filter(function(idx){return checked.has(idx);}).length;
+      var allDone=secItems.length>0&&doneCount===secItems.length;
+      html+='<div class="cl-section-header cl-section-'+x.key+'">'
+        +'<div class="cl-section-label">'+x.label+'<span class="count">'+doneCount+'/'+secItems.length+'</span></div>'
+        +'<button class="cl-tick-all'+(allDone?' done':'')+'" onclick="tickAllSection(\''+x.key+'\',event)">'+(allDone?'Untick all':'Tick all')+'</button>'
+        +'</div>';
+    } else {
+      var done=checked.has(i);
+      html+='<div class="check-item" onclick="toggleCheck('+i+')">'
+        +'<div class="check-box'+(done?' done':'')+'"></div>'
+        +'<div class="check-text">'
+        +'<div class="check-name'+(done?' done':'')+'">'+x.title+(x.time?'<span class="check-time">· '+x.time+'</span>':'')+'</div>'
+        +(x.items&&x.items.length?'<div class="cl-steps'+(done?' cl-steps-done':'')+'">'+x.items.map(function(s){return '<div class="cl-step"><span>'+s+'</span></div>';}).join('')+'</div>':'')
+        +'</div>'
+        +'</div>';
+    }
+  });
+  el.innerHTML=html;
+  updateScoreBadge();
+  updateStreakBadge();
+}
+function toggleCheck(i) {
+  if(checked.has(i)) checked.delete(i); else checked.add(i);
+  saveChecked();
+  renderChecklist();
+  maybeSaveScore();
+}
+function tickAllSection(key,e) {
+  if(e) e.stopPropagation();
+  var allItems=window._allChecklistItems||[];
+  var indices=[];
+  var inSec=false;
+  for(var i=0;i<allItems.length;i++){
+    if(allItems[i].type==='section'){inSec=(allItems[i].key===key);continue;}
+    if(inSec) indices.push(i);
+  }
+  var allDone=indices.length>0&&indices.every(function(i){return checked.has(i);});
+  indices.forEach(function(i){allDone?checked.delete(i):checked.add(i);});
+  saveChecked();
+  renderChecklist();
+  maybeSaveScore();
+}
+function updateScoreBadge() {
+  var allItems=window._allChecklistItems||[];
+  var taskItems=allItems.filter(function(x){return x.type==='item';});
+  var total=taskItems.length;
+  var done=allItems.reduce(function(c,x,i){return x.type==='item'&&checked.has(i)?c+1:c;},0);
+  var pct=total>0?Math.round((done/total)*100):0;
+  var badge=document.getElementById('scoreBadge'); if(badge) badge.textContent=pct+'%';
+}
+function updateStreakBadge() {
+  var streak=load('ascend_streak',0);
+  var el=document.getElementById('streakCount'); if(el) el.textContent=streak;
+}
+function maybeSaveScore() {
+  var allItems=window._allChecklistItems||[];
+  var taskItems=allItems.filter(function(x){return x.type==='item';});
+  var total=taskItems.length;
+  var done=allItems.reduce(function(c,x,i){return x.type==='item'&&checked.has(i)?c+1:c;},0);
+  var pct=total>0?Math.round((done/total)*100):0;
+  var history=load('ascend_score_history',[]);
+  var dk=todayKey();
+  var existing=history.find(function(h){return h.date===dk;});
+  if(existing) existing.score=pct; else history.unshift({date:dk,score:pct});
+  save('ascend_score_history',history.slice(0,90));
 }
 
-// PROGRESS PHOTOS
-var _checkinPhotos=[null,null,null,null];
-var _activeCheckinSlot=0;
-var CHECKIN_LABELS=["Face Front","Face Side","Body Front","Body Side"];
+// ─── CALENDAR ───
+var _calYear, _calMonth;
+function openCalendar() {
+  var now=new Date(); _calYear=now.getFullYear(); _calMonth=now.getMonth();
+  document.getElementById('calendarPopup').style.display='flex';
+  renderCalendar();
+}
+function closeCalendar() { document.getElementById('calendarPopup').style.display='none'; }
+function calNav(dir) { _calMonth+=dir; if(_calMonth>11){_calMonth=0;_calYear++;}if(_calMonth<0){_calMonth=11;_calYear--;} renderCalendar(); }
+function renderCalendar() {
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent=months[_calMonth]+' '+_calYear;
+  var history=load('ascend_score_history',[]);
+  var scoreMap={};
+  history.forEach(function(h){scoreMap[h.date]=h.score;});
+  var grid=document.getElementById('calGrid'); if(!grid) return;
+  var dows=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var html=dows.map(function(d){return '<div class="cal-dow">'+d+'</div>';}).join('');
+  var first=new Date(_calYear,_calMonth,1);
+  var startDay=(first.getDay()+6)%7;
+  var daysInMonth=new Date(_calYear,_calMonth+1,0).getDate();
+  var today=new Date(); var todayStr=todayKey();
+  for(var i=0;i<startDay;i++) html+='<div class="cal-day empty"></div>';
+  for(var d2=1;d2<=daysInMonth;d2++) {
+    var ds=_calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-'+String(d2).padStart(2,'0');
+    var isToday=ds===todayStr;
+    var score=scoreMap[ds];
+    var cls='cal-day';
+    if(isToday) cls+=' today';
+    else if(score===100) cls+=' completed';
+    else if(score!==undefined) cls+=' incomplete';
+    html+='<div class="'+cls+'">'+d2+'</div>';
+  }
+  grid.innerHTML=html;
+}
 
-function openCheckinUpload(){
+// ─── DAY PLANNER ───
+var _dayPlans=null; var _activePlanDay=0;
+const SHORT_DAY_NAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function loadDayPlans() {
+  if(!_dayPlans) {
+    var saved=load('ascend_day_plans',null);
+    if(saved) _dayPlans=saved;
+    else _dayPlans=SHORT_DAY_NAMES.map(function(){return {morning:[],day:[],night:[]};});
+  }
+  return _dayPlans;
+}
+function saveDayPlans() {
+  save('ascend_day_plans',_dayPlans);
+  syncSection('day_plans',_dayPlans);
+}
+function openDayPlanner() {
+  loadDayPlans();
+  document.getElementById('dayPlannerPopup').style.display='flex';
+  renderDayPlannerTabs();
+  renderDayPlanner();
+}
+function closeDayPlanner() {
+  document.getElementById('dayPlannerPopup').style.display='none';
+  renderChecklist();
+}
+function renderDayPlannerTabs() {
+  var el=document.getElementById('dayPlannerTabs'); if(!el) return;
+  el.innerHTML=SHORT_DAY_NAMES.map(function(d,i){
+    return '<button class="day-tab'+(i===_activePlanDay?' active':'')+'" onclick="switchPlanDay('+i+')">'+d+'</button>';
+  }).join('');
+}
+function switchPlanDay(i) { _activePlanDay=i; renderDayPlannerTabs(); renderDayPlanner(); }
+function renderDayPlanner() {
+  var el=document.getElementById('dayPlannerContent'); if(!el) return;
+  var plan=loadDayPlans()[_activePlanDay];
+  var html='';
+  ['day','morning','night'].forEach(function(sec) {
+    var labels={day:'⚡ During the day',morning:'☀️ Morning',night:'🌙 Night'};
+    html+='<div class="dp-section">'+labels[sec]+'</div>';
+    var blocks=plan[sec]||[];
+    blocks.forEach(function(block,bi) {
+      html+='<div class="dp-block">'
+        +'<div class="dp-block-head">'
+        +'<input class="dp-block-title" value="'+block.title+'" onblur="dpSaveTitle(\''+sec+'\','+bi+',this.value)"/>'
+        +'<div class="dp-block-reorder">'
+        +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',-1)"'+(bi===0?' disabled':'')+'>↑</button>'
+        +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',1)"'+(bi===blocks.length-1?' disabled':'')+'>↓</button>'
+        +'</div>'
+        +'<button class="dp-del-block" onclick="dpDelBlock(\''+sec+'\','+bi+')">✕</button>'
+        +'</div>';
+      (block.items||[]).forEach(function(item,ii) {
+        html+='<div class="dp-step-row">'
+          +'<span class="dp-step-dash">—</span>'
+          +'<input class="dp-step-input" value="'+item+'" onblur="dpSaveItem(\''+sec+'\','+bi+','+ii+',this.value)"/>'
+          +'<button class="dp-del-step" onclick="dpDelItem(\''+sec+'\','+bi+','+ii+')">✕</button>'
+          +'</div>';
+      });
+      html+='<button class="dp-add-step" onclick="dpAddItem(\''+sec+'\','+bi+')">+ add step</button>'
+        +'</div>';
+    });
+    html+='<button class="dp-add-block" onclick="dpAddBlock(\''+sec+'\')">+ Add block</button>';
+  });
+  html+='<button class="dp-copy-btn" onclick="copyDayToAll()">Set for all days</button>';
+  el.innerHTML=html;
+}
+function dpSaveTitle(sec,bi,val) {
+  loadDayPlans()[_activePlanDay][sec][bi].title=val; saveDayPlans();
+}
+function dpSaveItem(sec,bi,ii,val) {
+  loadDayPlans()[_activePlanDay][sec][bi].items[ii]=val; saveDayPlans();
+}
+function dpAddBlock(sec) {
+  loadDayPlans()[_activePlanDay][sec].push({title:'New block',items:[]}); saveDayPlans(); renderDayPlanner();
+}
+function dpDelBlock(sec,bi) {
+  loadDayPlans()[_activePlanDay][sec].splice(bi,1); saveDayPlans(); renderDayPlanner();
+}
+function dpAddItem(sec,bi) {
+  var block=loadDayPlans()[_activePlanDay][sec][bi];
+  if(!block.items) block.items=[];
+  block.items.push(''); saveDayPlans(); renderDayPlanner();
+}
+function dpDelItem(sec,bi,ii) {
+  loadDayPlans()[_activePlanDay][sec][bi].items.splice(ii,1); saveDayPlans(); renderDayPlanner();
+}
+function dpMove(sec,bi,dir) {
+  var arr=loadDayPlans()[_activePlanDay][sec];
+  var newIdx=bi+dir; if(newIdx<0||newIdx>=arr.length) return;
+  var tmp=arr[bi]; arr[bi]=arr[newIdx]; arr[newIdx]=tmp;
+  saveDayPlans(); renderDayPlanner();
+}
+function copyDayToAll() {
+  var current=JSON.parse(JSON.stringify(loadDayPlans()[_activePlanDay]));
+  _dayPlans=SHORT_DAY_NAMES.map(function(){return JSON.parse(JSON.stringify(current));});
+  saveDayPlans(); renderDayPlanner();
+}
+
+// ─── PROGRESS PHOTOS ───
+var _checkinPhotos=[null,null,null,null]; var _activeCheckinSlot=0;
+function openCheckinUpload() {
   _checkinPhotos=[null,null,null,null];
   renderCheckinSlots();
-  var m=document.getElementById("checkinModal"); if(m){m.style.display="flex";m.style.alignItems="center";m.style.justifyContent="center";}
+  var m=document.getElementById('checkinModal'); if(m){m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';}
 }
-function closeCheckinUpload(){
-  var m=document.getElementById("checkinModal"); if(m){m.style.display="none";}
-}
-function renderCheckinSlots(){
-  var el=document.getElementById("checkinSlots"); if(!el)return;
-  el.innerHTML="<div style=\"display:grid;grid-template-columns:repeat(4,1fr);gap:8px;\">"
+function closeCheckinUpload() { var m=document.getElementById('checkinModal'); if(m) m.style.display='none'; }
+function renderCheckinSlots() {
+  var el=document.getElementById('checkinSlots'); if(!el) return;
+  var labels=['Face Front','Face Side','Body Front','Body Side'];
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
     +_checkinPhotos.map(function(p,i){
-      return "<div class=\"upload-slot"+(p?" filled":"")+"\" onclick=\"triggerCheckinSlot("+i+")\">"
-        +(p?"<img src=\""+p+"\" />":"")
-        +"<span class=\"upload-slot-icon\">📷</span>"
-        +"<span class=\"upload-slot-label\">"+CHECKIN_LABELS[i]+"</span>"
-        +"<button class=\"upload-slot-remove\" onclick=\"removeCheckinPhoto(event,"+i+")\" >✕</button>"
-        +"</div>";
-    }).join("")
-    +"</div>";
+      return '<div class="upload-slot'+(p?' filled':'')+'" onclick="triggerCheckinPhoto('+i+')">'
+        +(p?'<img src="'+p+'" /><button class="upload-slot-remove" onclick="removeCheckinPhoto(event,'+i+')">✕</button>':'')
+        +'<div class="upload-slot-icon">📷</div>'
+        +'<div class="upload-slot-label">'+labels[i]+'</div>'
+        +'</div>';
+    }).join('')
+    +'</div>'
+    +'<input type="file" id="checkinFileInput" accept="image/*" style="display:none" onchange="handleCheckinFile(event)">';
 }
-function triggerCheckinSlot(i){
-  _activeCheckinSlot=i;
-  document.getElementById("checkinFileInput").click();
-}
-function removeCheckinPhoto(e,i){
-  e.stopPropagation(); _checkinPhotos[i]=null; renderCheckinSlots();
-}
-function handleCheckinFile(e){
-  var file=e.target.files[0]; if(!file)return;
+function triggerCheckinPhoto(i) { _activeCheckinSlot=i; document.getElementById('checkinFileInput').click(); }
+function removeCheckinPhoto(e,i) { e.stopPropagation(); _checkinPhotos[i]=null; renderCheckinSlots(); }
+function handleCheckinFile(e) {
+  var file=e.target.files[0]; if(!file) return;
   var reader=new FileReader();
-  reader.onload=function(ev){
-    var img=new Image();
-    img.onload=function(){
-      var scale=Math.min(1,800/img.width);
-      var canvas=document.createElement("canvas");
-      canvas.width=img.width*scale; canvas.height=img.height*scale;
-      canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
-      _checkinPhotos[_activeCheckinSlot]=canvas.toDataURL("image/jpeg",0.7);
-      renderCheckinSlots();
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);
-  e.target.value="";
+  reader.onload=function(ev){ _checkinPhotos[_activeCheckinSlot]=ev.target.result; renderCheckinSlots(); };
+  reader.readAsDataURL(file); e.target.value='';
 }
-function saveCheckin(){
+function saveCheckin() {
   var photos=_checkinPhotos.filter(function(p){return p;});
-  if(!photos.length){closeCheckinUpload();return;}
-  var checkins=JSON.parse(localStorage.getItem("ascend_checkins")||"[]");
-  checkins.unshift({date:new Date().toISOString(),photos:_checkinPhotos});
-  localStorage.setItem("ascend_checkins",JSON.stringify(checkins.slice(0,12)));
+  if(!photos.length){ closeCheckinUpload(); return; }
+  var checkins=load('ascend_checkins',[]);
+  checkins.unshift({id:Date.now(),date:new Date().toISOString(),photos:_checkinPhotos});
+  checkins=checkins.slice(0,12);
+  save('ascend_checkins',checkins);
+  syncSection('checkins',checkins);
   closeCheckinUpload();
   renderProgressPhotos();
 }
-function deleteCheckin(idx){
-  var checkins=JSON.parse(localStorage.getItem("ascend_checkins")||"[]");
-  checkins.splice(idx,1);
-  localStorage.setItem("ascend_checkins",JSON.stringify(checkins));
-  renderProgressPhotos();
-}
-function renderProgressPhotos(){
-  var el=document.getElementById("progressPhotosWrap"); if(!el)return;
-  var checkins=JSON.parse(localStorage.getItem("ascend_checkins")||"[]");
-  if(!checkins.length){
-    el.innerHTML="<div class=\"empty-state\"><div class=\"empty-icon\">📸</div><div class=\"empty-title\">No check-ins yet</div><div class=\"empty-sub\">Tap + Add check-in to upload your first progress photos.</div></div>";
-    return;
-  }
-  el.innerHTML=checkins.map(function(c,ci){
-    var d=new Date(c.date);
+function renderProgressPhotos() {
+  var el=document.getElementById('progressPhotosWrap'); if(!el) return;
+  var checkins=load('ascend_checkins',[]);
+  if(!checkins.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">📸</div><div class="empty-title">No check-ins yet</div><div class="empty-sub">Tap + Add check-in to upload your first progress photos.</div></div>'; return; }
+  var labels=['Face Front','Face Side','Body Front','Body Side'];
+  el.innerHTML=checkins.map(function(ci){
+    var d=new Date(ci.date);
     var diffDays=Math.floor((Date.now()-d)/86400000);
-    var dateStr=d.toLocaleDateString("en-NZ",{day:"numeric",month:"short",year:"numeric"});
-    var agoStr=diffDays===0?"Today":diffDays===1?"Yesterday":diffDays+" days ago";
-    var photos=c.photos||[];
-    return "<div class=\"checkin-block\">"
-      +"<div class=\"checkin-block-date\"><span>"+dateStr+" · "+agoStr+"</span>"
-      +"<button class=\"checkin-block-del\" onclick=\"deleteCheckin("+ci+")\" title=\"Remove check-in\">✕ Remove</button></div>"
-      +"<div class=\"checkin-photo-grid\">"
-      +photos.map(function(p,pi){
-        return p
-          ? "<div class=\"checkin-photo-slot\"><img src=\""+p+"\" /><div class=\"checkin-photo-label\">"+CHECKIN_LABELS[pi]+"</div></div>"
-          : "<div class=\"checkin-photo-slot\" style=\"opacity:.3;\"><div class=\"checkin-photo-label\">"+CHECKIN_LABELS[pi]+"</div></div>";
-      }).join("")
-      +"</div></div>";
-  }).join("");
+    var timeStr=diffDays===0?'Today':diffDays===1?'Yesterday':diffDays+' days ago';
+    return '<div class="checkin-block">'
+      +'<div class="checkin-block-date">'+d.toLocaleDateString('en-NZ',{day:'numeric',month:'short',year:'numeric'})+' <span style="font-weight:400;color:var(--t2);">· '+timeStr+'</span>'
+      +'<button class="checkin-block-del" onclick="deleteCheckin('+ci.id+')">✕</button></div>'
+      +'<div class="checkin-photo-grid">'
+      +ci.photos.map(function(p,i){return p?'<div class="checkin-photo-slot"><img src="'+p+'" /><div class="checkin-photo-label">'+labels[i]+'</div></div>':'';}).join('')
+      +'</div></div>';
+  }).join('');
+}
+function deleteCheckin(id) {
+  var checkins=load('ascend_checkins',[]).filter(function(c){return c.id!==id;});
+  save('ascend_checkins',checkins); syncSection('checkins',checkins); renderProgressPhotos();
 }
 
-
-// BODY WEIGHT
-function loadBodyWeight(){ return JSON.parse(localStorage.getItem("ascend_bodyweight")||'{"current":75,"goal":80}'); }
-function saveBodyWeight(w){ localStorage.setItem("ascend_bodyweight",JSON.stringify(w)); }
-function renderWeightCards(){
-  var el=document.getElementById("weightCards"); if(!el)return;
-  var w=loadBodyWeight();
-  el.innerHTML=
-    "<div class=\"macro-card\" onclick=\"editBodyWeight('current')\">"
-      +"<div class=\"macro-lbl\">Current</div>"
-      +"<span class=\"macro-val\" id=\"bw-current\">"+w.current+"</span>"
-      +"<span class=\"macro-val-unit\">kg</span>"
-    +"</div>"
-    +"<div class=\"macro-card\" onclick=\"editBodyWeight('goal')\">"
-      +"<div class=\"macro-lbl\">Goal</div>"
-      +"<span class=\"macro-val\" style=\"color:#22c55e\" id=\"bw-goal\">"+w.goal+"</span>"
-      +"<span class=\"macro-val-unit\">kg</span>"
-    +"</div>";
+// ─── LMG DETAIL ───
+function openLMGDetail(id) {
+  var goals=loadLMG(); var g=goals.find(function(x){return x.id===id;}); if(!g) return;
+  var popup=document.createElement('div');
+  popup.className='popup-overlay'; popup.id='lmgDetailPopup';
+  popup.style.display='flex';
+  popup.innerHTML='<div class="popup-box" style="max-width:480px;">'
+    +'<button class="popup-close" onclick="closeLMGDetail()">✕</button>'
+    +'<div class="popup-title">'+g.text+'</div>'
+    +'<div style="margin-top:16px;">'
+    +'<div class="settings-label">Goal name</div>'
+    +'<input class="settings-input" id="lmgDetailName" value="'+g.text+'" style="margin-bottom:14px;"/>'
+    +'<div class="settings-label">How I\'ll achieve this</div>'
+    +'<textarea class="settings-input" id="lmgDetailNotes" style="min-height:100px;resize:vertical;margin-bottom:14px;">'+g.notes+'</textarea>'
+    +'</div>'
+    +'<button class="btn-y" style="width:100%;justify-content:center;" onclick="saveLMGDetail('+id+')">Save</button>'
+    +'</div>';
+  document.body.appendChild(popup);
+  popup.addEventListener('click',function(e){if(e.target===popup)closeLMGDetail();});
 }
-function editBodyWeight(key){
-  var card=document.getElementById("bw-"+key)?.closest(".macro-card"); if(!card)return;
-  var w=loadBodyWeight(); var label=key==="current"?"Current":"Goal";
-  var col=key==="current"?"var(--y)":"#22c55e";
-  card.innerHTML="<div class=\"macro-lbl\">"+label+"</div>"
-    +"<div style=\"display:flex;align-items:baseline;gap:3px;\">"
-    +"<input class=\"macro-inline-input\" style=\"color:"+col+";border-bottom-color:"+col+";\" id=\"bwinp-"+key+"\" type=\"number\" value=\""+w[key]+"\" />"
-    +"<span class=\"macro-val-unit\">kg</span></div>";
-  card.onclick=null;
-  var inp=document.getElementById("bwinp-"+key); inp.focus(); inp.select();
-  function done(){var v=parseFloat(inp.value);if(!isNaN(v)&&v>0){w[key]=v;saveBodyWeight(w);}renderWeightCards();}
-  inp.addEventListener("blur",done);
-  inp.addEventListener("keydown",function(e){if(e.key==="Enter")inp.blur();if(e.key==="Escape")renderWeightCards();});
+function closeLMGDetail() { var p=document.getElementById('lmgDetailPopup'); if(p) p.remove(); }
+function saveLMGDetail(id) {
+  var goals=loadLMG(); var g=goals.find(function(x){return x.id===id;}); if(!g) return;
+  g.text=document.getElementById('lmgDetailName').value.trim()||g.text;
+  g.notes=document.getElementById('lmgDetailNotes').value;
+  saveLMG(goals); closeLMGDetail(); renderLMG();
 }
 
-
-function openLMGDetail(id){
-  var goals=loadLMG();
-  var g=goals.find(function(x){return x.id===id;}); if(!g)return;
-  var images=g.images||[];
-  var existing=document.getElementById("lmgDetailModal");
-  if(existing)existing.remove();
-  var modal=document.createElement("div");
-  modal.id="lmgDetailModal";
-  modal.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);";
-  modal.innerHTML="<div style=\"background:var(--bg-card);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:28px;width:90%;max-width:520px;max-height:88vh;overflow-y:auto;position:relative;\">"
-    +"<button onclick=\"closeLMGDetail()\" style=\"position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-size:13px;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;\">✕</button>"
-    +"<div style=\"font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px;\">"+g.text+"</div>"
-    +"<div style=\"font-size:11px;color:var(--t3);margin-bottom:20px;\">Click the title above to rename</div>"
-    +"<input id=\"lmg-title-inp\" value=\""+g.text+"\" style=\"width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:14px;font-weight:700;padding:10px 13px;outline:none;margin-bottom:18px;\" placeholder=\"Goal name\"/>"
-    +"<div style=\"font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;\">How I'll achieve this</div>"
-    +"<textarea id=\"lmg-notes-inp\" placeholder=\"Write your plan, research, steps...\""
-    +" style=\"width:100%;min-height:130px;background:var(--bg-input);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.6;padding:11px 13px;outline:none;resize:vertical;margin-bottom:18px;\">"+g.notes+"</textarea>"
-    +"<div style=\"font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;\">Inspo Images</div>"
-    +"<div id=\"lmg-img-grid\" style=\"display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;\">"
-    +renderLMGImageSlots(images)
-    +"</div>"
-    +"<input type=\"file\" id=\"lmgImgInput\" accept=\"image/*\" style=\"display:none\" onchange=\"handleLMGImage(event,"+id+")\">"
-    +"<button onclick=\"document.getElementById('lmgImgInput').click()\" style=\"width:100%;padding:9px;background:transparent;border:1px dashed rgba(255,255,255,0.1);border-radius:9px;color:var(--t2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:16px;\" onmouseover=\"this.style.borderColor='var(--y)';this.style.color='var(--y)'\" onmouseout=\"this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--t2)'\">+ Add inspo image</button>"
-    +"<button onclick=\"saveLMGDetail("+id+")\" style=\"width:100%;padding:11px;background:linear-gradient(135deg,#FFCC00,#FF9500);border:none;border-radius:10px;color:#000;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;\">Save</button>"
-    +"</div>";
-  document.body.appendChild(modal);
-  document.getElementById("lmg-notes-inp").focus();
+// ─── NOTIFICATIONS ───
+function getNotifs() { return load(NOTIF_KEY,[]); }
+function saveNotifs(arr) { save(NOTIF_KEY,arr); }
+function addNotif(msg,icon,iconClass) {
+  var notifs=getNotifs();
+  notifs.unshift({id:Date.now(),msg:msg,icon:icon||'🔔',iconClass:iconClass||'',time:new Date().toISOString(),read:false});
+  saveNotifs(notifs); renderNotifBadge();
 }
-function renderLMGImageSlots(images){
-  var html="";
-  for(var i=0;i<4;i++){
-    var img=images[i]||null;
-    html+="<div style=\"border-radius:9px;aspect-ratio:1;overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);position:relative;\">"
-      +(img?"<img src=\""+img+"\" style=\"width:100%;height:100%;object-fit:cover;\" /><button onclick=\"removeLMGImage("+i+")\" style=\"position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.8);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;\">✕</button>":"<span style=\"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--t4);\">🖼</span>")
-      +"</div>";
+function dismissNotif(id) { saveNotifs(getNotifs().filter(function(n){return n.id!==id;})); renderNotifBadge(); renderNotifList(); }
+function clearAllNotifs() { saveNotifs([]); renderNotifBadge(); renderNotifList(); }
+function markAllRead() { saveNotifs(getNotifs().map(function(n){return Object.assign({},n,{read:true});})); renderNotifBadge(); }
+function renderNotifBadge() {
+  var unread=getNotifs().filter(function(n){return !n.read;}).length;
+  var badge=document.getElementById('notifBadge'); var btn=document.getElementById('notifBtn');
+  if(!badge||!btn) return;
+  if(unread>0){badge.style.display='flex';badge.textContent=unread>9?'9+':unread;btn.classList.add('has-notifs');}
+  else{badge.style.display='none';btn.classList.remove('has-notifs');}
+}
+function renderNotifList() {
+  var list=document.getElementById('notifList'); if(!list) return;
+  var notifs=getNotifs();
+  if(!notifs.length){list.innerHTML='<div class="notif-empty">All caught up ✓</div>';return;}
+  list.innerHTML=notifs.map(function(n){
+    var d=new Date(n.time); var diff=Date.now()-d;
+    var t=diff<60000?'Just now':diff<3600000?Math.floor(diff/60000)+'m ago':diff<86400000?Math.floor(diff/3600000)+'h ago':'Yesterday';
+    return '<div class="notif-item'+(n.read?'':' unread')+'">'
+      +'<div class="notif-icon '+n.iconClass+'">'+n.icon+'</div>'
+      +'<div class="notif-body"><div class="notif-msg">'+n.msg+'</div><div class="notif-time">'+t+'</div></div>'
+      +'<button class="notif-dismiss" onclick="dismissNotif('+n.id+')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function toggleNotifs() {
+  var dd=document.getElementById('notifDropdown'); if(!dd) return;
+  var isOpen=dd.classList.contains('open');
+  document.getElementById('avatarDropdown')?.classList.remove('open');
+  if(isOpen){dd.classList.remove('open');}else{dd.classList.add('open');renderNotifList();markAllRead();}
+}
+document.addEventListener('click',function(e){
+  var wrap=document.getElementById('notifWrap');
+  if(wrap&&!wrap.contains(e.target)) document.getElementById('notifDropdown')?.classList.remove('open');
+});
+
+// ─── REMINDERS ───
+var SHORT_DAY_LABELS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var REMINDER_ICONS=['📸','💪','🧴','🍽️','💊','🧘','📖','💧','🏋️','🌙','☀️','🔔','⚡','🎯','🛌'];
+function getReminders() {
+  var stored=load(REMINDERS_KEY,null);
+  if(stored) return stored;
+  var defaults=[{id:1,msg:'Time to add your weekly progress photos — keep the streak going.',icon:'📸',freq:'weekly',day:5,time:'09:00',enabled:true}];
+  save(REMINDERS_KEY,defaults); return defaults;
+}
+function saveReminders(arr) { save(REMINDERS_KEY,arr); syncSection('reminders',arr); }
+function openReminderSettings() {
+  document.getElementById('notifDropdown').classList.remove('open');
+  renderReminderList();
+  document.getElementById('reminderSettingsPopup').style.display='flex';
+}
+function closeReminderSettings() { document.getElementById('reminderSettingsPopup').style.display='none'; }
+function renderReminderList() {
+  var el=document.getElementById('reminderList'); if(!el) return;
+  var reminders=getReminders();
+  var FREQ={daily:'Daily',weekly:'Weekly',monthly:'Monthly',once:'One time'};
+  if(!reminders.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--t3);font-size:13px;">No reminders yet</div>';return;}
+  el.innerHTML=reminders.map(function(r){
+    var fl=FREQ[r.freq]||r.freq;
+    if(r.freq==='weekly') fl+=' · '+SHORT_DAY_LABELS[r.day||0];
+    if(r.time) fl+=' · '+r.time;
+    return '<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">'
+      +'<div style="font-size:20px;flex-shrink:0;">'+r.icon+'</div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;">'+r.msg+'</div>'
+      +'<div style="font-size:11px;color:var(--t3);">'+fl+'</div></div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0;">'
+      +'<button onclick="editReminder('+r.id+')" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;font-family:inherit;">Edit</button>'
+      +'<button onclick="deleteReminder('+r.id+')" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:7px;color:var(--red);font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;font-family:inherit;">Delete</button>'
+      +'</div></div>';
+  }).join('');
+}
+var _reminderEditId=null;
+function addReminder() {
+  _reminderEditId=null;
+  document.getElementById('reminderEditTitle').textContent='New Reminder';
+  document.getElementById('reminderEditMsg').value='';
+  document.getElementById('reminderEditFreq').value='daily';
+  document.getElementById('reminderEditTime').value='09:00';
+  document.getElementById('reminderEditDay').value='5';
+  renderIconPicker('📸'); reminderFreqChange();
+  document.getElementById('reminderEditPopup').style.display='flex';
+}
+function editReminder(id) {
+  var r=getReminders().find(function(x){return x.id===id;}); if(!r) return;
+  _reminderEditId=id;
+  document.getElementById('reminderEditTitle').textContent='Edit Reminder';
+  document.getElementById('reminderEditMsg').value=r.msg;
+  document.getElementById('reminderEditFreq').value=r.freq||'daily';
+  document.getElementById('reminderEditTime').value=r.time||'09:00';
+  document.getElementById('reminderEditDay').value=r.day||5;
+  renderIconPicker(r.icon||'📸'); reminderFreqChange();
+  document.getElementById('reminderEditPopup').style.display='flex';
+}
+function deleteReminder(id) {
+  if(!confirm('Delete this reminder?')) return;
+  saveReminders(getReminders().filter(function(r){return r.id!==id;})); renderReminderList();
+}
+function closeReminderEdit() { document.getElementById('reminderEditPopup').style.display='none'; }
+function reminderFreqChange() {
+  var freq=document.getElementById('reminderEditFreq').value;
+  document.getElementById('reminderEditDayWrap').style.display=freq==='weekly'?'block':'none';
+  document.getElementById('reminderEditMonthDayWrap').style.display=freq==='monthly'?'block':'none';
+  document.getElementById('reminderEditDateWrap').style.display=freq==='once'?'block':'none';
+}
+function renderIconPicker(selected) {
+  var el=document.getElementById('reminderIconPicker'); if(!el) return;
+  el.innerHTML=REMINDER_ICONS.map(function(ic){
+    return '<span onclick="selectReminderIcon(this,\''+ic+'\')" style="font-size:22px;cursor:pointer;padding:6px;border-radius:8px;border:2px solid '+(ic===selected?'var(--y)':'transparent')+';transition:all .15s;">'+ic+'</span>';
+  }).join('');
+}
+function selectReminderIcon(el,icon) {
+  document.querySelectorAll('#reminderIconPicker span').forEach(function(s){s.style.borderColor='transparent';});
+  el.style.borderColor='var(--y)';
+}
+function getSelectedIcon() {
+  var spans=document.querySelectorAll('#reminderIconPicker span');
+  for(var i=0;i<spans.length;i++){if(spans[i].style.borderColor&&spans[i].style.borderColor!=='transparent')return spans[i].textContent;}
+  return '🔔';
+}
+function saveReminderEdit() {
+  var msg=document.getElementById('reminderEditMsg').value.trim();
+  if(!msg){alert('Please enter a message');return;}
+  var r={id:_reminderEditId||Date.now(),msg:msg,icon:getSelectedIcon(),freq:document.getElementById('reminderEditFreq').value,day:parseInt(document.getElementById('reminderEditDay').value),time:document.getElementById('reminderEditTime').value,enabled:true};
+  var reminders=getReminders();
+  if(_reminderEditId){var idx=reminders.findIndex(function(x){return x.id===_reminderEditId;});if(idx>-1)reminders[idx]=r;else reminders.push(r);}
+  else reminders.push(r);
+  saveReminders(reminders); closeReminderEdit(); renderReminderList();
+}
+function getWeekNumber(d) {
+  var date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));
+  var yearStart=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date-yearStart)/86400000)+1)/7);
+}
+function checkScheduledNotifs() {
+  var now=new Date(); var seen=load(NOTIF_SEEN_KEY,{});
+  getReminders().forEach(function(r){
+    if(!r.enabled) return;
+    var rh=9,rm=0; if(r.time){var p=r.time.split(':');rh=parseInt(p[0]);rm=parseInt(p[1]||0);}
+    if(now.getHours()<rh||(now.getHours()===rh&&now.getMinutes()<rm)) return;
+    var key='r_'+r.id+'_';
+    if(r.freq==='daily') key+=now.getFullYear()+'_'+now.getMonth()+'_'+now.getDate();
+    else if(r.freq==='weekly'){key+=now.getFullYear()+'_'+getWeekNumber(now);if(now.getDay()!==(r.day||5))return;}
+    else if(r.freq==='monthly'){key+=now.getFullYear()+'_'+now.getMonth();if(now.getDate()!==(r.monthDay||1))return;}
+    else if(r.freq==='once'){if(!r.date)return;var rd=new Date(r.date);if(now.toDateString()!==rd.toDateString())return;key+=r.date;}
+    if(!seen[key]){addNotif(r.msg,r.icon,'notif-icon-photo');seen[key]=true;save(NOTIF_SEEN_KEY,seen);}
+  });
+}
+(function(){getReminders();checkScheduledNotifs();renderNotifBadge();setInterval(checkScheduledNotifs,60000);})();
+
+// ─── NAVIGATION ───
+function showPage(name,linkEl) {
+  document.querySelectorAll('.panel-page').forEach(function(p){p.classList.remove('active');});
+  var page=document.getElementById('page-'+name);
+  if(page) page.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  if(linkEl) linkEl.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(function(n){
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+name+"'")) n.classList.add('active');
+    });
   }
-  return html;
+  localStorage.setItem('ascend_page',name);
+  if(name==='nutrition'){renderMacros();renderMealsSection();}
+  if(name==='training'){renderTrainingSection();renderWeightCards();}
+  if(name==='progress'){renderLMG();renderProgressPhotos();}
+  closeSidebar();
 }
-var _editingLMGId=null;
-var _lmgEditImages=[];
-function handleLMGImage(e,id){
-  var file=e.target.files[0]; if(!file)return;
-  _editingLMGId=id;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var img2=new Image();
-    img2.onload=function(){
-      var scale=Math.min(1,600/img2.width);
-      var canvas=document.createElement("canvas");
-      canvas.width=img2.width*scale;canvas.height=img2.height*scale;
-      canvas.getContext("2d").drawImage(img2,0,0,canvas.width,canvas.height);
-      var data=canvas.toDataURL("image/jpeg",0.7);
-      var goals=loadLMG();
-      var g=goals.find(function(x){return x.id===id;}); if(!g)return;
-      if(!g.images)g.images=[];
-      var slot=g.images.indexOf(null);
-      if(slot===-1&&g.images.length<4)slot=g.images.length;
-      if(slot===-1)slot=3;
-      g.images[slot]=data;
-      saveLMG(goals);
-      var grid=document.getElementById("lmg-img-grid");
-      if(grid)grid.innerHTML=renderLMGImageSlots(g.images);
-    };
-    img2.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);
-  e.target.value="";
+function toggleDropdown() { document.getElementById('avatarDropdown').classList.toggle('open'); }
+document.addEventListener('click',function(e){
+  var dd=document.getElementById('avatarDropdown');
+  var av=document.getElementById('avatarBtn');
+  if(dd&&av&&!av.contains(e.target)&&!dd.contains(e.target)) dd.classList.remove('open');
+});
+function signOut() {
+  document.getElementById('avatarDropdown').classList.remove('open');
+  if(window._sb) window._sb.auth.signOut();
+  localStorage.removeItem('ascend_user_id');
+  window.location.href='/login';
 }
-function removeLMGImage(idx){
-  var modal=document.getElementById("lmgDetailModal"); if(!modal)return;
-  var titleInp=document.getElementById("lmg-title-inp");
-  var id=parseInt(modal.querySelector("button[onclick*='saveLMGDetail']").getAttribute("onclick").match(/d+/)[0]);
-  var goals=loadLMG();
-  var g=goals.find(function(x){return x.id===id;}); if(!g||!g.images)return;
-  g.images[idx]=null;
-  saveLMG(goals);
-  var grid=document.getElementById("lmg-img-grid");
-  if(grid)grid.innerHTML=renderLMGImageSlots(g.images);
+function openPricing() { document.getElementById('avatarDropdown').classList.remove('open'); window.location.href='/checkout'; }
+function updateBottomNav(name) {
+  document.querySelectorAll('.bottom-nav-item').forEach(function(b){b.classList.toggle('active',b.id==='bnav-'+name);});
 }
-function saveLMGDetail(id){
-  var goals=loadLMG();
-  var g=goals.find(function(x){return x.id===id;}); if(!g)return;
-  var titleInp=document.getElementById("lmg-title-inp");
-  var notesInp=document.getElementById("lmg-notes-inp");
-  if(titleInp)g.text=titleInp.value.trim()||g.text;
-  if(notesInp)g.notes=notesInp.value;
-  saveLMG(goals);
-  closeLMGDetail();
-  renderLMG();
+function toggleSidebar() {
+  var sb=document.querySelector('.sidebar'); var bd=document.getElementById('sidebarBackdrop');
+  var isOpen=sb.classList.contains('open');
+  sb.classList.toggle('open',!isOpen); bd.classList.toggle('open',!isOpen);
 }
-function closeLMGDetail(){
-  var m=document.getElementById("lmgDetailModal"); if(m)m.remove();
+function closeSidebar() {
+  document.querySelector('.sidebar')?.classList.remove('open');
+  document.getElementById('sidebarBackdrop')?.classList.remove('open');
 }
 
+// ─── DAY BADGE ───
+var _days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function updateDayBadge() {
+  var el=document.getElementById('dayBadge'); if(el) el.textContent=_days[new Date().getDay()];
+}
 
+// ─── SYNC ───
+var _savePending={};
+function syncSection(section,data) {
+  var userId=localStorage.getItem('ascend_user_id'); if(!userId) return;
+  if(_savePending[section]) clearTimeout(_savePending[section]);
+  _savePending[section]=setTimeout(function(){
+    fetch('/api/data/save',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-user-id':userId},
+      body:JSON.stringify({section:section,data:data})
+    }).catch(function(){});
+  },800);
+}
+async function loadFromCloud() {
+  var userId=localStorage.getItem('ascend_user_id'); if(!userId) return;
+  try{
+    var res=await fetch('/api/data/load',{headers:{'x-user-id':userId}});
+    var json=await res.json();
+    if(!json.data) return;
+    var d=json.data;
+    if(d.meals)      save('ascend_meals',d.meals);
+    if(d.macros)     save('ascend_macros',d.macros);
+    if(d.workouts)   save('ascend_workouts',d.workouts);
+    if(d.bodyweight) save('ascend_bodyweight',d.bodyweight);
+    if(d.lmg)        save('ascend_lmg',d.lmg);
+    if(d.day_plans)  save('ascend_day_plans',d.day_plans);
+    if(d.settings)   save('ascend_settings',d.settings);
+    if(d.checkins)   save('ascend_checkins',d.checkins);
+    if(d.reminders)  save(REMINDERS_KEY,d.reminders);
+  }catch(e){}
+}
 
-// ── SUPABASE SESSION ──
-// restore session from login.html
-localStorage.setItem('ascend_user_id', '85370f94-978d-4e5b-a021-4fd2eb3de5ce');
-(function initSupabaseSession(){
+// ─── CHECKLIST SERVER SYNC ───
+async function saveChecklistToServer(date) {
+  var userId=localStorage.getItem('ascend_user_id'); if(!userId) return;
+  fetch('/api/checklist/save',{method:'POST',headers:{'Content-Type':'application/json','x-user-id':userId},body:JSON.stringify({checked:[...checked],date:date})}).catch(function(){});
+}
+function loadChecklistFromServer(){return Promise.resolve(false);}
+
+// ─── SUPABASE SESSION ───
+localStorage.setItem('ascend_user_id','85370f94-978d-4e5b-a021-4fd2eb3de5ce');
+(function(){
   import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm').then(function(mod){
-    var sb = mod.createClient(
-      'https://asvpzsnncbxkpycsgfnj.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0'
-    );
-    window._sb = sb;
-    var _ss = localStorage.getItem('ascend_session');
-    if(_ss){ try{
-      var _sp=JSON.parse(_ss);
-      console.log('[auth] restoring session, user:', _sp.user?.id);
-      sb.auth.setSession({access_token:_sp.access_token,refresh_token:_sp.refresh_token}).then(function(r){
-        var uid = r.data?.session?.user?.id || _sp.user?.id;
-        console.log('[auth] session restored, uid:', uid);
-        if(uid){
-          localStorage.setItem('ascend_user_id', uid);
-          pullFromCloud().then(function(ok){
-            console.log('[sync] initial pull:', ok);
-            if(ok){ renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); }
-          });
-        }
-      }).catch(function(e){ console.log('[auth] setSession error:', e.message); if(_sp.user?.id) localStorage.setItem('ascend_user_id', _sp.user.id); });
-    }catch(e){ console.log('[auth] parse error:', e.message); } }
+    var sb=mod.createClient('https://asvpzsnncbxkpycsgfnj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0');
+    window._sb=sb;
     sb.auth.getSession().then(function(res){
-      var user = res.data.session?.user;
+      var user=res.data.session?.user;
       if(user){
-        localStorage.setItem('ascend_user_id', user.id);
-        localStorage.setItem('ascend_session', JSON.stringify(res.data.session));
-        console.log('[auth] session found:', user.id);
-        pullFromCloud().then(function(ok){ if(ok) console.log('[sync] cloud data loaded'); });
-        setTimeout(pushToCloud, 2000);
-      } else {
-        console.log('[auth] no session');
+        localStorage.setItem('ascend_user_id',user.id);
+        localStorage.setItem('ascend_session',JSON.stringify(res.data.session));
       }
     });
-    // Listen for auth changes (e.g. OAuth redirect)
-    sb.auth.onAuthStateChange(function(event, session){
+    sb.auth.onAuthStateChange(function(event,session){
       if(session?.user){
-        localStorage.setItem('ascend_user_id', session.user.id);
-        localStorage.setItem('ascend_session', JSON.stringify(session));
-        console.log('[auth] state change:', event, session.user.id);
-        if(event === 'SIGNED_IN'){
-          pullFromCloud().then(function(synced){
-            console.log('[sync] SIGNED_IN pull:', synced);
-            if(synced){
-              var saved=localStorage.getItem('ascend_profile');
-              if(saved) profile=JSON.parse(saved);
-              renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
-            }
-            setTimeout(pushToCloud, 1000);
-          });
-        }
-      } else {
-        localStorage.removeItem('ascend_user_id');
+        localStorage.setItem('ascend_user_id',session.user.id);
+        localStorage.setItem('ascend_session',JSON.stringify(session));
       }
     });
   });
 })();
 
-// ── CLOUD SYNC ──
-var _lastAction = 0;
-function _bumpAction(){ _lastAction = Date.now(); }
-var SYNC_KEYS = [
-  'ascend_profile','ascend_day_plans','ascend_meal_plans','ascend_macros',
-  'ascend_meals','ascend_workouts','ascend_bodyweight','ascend_lmg',
-  'ascend_checkins','ascend_score_history','ascend_settings','ascend_notifications',
-  'ascend_notif_seen'
-];
-
-function getSyncPayload(){
-  var obj = {};
-  SYNC_KEYS.forEach(function(k){
-    var v = localStorage.getItem(k);
-    if(v) obj[k] = v;
+// ─── BOOT ───
+window.addEventListener('DOMContentLoaded', function(){
+  updateDayBadge();
+  setInterval(updateDayBadge,60000);
+  // Load from cloud first, then render everything
+  loadFromCloud().then(function(){
+    renderChecklist();
+    renderMacros();
+    renderMealsSection();
+    renderTrainingSection();
+    renderWeightCards();
+    renderProgressPhotos();
+    renderLMG();
+    renderNotifBadge();
+    var lastPage=localStorage.getItem('ascend_page');
+    if(lastPage&&lastPage!=='checklist') showPage(lastPage,null);
   });
-  return obj;
-}
-
-function applySyncPayload(obj){
-  if(!obj) return;
-  SYNC_KEYS.forEach(function(k){
-    if(obj[k] !== undefined && obj[k] !== null){
-      localStorage.setItem(k, obj[k]);
-    }
-  });
-}
-
-var _syncTimer = null;
-function pushToCloud(){
-  if(_syncTimer) clearTimeout(_syncTimer);
-  _syncTimer = setTimeout(function(){
-    var userId = localStorage.getItem('ascend_user_id');
-    if(!userId) return;
-    fetch('/api/profile/save',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-user-id':userId},
-      body:JSON.stringify({profile:getSyncPayload()})
-    }).catch(function(){});
-  }, 1000);
-}
-
-async function pullFromCloud(){
-  var userId = localStorage.getItem('ascend_user_id');
-  if(!userId) return false;
-  try{
-    var res = await fetch('/api/credits',{headers:{'x-user-id':userId}});
-    var data = await res.json();
-    if(data.profile && typeof data.profile === 'object'){
-      applySyncPayload(data.profile);
-      return true;
-    }
-  }catch(e){}
-  return false;
-}
-
-// Pull non-checklist data every 10s
-setInterval(function(){
-  if(!localStorage.getItem('ascend_user_id')) return;
-  pullFromCloud().then(function(ok){
-    if(!ok) return;
-    renderMacros(); renderMealsSection(); renderTrainingSection();
-    renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
-  });
-}, 10000);
-
-// Pull checklist from dedicated table every 10s, only update if server differs
-setInterval(async function(){
-  var userId = localStorage.getItem('ascend_user_id');
-  if(!userId) return;
-  try{
-    var n=new Date(), dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
-    var res = await fetch('/api/checklist/history',{headers:{'x-user-id':userId}});
-    var data = await res.json();
-    if(data.logs && data.logs.length){
-      var todayLog = data.logs.find(function(l){ return l.date===dk; });
-      if(todayLog && todayLog.checked){
-        var serverChecked = new Set(todayLog.checked);
-        var localStr = JSON.stringify([...checked].sort(function(a,b){return a-b;}));
-        var serverStr = JSON.stringify([...serverChecked].sort(function(a,b){return a-b;}));
-        if(localStr !== serverStr){
-          checked = serverChecked;
-          localStorage.setItem('ascend_checked_today', JSON.stringify([...checked]));
-          localStorage.setItem('ascend_checked_date', dk);
-          renderChecklist();
-        }
-      }
-    }
-  }catch(e){}
-}, 10000);
-
-// Push on tab hide, pull on tab show
-document.addEventListener('visibilitychange', function(){
-  if(document.visibilityState === 'hidden'){
-    pushToCloud();
-  } else {
-    pullFromCloud().then(function(ok){
-      if(ok){ renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge(); }
-    });
-    loadChecklistFromServer().then(function(ok){
-      if(ok) renderChecklist();
-    });
-  }
 });
-
-function updateBottomNav(name){
-  document.querySelectorAll('.bottom-nav-item').forEach(function(b){
-    b.classList.toggle('active', b.id === 'bnav-'+name);
-  });
-}
-
-
-function toggleSidebar(){
-  var sb=document.querySelector('.sidebar');
-  var bd=document.getElementById('sidebarBackdrop');
-  var isOpen=sb.classList.contains('open');
-  sb.classList.toggle('open',!isOpen);
-  bd.classList.toggle('open',!isOpen);
-}
-function closeSidebar(){
-  document.querySelector('.sidebar')?.classList.remove('open');
-  document.getElementById('sidebarBackdrop')?.classList.remove('open');
-}
-
-
-function tickAllSection(key,e){
-  if(e)e.stopPropagation();
-  var allItems=window._allChecklistItems||[];
-  var indices=[];var inSec=false;
-  for(var i=0;i<allItems.length;i++){
-    if(allItems[i].type==='section'){inSec=(allItems[i].key===key);continue;}
-    if(inSec)indices.push(i);
-  }
-  var allDone=indices.length>0&&indices.every(function(i){return checked.has(i);});
-  indices.forEach(function(i){allDone?checked.delete(i):checked.add(i);});
-  var n=new Date(),dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
-  localStorage.setItem('ascend_checked_today',JSON.stringify([...checked]));
-  localStorage.setItem('ascend_checked_date',dk);
-  var dk2=new Date();var dks=dk2.getFullYear()+'-'+String(dk2.getMonth()+1).padStart(2,'0')+'-'+String(dk2.getDate()).padStart(2,'0');
-  renderChecklist();maybeSaveScore();saveChecklistToServer(dks);pushToCloud();
-}
-
-// Save checked state to Supabase directly
-async function saveChecklistToServer(date){
-  var userId=localStorage.getItem('ascend_user_id'); if(!userId)return;
-  fetch('/api/checklist/save',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-user-id':userId},
-    body:JSON.stringify({checked:[...checked],date:date})
-  }).catch(function(){});
-  // Also push full profile blob
-  pushToCloud();
-}
-
-// Load today's checked state from Supabase
-async function loadChecklistFromServer(){
-  var userId=localStorage.getItem('ascend_user_id'); if(!userId)return false;
-  var n=new Date(),dk=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
-  try{
-    var res=await fetch('/api/checklist/history',{headers:{'x-user-id':userId}});
-    var data=await res.json();
-    if(data.logs&&data.logs.length){
-      var todayLog=data.logs.find(function(l){return l.date===dk;});
-      if(todayLog&&todayLog.checked){
-        checked=new Set(todayLog.checked);
-        localStorage.setItem('ascend_checked_today',JSON.stringify([...checked]));
-        localStorage.setItem('ascend_checked_date',dk);
-        return true;
-      }
-    }
-  }catch(e){}
-  return false;
-}
-
 </script>
 </body>
 </html>
-</body>
