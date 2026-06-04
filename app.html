@@ -2114,51 +2114,55 @@ function loadMeals(){ return JSON.parse(localStorage.getItem("ascend_meals")||JS
 function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); _bumpAction(); pushToCloud(); }
 
 function getMealItems(meal){
-  return (meal.desc||'').split('\n').filter(function(s){return s.trim();});
-}
-function setMealItems(id, items){
-  var meals=loadMeals();
-  var m=meals.find(function(x){return x.id===id;}); if(!m)return;
-  m.desc = items.join('\n');
-  saveMeals(meals);
+  // Keep all items including empty ones to preserve indices
+  var parts = (meal.desc||'').split('\n');
+  return parts.length ? parts : [''];
 }
 function saveMealBullet(el){
-  var mid=parseInt(el.dataset.mid), bi=parseInt(el.dataset.bi);
-  var meals=loadMeals();
-  var m=meals.find(function(x){return x.id===mid;}); if(!m)return;
-  var items=getMealItems(m); items[bi]=el.innerText.trim()||'';
-  m.desc=items.join('\n'); saveMeals(meals);
+  // Read all bullets from DOM directly to avoid index mismatch
+  var mid = parseInt(el.dataset.mid);
+  var allBullets = document.querySelectorAll('[data-mid="'+mid+'"]');
+  var items = [];
+  allBullets.forEach(function(b){ items.push(b.innerText.trim()); });
+  var meals = loadMeals();
+  var m = meals.find(function(x){ return x.id===mid; }); if(!m) return;
+  m.desc = items.filter(function(s){ return s; }).join('\n');
+  saveMeals(meals);
 }
 function mealBulletKey(e,el){
-  if(e.key==='Enter'){e.preventDefault();addMealBullet(parseInt(el.dataset.mid));}
-  if(e.key==='Backspace'&&el.innerText.trim()===''){e.preventDefault();delMealBullet(parseInt(el.dataset.mid),parseInt(el.dataset.bi));}
+  if(e.key==='Enter'){
+    e.preventDefault();
+    addMealBullet(parseInt(el.dataset.mid));
+  }
+  if(e.key==='Backspace' && el.innerText.trim()===''){
+    e.preventDefault();
+    delMealBullet(parseInt(el.dataset.mid), parseInt(el.dataset.bi));
+  }
 }
 function addMealBullet(id){
-  var meals=loadMeals();
-  var m=meals.find(function(x){return x.id===id;}); if(!m)return;
-  var items=getMealItems(m);
-  items.push('new item');
-  m.desc=items.join('\n');
+  var meals = loadMeals();
+  var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
+  var items = (m.desc||'').split('\n').filter(function(s){ return s.trim(); });
+  items.push('');
+  m.desc = items.join('\n');
   saveMeals(meals);
   renderMealsSection();
   setTimeout(function(){
-    var rows=document.querySelectorAll('[data-mid="'+id+'"]');
+    var rows = document.querySelectorAll('[data-mid="'+id+'"]');
     if(rows.length){
-      var last=rows[rows.length-1];
+      var last = rows[rows.length-1];
       last.focus();
-      var range=document.createRange();
-      range.selectNodeContents(last);
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
     }
-  },50);
+  }, 30);
 }
-function delMealBullet(id,bi){
-  var meals=loadMeals();
-  var m=meals.find(function(x){return x.id===id;}); if(!m)return;
-  var items=getMealItems(m); items.splice(bi,1);
-  if(!items.length) items=[''];
-  m.desc=items.join('\n'); saveMeals(meals); renderMealsSection();
+function delMealBullet(id, bi){
+  var meals = loadMeals();
+  var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
+  var items = (m.desc||'').split('\n').filter(function(s){ return s.trim(); });
+  items.splice(bi, 1);
+  m.desc = items.join('\n');
+  saveMeals(meals);
+  renderMealsSection();
 }
 function renderMealsSection(){
   var el=document.getElementById("mealsSection"); if(!el)return;
