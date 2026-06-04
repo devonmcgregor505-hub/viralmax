@@ -256,9 +256,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .meal-name-input::placeholder{color:var(--t3);}
 .meal-bullet-row{display:flex;align-items:center;gap:6px;padding:2px 0;}
 .meal-bullet-dash{color:var(--t3);font-size:11px;flex-shrink:0;}
-.meal-bullet-input{flex:1;font-size:12.5px;color:var(--t2);outline:none;min-width:0;line-height:1.5;border-bottom:1px solid transparent;transition:border-color .15s;padding:1px 2px;}
+.meal-bullet-input{flex:1;font-size:12.5px;color:var(--t2);background:transparent;border:none;border-bottom:1px solid transparent;outline:none;font-family:inherit;min-width:0;padding:1px 2px;transition:border-color .15s;}
 .meal-bullet-input:focus{border-bottom-color:var(--t3);color:var(--text);}
-.meal-bullet-input:empty::before{content:attr(placeholder);color:var(--t4);}
 .meal-bullet-del{background:none;border:none;color:var(--t4);font-size:10px;cursor:pointer;padding:1px 4px;opacity:0;transition:opacity .15s;}
 .meal-bullet-row:hover .meal-bullet-del{opacity:1;}
 .meal-bullet-del:hover{color:var(--red);}
@@ -2343,55 +2342,33 @@ function loadMeals(){ return JSON.parse(localStorage.getItem("ascend_meals")||JS
 function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); _bumpAction(); pushToCloud(); }
 
 function getMealItems(meal){
-  // Keep all items including empty ones to preserve indices
-  var parts = (meal.desc||'').split('\n');
-  return parts.length ? parts : [''];
+  return (meal.desc||'').split('\n').filter(function(s){ return s.trim(); });
 }
-function saveMealBullet(el){
-  // Read all bullets from DOM directly to avoid index mismatch
-  var mid = parseInt(el.dataset.mid);
-  var allBullets = document.querySelectorAll('[data-mid="'+mid+'"]');
-  var items = [];
-  allBullets.forEach(function(b){ items.push(b.innerText.trim()); });
+function saveMealBullet(id, bi, val){
   var meals = loadMeals();
-  var m = meals.find(function(x){ return x.id===mid; }); if(!m) return;
-  m.desc = items.filter(function(s){ return s; }).join('\n');
+  var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
+  var items = getMealItems(m);
+  items[bi] = val;
+  m.desc = items.filter(function(s){ return s.trim(); }).join('\n');
   saveMeals(meals);
-}
-function mealBulletKey(e,el){
-  if(e.key==='Enter'){
-    e.preventDefault();
-    addMealBullet(parseInt(el.dataset.mid));
-  }
-  if(e.key==='Backspace' && el.innerText.trim()===''){
-    e.preventDefault();
-    delMealBullet(parseInt(el.dataset.mid), parseInt(el.dataset.bi));
-  }
 }
 function addMealBullet(id){
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = (m.desc||'').split('\n').filter(function(s){ return s.trim(); });
+  var items = getMealItems(m);
   items.push('New item');
   m.desc = items.join('\n');
   saveMeals(meals);
   renderMealsSection();
   setTimeout(function(){
-    var rows = document.querySelectorAll('[data-mid="'+id+'"]');
-    if(rows.length){
-      var last = rows[rows.length-1];
-      last.focus();
-      var range = document.createRange();
-      range.selectNodeContents(last);
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
-    }
+    var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
+    if(inputs.length){ inputs[inputs.length-1].focus(); inputs[inputs.length-1].select(); }
   }, 30);
 }
 function delMealBullet(id, bi){
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = (m.desc||'').split('\n').filter(function(s){ return s.trim(); });
+  var items = getMealItems(m);
   items.splice(bi, 1);
   m.desc = items.join('\n');
   saveMeals(meals);
@@ -2418,7 +2395,7 @@ function renderMealsSection(){
         var bullets = items.map(function(item, bi){
           return '<div class="meal-bullet-row">'
             +'<span class="meal-bullet-dash">—</span>'
-            +'<span class="meal-bullet-input" contenteditable="true" data-mid="'+meal.id+'" data-bi="'+bi+'" onblur="saveMealBullet(this)" onkeydown="mealBulletKey(event,this)">'+item+'</span>'
+            +'<input class="meal-bullet-input" type="text" data-mid="'+meal.id+'" data-bi="'+bi+'" value="'+item.replace(/"/g,'&quot;')+'" onchange="saveMealBullet('+meal.id+','+bi+',this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();addMealBullet('+meal.id+');}if(event.key==='Backspace'&&this.value===''){event.preventDefault();delMealBullet('+meal.id+','+bi+');}" />'
             +'<button class="meal-bullet-del" onclick="delMealBullet('+meal.id+','+bi+')">✕</button>'
             +'</div>';
         }).join('');
