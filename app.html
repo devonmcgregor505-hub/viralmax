@@ -2184,7 +2184,6 @@ function checkScheduledNotifs(){
 // MACROS
 var MACRO_DEFAULTS = {calories:2600,protein:160};
 function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||JSON.stringify(MACRO_DEFAULTS)); }
-function saveMacros(m){ localStorage.setItem("ascend_macros",JSON.stringify(m)); }
 function renderMacros(){
   var el=document.getElementById("macroGrid"); if(!el)return;
   var m=loadMacros();
@@ -2225,7 +2224,6 @@ function saveMacroEdit(key){
 
 // MACROS
 function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||'{"calories":2600,"protein":160}'); }
-function saveMacros(m){ localStorage.setItem("ascend_macros",JSON.stringify(m)); }
 function renderMacros(){
   var el=document.getElementById("macroGrid"); if(!el)return;
   var m=loadMacros();
@@ -2268,7 +2266,6 @@ function editMacro(key){
 
 // MACROS
 function loadMacros(){ return JSON.parse(localStorage.getItem("ascend_macros")||'{"calories":2600,"protein":160}'); }
-function saveMacros(m){ localStorage.setItem("ascend_macros",JSON.stringify(m)); }
 function renderMacros(){
   var el=document.getElementById("macroGrid"); if(!el)return;
   var m=loadMacros();
@@ -2303,7 +2300,6 @@ function editMacro(key){
 
 // MACROS
 function loadMacros(){return JSON.parse(localStorage.getItem("ascend_macros")||'{"calories":2600,"protein":160}');}
-function saveMacros(m){localStorage.setItem("ascend_macros",JSON.stringify(m));_bumpAction();pushToCloud();}
 function renderMacros(){
   var el=document.getElementById("macroGrid");if(!el)return;
   var m=loadMacros();
