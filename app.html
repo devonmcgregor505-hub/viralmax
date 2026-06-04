@@ -2343,41 +2343,33 @@ function getMealItems(meal){
   return (meal.desc||'').split('\n').filter(function(s){ return s.trim(); });
 }
 function saveMealBullet(id, bi, val){
-  // Read ALL current inputs from DOM for this meal to get exact current state
-  var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
-  var items = [];
-  inputs.forEach(function(inp){ items.push(inp.value.trim()); });
-  items[bi] = val.trim();
-  items = items.filter(function(s){ return s; });
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
+  var items = getMealItems(m);
+  while(items.length <= bi) items.push('');
+  items[bi] = val.trim();
+  items = items.filter(function(s){ return s; });
   m.desc = items.join('\n');
   saveMeals(meals);
 }
 function addMealBullet(id){
-  // Read current DOM state before re-rendering
-  var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
-  var items = [];
-  inputs.forEach(function(inp){ if(inp.value.trim()) items.push(inp.value.trim()); });
-  items.push('New item');
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
+  var items = getMealItems(m);
+  items.push('New item');
   m.desc = items.join('\n');
   saveMeals(meals);
   renderMealsSection();
   setTimeout(function(){
     var all = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
     if(all.length){ all[all.length-1].focus(); all[all.length-1].select(); }
-  }, 30);
+  }, 50);
 }
 function delMealBullet(id, bi){
-  var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
-  var items = [];
-  inputs.forEach(function(inp){ items.push(inp.value.trim()); });
-  items.splice(bi, 1);
-  items = items.filter(function(s){ return s; });
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
+  var items = getMealItems(m);
+  items.splice(bi, 1);
   m.desc = items.join('\n');
   saveMeals(meals);
   renderMealsSection();
