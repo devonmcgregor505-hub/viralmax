@@ -1291,7 +1291,7 @@ function renderChecklist() {
   var morningItems=morning.map(function(b){return {type:'item',section:'morning',title:b.title,time:b.time,items:b.items||[]};});
   var nightItems=night.map(function(b){return {type:'item',section:'night',title:b.title,time:b.time,items:b.items||[]};});
   if(isNight){
-    // Nighttime order: During the day → Night → Morning
+    // Nighttime: During the day → Night → Morning
     allItems.push({type:'section',key:'day',label:'⚡ During the day',color:'day'});
     dayItems.forEach(function(x){allItems.push(x);});
     allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
@@ -1299,11 +1299,11 @@ function renderChecklist() {
     allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
     morningItems.forEach(function(x){allItems.push(x);});
   } else {
-    // Daytime order: Morning → During the day → Night
-    allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
-    morningItems.forEach(function(x){allItems.push(x);});
+    // Daytime: During the day → Morning → Night
     allItems.push({type:'section',key:'day',label:'⚡ During the day',color:'day'});
     dayItems.forEach(function(x){allItems.push(x);});
+    allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
+    morningItems.forEach(function(x){allItems.push(x);});
     allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
     nightItems.forEach(function(x){allItems.push(x);});
   }
