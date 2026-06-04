@@ -1281,13 +1281,20 @@ function renderChecklist() {
   }
   var allItems=[];
   var isNight=nowHour>=middayHour;
-  if(!isNight) allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
+  // Morning section + items
+  if(!isNight){
+    allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
+    morning.forEach(function(b){ allItems.push({type:'item',section:'morning',title:b.title,time:b.time,items:b.items||[]}); });
+  }
+  // Day section + items
   allItems.push({type:'section',key:'day',label:'⚡ During the day',color:'day'});
-  if(isNight) allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
-  morning.forEach(function(b){ allItems.push({type:'item',section:'morning',title:b.title,time:b.time,items:b.items||[]}); });
   if(dayTasks) dayTasks.forEach(function(t){ allItems.push({type:'item',section:'day',title:t.name||t.title,items:[]}); });
   else { allItems.push({type:'item',section:'day',title:'Drink 3L water',items:[]}); allItems.push({type:'item',section:'day',title:'Training or movement',items:[]}); }
-  night.forEach(function(b){ allItems.push({type:'item',section:'night',title:b.title,time:b.time,items:b.items||[]}); });
+  // Night section + items
+  if(isNight){
+    allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
+    night.forEach(function(b){ allItems.push({type:'item',section:'night',title:b.title,time:b.time,items:b.items||[]}); });
+  }
   window._allChecklistItems=allItems;
   var itemIdx=0;
   var html='';
