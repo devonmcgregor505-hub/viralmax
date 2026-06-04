@@ -2332,33 +2332,33 @@ function editMacro(key){
 
 // MEALS
 var DEFAULT_MEALS = [
-  {id:1, emoji:"🌅", name:"Breakfast", desc:"Eggs, Greek yogurt, fruit", cals:450, protein:35},
-  {id:2, emoji:"☀️", name:"Lunch", desc:"Chicken & rice bowl", cals:650, protein:50},
-  {id:3, emoji:"🌙", name:"Dinner", desc:"Beef mince & vegetables", cals:750, protein:55}
+  {id:1, name:"Breakfast", items:["Eggs, Greek yogurt, fruit"], cals:450, protein:35},
+  {id:2, name:"Lunch", items:["Chicken & rice bowl"], cals:650, protein:50},
+  {id:3, name:"Dinner", items:["Beef mince & vegetables"], cals:750, protein:55}
 ];
-function loadMeals(){ return JSON.parse(localStorage.getItem("ascend_meals")||JSON.stringify(DEFAULT_MEALS)); }
+function loadMeals(){
+  var meals = JSON.parse(localStorage.getItem("ascend_meals")||JSON.stringify(DEFAULT_MEALS));
+  // migrate old desc string format to items array
+  meals.forEach(function(m){
+    if(!m.items){
+      m.items = m.desc ? m.desc.split('\n').filter(function(s){return s.trim();}) : [];
+      delete m.desc;
+    }
+  });
+  return meals;
+}
 function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); syncSection("meals",m); }
 
-function getMealItems(meal){
-  return (meal.desc||'').split('\n').filter(function(s){ return s.trim(); });
-}
 function saveMealBullet(id, bi, val){
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = getMealItems(m);
-  while(items.length <= bi) items.push('');
-  items[bi] = val.trim();
-  items = items.filter(function(s){ return s; });
-  m.desc = items.join('\n');
+  m.items[bi] = val.trim();
   saveMeals(meals);
-  renderMealsSection();
 }
 function addMealBullet(id){
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = getMealItems(m);
-  items.push('New item');
-  m.desc = items.join('\n');
+  m.items.push('New item');
   saveMeals(meals);
   renderMealsSection();
   setTimeout(function(){
@@ -2369,9 +2369,7 @@ function addMealBullet(id){
 function delMealBullet(id, bi){
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = getMealItems(m);
-  items.splice(bi, 1);
-  m.desc = items.join('\n');
+  m.items.splice(bi, 1);
   saveMeals(meals);
   renderMealsSection();
 }
@@ -2395,8 +2393,7 @@ function renderMealsSection(){
       +"<div class=\"meal-row-info\">"
       +"<input class=\"meal-name-input\" value=\""+meal.name+"\" placeholder=\"Meal name\" onchange=\"updateMeal("+meal.id+",'name',this.value)\"/>"
       +(function(){
-        var items = (meal.desc||'').split('\n').filter(function(s){return s.trim();});
-        if(!items.length) items = [''];
+        var items = meal.items && meal.items.length ? meal.items : [''];
         var bullets = items.map(function(item, bi){
           return '<div class="meal-bullet-row">'
             +'<span class="meal-bullet-dash">—</span>'
@@ -2431,7 +2428,7 @@ function addMeal(){
   var meals=loadMeals();
   var emojis=["🥗","🍳","🥩","🍱","🥤","🍚","🥪"];
   var newId=Date.now();
-  meals.push({id:newId,emoji:emojis[meals.length%emojis.length],name:"New meal",desc:"",cals:0,protein:0});
+  meals.push({id:newId,name:"New meal",items:[],cals:0,protein:0});
   saveMeals(meals); renderMealsSection();
   setTimeout(function(){
     var inputs=document.querySelectorAll(".meal-name-input");
