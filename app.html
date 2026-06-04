@@ -1280,14 +1280,33 @@ function renderChecklist() {
     morning=MORNING; night=NIGHT; dayTasks=null;
   }
   var allItems=[];
-  // Always show all three sections in order
-  allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
-  morning.forEach(function(b){ allItems.push({type:'item',section:'morning',title:b.title,time:b.time,items:b.items||[]}); });
-  allItems.push({type:'section',key:'day',label:'⚡ During the day',color:'day'});
-  if(dayTasks) dayTasks.forEach(function(t){ allItems.push({type:'item',section:'day',title:t.name||t.title,items:[]}); });
-  else { allItems.push({type:'item',section:'day',title:'Drink 3L water',items:[]}); allItems.push({type:'item',section:'day',title:'Training or movement',items:[]}); }
-  allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
-  night.forEach(function(b){ allItems.push({type:'item',section:'night',title:b.title,time:b.time,items:b.items||[]}); });
+  var isNight=nowHour>=middayHour;
+  var dayItems=[];
+  if(dayTasks && dayTasks.length){
+    dayTasks.forEach(function(t){ dayItems.push({type:'item',section:'day',title:t.name||t.title,items:t.items||[]}); });
+  } else {
+    dayItems.push({type:'item',section:'day',title:'Drink 3L water',items:[]});
+    dayItems.push({type:'item',section:'day',title:'Training or movement',items:[]});
+  }
+  var morningItems=morning.map(function(b){return {type:'item',section:'morning',title:b.title,time:b.time,items:b.items||[]};});
+  var nightItems=night.map(function(b){return {type:'item',section:'night',title:b.title,time:b.time,items:b.items||[]};});
+  if(isNight){
+    // Night time: show Day first, then Morning, then Night
+    allItems.push({type:'section',key:'day',label:'⚡ During the day',color:'day'});
+    dayItems.forEach(function(x){allItems.push(x);});
+    allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
+    morningItems.forEach(function(x){allItems.push(x);});
+    allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
+    nightItems.forEach(function(x){allItems.push(x);});
+  } else {
+    // Morning time: show Morning first, then Day, then Night
+    allItems.push({type:'section',key:'morning',label:'☀️ Morning',color:'morning'});
+    morningItems.forEach(function(x){allItems.push(x);});
+    allItems.push({type:'section',key:'day',label:'⚡ During the day',color:'day'});
+    dayItems.forEach(function(x){allItems.push(x);});
+    allItems.push({type:'section',key:'night',label:'🌙 Night',color:'night'});
+    nightItems.forEach(function(x){allItems.push(x);});
+  }
   window._allChecklistItems=allItems;
   var itemIdx=0;
   var html='';
