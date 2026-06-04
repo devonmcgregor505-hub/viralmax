@@ -671,9 +671,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <!-- ONBOARDING OVERLAY -->
-<div class="onboarding-overlay" id="onboardingOverlay">
-  <div class="onboarding-box">
-    <div class="ob-wordmark">ASCEND</div>
     <div id="obContent"></div>
   </div>
 </div>
@@ -1134,8 +1131,7 @@ async function generateRoutineFromAI(){
 }
 
 function launchApp(){
-  document.getElementById('onboardingOverlay').style.display='none';
-  localStorage.setItem('ascend_profile',JSON.stringify(profile));
+    localStorage.setItem('ascend_profile',JSON.stringify(profile));
   initApp();
   pushToCloud();
 }
@@ -1444,8 +1440,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     var saved=localStorage.getItem('ascend_profile');
     if(saved){
       profile=JSON.parse(saved);
-      document.getElementById('onboardingOverlay').style.display='none';
-      initApp();
+            initApp();
       var lastPage=localStorage.getItem('ascend_page');
       if(lastPage && lastPage!=='checklist') showPage(lastPage,null);
     } else {
@@ -1460,8 +1455,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       var saved=localStorage.getItem('ascend_profile');
       if(saved){
         profile=JSON.parse(saved);
-        document.getElementById('onboardingOverlay').style.display='none';
-        initApp();
+                initApp();
         var lastPage=localStorage.getItem('ascend_page');
         if(lastPage && lastPage!=='checklist') showPage(lastPage,null);
         return;
@@ -1512,7 +1506,7 @@ function redoQuiz(){
   document.getElementById('avatarDropdown').classList.remove('open');
   localStorage.removeItem('ascend_profile');
   profile=null; obStep=0; obAnswers={}; obMulti={};
-  document.getElementById('onboardingOverlay').style.display='flex';
+  
   renderOB();
 }
 function openPricing(){ document.getElementById('avatarDropdown').classList.remove('open'); window.location.href='/checkout'; }
