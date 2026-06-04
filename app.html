@@ -2341,42 +2341,52 @@ var DEFAULT_MEALS = [
 function loadMeals(){ return JSON.parse(localStorage.getItem("ascend_meals")||JSON.stringify(DEFAULT_MEALS)); }
 function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); _bumpAction(); pushToCloud(); }
 
-function mealBulletKeyHandler(e,id,bi){
-  if(e.key==="Enter"){e.preventDefault();addMealBullet(id);}
-  if(e.key==="Backspace"&&e.target.value===""){e.preventDefault();delMealBullet(id,bi);}
-}
 function getMealItems(meal){
   return (meal.desc||'').split('\n').filter(function(s){ return s.trim(); });
 }
 function saveMealBullet(id, bi, val){
+  // Read ALL current inputs from DOM for this meal to get exact current state
+  var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
+  var items = [];
+  inputs.forEach(function(inp){ items.push(inp.value.trim()); });
+  items[bi] = val.trim();
+  items = items.filter(function(s){ return s; });
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = getMealItems(m);
-  items[bi] = val;
-  m.desc = items.filter(function(s){ return s.trim(); }).join('\n');
+  m.desc = items.join('\n');
   saveMeals(meals);
 }
 function addMealBullet(id){
+  // Read current DOM state before re-rendering
+  var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
+  var items = [];
+  inputs.forEach(function(inp){ if(inp.value.trim()) items.push(inp.value.trim()); });
+  items.push('New item');
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = getMealItems(m);
-  items.push('New item');
   m.desc = items.join('\n');
   saveMeals(meals);
   renderMealsSection();
   setTimeout(function(){
-    var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
-    if(inputs.length){ inputs[inputs.length-1].focus(); inputs[inputs.length-1].select(); }
+    var all = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
+    if(all.length){ all[all.length-1].focus(); all[all.length-1].select(); }
   }, 30);
 }
 function delMealBullet(id, bi){
+  var inputs = document.querySelectorAll('.meal-bullet-input[data-mid="'+id+'"]');
+  var items = [];
+  inputs.forEach(function(inp){ items.push(inp.value.trim()); });
+  items.splice(bi, 1);
+  items = items.filter(function(s){ return s; });
   var meals = loadMeals();
   var m = meals.find(function(x){ return x.id===id; }); if(!m) return;
-  var items = getMealItems(m);
-  items.splice(bi, 1);
   m.desc = items.join('\n');
   saveMeals(meals);
   renderMealsSection();
+}
+function mealBulletKeyHandler(e,id,bi){
+  if(e.key==="Enter"){e.preventDefault();addMealBullet(id);}
+  if(e.key==="Backspace"&&e.target.value===""){e.preventDefault();delMealBullet(id,bi);}
 }
 function renderMealsSection(){
   var el=document.getElementById("mealsSection"); if(!el)return;
