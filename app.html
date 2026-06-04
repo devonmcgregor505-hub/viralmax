@@ -526,6 +526,64 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </head>
 <body>
 
+<!-- REMINDER SETTINGS POPUP -->
+<div class="popup-overlay" id="reminderSettingsPopup" style="display:none" onclick="if(event.target===this)closeReminderSettings()">
+  <div class="popup-box" style="max-width:500px;">
+    <button class="popup-close" onclick="closeReminderSettings()">✕</button>
+    <div class="popup-title">Reminders</div>
+    <div class="popup-sub">Set recurring or one-time notifications</div>
+    <div id="reminderList" style="margin-bottom:16px;"></div>
+    <button class="btn-y" style="width:100%;justify-content:center;" onclick="addReminder()">+ New reminder</button>
+  </div>
+</div>
+
+<!-- REMINDER EDIT POPUP -->
+<div class="popup-overlay" id="reminderEditPopup" style="display:none" onclick="if(event.target===this)closeReminderEdit()">
+  <div class="popup-box" style="max-width:420px;">
+    <button class="popup-close" onclick="closeReminderEdit()">✕</button>
+    <div class="popup-title" id="reminderEditTitle">Edit Reminder</div>
+    <div style="margin-top:16px;">
+      <div class="settings-label">Message</div>
+      <input class="settings-input" id="reminderEditMsg" placeholder="Reminder message..." style="margin-bottom:14px;"/>
+      <div class="settings-label">Frequency</div>
+      <select class="settings-select" id="reminderEditFreq" onchange="reminderFreqChange()" style="margin-bottom:14px;">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="once">One time</option>
+      </select>
+      <div id="reminderEditDayWrap" style="display:none;margin-bottom:14px;">
+        <div class="settings-label">Day of week</div>
+        <select class="settings-select" id="reminderEditDay">
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+        </select>
+      </div>
+      <div id="reminderEditMonthDayWrap" style="display:none;margin-bottom:14px;">
+        <div class="settings-label">Day of month</div>
+        <input class="settings-input" type="number" id="reminderEditMonthDay" min="1" max="31" value="1"/>
+      </div>
+      <div id="reminderEditDateWrap" style="display:none;margin-bottom:14px;">
+        <div class="settings-label">Date</div>
+        <input class="settings-input" type="date" id="reminderEditDate"/>
+      </div>
+      <div class="settings-label">Time</div>
+      <input class="settings-input" type="time" id="reminderEditTime" value="09:00" style="margin-bottom:14px;"/>
+      <div class="settings-label">Icon</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="reminderIconPicker"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-y" style="flex:1;justify-content:center;" onclick="saveReminderEdit()">Save</button>
+      <button class="btn-ghost" onclick="closeReminderEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- SETTINGS POPUP -->
 <div class="popup-overlay" id="settingsPopup" style="display:none" onclick="if(event.target===this)closeSettings()">
   <div class="popup-box" style="max-width:480px;">
@@ -647,7 +705,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <div class="notif-dropdown" id="notifDropdown">
         <div class="notif-header">
           <span class="notif-title">Notifications</span>
-          <button class="notif-clear-all" onclick="clearAllNotifs()">Clear all</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="openReminderSettings()" style="background:none;border:none;color:var(--t3);cursor:pointer;padding:2px 4px;border-radius:5px;transition:color .15s;display:flex;align-items:center;" title="Manage reminders">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </button>
+            <button class="notif-clear-all" onclick="clearAllNotifs()">Clear all</button>
+          </div>
         </div>
         <div class="notif-list" id="notifList"></div>
       </div>
@@ -1866,11 +1929,28 @@ function updateStreakBadge(){
 // NOTIFICATIONS
 const NOTIF_KEY = 'ascend_notifications';
 const NOTIF_SEEN_KEY = 'ascend_notif_seen';
+const REMINDERS_KEY = 'ascend_reminders';
+var _reminderEditId = null;
+
+// ── DEFAULT REMINDERS ──
+function getReminders(){
+  var stored = localStorage.getItem(REMINDERS_KEY);
+  if(stored) return JSON.parse(stored);
+  // Pre-load the progress photos reminder
+  var defaults = [
+    {id:1, msg:'Time to add your weekly progress photos — keep the streak going.', icon:'📸', freq:'weekly', day:5, time:'09:00', enabled:true}
+  ];
+  localStorage.setItem(REMINDERS_KEY, JSON.stringify(defaults));
+  return defaults;
+}
+function saveReminders(arr){ localStorage.setItem(REMINDERS_KEY, JSON.stringify(arr)); pushToCloud(); }
+
+// ── NOTIFS ──
 function getNotifs(){ return JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]'); }
 function saveNotifs(arr){ localStorage.setItem(NOTIF_KEY, JSON.stringify(arr)); }
 function addNotif(msg, icon, iconClass){
   const notifs = getNotifs();
-  notifs.unshift({id:Date.now(), msg, icon:icon||'bell', iconClass:iconClass||'', time:new Date().toISOString(), read:false});
+  notifs.unshift({id:Date.now(), msg:msg, icon:icon||'🔔', iconClass:iconClass||'', time:new Date().toISOString(), read:false});
   saveNotifs(notifs);
   renderNotifBadge();
 }
@@ -1928,6 +2008,132 @@ document.addEventListener('click', function(e){
   var wrap = document.getElementById('notifWrap');
   if(wrap && !wrap.contains(e.target)) document.getElementById('notifDropdown') && document.getElementById('notifDropdown').classList.remove('open');
 });
+
+// ── REMINDER SETTINGS ──
+var REMINDER_ICONS = ['📸','💪','🧴','🍽️','💊','🧘','📖','💧','🏋️','🌙','☀️','🔔','⚡','🎯','🛌'];
+var FREQ_LABELS = {daily:'Daily', weekly:'Weekly', monthly:'Monthly', once:'One time'};
+var DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function openReminderSettings(){
+  document.getElementById('notifDropdown').classList.remove('open');
+  renderReminderList();
+  document.getElementById('reminderSettingsPopup').style.display='flex';
+}
+function closeReminderSettings(){
+  document.getElementById('reminderSettingsPopup').style.display='none';
+}
+function renderReminderList(){
+  var reminders = getReminders();
+  var el = document.getElementById('reminderList');
+  if(!el) return;
+  if(!reminders.length){
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--t3);font-size:13px;">No reminders yet</div>';
+    return;
+  }
+  el.innerHTML = reminders.map(function(r){
+    var freqLabel = FREQ_LABELS[r.freq] || r.freq;
+    if(r.freq==='weekly') freqLabel += ' · '+DAY_NAMES[r.day||0];
+    if(r.freq==='monthly') freqLabel += ' · Day '+r.monthDay;
+    if(r.time) freqLabel += ' · '+r.time;
+    return '<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">'
+      +'<div style="font-size:20px;flex-shrink:0;">'+r.icon+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.msg+'</div>'
+        +'<div style="font-size:11px;color:var(--t3);">'+freqLabel+'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0;">'
+        +'<button onclick="editReminder('+r.id+')" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;font-family:inherit;transition:all .15s;">Edit</button>'
+        +'<button onclick="deleteReminder('+r.id+')" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:7px;color:var(--red);font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;font-family:inherit;transition:all .15s;">Delete</button>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+function addReminder(){
+  _reminderEditId = null;
+  document.getElementById('reminderEditTitle').textContent = 'New Reminder';
+  document.getElementById('reminderEditMsg').value = '';
+  document.getElementById('reminderEditFreq').value = 'daily';
+  document.getElementById('reminderEditTime').value = '09:00';
+  document.getElementById('reminderEditDay').value = '5';
+  document.getElementById('reminderEditMonthDay').value = '1';
+  var today = new Date(); var dd=String(today.getDate()).padStart(2,'0'); var mm=String(today.getMonth()+1).padStart(2,'0');
+  document.getElementById('reminderEditDate').value = today.getFullYear()+'-'+mm+'-'+dd;
+  renderIconPicker('📸');
+  reminderFreqChange();
+  document.getElementById('reminderEditPopup').style.display='flex';
+}
+function editReminder(id){
+  var r = getReminders().find(function(x){return x.id===id;}); if(!r) return;
+  _reminderEditId = id;
+  document.getElementById('reminderEditTitle').textContent = 'Edit Reminder';
+  document.getElementById('reminderEditMsg').value = r.msg;
+  document.getElementById('reminderEditFreq').value = r.freq||'daily';
+  document.getElementById('reminderEditTime').value = r.time||'09:00';
+  document.getElementById('reminderEditDay').value = r.day||5;
+  document.getElementById('reminderEditMonthDay').value = r.monthDay||1;
+  if(r.date) document.getElementById('reminderEditDate').value = r.date;
+  renderIconPicker(r.icon||'📸');
+  reminderFreqChange();
+  document.getElementById('reminderEditPopup').style.display='flex';
+}
+function deleteReminder(id){
+  if(!confirm('Delete this reminder?')) return;
+  saveReminders(getReminders().filter(function(r){return r.id!==id;}));
+  renderReminderList();
+}
+function closeReminderEdit(){
+  document.getElementById('reminderEditPopup').style.display='none';
+}
+function reminderFreqChange(){
+  var freq = document.getElementById('reminderEditFreq').value;
+  document.getElementById('reminderEditDayWrap').style.display = freq==='weekly'?'block':'none';
+  document.getElementById('reminderEditMonthDayWrap').style.display = freq==='monthly'?'block':'none';
+  document.getElementById('reminderEditDateWrap').style.display = freq==='once'?'block':'none';
+}
+function renderIconPicker(selected){
+  var el = document.getElementById('reminderIconPicker'); if(!el) return;
+  el.innerHTML = REMINDER_ICONS.map(function(ic){
+    return '<span onclick="selectReminderIcon(this,\''+ic+'\')" style="font-size:22px;cursor:pointer;padding:6px;border-radius:8px;border:2px solid '+(ic===selected?'var(--y)':'transparent')+';transition:all .15s;">'+ic+'</span>';
+  }).join('');
+}
+function selectReminderIcon(el, icon){
+  document.querySelectorAll('#reminderIconPicker span').forEach(function(s){ s.style.borderColor='transparent'; });
+  el.style.borderColor='var(--y)';
+  el.dataset.selected='true';
+}
+function getSelectedIcon(){
+  var spans = document.querySelectorAll('#reminderIconPicker span');
+  for(var i=0;i<spans.length;i++){ if(spans[i].style.borderColor.includes('255')||spans[i].style.borderColor==='var(--y)') return spans[i].textContent; }
+  return '🔔';
+}
+function saveReminderEdit(){
+  var msg = document.getElementById('reminderEditMsg').value.trim();
+  if(!msg){ alert('Please enter a message'); return; }
+  var freq = document.getElementById('reminderEditFreq').value;
+  var r = {
+    id: _reminderEditId || Date.now(),
+    msg: msg,
+    icon: getSelectedIcon(),
+    freq: freq,
+    day: parseInt(document.getElementById('reminderEditDay').value),
+    monthDay: parseInt(document.getElementById('reminderEditMonthDay').value),
+    date: document.getElementById('reminderEditDate').value,
+    time: document.getElementById('reminderEditTime').value,
+    enabled: true
+  };
+  var reminders = getReminders();
+  if(_reminderEditId){
+    var idx = reminders.findIndex(function(x){return x.id===_reminderEditId;});
+    if(idx>-1) reminders[idx]=r; else reminders.push(r);
+  } else {
+    reminders.push(r);
+  }
+  saveReminders(reminders);
+  closeReminderEdit();
+  renderReminderList();
+}
+
+// ── CHECK SCHEDULED REMINDERS ──
 function getWeekNumber(d){
   var date = new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
   date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));
@@ -1937,17 +2143,40 @@ function getWeekNumber(d){
 function checkScheduledNotifs(){
   var now = new Date();
   var seen = JSON.parse(localStorage.getItem(NOTIF_SEEN_KEY)||'{}');
-  var weekKey = 'photo_'+now.getFullYear()+'_'+getWeekNumber(now);
-  if(now.getDay()===5 && !seen[weekKey]){
-    addNotif('Time to add your weekly progress photos — keep the streak going.', '📸', 'notif-icon-photo');
-    seen[weekKey]=true;
-    localStorage.setItem(NOTIF_SEEN_KEY, JSON.stringify(seen));
-  }
+  var reminders = getReminders();
+  var nowHour = now.getHours();
+  var nowMin = now.getMinutes();
+  reminders.forEach(function(r){
+    if(!r.enabled) return;
+    var rHour = 9, rMin = 0;
+    if(r.time){ var parts=r.time.split(':'); rHour=parseInt(parts[0]); rMin=parseInt(parts[1]||0); }
+    if(nowHour < rHour || (nowHour===rHour && nowMin < rMin)) return;
+    var key = 'r_'+r.id+'_';
+    if(r.freq==='daily'){
+      key += now.getFullYear()+'_'+now.getMonth()+'_'+now.getDate();
+    } else if(r.freq==='weekly'){
+      key += now.getFullYear()+'_'+getWeekNumber(now);
+      if(now.getDay() !== (r.day||5)) return;
+    } else if(r.freq==='monthly'){
+      key += now.getFullYear()+'_'+now.getMonth();
+      if(now.getDate() !== (r.monthDay||1)) return;
+    } else if(r.freq==='once'){
+      if(!r.date) return;
+      var rd=new Date(r.date); if(now.toDateString()!==rd.toDateString()) return;
+      key += r.date;
+    }
+    if(!seen[key]){
+      addNotif(r.msg, r.icon, 'notif-icon-photo');
+      seen[key]=true;
+      localStorage.setItem(NOTIF_SEEN_KEY, JSON.stringify(seen));
+    }
+  });
 }
 (function initNotifs(){
+  getReminders(); // ensure defaults are seeded
   checkScheduledNotifs();
   renderNotifBadge();
-  setInterval(checkScheduledNotifs, 3600000);
+  setInterval(checkScheduledNotifs, 60000);
 })();
 
 
