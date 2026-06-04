@@ -1136,6 +1136,7 @@ function launchApp(){
 }
 
 // ─── APP INIT ───
+function loadChecklistFromServer(){ return Promise.resolve(false); }
 function initApp(){
   const saved = JSON.parse(localStorage.getItem('ascend_profile')||'{}');
   const morning   = saved.morning   || MORNING;
