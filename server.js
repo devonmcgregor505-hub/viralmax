@@ -319,6 +319,39 @@ app.get('/api/scores/history', async (req, res) => {
   }
 });
 
+// ── Save user data (per-section) ──
+app.post('/api/data/save', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  if (!userId) return res.json({ ok: true });
+  const { section, data } = req.body;
+  const allowed = ['meals','macros','workouts','bodyweight','lmg','day_plans','settings','checkins','reminders'];
+  if (!allowed.includes(section)) return res.status(400).json({ error: 'invalid section' });
+  try {
+    const update = { user_id: userId, updated_at: new Date().toISOString() };
+    update[section] = data;
+    const { error } = await supabase.from('user_data').upsert(update, { onConflict: 'user_id' });
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch(err) {
+    console.error('[data/save]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Load all user data ──
+app.get('/api/data/load', async (req, res) => {
+  const userId = req.headers['x-user-id'];
+  if (!userId) return res.json({ data: null });
+  try {
+    const { data, error } = await supabase.from('user_data').select('*').eq('user_id', userId).single();
+    if (error && error.code !== 'PGRST116') throw error;
+    res.json({ data: data || null });
+  } catch(err) {
+    console.error('[data/load]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════════════════
 // AUTH + USER ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
