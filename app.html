@@ -2341,6 +2341,10 @@ var DEFAULT_MEALS = [
 function loadMeals(){ return JSON.parse(localStorage.getItem("ascend_meals")||JSON.stringify(DEFAULT_MEALS)); }
 function saveMeals(m){ localStorage.setItem("ascend_meals",JSON.stringify(m)); _bumpAction(); pushToCloud(); }
 
+function mealBulletKeyHandler(e,id,bi){
+  if(e.key==="Enter"){e.preventDefault();addMealBullet(id);}
+  if(e.key==="Backspace"&&e.target.value===""){e.preventDefault();delMealBullet(id,bi);}
+}
 function getMealItems(meal){
   return (meal.desc||'').split('\n').filter(function(s){ return s.trim(); });
 }
@@ -2395,7 +2399,7 @@ function renderMealsSection(){
         var bullets = items.map(function(item, bi){
           return '<div class="meal-bullet-row">'
             +'<span class="meal-bullet-dash">—</span>'
-            +'<input class="meal-bullet-input" type="text" data-mid="'+meal.id+'" data-bi="'+bi+'" value="'+item.replace(/"/g,'&quot;')+'" onchange="saveMealBullet('+meal.id+','+bi+',this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();addMealBullet('+meal.id+');}if(event.key==='Backspace'&&this.value===''){event.preventDefault();delMealBullet('+meal.id+','+bi+');}" />'
+            +'<input class="meal-bullet-input" type="text" data-mid="'+meal.id+'" data-bi="'+bi+'" value="'+item.replace(/"/g,'&quot;')+'" onchange="saveMealBullet('+meal.id+','+bi+',this.value)" onkeydown="mealBulletKeyHandler(event,'+meal.id+','+bi+')" />'
             +'<button class="meal-bullet-del" onclick="delMealBullet('+meal.id+','+bi+')">✕</button>'
             +'</div>';
         }).join('');
