@@ -874,39 +874,10 @@ const NIGHT = [
   {time:'10:00',title:'Sleep optimisation',tag:'mind',tagLabel:'Sleep',items:['Room cool — 17–19°C','Phone out of reach','Target 7.5–9h sleep','Magnesium glycinate 200–400mg']},
   {time:'10:15',title:'Daily review',tag:'mind',tagLabel:'Mind',items:['Did you hit your checklist today?','One thing you did well','One thing to improve tomorrow']},
 ];
-const DEFAULT_MEALS = [
-  {id:1, name:'Breakfast', items:['6x eggs, 300g cooked rice, 20g tallow'], cals:1040, protein:44},
-  {id:2, name:'Lunch',     items:['300g chuck steak, 300g cooked rice, 50g blueberries, 20g tallow'], cals:1100, protein:57},
-  {id:3, name:'Dinner',    items:['300g chuck steak, 300g cooked rice, 20g tallow'], cals:1070, protein:57},
-];
-const DEFAULT_MACROS = {calories:3200, protein:160};
-const DEFAULT_WORKOUTS = [
-  {id:'a', label:'A', name:'Push — chest, shoulders, triceps', tag:'push', open:false, exercises:[
-    {name:'Bench press',weight:60,goal:100},{name:'Overhead press',weight:40,goal:70},
-    {name:'Incline dumbbell press',weight:20,goal:35},{name:'Lateral raises',weight:10,goal:18},
-    {name:'Tricep pushdown',weight:30,goal:50}
-  ]},
-  {id:'b', label:'B', name:'Pull — back, biceps, rear delts', tag:'pull', open:false, exercises:[
-    {name:'Deadlift',weight:80,goal:140},{name:'Pull-ups',weight:0,goal:0},
-    {name:'Barbell row',weight:50,goal:90},{name:'Face pulls',weight:15,goal:25},
-    {name:'Barbell curl',weight:25,goal:40}
-  ]},
-  {id:'c', label:'C', name:'Arms & accessories', tag:'arms', open:false, exercises:[
-    {name:'Hammer curl',weight:14,goal:22},{name:'Skull crushers',weight:20,goal:35},
-    {name:'Cable curl',weight:15,goal:25},{name:'Overhead tricep',weight:20,goal:35}
-  ]},
-];
-const DEFAULT_LMG = [
-  {id:1,text:'Hair',done:false,notes:'',images:[]},
-  {id:2,text:'Skin',done:false,notes:'',images:[]},
-  {id:3,text:'Bloating',done:false,notes:'',images:[]},
-  {id:4,text:'Teeth',done:false,notes:'',images:[]},
-  {id:5,text:'Eyebrows',done:false,notes:'',images:[]},
-  {id:6,text:'Posture',done:false,notes:'',images:[]},
-  {id:7,text:'Physique',done:false,notes:'',images:[]},
-  {id:8,text:'Smell',done:false,notes:'',images:[]},
-  {id:9,text:'Voice',done:false,notes:'',images:[]},
-];
+const DEFAULT_MEALS = [];
+const DEFAULT_MACROS = {calories:2000, protein:150};
+const DEFAULT_WORKOUTS = [];
+const DEFAULT_LMG = [];
 const NOTIF_KEY = 'ascend_notifications';
 const NOTIF_SEEN_KEY = 'ascend_notif_seen';
 const REMINDERS_KEY = 'ascend_reminders';
