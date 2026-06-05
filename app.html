@@ -984,7 +984,7 @@ function renderMealsSection() {
   var totalProt=meals.reduce(function(s,m){return s+(m.protein||0);},0);
   var html='<div class="meals-header">'
     +'<div class="meals-title">Daily Diet</div>'
-    +'<div style="font-size:14px;font-weight:700;color:var(--text);">'+totalCals.toLocaleString()+' kcal &nbsp;<span style="color:var(--t3);">·</span>&nbsp; '+totalProt+'g protein</div>'
+    +'<div style="font-size:10px;font-weight:700;color:var(--text);">'+totalCals.toLocaleString()+' kcal &nbsp;<span style="color:var(--t3);">·</span>&nbsp; '+totalProt+'g protein</div>'
     +'</div>';
   meals.forEach(function(meal) {
     var items = meal.items && meal.items.length ? meal.items : [''];
