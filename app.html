@@ -1375,7 +1375,7 @@ function maybeSaveScore() {
   var total=taskItems.length;
   var done=allItems.reduce(function(c,x,i){return x.type==='item'&&checked.has(i)?c+1:c;},0);
   var pct=total>0?Math.round((done/total)*100):0;
-  var history=load('ascend_score_history',[]);
+  var history=load('ascend_score_history',[]); if(!Array.isArray(history)) history=[];
   var dk=todayKey();
   var existing=history.find(function(h){return h.date===dk;});
   if(existing) existing.score=pct; else history.unshift({date:dk,score:pct});
@@ -1394,7 +1394,7 @@ function calNav(dir) { _calMonth+=dir; if(_calMonth>11){_calMonth=0;_calYear++;}
 function renderCalendar() {
   var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('calMonthLabel').textContent=months[_calMonth]+' '+_calYear;
-  var history=load('ascend_score_history',[]);
+  var history=load('ascend_score_history',[]); if(!Array.isArray(history)) history=[];
   var scoreMap={};
   history.forEach(function(h){scoreMap[h.date]=h.score;});
   var grid=document.getElementById('calGrid'); if(!grid) return;
