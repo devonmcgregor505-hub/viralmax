@@ -1070,7 +1070,7 @@ function renderTrainingSection() {
       +'<span class="workout-day-name">'+day.name+'</span>'
       +'<span class="workout-day-tag wtag-'+day.tag+'">'+day.tag.toUpperCase()+'</span>'
       +'<span class="workout-day-arrow'+(day.open?' open':'')+'">▼</span>'
-      +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:4px 8px;margin-left:4px;transition:color .15s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--t4)'" onclick="event.stopPropagation();deleteWorkoutDay(''+day.id+'')" >✕</button>'
+      +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:4px 8px;margin-left:4px;" onclick="event.stopPropagation();deleteWorkoutDay(''+day.id+'')">✕</button>'
       +'</div>';
     if(day.open) {
       html+='<div class="workout-exercises">';
