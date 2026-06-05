@@ -1542,7 +1542,19 @@ function removeCheckinPhoto(e,i) { e.stopPropagation(); _checkinPhotos[i]=null; 
 function handleCheckinFile(e) {
   var file=e.target.files[0]; if(!file) return;
   var reader=new FileReader();
-  reader.onload=function(ev){ _checkinPhotos[_activeCheckinSlot]=ev.target.result; renderCheckinSlots(); };
+  reader.onload=function(ev){
+    // Compress before storing
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var maxW=400; var scale=Math.min(1,maxW/img.width);
+      canvas.width=img.width*scale; canvas.height=img.height*scale;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      _checkinPhotos[_activeCheckinSlot]=canvas.toDataURL('image/jpeg',0.5);
+      renderCheckinSlots();
+    };
+    img.src=ev.target.result;
+  };
   reader.readAsDataURL(file); e.target.value='';
 }
 function saveCheckin() {
