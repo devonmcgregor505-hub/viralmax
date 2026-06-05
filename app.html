@@ -1842,6 +1842,15 @@ async function loadFromCloud() {
     if(d.settings)   save('ascend_settings',d.settings);
     if(d.checkins)   save('ascend_checkins',d.checkins);
     if(d.reminders)  save(REMINDERS_KEY,d.reminders);
+    if(d.checklist && d.checklist.date){
+      var dk=new Date(); var todayStr=dk.getFullYear()+'-'+String(dk.getMonth()+1).padStart(2,'0')+'-'+String(dk.getDate()).padStart(2,'0');
+      if(d.checklist.date===todayStr){
+        checked=new Set(d.checklist.checked||[]);
+        save('ascend_checked_today',d.checklist.checked||[]);
+        save('ascend_checked_date',todayStr);
+        renderChecklist();
+      }
+    }
   }catch(e){}
 }
 
@@ -1857,6 +1866,9 @@ setInterval(function(){
 async function saveChecklistToServer(date) {
   var userId=localStorage.getItem('ascend_user_id'); if(!userId) return;
   fetch('/api/checklist/save',{method:'POST',headers:{'Content-Type':'application/json','x-user-id':userId},body:JSON.stringify({checked:[...checked],date:date})}).catch(function(){});
+  // Also save to user_data so loadFromCloud picks it up
+  var payload={checked:[...checked],date:date};
+  syncSection('checklist',payload);
 }
 function loadChecklistFromServer(){return Promise.resolve(false);}
 

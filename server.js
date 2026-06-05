@@ -324,7 +324,7 @@ app.post('/api/data/save', async (req, res) => {
   const userId = req.headers['x-user-id'];
   if (!userId) return res.json({ ok: true });
   const { section, data } = req.body;
-  const allowed = ['meals','macros','workouts','bodyweight','lmg','day_plans','settings','checkins','reminders'];
+  const allowed = ['meals','macros','workouts','bodyweight','lmg','day_plans','settings','checkins','reminders','checklist'];
   if (!allowed.includes(section)) return res.status(400).json({ error: 'invalid section' });
   try {
     const update = { user_id: userId, updated_at: new Date().toISOString() };
