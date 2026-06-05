@@ -862,9 +862,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 // ─── DATA DEFAULTS ───
 const MORNING = [];
 const NIGHT = [];
-const DEFAULT_MEALS = [];
+const DEFAULT_MEALS = [
+  {id:1, name:'Breakfast', items:[], cals:0, protein:0},
+  {id:2, name:'Lunch',     items:[], cals:0, protein:0},
+  {id:3, name:'Dinner',    items:[], cals:0, protein:0},
+];
 const DEFAULT_MACROS = {calories:2000, protein:150};
-const DEFAULT_WORKOUTS = [];
+const DEFAULT_WORKOUTS = [
+  {id:'a', label:'A', name:'Day A', tag:'push', open:false, exercises:[]},
+  {id:'b', label:'B', name:'Day B', tag:'pull', open:false, exercises:[]},
+  {id:'c', label:'C', name:'Day C', tag:'arms', open:false, exercises:[]},
+];
 const DEFAULT_LMG = [];
 const NOTIF_KEY = 'ascend_notifications';
 const NOTIF_SEEN_KEY = 'ascend_notif_seen';
@@ -1062,6 +1070,7 @@ function renderTrainingSection() {
       +'<span class="workout-day-name">'+day.name+'</span>'
       +'<span class="workout-day-tag wtag-'+day.tag+'">'+day.tag.toUpperCase()+'</span>'
       +'<span class="workout-day-arrow'+(day.open?' open':'')+'">▼</span>'
+      +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:4px 8px;margin-left:4px;transition:color .15s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--t4)'" onclick="event.stopPropagation();deleteWorkoutDay(''+day.id+'')" >✕</button>'
       +'</div>';
     if(day.open) {
       html+='<div class="workout-exercises">';
@@ -1094,7 +1103,21 @@ function renderTrainingSection() {
     }
     html+='</div>';
   });
+  html+='<button class="workout-add-btn" style="margin-top:10px;" onclick="addWorkoutDay()">+ Add day</button>';
   el.innerHTML=html;
+}
+function addWorkoutDay(){
+  var w=loadWorkouts();
+  var labels=['A','B','C','D','E','F','G'];
+  var newId='day_'+Date.now();
+  var label=labels[w.length]||String(w.length+1);
+  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:false,exercises:[]});
+  saveWorkouts(w); renderTrainingSection();
+}
+function deleteWorkoutDay(id){
+  if(!confirm('Remove this day?')) return;
+  var w=loadWorkouts().filter(function(d){return d.id!==id;});
+  saveWorkouts(w); renderTrainingSection();
 }
 function toggleWorkoutDay(id) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===id;}); if(!day) return;
