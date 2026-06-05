@@ -1751,7 +1751,14 @@ function saveReminderEdit() {
   var reminders=getReminders();
   if(_reminderEditId){var idx=reminders.findIndex(function(x){return x.id===_reminderEditId;});if(idx>-1)reminders[idx]=r;else reminders.push(r);}
   else reminders.push(r);
-  saveReminders(reminders); closeReminderEdit(); renderReminderList();
+  saveReminders(reminders);
+  // Clear seen state for this reminder so it can fire fresh
+  var seen=load(NOTIF_SEEN_KEY,{});
+  Object.keys(seen).forEach(function(k){ if(k.startsWith('r_'+r.id+'_')) delete seen[k]; });
+  save(NOTIF_SEEN_KEY,seen);
+  closeReminderEdit(); renderReminderList();
+  // Check immediately in case time has passed
+  checkScheduledNotifs();
 }
 function getWeekNumber(d) {
   var date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
