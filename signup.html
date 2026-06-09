@@ -159,6 +159,7 @@ window.doSignup = async function(){
   if(error){ showMsg(error.message, 'error'); setLoading(false); return; }
   if(data.user && data.session){
     localStorage.setItem('ascend_user_id', data.user.id);
+    localStorage.setItem('ascend_new_user', '1');
     window.location.href = '/app';
   } else {
     showMsg('Check your email to confirm your account, then sign in.', 'success');

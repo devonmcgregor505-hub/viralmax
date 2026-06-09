@@ -1914,6 +1914,14 @@ function loadChecklistFromServer(){return Promise.resolve(false);}
       if(session?.user){
         localStorage.setItem('ascend_user_id',session.user.id);
         localStorage.setItem('ascend_session',JSON.stringify(session));
+        // New Google OAuth signup: created_at and last_sign_in_at are within 5s of each other
+        if(event==='SIGNED_IN' && session.user.created_at && session.user.last_sign_in_at){
+          var created=new Date(session.user.created_at).getTime();
+          var lastSignIn=new Date(session.user.last_sign_in_at).getTime();
+          if(Math.abs(lastSignIn-created)<5000 && !localStorage.getItem(OB_DONE_KEY)){
+            localStorage.setItem('ascend_new_user','1');
+          }
+        }
       }
     });
   });
@@ -1952,7 +1960,11 @@ var OB_STEPS = [
 ];
 
 function checkOnboarding() {
-  if (!localStorage.getItem(OB_DONE_KEY)) startOnboarding();
+  // Show onboarding only for brand new users (flag set by signup page)
+  if (localStorage.getItem('ascend_new_user')) {
+    localStorage.removeItem('ascend_new_user');
+    startOnboarding();
+  }
 }
 
 function startOnboarding() {
