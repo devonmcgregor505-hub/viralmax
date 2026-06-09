@@ -1266,9 +1266,6 @@ function renderChecklist() {
   var dayItems=[];
   if(dayTasks && dayTasks.length){
     dayTasks.forEach(function(t){ dayItems.push({type:'item',section:'day',title:t.name||t.title,items:t.items||[]}); });
-  } else {
-    dayItems.push({type:'item',section:'day',title:'Drink 3L water',items:[]});
-    dayItems.push({type:'item',section:'day',title:'Training or movement',items:[]});
   }
   var morningItems=morning.map(function(b){return {type:'item',section:'morning',title:b.title,time:b.time,items:b.items||[]};});
   var nightItems=night.map(function(b){return {type:'item',section:'night',title:b.title,time:b.time,items:b.items||[]};});
