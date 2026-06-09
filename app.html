@@ -670,6 +670,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 </div>
 
 <!-- ONBOARDING OVERLAY -->
+<div class="onboarding-overlay" id="onboardingOverlay" style="display:none;">
+  <div class="onboarding-box">
     <div id="obContent"></div>
   </div>
 </div>
@@ -1917,6 +1919,211 @@ function loadChecklistFromServer(){return Promise.resolve(false);}
   });
 })();
 
+
+// ─── ONBOARDING ───
+var _obStep = 0;
+var _obData = {};
+var OB_DONE_KEY = 'ascend_ob_done';
+
+var OB_STEPS = [
+  { id:'name', label:'STEP 1 OF 5', q:"What's your name?", sub:"We'll personalise your experience.", type:'text', placeholder:'YOUR NAME' },
+  { id:'goal', label:'STEP 2 OF 5', q:'What is your main goal?', sub:'Pick the one that matters most right now.', type:'options', options:[
+    {val:'looksmax',label:'✦ Looksmaxxing — face, skin, hair, frame'},
+    {val:'bulk',label:'💪 Build muscle & bulk up'},
+    {val:'cut',label:'🔥 Lose fat & lean out'},
+    {val:'health',label:'🧬 Optimise health & longevity'},
+    {val:'all',label:'⚡ All of the above'}
+  ]},
+  { id:'wake', label:'STEP 3 OF 5', q:'What time do you wake up?', sub:"We'll schedule your morning routine around this.", type:'time' },
+  { id:'diet', label:'STEP 4 OF 5', q:'What is your diet style?', sub:'This shapes your nutrition defaults.', type:'options', options:[
+    {val:'carnivore',label:'🥩 Carnivore / Animal-based'},
+    {val:'keto',label:'🥑 Keto / Low-carb'},
+    {val:'balanced',label:'🍽️ Balanced / Flexible'},
+    {val:'highcarb',label:'🍚 High carb / Performance'},
+    {val:'vegan',label:'🌱 Plant-based / Vegan'}
+  ]},
+  { id:'split', label:'STEP 5 OF 5', q:'What is your training split?', sub:"We'll pre-load your workout days.", type:'options', options:[
+    {val:'ppl',label:'🏋️ Push / Pull / Legs'},
+    {val:'upper_lower',label:'⚡ Upper / Lower'},
+    {val:'bro',label:'💪 Bro split (chest/back/shoulders/arms/legs)'},
+    {val:'full_body',label:'🔄 Full body'},
+    {val:'none',label:'🚫 Not training yet'}
+  ]}
+];
+
+function checkOnboarding() {
+  if (!localStorage.getItem(OB_DONE_KEY)) startOnboarding();
+}
+
+function startOnboarding() {
+  _obStep = 0; _obData = {};
+  document.getElementById('onboardingOverlay').style.display = 'flex';
+  renderObStep();
+}
+
+function renderObStep() {
+  var step = OB_STEPS[_obStep];
+  var pct = Math.round((_obStep / OB_STEPS.length) * 100);
+  var html = '<div class="ob-wordmark">ASCEND</div>'
+    + '<div class="ob-title">Level Up.</div>'
+    + '<div class="ob-sub">Let\'s personalise your setup.</div>'
+    + '<div class="ob-progress"><div class="ob-progress-fill" style="width:' + pct + '%"></div></div>'
+    + '<div class="ob-step-label">' + step.label + '</div>'
+    + '<div class="ob-q">' + step.q + '</div>'
+    + '<div class="ob-q-sub">' + step.sub + '</div>';
+  if (step.type === 'options') {
+    html += '<div class="ob-options">';
+    step.options.forEach(function(opt) {
+      var sel = _obData[step.id] === opt.val ? ' selected' : '';
+      html += '<button class="ob-opt' + sel + '" onclick="obSelect(\'' + step.id + '\',\'' + opt.val + '\',this)">' + opt.label + '</button>';
+    });
+    html += '</div>';
+  } else if (step.type === 'text') {
+    var cur = _obData[step.id] || '';
+    html += '<div class="ob-input-wrap"><input class="ob-text-input" id="obTextInput" type="text" placeholder="' + step.placeholder + '" value="' + cur + '" oninput="obTextChange(this.value)" onkeydown="if(event.key===\'Enter\')obNext()" /></div>';
+  } else if (step.type === 'time') {
+    var curT = _obData[step.id] || '07:00';
+    html += '<div class="ob-input-wrap"><input class="ob-text-input" id="obTimeInput" type="time" value="' + curT + '" oninput="obTextChange(this.value)" style="font-size:36px;" /><div class="ob-text-unit">24-hour time</div></div>';
+  }
+  var canNext = obCanNext();
+  html += '<div class="ob-nav">'
+    + '<button class="ob-back" onclick="obBack()" style="visibility:' + (_obStep > 0 ? 'visible' : 'hidden') + '">← Back</button>'
+    + '<span class="ob-step-counter">' + (_obStep + 1) + ' / ' + OB_STEPS.length + '</span>'
+    + '<button class="ob-next" onclick="obNext()" ' + (canNext ? '' : 'disabled') + '>Continue →</button>'
+    + '</div>';
+  document.getElementById('obContent').innerHTML = html;
+  if (step.type === 'text') { var inp = document.getElementById('obTextInput'); if (inp) inp.focus(); }
+  if (step.type === 'time' && !_obData[step.id]) { var tinp = document.getElementById('obTimeInput'); if (tinp) _obData[step.id] = tinp.value; }
+}
+
+function obCanNext() {
+  var step = OB_STEPS[_obStep];
+  if (step.type === 'options') return !!_obData[step.id];
+  if (step.type === 'text') return !!(_obData[step.id] || '').trim();
+  if (step.type === 'time') return !!_obData[step.id];
+  return true;
+}
+
+function obSelect(id, val, el) {
+  _obData[id] = val;
+  document.querySelectorAll('.ob-opt').forEach(function(b) { b.classList.remove('selected'); });
+  el.classList.add('selected');
+  var btn = document.querySelector('.ob-next'); if (btn) btn.disabled = false;
+}
+
+function obTextChange(val) {
+  _obData[OB_STEPS[_obStep].id] = val;
+  var btn = document.querySelector('.ob-next'); if (btn) btn.disabled = !val.trim();
+}
+
+function obBack() { if (_obStep > 0) { _obStep--; renderObStep(); } }
+
+function obNext() {
+  if (!obCanNext()) return;
+  if (OB_STEPS[_obStep].type === 'time') { var t = document.getElementById('obTimeInput'); if (t) _obData[OB_STEPS[_obStep].id] = t.value; }
+  if (_obStep < OB_STEPS.length - 1) { _obStep++; renderObStep(); }
+  else obShowGenerating();
+}
+
+function obShowGenerating() {
+  document.getElementById('obContent').innerHTML =
+    '<div class="ob-generating">'
+    + '<div class="ob-gen-spinner"></div>'
+    + '<div class="ob-gen-title">Building your routine...</div>'
+    + '<div class="ob-gen-sub">Claude is crafting a personalised daily routine based on your goals.</div>'
+    + '</div>';
+  obCallClaude();
+}
+
+function obGetGoalLabel(v){return{looksmax:'Looksmaxxing',bulk:'Build muscle',cut:'Lose fat',health:'Optimise health',all:'All of the above'}[v]||v;}
+function obGetDietLabel(v){return{carnivore:'Carnivore/Animal-based',keto:'Keto/Low-carb',balanced:'Balanced/Flexible',highcarb:'High-carb/Performance',vegan:'Plant-based/Vegan'}[v]||v;}
+function obGetSplitLabel(v){return{ppl:'Push/Pull/Legs',upper_lower:'Upper/Lower',bro:'Bro split',full_body:'Full body',none:'Not training yet'}[v]||v;}
+
+async function obCallClaude() {
+  var prompt = 'You are a personal health coach setting up a new user in the Ascend app.\n\n'
+    + 'User profile:\n'
+    + '- Name: ' + _obData.name + '\n'
+    + '- Goal: ' + obGetGoalLabel(_obData.goal) + '\n'
+    + '- Wake time: ' + _obData.wake + '\n'
+    + '- Diet: ' + obGetDietLabel(_obData.diet) + '\n'
+    + '- Training split: ' + obGetSplitLabel(_obData.split) + '\n\n'
+    + 'Return ONLY a JSON object with this exact shape (no markdown, no explanation):\n'
+    + '{\n'
+    + '  "morning": [ { "title": "string", "time": "HH:MM", "items": ["step1","step2"] } ],\n'
+    + '  "night":   [ { "title": "string", "time": "HH:MM", "items": ["step1","step2"] } ],\n'
+    + '  "workouts": [ { "label": "A", "name": "string", "tag": "push", "exercises": [ { "name": "string", "weight": 0, "goal": 0 } ] } ],\n'
+    + '  "macros": { "calories": 2500, "protein": 180 }\n'
+    + '}\n\n'
+    + 'Rules: morning has 4-6 blocks timed from ' + _obData.wake + '; night has 4-6 blocks; each block 2-4 steps; workouts match their split (empty array if none); macros suit their goal.';
+  try {
+    var res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({messages:[{role:'user',content:prompt}], max_tokens:2000})
+    });
+    var json = await res.json();
+    var text = (json.content && json.content[0]) ? json.content[0].text : (json.reply || '');
+    text = text.replace(/```json|```/g,'').trim();
+    obApplyAndFinish(JSON.parse(text));
+  } catch(e) {
+    document.getElementById('obContent').innerHTML =
+      '<div class="ob-generating">'
+      + '<div class="ob-gen-title" style="color:var(--red);">Something went wrong</div>'
+      + '<div class="ob-gen-sub" style="margin-bottom:24px;">Couldn\'t reach Claude. Retry or skip to set up manually.</div>'
+      + '<div style="display:flex;gap:12px;justify-content:center;">'
+      + '<button class="btn-y" onclick="obShowGenerating()">Retry</button>'
+      + '<button class="btn-ghost" onclick="obApplyAndFinish(null)">Skip</button>'
+      + '</div></div>';
+  }
+}
+
+function obApplyAndFinish(data) {
+  var s = load('ascend_settings', {}); s.name = _obData.name; s.wakeTime = _obData.wake;
+  save('ascend_settings', s); syncSection('settings', s);
+  if (data) {
+    if (data.morning || data.night) {
+      var plans = SHORT_DAY_NAMES.map(function() {
+        return {
+          morning: (data.morning||[]).map(function(b){return{title:b.title,time:b.time,items:b.items||[]};}),
+          night:   (data.night||[]).map(function(b){return{title:b.title,time:b.time,items:b.items||[]};}),
+          day: []
+        };
+      });
+      save('ascend_day_plans', plans); syncSection('day_plans', plans); _dayPlans = plans;
+    }
+    if (data.workouts && data.workouts.length) {
+      var workouts = data.workouts.map(function(w,i){return{id:'ob_'+i,label:w.label||String.fromCharCode(65+i),name:w.name,tag:w.tag||'push',open:false,exercises:w.exercises||[]};});
+      save('ascend_workouts', workouts); syncSection('workouts', workouts);
+    }
+    if (data.macros) { save('ascend_macros',{calories:data.macros.calories||2000,protein:data.macros.protein||150}); syncSection('macros',data.macros); }
+  }
+  var goalLabels = {looksmax:'Looksmaxxing',bulk:'Build Muscle',cut:'Lose Fat',health:'Optimise Health',all:'Everything'};
+  document.getElementById('obContent').innerHTML =
+    '<div class="ob-complete">'
+    + '<div class="ob-complete-icon">⚡</div>'
+    + '<div class="ob-complete-title">You\'re set, ' + _obData.name + '.</div>'
+    + '<div class="ob-complete-sub">' + (data ? 'Your routine, workouts, and macros have been personalised by Claude.' : 'Settings saved. Build your routine in the Day Planner.') + '</div>'
+    + '<div class="ob-summary">'
+    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Goal</span><span class="ob-summary-val">'+(goalLabels[_obData.goal]||_obData.goal)+'</span></div>'
+    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Wake time</span><span class="ob-summary-val">'+_obData.wake+'</span></div>'
+    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Diet</span><span class="ob-summary-val">'+obGetDietLabel(_obData.diet)+'</span></div>'
+    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Training</span><span class="ob-summary-val">'+obGetSplitLabel(_obData.split)+'</span></div>'
+    + (data&&data.macros ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Calories</span><span class="ob-summary-val">'+data.macros.calories+' kcal</span></div>' : '')
+    + (data&&data.macros ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Protein</span><span class="ob-summary-val">'+data.macros.protein+'g</span></div>' : '')
+    + '</div>'
+    + '<button class="ob-launch" onclick="obLaunch()">Enter Ascend →</button>'
+    + '</div>';
+}
+
+function obLaunch() {
+  localStorage.setItem(OB_DONE_KEY, '1');
+  document.getElementById('onboardingOverlay').style.display = 'none';
+  renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderLMG(); renderProgressPhotos();
+  var s = load('ascend_settings',{});
+  var nameEl = document.getElementById('sidebarName'); if (nameEl && s.name) nameEl.textContent = s.name;
+  var avatarEl = document.getElementById('avatarBtn'); if (avatarEl && s.name) avatarEl.textContent = s.name[0].toUpperCase();
+}
+
 // ─── BOOT ───
 window.addEventListener('DOMContentLoaded', function(){
   updateDayBadge();
@@ -1931,6 +2138,7 @@ window.addEventListener('DOMContentLoaded', function(){
     renderProgressPhotos();
     renderLMG();
     renderNotifBadge();
+    checkOnboarding();
     var lastPage=localStorage.getItem('ascend_page');
     if(lastPage&&lastPage!=='checklist') showPage(lastPage,null);
   });
