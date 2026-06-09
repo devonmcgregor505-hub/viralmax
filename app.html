@@ -1959,7 +1959,7 @@ function buildDynamicSteps() {
     steps.push('ph_goal','ph_weight','ph_days','ph_split');
   }
   if (goals.includes('health')) {
-    steps.push('h_desired_diet','h_meals','h_desired_sleep');
+    steps.push('h_desired_diet','h_meals');
   }
   steps.push('generating');
   return steps;
@@ -2037,10 +2037,9 @@ function getStepDef(id) {
     lm_eyebrows: {
       label:'EYEBROWS', q:'What would you like to improve about your eyebrows?', sub:'', type:'multiselect',
       options:[
-        {val:'thin',   label:'Thin and patchy'},
-        {val:'light',  label:'Light coloured'},
-        {val:'messy',  label:'Messy / ungroomed'},
-        {val:'high',   label:'Too high set (expression / relax)'}
+        {val:'thick',  label:'Thicker / Fuller'},
+        {val:'dark',   label:'Darker / Tinted'},
+        {val:'tidy',   label:'More tidy'}
       ]
     },
     lm_bf_method: {
@@ -2366,6 +2365,10 @@ function obHairPreviewChoice(val, el) {
 
 // ─── HELPERS ───
 function obData2(key, val) { _obData[key] = val; }
+function obCheckWeightBtn() {
+  var btn = document.getElementById('obNextBtn');
+  if (btn) btn.disabled = !(_obData['current_weight'] && _obData['goal_weight']);
+}
 
 function obInputChange(val) {
   var id = _obStepStack[_obStepIndex];
@@ -2402,7 +2405,7 @@ function obMultiSelect(id, val, el) {
 function obCanNext(id, type) {
   if (type === 'photos') return true; // photos optional (except hair needs face, validated at hair step)
   if (type === 'wake_sleep') return true;
-  if (type === 'weight') return !!_obData['current_weight'] && !!_obData['goal_weight'];
+  if (type === 'weight') return !!(_obData['current_weight']||'').toString().trim() && !!(_obData['goal_weight']||'').toString().trim();
   if (type === 'sleep_wake') return true;
   if (type === 'hair_ai') return !!_obData['lm_hair_style'];
   if (type === 'hair_preview') return !!_obData['lm_hair_preview_choice'];
@@ -2490,7 +2493,7 @@ async function obCallClaude() {
     prompt += 'Currently eats: ' + (d.h_current_diet||'') + '\n';
     prompt += 'Wants to eat: ' + (d.h_desired_diet||'') + '\n';
     prompt += 'Meals: ' + (d.h_meals||[]).join(', ') + '\n';
-    prompt += 'Desired sleep/wake: sleep ' + (d.desired_sleep||'') + ' wake ' + (d.desired_wake||'') + '\n';
+
   }
 
   prompt += '\n=== OUTPUT ===\n'
