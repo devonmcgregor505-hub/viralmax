@@ -1919,39 +1919,15 @@ function loadChecklistFromServer(){return Promise.resolve(false);}
 })();
 
 
-// ─── ONBOARDING ───
-var _obStep = 0;
-var _obData = {};
-var OB_DONE_KEY = 'ascend_ob_done';
 
-var OB_STEPS = [
-  { id:'name', label:'STEP 1 OF 5', q:"What's your name?", sub:"We'll personalise your experience.", type:'text', placeholder:'YOUR NAME' },
-  { id:'goal', label:'STEP 2 OF 5', q:'What is your main goal?', sub:'Pick the one that matters most right now.', type:'options', options:[
-    {val:'looksmax',label:'✦ Looksmaxxing — face, skin, hair, frame'},
-    {val:'bulk',label:'💪 Build muscle & bulk up'},
-    {val:'cut',label:'🔥 Lose fat & lean out'},
-    {val:'health',label:'🧬 Optimise health & longevity'},
-    {val:'all',label:'⚡ All of the above'}
-  ]},
-  { id:'wake', label:'STEP 3 OF 5', q:'What time do you wake up?', sub:"We'll schedule your morning routine around this.", type:'time' },
-  { id:'diet', label:'STEP 4 OF 5', q:'What is your diet style?', sub:'This shapes your nutrition defaults.', type:'options', options:[
-    {val:'carnivore',label:'🥩 Carnivore / Animal-based'},
-    {val:'keto',label:'🥑 Keto / Low-carb'},
-    {val:'balanced',label:'🍽️ Balanced / Flexible'},
-    {val:'highcarb',label:'🍚 High carb / Performance'},
-    {val:'vegan',label:'🌱 Plant-based / Vegan'}
-  ]},
-  { id:'split', label:'STEP 5 OF 5', q:'What is your training split?', sub:"We'll pre-load your workout days.", type:'options', options:[
-    {val:'ppl',label:'🏋️ Push / Pull / Legs'},
-    {val:'upper_lower',label:'⚡ Upper / Lower'},
-    {val:'bro',label:'💪 Bro split (chest/back/shoulders/arms/legs)'},
-    {val:'full_body',label:'🔄 Full body'},
-    {val:'none',label:'🚫 Not training yet'}
-  ]}
-];
+// ─── ONBOARDING ───
+var OB_DONE_KEY = 'ascend_ob_done';
+var _obData = {};
+var _obPhotos = [null, null, null, null]; // face-front, face-side, body-front, body-side
+var _obStepStack = []; // dynamic step stack
+var _obStepIndex = 0;
 
 function checkOnboarding() {
-  // Show onboarding only for brand new users (flag set by signup page)
   if (localStorage.getItem('ascend_new_user')) {
     localStorage.removeItem('ascend_new_user');
     startOnboarding();
@@ -1959,113 +1935,582 @@ function checkOnboarding() {
 }
 
 function startOnboarding() {
-  _obStep = 0; _obData = {};
+  _obData = {}; _obPhotos = [null,null,null,null]; _obStepIndex = 0;
+  _obStepStack = buildStepStack();
   document.getElementById('onboardingOverlay').style.display = 'flex';
   renderObStep();
 }
 
+function buildStepStack() {
+  // Base steps always shown
+  var steps = ['name','age','wake_sleep','goals','photos'];
+  return steps;
+}
+
+function buildDynamicSteps() {
+  // Called after goals are selected — inserts branched steps
+  var goals = _obData.goals || [];
+  var steps = ['name','age','wake_sleep','goals','photos'];
+  if (goals.includes('looksmax')) {
+    steps.push('lm_areas');
+    // sub-steps added dynamically after lm_areas answered
+  }
+  if (goals.includes('physique')) {
+    steps.push('ph_goal','ph_weight','ph_days','ph_split');
+  }
+  if (goals.includes('health')) {
+    steps.push('h_current_diet','h_desired_diet','h_meals','h_current_sleep','h_desired_sleep');
+  }
+  steps.push('generating');
+  return steps;
+}
+
+function buildLMSubSteps() {
+  var areas = _obData.lm_areas || [];
+  var sub = [];
+  if (areas.includes('skin'))    sub.push('lm_skin');
+  if (areas.includes('hair'))    sub.push('lm_hair_style','lm_hair_preview');
+  if (areas.includes('eyebrows'))sub.push('lm_eyebrows');
+  if (areas.includes('bf'))      sub.push('lm_bf_method','lm_bf_cals');
+  if (areas.includes('teeth'))   sub.push('lm_teeth');
+  if (areas.includes('posture')) sub.push('lm_posture');
+  return sub;
+}
+
+function insertLMSubSteps() {
+  var idx = _obStepStack.indexOf('lm_areas');
+  var sub = buildLMSubSteps();
+  _obStepStack.splice(idx + 1, 0, ...sub);
+}
+
+// ─── STEP DEFINITIONS ───
+function getStepDef(id) {
+  var defs = {
+    name: {
+      label:'STEP 1', q:"What's your name?", sub:'', type:'text', placeholder:'YOUR NAME'
+    },
+    age: {
+      label:'STEP 2', q:'How old are you?', sub:'', type:'number', placeholder:'18', unit:'years old'
+    },
+    wake_sleep: {
+      label:'STEP 3', q:'What time do you want to wake up and sleep?', sub:'Used to schedule your daily routine.', type:'wake_sleep'
+    },
+    goals: {
+      label:'STEP 4', q:"What are you looking to improve?", sub:'Select all that apply — minimum 1.', type:'multiselect',
+      options:[
+        {val:'looksmax', label:'✦ Looksmaxxing — face, skin, hair, frame'},
+        {val:'physique',  label:'💪 Physique — build muscle, lose fat'},
+        {val:'health',    label:'🧬 Health — diet, sleep, longevity'}
+      ]
+    },
+    photos: {
+      label:'STEP 5', q:'Upload your reference photos', sub:'Used by Claude to personalise your plan. Face photos required if you selected hair.', type:'photos'
+    },
+    lm_areas: {
+      label:'LOOKSMAX', q:'Which areas are you looking to improve?', sub:'Select all that apply.', type:'multiselect',
+      options:[
+        {val:'skin',    label:'🧴 Skin'},
+        {val:'hair',    label:'💇 Hair'},
+        {val:'eyebrows',label:'🔶 Eyebrows'},
+        {val:'bf',      label:'🔥 Lower body fat %'},
+        {val:'teeth',   label:'🦷 Teeth'},
+        {val:'posture', label:'🧍 Posture'},
+        {val:'none',    label:'✕ None of these'}
+      ]
+    },
+    lm_skin: {
+      label:'SKIN', q:"What are your biggest skin concerns?", sub:'Select all that apply.', type:'multiselect',
+      options:[
+        {val:'acne',   label:'😣 Acne / Blackheads / Sebaceous Filaments'},
+        {val:'pigment',label:'🟤 Hyperpigmentation / PIH'},
+        {val:'texture',label:'🔲 Texture Issues'},
+        {val:'dry',    label:'💧 Dryness & Dehydration'},
+        {val:'red',    label:'🔴 Redness'}
+      ]
+    },
+    lm_hair_style: {
+      label:'HAIR', q:'Analysing your face shape...', sub:'Claude will recommend 4 styles suited to your face.', type:'hair_ai'
+    },
+    lm_hair_preview: {
+      label:'HAIR PREVIEW', q:'Would you like a hair preview?', sub:'AI generates you with your chosen style.', type:'hair_preview'
+    },
+    lm_eyebrows: {
+      label:'EYEBROWS', q:'What would you like to improve about your eyebrows?', sub:'', type:'multiselect',
+      options:[
+        {val:'thin',   label:'Thin and patchy'},
+        {val:'light',  label:'Light coloured'},
+        {val:'messy',  label:'Messy / ungroomed'},
+        {val:'high',   label:'Too high set (expression / relax)'}
+      ]
+    },
+    lm_bf_method: {
+      label:'LOWER BF%', q:'How would you like to lower your body fat?', sub:'', type:'multiselect',
+      options:[
+        {val:'deficit',label:'🍽️ Calorie deficit'},
+        {val:'fasting', label:'⏱️ Intermittent fasting'},
+        {val:'lowcarb', label:'🥩 Low carb'}
+      ]
+    },
+    lm_bf_cals: {
+      label:'LOWER BF%', q:"What is your calorie maintenance?", sub:'Approximate daily calories to maintain your current weight.', type:'number', placeholder:'2500', unit:'kcal / day'
+    },
+    lm_teeth: {
+      label:'TEETH', q:'How would you like to improve your teeth?', sub:'', type:'multiselect',
+      options:[
+        {val:'brush',  label:'🪥 Brushing morning and night'},
+        {val:'strips', label:'⬜ Whitening strips'},
+        {val:'floss',  label:'🦷 Flossing daily'}
+      ]
+    },
+    lm_posture: {
+      label:'POSTURE', q:"What's currently bad about your posture?", sub:'', type:'multiselect',
+      options:[
+        {val:'fhp',    label:'Forward head posture'},
+        {val:'rounded',label:'Rounded shoulders'},
+        {val:'ppt',    label:'Posterior pelvic tilt'}
+      ]
+    },
+    ph_goal: {
+      label:'PHYSIQUE', q:'What is your physique goal?', sub:'Describe what you want to achieve.', type:'text', placeholder:'E.G. LEAN AND MUSCULAR'
+    },
+    ph_weight: {
+      label:'PHYSIQUE', q:'Current weight and goal weight?', sub:'', type:'weight'
+    },
+    ph_days: {
+      label:'PHYSIQUE', q:'How many days a week can you train?', sub:'', type:'options',
+      options:[
+        {val:'2',label:'2 days'},
+        {val:'3',label:'3 days'},
+        {val:'4',label:'4 days'},
+        {val:'5',label:'5 days'},
+        {val:'6',label:'6 days'}
+      ]
+    },
+    ph_split: {
+      label:'PHYSIQUE', q:'What training split do you want?', sub:'', type:'options',
+      options:[
+        {val:'ppa',  label:'💪 Push / Pull / Arms'},
+        {val:'ppl',  label:'🏋️ Push / Pull / Legs'},
+        {val:'bro',  label:'⚡ Bro split (chest/back/shoulders/arms/legs)'}
+      ]
+    },
+    h_current_diet: {
+      label:'HEALTH', q:'What do you currently eat?', sub:'Describe your typical daily diet.', type:'textarea', placeholder:'E.g. eggs, steak, rice, vegetables...'
+    },
+    h_desired_diet: {
+      label:'HEALTH', q:'What would you like to eat?', sub:'Describe your ideal diet going forward.', type:'textarea', placeholder:'E.g. carnivore, high protein, balanced...'
+    },
+    h_meals: {
+      label:'HEALTH', q:'Which meals do you have each day?', sub:'', type:'multiselect',
+      options:[
+        {val:'breakfast',label:'☀️ Breakfast'},
+        {val:'lunch',    label:'🌤️ Lunch'},
+        {val:'dinner',   label:'🌙 Dinner'}
+      ]
+    },
+    h_current_sleep: {
+      label:'HEALTH', q:'What time do you currently sleep and wake up?', sub:'', type:'sleep_wake', prefix:'current'
+    },
+    h_desired_sleep: {
+      label:'HEALTH', q:'What time would you like to sleep and wake up?', sub:'', type:'sleep_wake', prefix:'desired'
+    },
+    generating: {
+      label:'', q:'', sub:'', type:'generating'
+    }
+  };
+  return defs[id] || null;
+}
+
+// ─── RENDER ───
 function renderObStep() {
-  var step = OB_STEPS[_obStep];
-  var pct = Math.round((_obStep / OB_STEPS.length) * 100);
+  var id = _obStepStack[_obStepIndex];
+  if (!id) return;
+  if (id === 'generating') { obShowGenerating(); return; }
+  var step = getStepDef(id);
+  if (!step) { obAdvance(); return; }
+
+  var total = _obStepStack.filter(function(s){return s!=='generating';}).length;
+  var pct = Math.round((_obStepIndex / total) * 100);
+
   var html = '<div class="ob-wordmark">ASCEND</div>'
     + '<div class="ob-title">Level Up.</div>'
-    + '<div class="ob-sub">Let\'s personalise your setup.</div>'
+    + '<div class="ob-sub">Let\'s build your personalised plan.</div>'
     + '<div class="ob-progress"><div class="ob-progress-fill" style="width:' + pct + '%"></div></div>'
     + '<div class="ob-step-label">' + step.label + '</div>'
     + '<div class="ob-q">' + step.q + '</div>'
-    + '<div class="ob-q-sub">' + step.sub + '</div>';
-  if (step.type === 'options') {
+    + (step.sub ? '<div class="ob-q-sub">' + step.sub + '</div>' : '');
+
+  if (step.type === 'text') {
+    var cur = _obData[id] || '';
+    html += '<div class="ob-input-wrap"><input class="ob-text-input" id="obInput" type="text" placeholder="' + step.placeholder + '" value="' + cur + '" oninput="obInputChange(this.value)" onkeydown="if(event.key===\'Enter\')obNext()" /></div>';
+    if (step.unit) html += '<div class="ob-text-unit">' + step.unit + '</div>';
+  } else if (step.type === 'number') {
+    var curN = _obData[id] || '';
+    html += '<div class="ob-input-wrap"><input class="ob-text-input" id="obInput" type="number" placeholder="' + step.placeholder + '" value="' + curN + '" oninput="obInputChange(this.value)" onkeydown="if(event.key===\'Enter\')obNext()" /></div>';
+    if (step.unit) html += '<div class="ob-text-unit">' + step.unit + '</div>';
+  } else if (step.type === 'textarea') {
+    var curTA = _obData[id] || '';
+    html += '<div class="ob-input-wrap"><textarea class="ob-text-input" id="obInput" placeholder="' + step.placeholder + '" oninput="obInputChange(this.value)" style="height:100px;resize:none;font-size:16px;font-family:inherit;">' + curTA + '</textarea></div>';
+  } else if (step.type === 'options') {
     html += '<div class="ob-options">';
     step.options.forEach(function(opt) {
-      var sel = _obData[step.id] === opt.val ? ' selected' : '';
-      html += '<button class="ob-opt' + sel + '" onclick="obSelect(\'' + step.id + '\',\'' + opt.val + '\',this)">' + opt.label + '</button>';
+      var sel = _obData[id] === opt.val ? ' selected' : '';
+      html += '<button class="ob-opt' + sel + '" onclick="obSingleSelect(\'' + id + '\',\'' + opt.val + '\',this)">' + opt.label + '</button>';
     });
     html += '</div>';
-  } else if (step.type === 'text') {
-    var cur = _obData[step.id] || '';
-    html += '<div class="ob-input-wrap"><input class="ob-text-input" id="obTextInput" type="text" placeholder="' + step.placeholder + '" value="' + cur + '" oninput="obTextChange(this.value)" onkeydown="if(event.key===\'Enter\')obNext()" /></div>';
-  } else if (step.type === 'time') {
-    var curT = _obData[step.id] || '07:00';
-    html += '<div class="ob-input-wrap"><input class="ob-text-input" id="obTimeInput" type="time" value="' + curT + '" oninput="obTextChange(this.value)" style="font-size:36px;" /><div class="ob-text-unit">24-hour time</div></div>';
+  } else if (step.type === 'multiselect') {
+    var curMs = _obData[id] || [];
+    html += '<div class="ob-options">';
+    step.options.forEach(function(opt) {
+      var sel = curMs.includes(opt.val) ? ' selected' : '';
+      html += '<button class="ob-opt' + sel + '" onclick="obMultiSelect(\'' + id + '\',\'' + opt.val + '\',this)">' + opt.label + '</button>';
+    });
+    html += '</div>';
+  } else if (step.type === 'wake_sleep') {
+    var wt = _obData['wake'] || '07:00';
+    var st = _obData['sleep'] || '22:30';
+    html += '<div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px;">'
+      + '<div><div class="ob-text-unit" style="margin-bottom:6px;">Wake up time</div><input class="ob-text-input" type="time" value="' + wt + '" style="font-size:32px;" onchange="obData2(\'wake\',this.value)" /></div>'
+      + '<div><div class="ob-text-unit" style="margin-bottom:6px;">Sleep time</div><input class="ob-text-input" type="time" value="' + st + '" style="font-size:32px;" onchange="obData2(\'sleep\',this.value)" /></div>'
+      + '</div>';
+    if (!_obData['wake']) _obData['wake'] = wt;
+    if (!_obData['sleep']) _obData['sleep'] = st;
+  } else if (step.type === 'weight') {
+    var cw = _obData['current_weight'] || '';
+    var gw = _obData['goal_weight'] || '';
+    html += '<div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px;">'
+      + '<div><div class="ob-text-unit" style="margin-bottom:6px;">Current weight (kg)</div><input class="ob-text-input" id="obCW" type="number" placeholder="75" value="' + cw + '" style="font-size:32px;" oninput="obData2(\'current_weight\',this.value)" /></div>'
+      + '<div><div class="ob-text-unit" style="margin-bottom:6px;">Goal weight (kg)</div><input class="ob-text-input" id="obGW" type="number" placeholder="85" value="' + gw + '" style="font-size:32px;" oninput="obData2(\'goal_weight\',this.value)" /></div>'
+      + '</div>';
+  } else if (step.type === 'sleep_wake') {
+    var px = step.prefix;
+    var cs = _obData[px+'_sleep'] || '22:30';
+    var cw2 = _obData[px+'_wake'] || '07:00';
+    html += '<div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px;">'
+      + '<div><div class="ob-text-unit" style="margin-bottom:6px;">Sleep time</div><input class="ob-text-input" type="time" value="' + cs + '" style="font-size:32px;" onchange="obData2(\'' + px + '_sleep\',this.value)" /></div>'
+      + '<div><div class="ob-text-unit" style="margin-bottom:6px;">Wake time</div><input class="ob-text-input" type="time" value="' + cw2 + '" style="font-size:32px;" onchange="obData2(\'' + px + '_wake\',this.value)" /></div>'
+      + '</div>';
+    if (!_obData[px+'_sleep']) _obData[px+'_sleep'] = cs;
+    if (!_obData[px+'_wake'])  _obData[px+'_wake']  = cw2;
+  } else if (step.type === 'photos') {
+    html += obRenderPhotoStep();
+  } else if (step.type === 'hair_ai') {
+    html += obRenderHairAI();
+  } else if (step.type === 'hair_preview') {
+    html += obRenderHairPreview();
   }
-  var canNext = obCanNext();
+
+  var canNext = obCanNext(id, step.type);
   html += '<div class="ob-nav">'
-    + '<button class="ob-back" onclick="obBack()" style="visibility:' + (_obStep > 0 ? 'visible' : 'hidden') + '">← Back</button>'
-    + '<span class="ob-step-counter">' + (_obStep + 1) + ' / ' + OB_STEPS.length + '</span>'
-    + '<button class="ob-next" onclick="obNext()" ' + (canNext ? '' : 'disabled') + '>Continue →</button>'
+    + '<button class="ob-back" onclick="obBack()" style="visibility:' + (_obStepIndex > 0 ? 'visible' : 'hidden') + '">← Back</button>'
+    + '<span class="ob-step-counter">' + (_obStepIndex + 1) + ' / ' + total + '</span>'
+    + '<button class="ob-next" id="obNextBtn" onclick="obNext()" ' + (canNext ? '' : 'disabled') + '>Continue →</button>'
     + '</div>';
+
   document.getElementById('obContent').innerHTML = html;
-  if (step.type === 'text') { var inp = document.getElementById('obTextInput'); if (inp) inp.focus(); }
-  if (step.type === 'time' && !_obData[step.id]) { var tinp = document.getElementById('obTimeInput'); if (tinp) _obData[step.id] = tinp.value; }
+
+  if (step.type === 'text' || step.type === 'number' || step.type === 'textarea') {
+    var inp = document.getElementById('obInput'); if (inp) inp.focus();
+  }
+  if (step.type === 'hair_ai' && !_obData['lm_hair_styles']) {
+    obFetchHairStyles();
+  }
 }
 
-function obCanNext() {
-  var step = OB_STEPS[_obStep];
-  if (step.type === 'options') return !!_obData[step.id];
-  if (step.type === 'text') return !!(_obData[step.id] || '').trim();
-  if (step.type === 'time') return !!_obData[step.id];
+function obRenderPhotoStep() {
+  var labels = ['Face Front','Face Side','Body Front','Body Side'];
+  var html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px;">';
+  for (var i = 0; i < 4; i++) {
+    var p = _obPhotos[i];
+    html += '<div class="upload-slot' + (p ? ' filled' : '') + '" onclick="obTriggerPhoto(' + i + ')" style="aspect-ratio:3/4;">'
+      + (p ? '<img src="' + p + '" /><button class="upload-slot-remove" onclick="obRemovePhoto(event,' + i + ')">✕</button>' : '')
+      + '<div class="upload-slot-icon">📷</div>'
+      + '<div class="upload-slot-label">' + labels[i] + '</div>'
+      + '</div>';
+  }
+  html += '</div><input type="file" id="obPhotoInput" accept="image/*" style="display:none" onchange="obHandlePhoto(event)">';
+  return html;
+}
+
+var _obActivePhotoSlot = 0;
+function obTriggerPhoto(i) { _obActivePhotoSlot = i; document.getElementById('obPhotoInput').click(); }
+function obRemovePhoto(e, i) { e.stopPropagation(); _obPhotos[i] = null; renderObStep(); }
+function obHandlePhoto(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxW = 600; var scale = Math.min(1, maxW / img.width);
+      canvas.width = img.width * scale; canvas.height = img.height * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      _obPhotos[_obActivePhotoSlot] = canvas.toDataURL('image/jpeg', 0.7);
+      renderObStep();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file); e.target.value = '';
+}
+
+function obRenderHairAI() {
+  var styles = _obData['lm_hair_styles'];
+  if (!styles) {
+    return '<div class="ob-generating" style="padding:24px 0;">'
+      + '<div class="ob-gen-spinner"></div>'
+      + '<div class="ob-gen-sub">Analysing your face shape...</div>'
+      + '</div>';
+  }
+  if (styles.error) {
+    return '<div style="color:var(--red);font-size:13px;margin-bottom:16px;">Couldn\'t analyse photos. Pick a style manually or skip.</div>'
+      + obRenderHairOptions();
+  }
+  return obRenderHairOptions();
+}
+
+function obRenderHairOptions() {
+  var styles = _obData['lm_hair_styles'] || [];
+  var cur = _obData['lm_hair_style'] || '';
+  var html = '<div class="ob-options">';
+  if (Array.isArray(styles)) {
+    styles.forEach(function(s, i) {
+      var sel = cur === s ? ' selected' : '';
+      html += '<button class="ob-opt' + sel + '" onclick="obSingleSelect(\'lm_hair_style\',\'' + s.replace(/'/g,"\\'") + '\',this)"><span style="font-size:11px;color:var(--t3);margin-right:6px;">#' + (i+1) + '</span>' + s + '</button>';
+    });
+  }
+  var customSel = cur && !styles.includes(cur) ? ' selected' : '';
+  html += '<button class="ob-opt' + customSel + '" onclick="obHairCustom(this)">✏️ None of these — type my own</button>';
+  if (_obData['lm_hair_custom']) {
+    html += '<input class="ob-text-input" id="obHairCustomInput" type="text" placeholder="DESCRIBE YOUR STYLE" value="' + (_obData['lm_hair_custom']||'') + '" oninput="obData2(\'lm_hair_custom\',this.value);obData2(\'lm_hair_style\',this.value)" style="font-size:18px;margin-top:8px;" />';
+  }
+  html += '</div>';
+  return html;
+}
+
+function obHairCustom(el) {
+  _obData['lm_hair_custom'] = _obData['lm_hair_custom'] || '';
+  document.querySelectorAll('.ob-opt').forEach(function(b){b.classList.remove('selected');});
+  el.classList.add('selected');
+  renderObStep();
+  setTimeout(function(){ var inp=document.getElementById('obHairCustomInput'); if(inp) inp.focus(); }, 50);
+}
+
+async function obFetchHairStyles() {
+  var facePhotos = [_obPhotos[0], _obPhotos[1]].filter(Boolean);
+  if (!facePhotos.length) {
+    _obData['lm_hair_styles'] = ['Textured crop','Side part','Buzz cut','Flow / curtains'];
+    renderObStep(); return;
+  }
+  var messages = [{
+    role: 'user',
+    content: facePhotos.map(function(p) {
+      return { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: p.split(',')[1] } };
+    }).concat([{ type: 'text', text: 'Based on this person\'s face shape and features, recommend exactly 4 hairstyles that would suit them best. Rank them from best (#1) to least best (#4). Return ONLY a JSON array of 4 short style name strings, e.g. ["Textured crop","Side part","Buzz cut","French crop"]. No explanation, no markdown.' }])
+  }];
+  try {
+    var res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({messages: messages, max_tokens: 200}) });
+    var json = await res.json();
+    var text = (json.content && json.content[0]) ? json.content[0].text : (json.reply||'');
+    text = text.replace(/```json|```/g,'').trim();
+    var arr = JSON.parse(text);
+    _obData['lm_hair_styles'] = Array.isArray(arr) ? arr : ['Textured crop','Side part','Buzz cut','Flow / curtains'];
+  } catch(e) {
+    _obData['lm_hair_styles'] = ['Textured crop','Side part','Buzz cut','Flow / curtains'];
+  }
+  renderObStep();
+}
+
+function obRenderHairPreview() {
+  var style = _obData['lm_hair_style'] || 'your chosen style';
+  var accepted = _obData['lm_hair_preview_accepted'];
+  if (accepted === true) {
+    return '<div style="padding:16px 0;color:var(--grn);font-size:14px;font-weight:700;">✓ Style locked in: ' + style + '</div>';
+  }
+  return '<div class="ob-options">'
+    + '<button class="ob-opt' + (_obData['lm_hair_preview_choice']==='yes'?' selected':'') + '" onclick="obHairPreviewChoice(\'yes\',this)">✨ Yes — show me a preview</button>'
+    + '<button class="ob-opt' + (_obData['lm_hair_preview_choice']==='no'?' selected':'') + '" onclick="obHairPreviewChoice(\'no\',this)">→ No — skip preview</button>'
+    + '</div>'
+    + (_obData['lm_hair_preview_choice']==='yes' ? '<div style="margin-top:12px;padding:14px 16px;background:var(--bg-panel);border:1px solid var(--border-y);border-radius:12px;color:var(--y);font-size:13px;font-weight:600;">⚡ Hair preview coming soon — this feature is being built.</div>' : '');
+}
+
+function obHairPreviewChoice(val, el) {
+  _obData['lm_hair_preview_choice'] = val;
+  if (val === 'no') _obData['lm_hair_preview_accepted'] = true;
+  document.querySelectorAll('.ob-opt').forEach(function(b){b.classList.remove('selected');});
+  el.classList.add('selected');
+  var btn = document.getElementById('obNextBtn'); if (btn) btn.disabled = false;
+  renderObStep();
+}
+
+// ─── HELPERS ───
+function obData2(key, val) { _obData[key] = val; }
+
+function obInputChange(val) {
+  var id = _obStepStack[_obStepIndex];
+  _obData[id] = val;
+  var btn = document.getElementById('obNextBtn');
+  if (btn) btn.disabled = !val.toString().trim();
+}
+
+function obSingleSelect(id, val, el) {
+  _obData[id] = val;
+  document.querySelectorAll('.ob-opt').forEach(function(b){b.classList.remove('selected');});
+  el.classList.add('selected');
+  var btn = document.getElementById('obNextBtn'); if (btn) btn.disabled = false;
+}
+
+function obMultiSelect(id, val, el) {
+  var arr = _obData[id] || [];
+  // if none selected, clear others
+  if (val === 'none') { arr = arr.includes('none') ? [] : ['none']; }
+  else {
+    arr = arr.filter(function(v){return v!=='none';});
+    if (arr.includes(val)) arr = arr.filter(function(v){return v!==val;});
+    else arr.push(val);
+  }
+  _obData[id] = arr;
+  // re-render options
+  document.querySelectorAll('.ob-opt').forEach(function(b){
+    var bval = b.getAttribute('onclick') && b.getAttribute('onclick').match(/'([^']+)'\s*,this/);
+    if (bval) b.classList.toggle('selected', arr.includes(bval[1]));
+  });
+  var btn = document.getElementById('obNextBtn'); if (btn) btn.disabled = arr.length === 0;
+}
+
+function obCanNext(id, type) {
+  if (type === 'photos') return true; // photos optional (except hair needs face, validated at hair step)
+  if (type === 'wake_sleep') return true;
+  if (type === 'weight') return !!_obData['current_weight'] && !!_obData['goal_weight'];
+  if (type === 'sleep_wake') return true;
+  if (type === 'hair_ai') return !!_obData['lm_hair_style'];
+  if (type === 'hair_preview') return !!_obData['lm_hair_preview_choice'];
+  if (type === 'multiselect') return (_obData[id]||[]).length > 0;
+  if (type === 'options') return !!_obData[id];
+  if (type === 'text' || type === 'textarea' || type === 'number') return !!(_obData[id]||'').toString().trim();
   return true;
 }
 
-function obSelect(id, val, el) {
-  _obData[id] = val;
-  document.querySelectorAll('.ob-opt').forEach(function(b) { b.classList.remove('selected'); });
-  el.classList.add('selected');
-  var btn = document.querySelector('.ob-next'); if (btn) btn.disabled = false;
+function obBack() {
+  if (_obStepIndex > 0) { _obStepIndex--; renderObStep(); }
 }
-
-function obTextChange(val) {
-  _obData[OB_STEPS[_obStep].id] = val;
-  var btn = document.querySelector('.ob-next'); if (btn) btn.disabled = !val.trim();
-}
-
-function obBack() { if (_obStep > 0) { _obStep--; renderObStep(); } }
 
 function obNext() {
-  if (!obCanNext()) return;
-  if (OB_STEPS[_obStep].type === 'time') { var t = document.getElementById('obTimeInput'); if (t) _obData[OB_STEPS[_obStep].id] = t.value; }
-  if (_obStep < OB_STEPS.length - 1) { _obStep++; renderObStep(); }
-  else obShowGenerating();
+  var id = _obStepStack[_obStepIndex];
+  var step = getStepDef(id);
+  if (!step) return;
+  if (!obCanNext(id, step.type)) return;
+
+  // After goals selected — rebuild dynamic stack
+  if (id === 'goals') {
+    _obStepStack = buildDynamicSteps();
+  }
+  // After lm_areas selected — insert sub-steps
+  if (id === 'lm_areas') {
+    var areas = _obData['lm_areas'] || [];
+    if (!areas.includes('none') && areas.length > 0) {
+      insertLMSubSteps();
+    }
+  }
+
+  _obStepIndex++;
+  // Skip hair_preview if hair not in lm_areas
+  var nextId = _obStepStack[_obStepIndex];
+  if (nextId === 'lm_hair_preview' && !(_obData['lm_areas']||[]).includes('hair')) {
+    _obStepIndex++;
+  }
+  renderObStep();
 }
 
+// ─── GENERATING ───
 function obShowGenerating() {
   document.getElementById('obContent').innerHTML =
     '<div class="ob-generating">'
     + '<div class="ob-gen-spinner"></div>'
-    + '<div class="ob-gen-title">Building your routine...</div>'
-    + '<div class="ob-gen-sub">Claude is crafting a personalised daily routine based on your goals.</div>'
+    + '<div class="ob-gen-title">Building your plan...</div>'
+    + '<div class="ob-gen-sub">Claude is analysing your goals and creating<br>your fully personalised Ascend plan.</div>'
     + '</div>';
   obCallClaude();
 }
 
-function obGetGoalLabel(v){return{looksmax:'Looksmaxxing',bulk:'Build muscle',cut:'Lose fat',health:'Optimise health',all:'All of the above'}[v]||v;}
-function obGetDietLabel(v){return{carnivore:'Carnivore/Animal-based',keto:'Keto/Low-carb',balanced:'Balanced/Flexible',highcarb:'High-carb/Performance',vegan:'Plant-based/Vegan'}[v]||v;}
-function obGetSplitLabel(v){return{ppl:'Push/Pull/Legs',upper_lower:'Upper/Lower',bro:'Bro split',full_body:'Full body',none:'Not training yet'}[v]||v;}
-
 async function obCallClaude() {
-  var prompt = 'You are a personal health coach setting up a new user in the Ascend app.\n\n'
-    + 'User profile:\n'
-    + '- Name: ' + _obData.name + '\n'
-    + '- Goal: ' + obGetGoalLabel(_obData.goal) + '\n'
-    + '- Wake time: ' + _obData.wake + '\n'
-    + '- Diet: ' + obGetDietLabel(_obData.diet) + '\n'
-    + '- Training split: ' + obGetSplitLabel(_obData.split) + '\n\n'
+  var d = _obData;
+  var goals = d.goals || [];
+
+  var prompt = 'You are a world-class personal coach building a fully personalised plan for a new Ascend app user.\n\n'
+    + '=== USER PROFILE ===\n'
+    + 'Name: ' + (d.name||'User') + '\n'
+    + 'Age: ' + (d.age||'Unknown') + '\n'
+    + 'Wake time: ' + (d.wake||'07:00') + '\n'
+    + 'Sleep time: ' + (d.sleep||'22:30') + '\n'
+    + 'Goals selected: ' + goals.join(', ') + '\n';
+
+  if (goals.includes('looksmax')) {
+    var areas = d.lm_areas || [];
+    prompt += '\n=== LOOKSMAX ===\n';
+    prompt += 'Focus areas: ' + areas.join(', ') + '\n';
+    if (d.lm_skin) prompt += 'Skin concerns: ' + (d.lm_skin||[]).join(', ') + '\n';
+    if (d.lm_hair_style) prompt += 'Hair goal: ' + d.lm_hair_style + '\n';
+    if (d.lm_eyebrows) prompt += 'Eyebrow concerns: ' + (d.lm_eyebrows||[]).join(', ') + '\n';
+    if (d.lm_bf_method) prompt += 'BF% reduction method: ' + (d.lm_bf_method||[]).join(', ') + '\n';
+    if (d.lm_bf_cals) prompt += 'Calorie maintenance: ' + d.lm_bf_cals + ' kcal\n';
+    if (d.lm_teeth) prompt += 'Teeth goals: ' + (d.lm_teeth||[]).join(', ') + '\n';
+    if (d.lm_posture) prompt += 'Posture issues: ' + (d.lm_posture||[]).join(', ') + '\n';
+  }
+  if (goals.includes('physique')) {
+    prompt += '\n=== PHYSIQUE ===\n';
+    prompt += 'Goal: ' + (d.ph_goal||'') + '\n';
+    prompt += 'Current weight: ' + (d.current_weight||'') + 'kg, Goal weight: ' + (d.goal_weight||'') + 'kg\n';
+    prompt += 'Training days/week: ' + (d.ph_days||'') + '\n';
+    prompt += 'Training split: ' + (d.ph_split||'') + '\n';
+  }
+  if (goals.includes('health')) {
+    prompt += '\n=== HEALTH ===\n';
+    prompt += 'Currently eats: ' + (d.h_current_diet||'') + '\n';
+    prompt += 'Wants to eat: ' + (d.h_desired_diet||'') + '\n';
+    prompt += 'Meals: ' + (d.h_meals||[]).join(', ') + '\n';
+    prompt += 'Current sleep/wake: sleep ' + (d.current_sleep||'') + ' wake ' + (d.current_wake||'') + '\n';
+    prompt += 'Desired sleep/wake: sleep ' + (d.desired_sleep||'') + ' wake ' + (d.desired_wake||'') + '\n';
+  }
+
+  prompt += '\n=== OUTPUT ===\n'
     + 'Return ONLY a JSON object with this exact shape (no markdown, no explanation):\n'
     + '{\n'
-    + '  "morning": [ { "title": "string", "time": "HH:MM", "items": ["step1","step2"] } ],\n'
-    + '  "night":   [ { "title": "string", "time": "HH:MM", "items": ["step1","step2"] } ],\n'
+    + '  "morning": [ { "title": "string", "time": "HH:MM", "items": ["step1","step2","step3"] } ],\n'
+    + '  "night":   [ { "title": "string", "time": "HH:MM", "items": ["step1","step2","step3"] } ],\n'
     + '  "workouts": [ { "label": "A", "name": "string", "tag": "push", "exercises": [ { "name": "string", "weight": 0, "goal": 0 } ] } ],\n'
-    + '  "macros": { "calories": 2500, "protein": 180 }\n'
+    + '  "meals": [ { "name": "string", "items": ["food1","food2"], "cals": 0, "protein": 0 } ],\n'
+    + '  "macros": { "calories": 0, "protein": 0 },\n'
+    + '  "lmg": [ { "text": "string", "done": false, "notes": "string" } ],\n'
+    + '  "bodyweight": { "current": 0, "goal": 0 }\n'
     + '}\n\n'
-    + 'Rules: morning has 4-6 blocks timed from ' + _obData.wake + '; night has 4-6 blocks; each block 2-4 steps; workouts match their split (empty array if none); macros suit their goal.';
+    + 'Rules:\n'
+    + '- morning: 4-6 blocks timed from wake time ' + (d.wake||'07:00') + ', include skincare/hair/posture if relevant\n'
+    + '- night: 4-6 blocks timed toward sleep ' + (d.sleep||'22:30') + ', include skincare/wind-down\n'
+    + '- workouts: match their split and days. Empty array if no physique goal or split is "none"\n'
+    + '- meals: match their desired diet and selected meal times. Realistic portions.\n'
+    + '- macros: calculate based on weight, goal, and age\n'
+    + '- lmg: specific looksmax goals based on their selected areas. Empty array if no looksmax goal.\n'
+    + '- bodyweight: use their entered weights or 0 if not provided\n'
+    + '- All times as HH:MM strings\n';
+
+  // Build message content — include photos if available
+  var content = [];
+  var facePhotos = [_obPhotos[0], _obPhotos[1]].filter(Boolean);
+  var bodyPhotos = [_obPhotos[2], _obPhotos[3]].filter(Boolean);
+  var allPhotos = [_obPhotos[0], _obPhotos[1], _obPhotos[2], _obPhotos[3]].filter(Boolean);
+  allPhotos.forEach(function(p) {
+    content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: p.split(',')[1] } });
+  });
+  content.push({ type: 'text', text: prompt });
+
   try {
     var res = await fetch('/api/chat', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({messages:[{role:'user',content:prompt}], max_tokens:2000})
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: content }], max_tokens: 4000 })
     });
     var json = await res.json();
-    var text = (json.content && json.content[0]) ? json.content[0].text : (json.reply || '');
+    var text = (json.content && json.content[0]) ? json.content[0].text : (json.reply||'');
     text = text.replace(/```json|```/g,'').trim();
     obApplyAndFinish(JSON.parse(text));
   } catch(e) {
@@ -2081,9 +2526,24 @@ async function obCallClaude() {
 }
 
 function obApplyAndFinish(data) {
-  var s = load('ascend_settings', {}); s.name = _obData.name; s.wakeTime = _obData.wake;
+  // Save base settings
+  var s = load('ascend_settings', {});
+  s.name = _obData.name || s.name;
+  s.wakeTime  = _obData.wake  || s.wakeTime  || '07:00';
+  s.sleepTime = _obData.sleep || s.sleepTime || '22:30';
   save('ascend_settings', s); syncSection('settings', s);
+
+  // Save photos as first progress check-in
+  var photos = _obPhotos.filter(Boolean);
+  if (photos.length) {
+    var checkins = load('ascend_checkins', []);
+    checkins.unshift({ id: Date.now(), date: new Date().toISOString(), photos: _obPhotos });
+    checkins = checkins.slice(0, 12);
+    save('ascend_checkins', checkins); syncSection('checkins', checkins);
+  }
+
   if (data) {
+    // Day plans — same routine all 7 days
     if (data.morning || data.night) {
       var plans = SHORT_DAY_NAMES.map(function() {
         return {
@@ -2094,25 +2554,40 @@ function obApplyAndFinish(data) {
       });
       save('ascend_day_plans', plans); syncSection('day_plans', plans); _dayPlans = plans;
     }
+    // Workouts
     if (data.workouts && data.workouts.length) {
       var workouts = data.workouts.map(function(w,i){return{id:'ob_'+i,label:w.label||String.fromCharCode(65+i),name:w.name,tag:w.tag||'push',open:false,exercises:w.exercises||[]};});
       save('ascend_workouts', workouts); syncSection('workouts', workouts);
     }
+    // Meals
+    if (data.meals && data.meals.length) {
+      var meals = data.meals.map(function(m,i){return{id:i+1,name:m.name,items:m.items||[],cals:m.cals||0,protein:m.protein||0};});
+      save('ascend_meals', meals); syncSection('meals', meals);
+    }
+    // Macros
     if (data.macros) { save('ascend_macros',{calories:data.macros.calories||2000,protein:data.macros.protein||150}); syncSection('macros',data.macros); }
+    // LMG
+    if (data.lmg && data.lmg.length) {
+      var lmg = data.lmg.map(function(g,i){return{id:Date.now()+i,text:g.text,done:false,notes:g.notes||''};});
+      save('ascend_lmg', lmg); syncSection('lmg', lmg);
+    }
+    // Bodyweight
+    if (data.bodyweight) { save('ascend_bodyweight', data.bodyweight); syncSection('bodyweight', data.bodyweight); }
   }
-  var goalLabels = {looksmax:'Looksmaxxing',bulk:'Build Muscle',cut:'Lose Fat',health:'Optimise Health',all:'Everything'};
+
+  // Completion screen
   document.getElementById('obContent').innerHTML =
     '<div class="ob-complete">'
     + '<div class="ob-complete-icon">⚡</div>'
-    + '<div class="ob-complete-title">You\'re set, ' + _obData.name + '.</div>'
-    + '<div class="ob-complete-sub">' + (data ? 'Your routine, workouts, and macros have been personalised by Claude.' : 'Settings saved. Build your routine in the Day Planner.') + '</div>'
+    + '<div class="ob-complete-title">You\'re set' + (_obData.name ? ', ' + _obData.name : '') + '.</div>'
+    + '<div class="ob-complete-sub">' + (data ? 'Your routine, nutrition, workouts, and goals have been built by Claude.' : 'Settings saved. You can customise everything inside the app.') + '</div>'
     + '<div class="ob-summary">'
-    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Goal</span><span class="ob-summary-val">'+(goalLabels[_obData.goal]||_obData.goal)+'</span></div>'
-    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Wake time</span><span class="ob-summary-val">'+_obData.wake+'</span></div>'
-    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Diet</span><span class="ob-summary-val">'+obGetDietLabel(_obData.diet)+'</span></div>'
-    + '<div class="ob-summary-row"><span class="ob-summary-lbl">Training</span><span class="ob-summary-val">'+obGetSplitLabel(_obData.split)+'</span></div>'
-    + (data&&data.macros ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Calories</span><span class="ob-summary-val">'+data.macros.calories+' kcal</span></div>' : '')
-    + (data&&data.macros ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Protein</span><span class="ob-summary-val">'+data.macros.protein+'g</span></div>' : '')
+    + (_obData.name    ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Name</span><span class="ob-summary-val">' + _obData.name + '</span></div>' : '')
+    + (_obData.age     ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Age</span><span class="ob-summary-val">' + _obData.age + '</span></div>' : '')
+    + (_obData.wake    ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Wake time</span><span class="ob-summary-val">' + _obData.wake + '</span></div>' : '')
+    + (_obData.goals   ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Goals</span><span class="ob-summary-val">' + (_obData.goals||[]).join(', ') + '</span></div>' : '')
+    + (data&&data.macros ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Calories</span><span class="ob-summary-val">' + data.macros.calories + ' kcal</span></div>' : '')
+    + (data&&data.macros ? '<div class="ob-summary-row"><span class="ob-summary-lbl">Protein</span><span class="ob-summary-val">' + data.macros.protein + 'g</span></div>' : '')
     + '</div>'
     + '<button class="ob-launch" onclick="obLaunch()">Enter Ascend →</button>'
     + '</div>';
@@ -2121,10 +2596,11 @@ function obApplyAndFinish(data) {
 function obLaunch() {
   localStorage.setItem(OB_DONE_KEY, '1');
   document.getElementById('onboardingOverlay').style.display = 'none';
-  renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection(); renderWeightCards(); renderLMG(); renderProgressPhotos();
-  var s = load('ascend_settings',{});
-  var nameEl = document.getElementById('sidebarName'); if (nameEl && s.name) nameEl.textContent = s.name;
-  var avatarEl = document.getElementById('avatarBtn'); if (avatarEl && s.name) avatarEl.textContent = s.name[0].toUpperCase();
+  renderChecklist(); renderMacros(); renderMealsSection(); renderTrainingSection();
+  renderWeightCards(); renderLMG(); renderProgressPhotos();
+  var s = load('ascend_settings', {});
+  var avatarEl = document.getElementById('avatarBtn');
+  if (avatarEl && s.name) avatarEl.textContent = s.name[0].toUpperCase();
 }
 
 // ─── BOOT ───
