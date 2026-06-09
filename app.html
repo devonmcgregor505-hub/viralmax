@@ -957,7 +957,7 @@ function renderMealsSection() {
     var bullets = items.map(function(item, bi) {
       return '<div class="meal-bullet-row">'
         +'<span class="meal-bullet-dash">—</span>'
-        +'<input class="meal-bullet-input" type="text" value="'+item.replace(/"/g,'&quot;')+'"'
+        +'<input class="meal-bullet-input" type="text" placeholder="Add a food item..." value="'+item.replace(/"/g,'&quot;')+'"'
         +' onblur="saveMealItem('+meal.id+','+bi+',this.value)"'
         +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();addMealItem('+meal.id+');}if(event.key===\'Backspace\'&&this.value===\'\'){event.preventDefault();delMealItem('+meal.id+','+bi+');}" />'
         +'<button class="meal-bullet-del" onclick="delMealItem('+meal.id+','+bi+')">✕</button>'
@@ -1074,6 +1074,13 @@ function renderTrainingSection() {
       +'</div>';
     if(day.open) {
       html+='<div class="workout-exercises">';
+      if(day.exercises.length === 0) {
+        html+='<div class="empty-state" style="padding:24px 16px;">'
+          +'<div class="empty-icon" style="font-size:22px;margin-bottom:8px;">🏋️</div>'
+          +'<div class="empty-title" style="font-size:13px;">No exercises yet</div>'
+          +'<div class="empty-sub" style="font-size:12px;">Tap &ldquo;+ Add exercise&rdquo; below to build this day.</div>'
+          +'</div>';
+      }
       day.exercises.forEach(function(ex,ei) {
         var pct=ex.goal ? Math.min(100,Math.round((ex.weight/ex.goal)*100)) : 0;
         var barColor=pct>=100?'#22c55e':pct>=60?'var(--y)':'#60a5fa';
@@ -1182,6 +1189,14 @@ function toggleLMG() {
 function renderLMG() {
   var el=document.getElementById('lmgList'); if(!el) return;
   var goals=loadLMG();
+  if(!goals.length) {
+    el.innerHTML='<div class="empty-state" style="padding:24px 16px;">'
+      +'<div class="empty-icon" style="font-size:22px;margin-bottom:8px;">✦</div>'
+      +'<div class="empty-title" style="font-size:13px;">No goals added yet</div>'
+      +'<div class="empty-sub" style="font-size:12px;">Add looksmax goals — jawline, skin, hair, posture — and track your progress here.</div>'
+      +'</div>';
+    return;
+  }
   el.innerHTML=goals.map(function(g) {
     return '<div class="lmg-item">'
       +'<div class="lmg-check'+(g.done?' done':'')+'" onclick="toggleLMGoal('+g.id+')"></div>'
@@ -1311,7 +1326,18 @@ function renderChecklist() {
         +'</div>';
     }
   });
-  el.innerHTML=html;
+  // Empty state: if no items exist across all sections, prompt user to set up Day Planner
+  var totalItems = allItems.filter(function(x){return x.type==='item';}).length;
+  if(totalItems === 0) {
+    el.innerHTML = '<div class="empty-state" style="padding:64px 24px;">'
+      + '<div class="empty-icon">📋</div>'
+      + '<div class="empty-title">Your checklist is empty</div>'
+      + '<div class="empty-sub" style="margin-bottom:24px;">Build your daily routine by adding morning, day, and night tasks in the Day Planner.</div>'
+      + '<button class="btn-y" style="display:inline-flex;" onclick="openDayPlanner()">Open Day Planner</button>'
+      + '</div>';
+  } else {
+    el.innerHTML=html;
+  }
   updateScoreBadge();
   updateStreakBadge();
 }
