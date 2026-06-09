@@ -113,7 +113,7 @@ async function callClaude(messages, systemPrompt = '', maxTokens = 1024) {
 
 // ── AI Chat (proxies Claude, keeps API key server-side) ──
 app.post('/api/chat', async (req, res) => {
-  const { messages, profile } = req.body;
+  const { messages, profile, max_tokens } = req.body;
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'messages array required' });
   }
@@ -127,8 +127,9 @@ app.post('/api/chat', async (req, res) => {
   const system = `You are Ascend AI — a sharp, practical health and appearance coach. Your user is ${age} years old, ${profile?.height||'unknown'}cm tall, ${profile?.weight||'unknown'}kg. Their goal: ${goal}. Focus areas: ${focus}. Training style: ${train}. Wake time: ${wake}. Accountability style: ${acct} and encouraging. Be direct, specific, and actionable. No fluff. Keep responses concise but complete. Never use markdown headers or bullet asterisks — use plain text with dashes for lists if needed.`;
 
   try {
-    const reply = await callClaude(messages, system, 800);
-    res.json({ reply });
+    const tokens = max_tokens || 800;
+    const reply = await callClaude(messages, system, tokens);
+    res.json({ reply, content: [{ type: 'text', text: reply }] });
   } catch(err) {
     console.error('[api/chat] error:', err.message);
     res.status(500).json({ error: err.message });

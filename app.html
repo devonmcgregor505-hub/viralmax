@@ -1959,7 +1959,7 @@ function buildDynamicSteps() {
     steps.push('ph_goal','ph_weight','ph_days','ph_split');
   }
   if (goals.includes('health')) {
-    steps.push('h_current_diet','h_desired_diet','h_meals','h_current_sleep','h_desired_sleep');
+    steps.push('h_desired_diet','h_meals','h_desired_sleep');
   }
   steps.push('generating');
   return steps;
@@ -2490,7 +2490,6 @@ async function obCallClaude() {
     prompt += 'Currently eats: ' + (d.h_current_diet||'') + '\n';
     prompt += 'Wants to eat: ' + (d.h_desired_diet||'') + '\n';
     prompt += 'Meals: ' + (d.h_meals||[]).join(', ') + '\n';
-    prompt += 'Current sleep/wake: sleep ' + (d.current_sleep||'') + ' wake ' + (d.current_wake||'') + '\n';
     prompt += 'Desired sleep/wake: sleep ' + (d.desired_sleep||'') + ' wake ' + (d.desired_wake||'') + '\n';
   }
 
