@@ -2288,11 +2288,33 @@ function obRenderHairOptions() {
 }
 
 function obHairCustom(el) {
-  _obData['lm_hair_custom'] = _obData['lm_hair_custom'] || '';
+  if (!_obData['lm_hair_custom_shown']) {
+    _obData['lm_hair_custom_shown'] = true;
+    _obData['lm_hair_custom'] = '';
+    _obData['lm_hair_style'] = '';
+  }
   document.querySelectorAll('.ob-opt').forEach(function(b){b.classList.remove('selected');});
   el.classList.add('selected');
-  renderObStep();
-  setTimeout(function(){ var inp=document.getElementById('obHairCustomInput'); if(inp) inp.focus(); }, 50);
+  var existing = document.getElementById('obHairCustomInput');
+  if (!existing) {
+    var wrap = document.createElement('div');
+    wrap.style.marginTop = '12px';
+    wrap.innerHTML = '<input class="ob-text-input" id="obHairCustomInput" type="text" placeholder="DESCRIBE YOUR STYLE" style="font-size:18px;" />';
+    el.parentNode.appendChild(wrap);
+  }
+  setTimeout(function(){
+    var inp = document.getElementById('obHairCustomInput');
+    if (inp) {
+      inp.focus();
+      inp.oninput = function() {
+        _obData['lm_hair_custom'] = this.value;
+        _obData['lm_hair_style'] = this.value;
+        var btn = document.getElementById('obNextBtn');
+        if (btn) btn.disabled = !this.value.trim();
+      };
+      if (_obData['lm_hair_custom']) inp.value = _obData['lm_hair_custom'];
+    }
+  }, 50);
 }
 
 async function obFetchHairStyles() {
@@ -2507,7 +2529,7 @@ async function obCallClaude() {
     var res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [{ role: 'user', content: content }], max_tokens: 4000 })
+      body: JSON.stringify({ messages: [{ role: 'user', content: content }], max_tokens: 4000, profile: { age: _obData.age || '19' } })
     });
     var json = await res.json();
     var text = (json.content && json.content[0]) ? json.content[0].text : (json.reply||'');
