@@ -2134,6 +2134,10 @@ window.addEventListener('DOMContentLoaded', function(){
     var sb=mod.createClient('https://asvpzsnncbxkpycsgfnj.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdnB6c25uY2J4a3B5Y3NnZm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3OTMwOTksImV4cCI6MjA5MTM2OTA5OX0.S1poy30uv9R6_xG8d-wi27eIgeXbvlVIaLbgAljM4j0');
     sb.auth.getSession().then(function(res){
       if(!res.data.session){ window.location.href='/'; return; }
+      // Store user ID immediately so loadFromCloud works on first load
+      var user=res.data.session.user;
+      localStorage.setItem('ascend_user_id', user.id);
+      localStorage.setItem('ascend_session', JSON.stringify(res.data.session));
       bootApp();
     });
   });
@@ -2155,6 +2159,8 @@ function bootApp(){
       if(email) avatarEl.textContent=email[0].toUpperCase();
     }catch(e){}
   })();
+  // Check onboarding immediately — before cloud load so flag isn't lost
+  checkOnboarding();
   // Load from cloud first, then render everything
   loadFromCloud().then(function(){
     renderChecklist();
@@ -2171,7 +2177,6 @@ function bootApp(){
       var avatarEl=document.getElementById('avatarBtn');
       if(avatarEl && s.name && s.name.trim()) avatarEl.textContent=s.name[0].toUpperCase();
     })();
-    checkOnboarding();
     var lastPage=localStorage.getItem('ascend_page');
     if(lastPage&&lastPage!=='checklist') showPage(lastPage,null);
   });
