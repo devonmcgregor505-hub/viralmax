@@ -1165,23 +1165,51 @@ function applyFoodItem(dbEntry, query, mealId, bi) {
   saveMeals(meals); closeFoodDropdown(); renderMealsSection();
 }
 
+var _amountTimers = {};
 function updateFoodAmount(mealId, bi, amount) {
-  amount = parseFloat(amount) || 0;
-  var meals = loadMeals();
-  var meal = meals.find(function(x){return x.id===mealId;}); if(!meal) return;
-  var itemName = (meal.items||[])[bi] || '';
-  var key = itemName.toLowerCase().trim();
-  var stored = meal.itemNutrients && meal.itemNutrients[key];
-  if (!stored || !stored._dbKey) return;
-  var dbEntry = FOOD_DB.find(function(f){ return f.n.toLowerCase()===stored._dbKey.toLowerCase(); });
-  if (!dbEntry) return;
-  var grams = amountToGrams(stored._dbKey, amount);
-  var nutrients = dbToNutrients(dbEntry, grams);
-  nutrients._dbKey = stored._dbKey;
-  nutrients._amount = amount;
-  meal.itemNutrients[key] = nutrients;
-  var mn = calcMealNutrients(meal); meal.cals=mn.calories; meal.protein=mn.protein;
-  saveMeals(meals); renderMealsSection();
+  var tk = mealId+'_'+bi;
+  clearTimeout(_amountTimers[tk]);
+  _amountTimers[tk] = setTimeout(function() {
+    amount = parseFloat(amount) || 0;
+    if (amount <= 0) return;
+    var meals = loadMeals();
+    var meal = meals.find(function(x){return x.id===mealId;}); if(!meal) return;
+    var itemName = (meal.items||[])[bi] || '';
+    var key = itemName.toLowerCase().trim();
+    var stored = meal.itemNutrients && meal.itemNutrients[key];
+    if (!stored || !stored._dbKey) return;
+    var dbEntry = FOOD_DB.find(function(f){ return f.n.toLowerCase()===stored._dbKey.toLowerCase(); });
+    if (!dbEntry) return;
+    var grams = amountToGrams(stored._dbKey, amount);
+    var nutrients = dbToNutrients(dbEntry, grams);
+    nutrients._dbKey = stored._dbKey;
+    nutrients._amount = amount;
+    meal.itemNutrients[key] = nutrients;
+    var mn = calcMealNutrients(meal);
+    meal.cals = mn.calories; meal.protein = mn.protein;
+    saveMeals(meals);
+    renderNutrientPanel();
+    var daily = calcDailyNutrients();
+    var targets = getNutrientTargets();
+    var calPct = Math.min(100,Math.round((daily.calories/targets.calories.optimal)*100));
+    var protPct = Math.min(100,Math.round((daily.protein/targets.protein.optimal)*100));
+    var cards = document.querySelectorAll('#mealsSection .macro-val');
+    if(cards[0]) cards[0].textContent = Math.round(daily.calories);
+    if(cards[1]) cards[1].textContent = Math.round(daily.protein);
+    var bars = document.querySelectorAll('#mealsSection .macro-progress-fill');
+    if(bars[0]){bars[0].style.width=calPct+'%';bars[0].style.background=calPct>105?'var(--red)':'var(--grad)';}
+    if(bars[1]) bars[1].style.width=protPct+'%';
+    var mealRows = document.querySelectorAll('.meal-row');
+    var allMeals = loadMeals();
+    var mIdx = -1;
+    for(var i=0;i<allMeals.length;i++){if(allMeals[i].id===mealId){mIdx=i;break;}}
+    if(mIdx>=0 && mealRows[mIdx]){
+      var mNut = calcMealNutrients(allMeals[mIdx]);
+      var pills = mealRows[mIdx].querySelectorAll('.meal-macro-pill');
+      if(pills[0]) pills[0].textContent = Math.round(mNut.calories)+' kcal';
+      if(pills[1]) pills[1].textContent = Math.round(mNut.protein)+'g';
+    }
+  }, 600);
 }
 
 function renderMealsSection() {
