@@ -358,6 +358,26 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .upload-slot-remove{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.8);border:none;color:#fff;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;}
 .upload-slot.filled .upload-slot-remove{display:flex;}
 
+/* ─── FOOD AUTOCOMPLETE ─── */
+.food-ac-wrap{position:relative;}
+.food-ac-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--border-y);border-radius:10px;z-index:200;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+.food-ac-item{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);}
+.food-ac-item:hover{background:var(--yd);color:var(--y);}
+.food-ac-item:last-child{border-bottom:none;}
+.food-ac-meta{font-size:10px;color:var(--t3);margin-top:1px;}
+/* ─── NUTRIENT PANEL ─── */
+.nutrient-panel{margin-top:20px;}
+.nutrient-panel-title{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.nutrient-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+.nutrient-row:last-child{border-bottom:none;}
+.nutrient-name{font-size:12px;font-weight:700;color:var(--t2);width:110px;flex-shrink:0;}
+.nutrient-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.nutrient-bar-fill{height:100%;border-radius:3px;transition:width .4s;}
+.nutrient-vals{font-size:11px;color:var(--t3);white-space:nowrap;min-width:80px;text-align:right;}
+.nutrient-vals span{color:var(--text);font-weight:700;}
+/* ─── MACRO PROGRESS ─── */
+.macro-progress-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:6px;overflow:hidden;}
+.macro-progress-fill{height:100%;border-radius:2px;background:var(--grad);transition:width .3s;}
 /* ─── EMPTY STATE ─── */
 .empty-state{text-align:center;padding:48px 24px;color:var(--t2);}
 .empty-icon{font-size:32px;margin-bottom:12px;}
@@ -795,9 +815,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
             <div class="section-title">Nutrition</div>
             
           </div>
-          <div id="macroGrid" style="display:flex;gap:8px;flex-shrink:0;"></div>
+
         </div>
         <div id="mealsSection"></div>
+        <div class="nutrient-panel card" id="nutrientPanel" style="margin-top:16px;"></div>
       </div>
 
       <!-- TRAINING PAGE -->
@@ -856,9 +877,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 const MORNING = [];
 const NIGHT = [];
 const DEFAULT_MEALS = [
-  {id:1, name:'Breakfast', items:[], cals:0, protein:0},
-  {id:2, name:'Lunch',     items:[], cals:0, protein:0},
-  {id:3, name:'Dinner',    items:[], cals:0, protein:0},
+  {id:1, name:'Breakfast', items:[], itemNutrients:{}, cals:0, protein:0},
+  {id:2, name:'Lunch',     items:[], itemNutrients:{}, cals:0, protein:0},
+  {id:3, name:'Dinner',    items:[], itemNutrients:{}, cals:0, protein:0},
 ];
 const DEFAULT_MACROS = {calories:2000, protein:150};
 const DEFAULT_WORKOUTS = [
@@ -2566,6 +2587,7 @@ function obApplyAndFinish(data) {
   s.name = _obData.name || s.name;
   s.wakeTime  = _obData.wake  || s.wakeTime  || '07:00';
   s.sleepTime = _obData.sleep || s.sleepTime || '22:30';
+  if (_obData.age) save('ascend_ob_age', _obData.age);
   save('ascend_settings', s); syncSection('settings', s);
 
   // Save photos as first progress check-in
