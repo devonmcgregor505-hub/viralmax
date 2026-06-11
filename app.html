@@ -365,16 +365,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .food-ac-item:hover{background:var(--yd);color:var(--y);}
 .food-ac-item:last-child{border-bottom:none;}
 .food-ac-meta{font-size:10px;color:var(--t3);margin-top:1px;}
-/* ─── NUTRIENT PANEL ─── */
-.nutrient-panel{margin-top:20px;}
-.nutrient-panel-title{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
-.nutrient-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
-.nutrient-row:last-child{border-bottom:none;}
-.nutrient-name{font-size:12px;font-weight:700;color:var(--t2);width:110px;flex-shrink:0;}
-.nutrient-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
-.nutrient-bar-fill{height:100%;border-radius:3px;transition:width .4s;}
-.nutrient-vals{font-size:11px;color:var(--t3);white-space:nowrap;min-width:80px;text-align:right;}
-.nutrient-vals span{color:var(--text);font-weight:700;}
 /* ─── MACRO PROGRESS ─── */
 .macro-progress-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:6px;overflow:hidden;}
 .macro-progress-fill{height:100%;border-radius:2px;background:var(--grad);transition:width .3s;}
@@ -818,7 +808,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
         </div>
         <div id="mealsSection"></div>
-        <div class="nutrient-panel card" id="nutrientPanel" style="margin-top:16px;"></div>
       </div>
 
       <!-- TRAINING PAGE -->
@@ -961,37 +950,28 @@ function saveMeals(m) { save('ascend_meals', m); syncSection('meals', m); }
 function getNutrientTargets() {
   var custom = load('ascend_nutrient_targets', {});
   var age = parseInt(localStorage.getItem('ascend_ob_age') || '19') || 19;
-  var base = {
-    calories: { name:'Calories',  unit:'kcal', optimal: age < 25 ? 2800 : 2500 },
-    protein:  { name:'Protein',   unit:'g',    optimal: age < 25 ? 180 : 160 },
-    carbs:    { name:'Carbs',     unit:'g',    optimal: 250 },
-    fat:      { name:'Fat',       unit:'g',    optimal: 70 },
-    fibre:    { name:'Fibre',     unit:'g',    optimal: 30 },
-    sugar:    { name:'Sugar',     unit:'g',    optimal: 50, over_is_bad: true },
-    sodium:   { name:'Sodium',    unit:'mg',   optimal: 2300, over_is_bad: true },
-    calcium:  { name:'Calcium',   unit:'mg',   optimal: 1000 },
-    iron:     { name:'Iron',      unit:'mg',   optimal: 8 },
-    vitc:     { name:'Vitamin C', unit:'mg',   optimal: 90 }
+  return {
+    calories: { name:'Calories', unit:'kcal', optimal: custom.calories || (age < 25 ? 2800 : 2500) },
+    protein:  { name:'Protein',  unit:'g',    optimal: custom.protein  || (age < 25 ? 180  : 160)  }
   };
-  Object.keys(custom).forEach(function(k){ if(base[k]) base[k].optimal = custom[k]; });
-  return base;
 }
 function calcMealNutrients(meal) {
-  var nut = {calories:0,protein:0,carbs:0,fat:0,fibre:0,sugar:0,sodium:0,calcium:0,iron:0,vitc:0};
+  var nut = {calories:0, protein:0};
   var stored = meal.itemNutrients || {};
   (meal.items||[]).forEach(function(item) {
     var key = (item||'').toLowerCase().trim();
-    if (stored[key]) Object.keys(nut).forEach(function(n){ nut[n] += stored[key][n] || 0; });
+    if (stored[key]) { nut.calories += stored[key].calories || 0; nut.protein += stored[key].protein || 0; }
   });
   if (nut.calories === 0 && meal.cals) nut.calories = meal.cals;
   if (nut.protein === 0 && meal.protein) nut.protein = meal.protein;
   return nut;
 }
 function calcDailyNutrients() {
-  var total = {calories:0,protein:0,carbs:0,fat:0,fibre:0,sugar:0,sodium:0,calcium:0,iron:0,vitc:0};
+  var total = {calories:0, protein:0};
   loadMeals().forEach(function(meal) {
     var n = calcMealNutrients(meal);
-    Object.keys(total).forEach(function(k){ total[k] += n[k] || 0; });
+    total.calories += n.calories || 0;
+    total.protein  += n.protein  || 0;
   });
   return total;
 }
@@ -999,61 +979,61 @@ var _acTimer = null;
 // ─── LOCAL FOOD DATABASE ───
 var FOOD_DB = [
   // Beef
-  {n:'Rump steak',cal:187,pro:22,carb:0,fat:11,fib:0,sug:0,sod:60,cal2:5,ir:2.5,vc:0},
-  {n:'Chuck steak',cal:185,pro:21,carb:0,fat:11,fib:0,sug:0,sod:65,cal2:10,ir:2.8,vc:0},
-  {n:'Ribeye steak',cal:271,pro:20,carb:0,fat:22,fib:0,sug:0,sod:54,cal2:8,ir:2.2,vc:0},
-  {n:'Beef mince',cal:196,pro:19,carb:0,fat:13,fib:0,sug:0,sod:75,cal2:12,ir:2.6,vc:0},
-  {n:'Sirloin steak',cal:193,pro:22,carb:0,fat:11,fib:0,sug:0,sod:58,cal2:6,ir:2.4,vc:0},
-  {n:'Beef liver',cal:135,pro:21,carb:4,fat:4,fib:0,sug:0,sod:76,cal2:6,ir:6.5,vc:23},
-  {n:'Beef brisket',cal:218,pro:20,carb:0,fat:15,fib:0,sug:0,sod:64,cal2:10,ir:2.4,vc:0},
+  {n:'Rump steak',cal:187,pro:22},
+  {n:'Chuck steak',cal:185,pro:21},
+  {n:'Ribeye steak',cal:271,pro:20},
+  {n:'Beef mince',cal:196,pro:19},
+  {n:'Sirloin steak',cal:193,pro:22},
+  {n:'Beef liver',cal:135,pro:21},
+  {n:'Beef brisket',cal:218,pro:20},
   // Chicken
-  {n:'Chicken breast',cal:120,pro:23,carb:0,fat:3,fib:0,sug:0,sod:74,cal2:15,ir:1.0,vc:0},
-  {n:'Chicken thigh',cal:177,pro:20,carb:0,fat:11,fib:0,sug:0,sod:88,cal2:12,ir:1.3,vc:0},
-  {n:'Chicken mince',cal:170,pro:29,carb:0,fat:6,fib:0,sug:0,sod:80,cal2:12,ir:1.1,vc:0},
+  {n:'Chicken breast',cal:120,pro:23},
+  {n:'Chicken thigh',cal:177,pro:20},
+  {n:'Chicken mince',cal:170,pro:29},
   // Pork
-  {n:'Pork belly',cal:518,pro:9,carb:0,fat:53,fib:0,sug:0,sod:42,cal2:6,ir:0.5,vc:0},
-  {n:'Pork mince',cal:263,pro:18,carb:0,fat:21,fib:0,sug:0,sod:62,cal2:10,ir:0.9,vc:0},
-  {n:'Bacon',cal:541,pro:37,carb:1,fat:42,fib:0,sug:0,sod:1700,cal2:9,ir:0.8,vc:0},
+  {n:'Pork belly',cal:518,pro:9},
+  {n:'Pork mince',cal:263,pro:18},
+  {n:'Bacon',cal:541,pro:37},
   // Fish
-  {n:'Salmon',cal:208,pro:20,carb:0,fat:13,fib:0,sug:0,sod:59,cal2:9,ir:0.3,vc:0},
-  {n:'Tuna',cal:116,pro:26,carb:0,fat:1,fib:0,sug:0,sod:50,cal2:10,ir:1.3,vc:0},
-  {n:'Sardines',cal:208,pro:25,carb:0,fat:11,fib:0,sug:0,sod:505,cal2:382,ir:2.9,vc:0},
-  {n:'Cod',cal:82,pro:18,carb:0,fat:1,fib:0,sug:0,sod:54,cal2:16,ir:0.4,vc:1},
+  {n:'Salmon',cal:208,pro:20},
+  {n:'Tuna',cal:116,pro:26},
+  {n:'Sardines',cal:208,pro:25},
+  {n:'Cod',cal:82,pro:18},
   // Eggs & Dairy
-  {n:'Egg',cal:155,pro:13,carb:1,fat:11,fib:0,sug:1,sod:124,cal2:56,ir:1.8,vc:0},
-  {n:'Egg white',cal:52,pro:11,carb:1,fat:0,fib:0,sug:1,sod:166,cal2:7,ir:0.1,vc:0},
-  {n:'Whole milk',cal:61,pro:3,carb:5,fat:3,fib:0,sug:5,sod:44,cal2:113,ir:0.0,vc:1},
-  {n:'Greek yoghurt',cal:97,pro:9,carb:4,fat:5,fib:0,sug:4,sod:35,cal2:110,ir:0.1,vc:0},
-  {n:'Cheddar cheese',cal:403,pro:25,carb:1,fat:33,fib:0,sug:1,sod:621,cal2:721,ir:0.7,vc:0},
-  {n:'Cottage cheese',cal:98,pro:11,carb:3,fat:4,fib:0,sug:3,sod:364,cal2:83,ir:0.2,vc:0},
-  {n:'Butter',cal:717,pro:1,carb:0,fat:81,fib:0,sug:0,sod:11,cal2:24,ir:0.0,vc:0},
-  {n:'Tallow',cal:902,pro:0,carb:0,fat:100,fib:0,sug:0,sod:0,cal2:0,ir:0.0,vc:0},
-  {n:'Whey protein',cal:400,pro:80,carb:8,fat:4,fib:0,sug:4,sod:200,cal2:600,ir:1.0,vc:0},
+  {n:'Egg',cal:155,pro:13},
+  {n:'Egg white',cal:52,pro:11},
+  {n:'Whole milk',cal:61,pro:3},
+  {n:'Greek yoghurt',cal:97,pro:9},
+  {n:'Cheddar cheese',cal:403,pro:25},
+  {n:'Cottage cheese',cal:98,pro:11},
+  {n:'Butter',cal:717,pro:1},
+  {n:'Tallow',cal:902,pro:0},
+  {n:'Whey protein',cal:400,pro:80},
   // Carbs & Grains
-  {n:'White rice cooked',cal:130,pro:3,carb:28,fat:0,fib:0,sug:0,sod:1,cal2:10,ir:0.2,vc:0},
-  {n:'Brown rice cooked',cal:123,pro:3,carb:26,fat:1,fib:2,sug:0,sod:1,cal2:10,ir:0.5,vc:0},
-  {n:'Oats',cal:389,pro:17,carb:66,fat:7,fib:11,sug:1,sod:2,cal2:54,ir:4.7,vc:0},
-  {n:'White bread',cal:265,pro:9,carb:51,fat:3,fib:3,sug:5,sod:491,cal2:151,ir:3.6,vc:0},
-  {n:'Sourdough bread',cal:274,pro:9,carb:52,fat:1,fib:3,sug:2,sod:480,cal2:22,ir:2.9,vc:0},
-  {n:'Pasta cooked',cal:158,pro:6,carb:31,fat:1,fib:2,sug:1,sod:1,cal2:7,ir:1.3,vc:0},
-  {n:'Potato',cal:77,pro:2,carb:17,fat:0,fib:2,sug:1,sod:6,cal2:12,ir:0.8,vc:20},
-  {n:'Sweet potato',cal:86,pro:2,carb:20,fat:0,fib:3,sug:4,sod:55,cal2:30,ir:0.6,vc:3},
+  {n:'White rice cooked',cal:130,pro:3},
+  {n:'Brown rice cooked',cal:123,pro:3},
+  {n:'Oats',cal:389,pro:17},
+  {n:'White bread',cal:265,pro:9},
+  {n:'Sourdough bread',cal:274,pro:9},
+  {n:'Pasta cooked',cal:158,pro:6},
+  {n:'Potato',cal:77,pro:2},
+  {n:'Sweet potato',cal:86,pro:2},
   // Fruits & Veg
-  {n:'Banana',cal:89,pro:1,carb:23,fat:0,fib:3,sug:12,sod:1,cal2:5,ir:0.3,vc:9},
-  {n:'Apple',cal:52,pro:0,carb:14,fat:0,fib:2,sug:10,sod:1,cal2:6,ir:0.1,vc:5},
-  {n:'Orange',cal:47,pro:1,carb:12,fat:0,fib:2,sug:9,sod:0,cal2:40,ir:0.1,vc:53},
-  {n:'Blueberries',cal:57,pro:1,carb:14,fat:0,fib:2,sug:10,sod:1,cal2:6,ir:0.3,vc:10},
-  {n:'Broccoli',cal:34,pro:3,carb:7,fat:0,fib:3,sug:2,sod:33,cal2:47,ir:0.7,vc:89},
-  {n:'Spinach',cal:23,pro:3,carb:4,fat:0,fib:2,sug:0,sod:79,cal2:99,ir:2.7,vc:28},
-  {n:'Avocado',cal:160,pro:2,carb:9,fat:15,fib:7,sug:1,sod:7,cal2:12,ir:0.6,vc:10},
-  {n:'Mixed vegetables',cal:65,pro:3,carb:13,fat:0,fib:4,sug:4,sod:40,cal2:40,ir:1.0,vc:15},
+  {n:'Banana',cal:89,pro:1},
+  {n:'Apple',cal:52,pro:0},
+  {n:'Orange',cal:47,pro:1},
+  {n:'Blueberries',cal:57,pro:1},
+  {n:'Broccoli',cal:34,pro:3},
+  {n:'Spinach',cal:23,pro:3},
+  {n:'Avocado',cal:160,pro:2},
+  {n:'Mixed vegetables',cal:65,pro:3},
   // Nuts & Oils
-  {n:'Almonds',cal:579,pro:21,carb:22,fat:50,fib:13,sug:4,sod:1,cal2:264,ir:3.7,vc:0},
-  {n:'Olive oil',cal:884,pro:0,carb:0,fat:100,fib:0,sug:0,sod:2,cal2:1,ir:0.6,vc:0},
-  {n:'Coconut oil',cal:862,pro:0,carb:0,fat:100,fib:0,sug:0,sod:0,cal2:1,ir:0.0,vc:0},
+  {n:'Almonds',cal:579,pro:21},
+  {n:'Olive oil',cal:884,pro:0},
+  {n:'Coconut oil',cal:862,pro:0},
   // Other
-  {n:'Honey',cal:304,pro:0,carb:82,fat:0,fib:0,sug:82,sod:4,cal2:6,ir:0.4,vc:0},
-  {n:'Protein bar',cal:350,pro:25,carb:35,fat:8,fib:3,sug:10,sod:200,cal2:200,ir:3.0,vc:0}
+  {n:'Honey',cal:304,pro:0},
+  {n:'Protein bar',cal:350,pro:25}
 ];
 
 // Keys map to nutrient object
@@ -1061,15 +1041,7 @@ function dbToNutrients(entry, grams) {
   var scale = grams / 100;
   return {
     calories: Math.round(entry.cal * scale),
-    protein:  Math.round(entry.pro * scale * 10) / 10,
-    carbs:    Math.round(entry.carb * scale * 10) / 10,
-    fat:      Math.round(entry.fat * scale * 10) / 10,
-    fibre:    Math.round(entry.fib * scale * 10) / 10,
-    sugar:    Math.round(entry.sug * scale * 10) / 10,
-    sodium:   Math.round(entry.sod * scale),
-    calcium:  Math.round(entry.cal2 * scale),
-    iron:     Math.round(entry.ir * scale * 10) / 10,
-    vitc:     Math.round(entry.vc * scale * 10) / 10
+    protein:  Math.round(entry.pro * scale * 10) / 10
   };
 }
 
@@ -1192,8 +1164,7 @@ function updateFoodAmount(mealId, bi, amount) {
     var mn = calcMealNutrients(meal);
     meal.cals = mn.calories; meal.protein = mn.protein;
     saveMeals(meals);
-    renderNutrientPanel();
-    var daily = calcDailyNutrients();
+      var daily = calcDailyNutrients();
     var targets = getNutrientTargets();
     var calPct = Math.min(100,Math.round((daily.calories/targets.calories.optimal)*100));
     var protPct = Math.min(100,Math.round((daily.protein/targets.protein.optimal)*100));
@@ -1277,27 +1248,8 @@ function renderMealsSection() {
   });
   html += '<button class="meal-add-btn" onclick="addMeal()">+ Add meal</button>';
   el.innerHTML = html;
-  renderNutrientPanel();
 }
-function renderNutrientPanel() {
-  var wrap = document.getElementById('nutrientPanel'); if(!wrap) return;
-  var daily = calcDailyNutrients();
-  var targets = getNutrientTargets();
-  var keys = ['calories','protein','carbs','fat','fibre','sugar','sodium','calcium','iron','vitc'];
-  var html = '<div class="nutrient-panel-title">Daily Nutrients</div>';
-  keys.forEach(function(k) {
-    var t = targets[k]; var val = Math.round(daily[k]*10)/10;
-    var pct = Math.min(100, Math.round((val/t.optimal)*100));
-    var over = t.over_is_bad && val > t.optimal;
-    var color = over ? 'var(--red)' : pct >= 80 ? 'var(--grn)' : pct >= 40 ? 'var(--y)' : '#60a5fa';
-    html += '<div class="nutrient-row">'
-      +'<div class="nutrient-name">'+t.name+'</div>'
-      +'<div class="nutrient-bar-wrap"><div class="nutrient-bar-fill" style="width:'+pct+'%;background:'+color+';"></div></div>'
-      +'<div class="nutrient-vals"><span>'+val+'</span> / '+t.optimal+' '+t.unit+'</div>'
-      +'</div>';
-  });
-  wrap.innerHTML = html;
-}
+
 function saveMealName(id, val) {
   var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
   m.name=val.trim()||m.name; saveMeals(meals);
