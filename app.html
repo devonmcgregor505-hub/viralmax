@@ -1081,10 +1081,10 @@ function renderMealsSection() {
       return '<div class="meal-bullet-row">'
         +'<span class="meal-bullet-dash">—</span>'
         +'<div class="food-ac-wrap" style="flex:1;">'
-        +'<input class="meal-bullet-input" id="'+inputId+'" type="text" placeholder="Search food..." value="'+(item||'').replace(/"/g,'&quot;')+'"'
+        +'<input class="meal-bullet-input" id="'+inputId+'" type="text" placeholder="Search food..." value="'+((item||'').replace(/&/g,"&amp;").replace(/"/g,"&quot;"))+'"'
         +' oninput="foodSearch(this.value,'+meal.id+','+bi+')"'
         +' onblur="setTimeout(closeAcDropdown,200);saveMealItem('+meal.id+','+bi+',this.value)"'
-        +' onkeydown="if(event.key==='Enter'){event.preventDefault();addMealItem('+meal.id+');}if(event.key==='Backspace'&&this.value===''){event.preventDefault();delMealItem('+meal.id+','+bi+');}" /></div>'
+        +' onkeydown="if(event.key==String.fromCharCode(13)){event.preventDefault();addMealItem('+meal.id+');}if(event.key==String.fromCharCode(8)&&!this.value){event.preventDefault();delMealItem('+meal.id+','+bi+');}" /></div>'
         +(hasNut ? '<span style="font-size:10px;color:var(--y);margin-left:4px;flex-shrink:0;">✓</span>' : '')
         +'<button class="meal-bullet-del" onclick="delMealItem('+meal.id+','+bi+')">✕</button>'
         +'</div>';
@@ -1171,7 +1171,7 @@ function editMacroTarget(key) {
   var popup=document.createElement('div'); popup.className='macro-edit-popup'; popup.id='macroEditPopup';
   popup.innerHTML='<div class="macro-edit-box"><div class="macro-edit-box-title">Edit '+t.name+' target</div>'
     +'<div class="macro-edit-field"><label>'+t.name+' ('+t.unit+')</label><input id="met-val" type="number" value="'+t.optimal+'" /></div>'
-    +'<div class="macro-edit-actions"><button class="macro-edit-save" onclick="saveMacroTarget(''+key+'')">Save</button>'
+    +'<div class="macro-edit-actions"><button class="macro-edit-save" onclick="saveMacroTarget(\''+key+'\')">Save</button>'
     +'<button class="macro-edit-cancel" onclick="closeMacroEdit()">Cancel</button></div></div>';
   document.body.appendChild(popup);
   popup.addEventListener('click',function(e){if(e.target===popup)closeMacroEdit();});
