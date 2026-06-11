@@ -2952,6 +2952,31 @@ function obLaunch() {
   if (avatarEl && s.name) avatarEl.textContent = s.name[0].toUpperCase();
 }
 
+// ─── MEAL DATA CLEANUP ───
+function cleanMealData() {
+  var meals = loadMeals();
+  var changed = false;
+  meals.forEach(function(meal) {
+    if (!meal.itemNutrients) return;
+    Object.keys(meal.itemNutrients).forEach(function(k) {
+      if (!meal.itemNutrients[k]._dbKey) {
+        delete meal.itemNutrients[k];
+        changed = true;
+      }
+    });
+    // Remove items that have no matching nutrient entry
+    if (meal.items) {
+      meal.items = meal.items.filter(function(item) {
+        var key = (item||'').toLowerCase().trim();
+        return key && meal.itemNutrients[key];
+      });
+    }
+    // Recalc meal totals
+    var mn = calcMealNutrients(meal);
+    meal.cals = mn.calories; meal.protein = mn.protein;
+  });
+  if (changed) { saveMeals(meals); }
+}
 // ─── BOOT ───
 window.addEventListener('DOMContentLoaded', function(){
   // Auth guard — redirect to home if not signed in
