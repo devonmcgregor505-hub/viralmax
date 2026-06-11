@@ -1133,18 +1133,55 @@ function closeFoodDropdown() { var d=document.getElementById('foodAcDd'); if(d) 
 // keep old name working
 function closeAcDropdown() { closeFoodDropdown(); }
 
+// Foods measured by count not grams
+var COUNTABLE_FOODS = ['egg','banana','apple','orange','sardine'];
+function isCountable(name) {
+  var n = (name||'').toLowerCase();
+  return COUNTABLE_FOODS.some(function(c){ return n.indexOf(c) !== -1; });
+}
+function getDefaultAmount(name) { return isCountable(name) ? 1 : 100; }
+function getUnit(name) { return isCountable(name) ? 'x' : 'g'; }
+function amountToGrams(name, amount) {
+  if (!isCountable(name)) return amount;
+  var perItem = {egg:60,banana:120,apple:150,orange:130,sardine:50};
+  var key = Object.keys(perItem).find(function(k){ return (name||'').toLowerCase().indexOf(k)!==-1; });
+  return amount * (perItem[key] || 100);
+}
+
 function applyFoodItem(dbEntry, query, mealId, bi) {
-  var grams = parseGrams(query, dbEntry.n);
+  var amount = getDefaultAmount(dbEntry.n);
+  var grams = amountToGrams(dbEntry.n, amount);
   var nutrients = dbToNutrients(dbEntry, grams);
+  nutrients._dbKey = dbEntry.n;
+  nutrients._amount = amount;
   var meals = loadMeals();
   var meal = meals.find(function(x){return x.id===mealId;}); if(!meal) return;
   if(!meal.itemNutrients) meal.itemNutrients={};
-  var key = query.toLowerCase().trim();
+  var key = dbEntry.n.toLowerCase().trim();
   meal.itemNutrients[key] = nutrients;
   if(!meal.items) meal.items=[];
-  meal.items[bi] = query;
+  meal.items[bi] = dbEntry.n;
   var mn = calcMealNutrients(meal); meal.cals=mn.calories; meal.protein=mn.protein;
   saveMeals(meals); closeFoodDropdown(); renderMealsSection();
+}
+
+function updateFoodAmount(mealId, bi, amount) {
+  amount = parseFloat(amount) || 0;
+  var meals = loadMeals();
+  var meal = meals.find(function(x){return x.id===mealId;}); if(!meal) return;
+  var itemName = (meal.items||[])[bi] || '';
+  var key = itemName.toLowerCase().trim();
+  var stored = meal.itemNutrients && meal.itemNutrients[key];
+  if (!stored || !stored._dbKey) return;
+  var dbEntry = FOOD_DB.find(function(f){ return f.n.toLowerCase()===stored._dbKey.toLowerCase(); });
+  if (!dbEntry) return;
+  var grams = amountToGrams(stored._dbKey, amount);
+  var nutrients = dbToNutrients(dbEntry, grams);
+  nutrients._dbKey = stored._dbKey;
+  nutrients._amount = amount;
+  meal.itemNutrients[key] = nutrients;
+  var mn = calcMealNutrients(meal); meal.cals=mn.calories; meal.protein=mn.protein;
+  saveMeals(meals); renderMealsSection();
 }
 
 function renderMealsSection() {
@@ -1172,14 +1209,24 @@ function renderMealsSection() {
     var bullets = items.map(function(item, bi) {
       var inputId = 'food-inp-'+meal.id+'-'+bi;
       var hasNut = meal.itemNutrients && meal.itemNutrients[(item||'').toLowerCase().trim()];
+      var storedNut = hasNut ? meal.itemNutrients[(item||'').toLowerCase().trim()] : null;
+      var itemAmount = storedNut && storedNut._amount != null ? storedNut._amount : '';
+      var itemUnit = storedNut && storedNut._dbKey ? getUnit(storedNut._dbKey) : 'g';
+      var amountInput = hasNut
+        ? '<input type="number" min="0" step="'+(itemUnit==='x'?'1':'10')+'" value="'+itemAmount+'"'
+          +' onchange="updateFoodAmount('+meal.id+','+bi+',this.value)"'
+          +' style="width:'+(itemUnit==='x'?'44px':'54px')+';background:var(--yd);border:1px solid var(--border-y);border-radius:6px;color:var(--y);font-family:'Bebas Neue',sans-serif;font-size:15px;padding:2px 4px;outline:none;text-align:center;" />'
+          +'<span style="font-size:10px;color:var(--t3);margin-left:2px;">'+itemUnit+'</span>'
+        : '';
       return '<div class="meal-bullet-row">'
         +'<span class="meal-bullet-dash">—</span>'
         +'<div class="food-ac-wrap" style="flex:1;">'
         +'<input class="meal-bullet-input" id="'+inputId+'" type="text" placeholder="Search food..." value="'+((item||'').replace(/&/g,"&amp;").replace(/"/g,"&quot;"))+'"'
         +' oninput="foodSearch(this.value,'+meal.id+','+bi+')"'
-        +' onblur="setTimeout(closeAcDropdown,200);saveMealItem('+meal.id+','+bi+',this.value)"'
+        +' onblur="setTimeout(closeFoodDropdown,200);saveMealItem('+meal.id+','+bi+',this.value)"'
         +' onkeydown="if(event.key==String.fromCharCode(13)){event.preventDefault();addMealItem('+meal.id+');}if(event.key==String.fromCharCode(8)&&!this.value){event.preventDefault();delMealItem('+meal.id+','+bi+');}" /></div>'
-        +(hasNut ? '<span style="font-size:10px;color:var(--y);margin-left:4px;flex-shrink:0;">✓</span>' : '')
+        +amountInput
+        +(hasNut ? '<span style="font-size:10px;color:var(--y);margin-left:4px;flex-shrink:0;" title="Nutrients loaded">✓</span>' : '')
         +'<button class="meal-bullet-del" onclick="delMealItem('+meal.id+','+bi+')">✕</button>'
         +'</div>';
     }).join('');
