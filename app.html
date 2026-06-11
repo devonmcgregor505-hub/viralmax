@@ -1872,7 +1872,18 @@ async function loadFromCloud() {
 }
 
 // ─── AUTO SYNC EVERY 30s ───
+var _lastKnownDate = todayKey();
 setInterval(function(){
+  // Check if day has changed — if so reset checklist
+  var currentDate = todayKey();
+  if (currentDate !== _lastKnownDate) {
+    _lastKnownDate = currentDate;
+    checked = new Set();
+    localStorage.setItem('ascend_checked_today', JSON.stringify([]));
+    localStorage.setItem('ascend_checked_date', currentDate);
+    renderChecklist();
+    updateDayBadge();
+  }
   loadFromCloud().then(function(){
     renderMacros(); renderMealsSection(); renderTrainingSection();
     renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
