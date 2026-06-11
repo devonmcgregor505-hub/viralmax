@@ -1061,12 +1061,12 @@ function renderMealsSection() {
   var calPct = Math.min(100, Math.round((daily.calories/targets.calories.optimal)*100));
   var protPct = Math.min(100, Math.round((daily.protein/targets.protein.optimal)*100));
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">'
-    +'<div class="macro-card" onclick="editMacroTarget('calories')">'
+    +'<div class="macro-card" onclick="editMacroTarget(\'calories\')">'
     +'<div class="macro-lbl">CALORIES</div>'
     +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.calories)+'</span><span class="macro-val-unit"> / '+targets.calories.optimal+' kcal</span></div>'
     +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+calPct+'%;background:'+(calPct>105?'var(--red)':'var(--grad)')+'"></div></div>'
     +'</div>'
-    +'<div class="macro-card" onclick="editMacroTarget('protein')">'
+    +'<div class="macro-card" onclick="editMacroTarget(\'protein\')">'
     +'<div class="macro-lbl">PROTEIN</div>'
     +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.protein)+'</span><span class="macro-val-unit">g / '+targets.protein.optimal+'g</span></div>'
     +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+protPct+'%;"></div></div>'
