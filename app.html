@@ -1305,7 +1305,12 @@ function saveMealName(id, val) {
 function saveMealItem(id, bi, val) {
   var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
   if(!m.items) m.items=[];
-  m.items[bi]=val.trim();
+  var trimmed = val.trim();
+  // Don't overwrite if nutrients already stored for the current item name
+  var currentKey = (m.items[bi]||'').toLowerCase().trim();
+  var hasStored = m.itemNutrients && m.itemNutrients[currentKey] && m.itemNutrients[currentKey]._dbKey;
+  if (hasStored && trimmed && trimmed.toLowerCase() !== currentKey) return;
+  m.items[bi]=trimmed;
   m.items=m.items.filter(function(s){return s;});
   saveMeals(meals);
 }
