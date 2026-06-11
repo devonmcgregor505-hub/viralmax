@@ -1214,7 +1214,7 @@ function renderMealsSection() {
       var itemUnit = storedNut && storedNut._dbKey ? getUnit(storedNut._dbKey) : 'g';
       var amountInput = hasNut
         ? '<input type="number" min="0" step="'+(itemUnit==='x'?'1':'10')+'" value="'+itemAmount+'"'
-          +' onchange="updateFoodAmount('+meal.id+','+bi+',this.value)"'
+          +' oninput="updateFoodAmount('+meal.id+','+bi+',this.value)"'
           +' style="width:'+(itemUnit==='x'?'44px':'54px')+';background:var(--yd);border:1px solid var(--border-y);border-radius:6px;color:var(--y);font-family:Bebas Neue,sans-serif;font-size:15px;padding:2px 4px;outline:none;text-align:center;" />'
           +'<span style="font-size:10px;color:var(--t3);margin-left:2px;">'+itemUnit+'</span>'
         : '';
