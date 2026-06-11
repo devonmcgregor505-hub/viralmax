@@ -1177,8 +1177,12 @@ function updateFoodAmount(mealId, bi, amount) {
     var itemName = (meal.items||[])[bi] || '';
     var key = itemName.toLowerCase().trim();
     var stored = meal.itemNutrients && meal.itemNutrients[key];
-    if (!stored || !stored._dbKey) return;
-    var dbEntry = FOOD_DB.find(function(f){ return f.n.toLowerCase()===stored._dbKey.toLowerCase(); });
+    var dbKey = stored && stored._dbKey ? stored._dbKey : itemName;
+    var dbEntry = FOOD_DB.find(function(f){ return f.n.toLowerCase()===dbKey.toLowerCase(); });
+    if (!dbEntry) {
+      // try partial match
+      dbEntry = FOOD_DB.find(function(f){ return itemName.toLowerCase().indexOf(f.n.toLowerCase().split(' ')[0])!==-1; });
+    }
     if (!dbEntry) return;
     var grams = amountToGrams(stored._dbKey, amount);
     var nutrients = dbToNutrients(dbEntry, grams);
