@@ -957,44 +957,173 @@ function loadMeals() {
   return meals;
 }
 function saveMeals(m) { save('ascend_meals', m); syncSection('meals', m); }
+// ─── NUTRIENT TARGETS ───
+function getNutrientTargets() {
+  var custom = load('ascend_nutrient_targets', {});
+  var age = parseInt(localStorage.getItem('ascend_ob_age') || '19') || 19;
+  var base = {
+    calories: { name:'Calories',  unit:'kcal', optimal: age < 25 ? 2800 : 2500 },
+    protein:  { name:'Protein',   unit:'g',    optimal: age < 25 ? 180 : 160 },
+    carbs:    { name:'Carbs',     unit:'g',    optimal: 250 },
+    fat:      { name:'Fat',       unit:'g',    optimal: 70 },
+    fibre:    { name:'Fibre',     unit:'g',    optimal: 30 },
+    sugar:    { name:'Sugar',     unit:'g',    optimal: 50, over_is_bad: true },
+    sodium:   { name:'Sodium',    unit:'mg',   optimal: 2300, over_is_bad: true },
+    calcium:  { name:'Calcium',   unit:'mg',   optimal: 1000 },
+    iron:     { name:'Iron',      unit:'mg',   optimal: 8 },
+    vitc:     { name:'Vitamin C', unit:'mg',   optimal: 90 }
+  };
+  Object.keys(custom).forEach(function(k){ if(base[k]) base[k].optimal = custom[k]; });
+  return base;
+}
+function calcMealNutrients(meal) {
+  var nut = {calories:0,protein:0,carbs:0,fat:0,fibre:0,sugar:0,sodium:0,calcium:0,iron:0,vitc:0};
+  var stored = meal.itemNutrients || {};
+  (meal.items||[]).forEach(function(item) {
+    var key = (item||'').toLowerCase().trim();
+    if (stored[key]) Object.keys(nut).forEach(function(n){ nut[n] += stored[key][n] || 0; });
+  });
+  if (nut.calories === 0 && meal.cals) nut.calories = meal.cals;
+  if (nut.protein === 0 && meal.protein) nut.protein = meal.protein;
+  return nut;
+}
+function calcDailyNutrients() {
+  var total = {calories:0,protein:0,carbs:0,fat:0,fibre:0,sugar:0,sodium:0,calcium:0,iron:0,vitc:0};
+  loadMeals().forEach(function(meal) {
+    var n = calcMealNutrients(meal);
+    Object.keys(total).forEach(function(k){ total[k] += n[k] || 0; });
+  });
+  return total;
+}
+var _acTimer = null;
+async function foodSearch(query, mealId, bi) {
+  if (!query || query.length < 2) { closeAcDropdown(); return; }
+  clearTimeout(_acTimer);
+  _acTimer = setTimeout(async function() {
+    try {
+      var url = 'https://world.openfoodfacts.org/cgi/search.pl?search_terms=' + encodeURIComponent(query) + '&search_simple=1&action=process&json=1&page_size=6&fields=product_name,nutriments';
+      var res = await fetch(url);
+      var json = await res.json();
+      var products = (json.products||[]).filter(function(p){ return p.product_name; });
+      showAcDropdown(products, mealId, bi);
+    } catch(e) { closeAcDropdown(); }
+  }, 400);
+}
+function showAcDropdown(products, mealId, bi) {
+  closeAcDropdown();
+  if (!products.length) return;
+  var inputEl = document.getElementById('food-inp-'+mealId+'-'+bi);
+  if (!inputEl) return;
+  var wrap = inputEl.closest('.food-ac-wrap'); if (!wrap) return;
+  var dd = document.createElement('div');
+  dd.className = 'food-ac-dropdown'; dd.id = 'foodAcDd';
+  products.forEach(function(p) {
+    var n = p.nutriments || {};
+    var cals = Math.round(n['energy-kcal_100g'] || n['energy-kcal'] || 0);
+    var prot = Math.round(n['proteins_100g'] || 0);
+    var el = document.createElement('div');
+    el.className = 'food-ac-item';
+    el.innerHTML = '<div>'+p.product_name+'</div><div class="food-ac-meta">'+cals+' kcal · '+prot+'g protein per 100g</div>';
+    el.onmousedown = function(e){ e.preventDefault(); selectFoodItem(p, mealId, bi); };
+    dd.appendChild(el);
+  });
+  wrap.appendChild(dd);
+}
+function closeAcDropdown() { var d=document.getElementById('foodAcDd'); if(d) d.remove(); }
+function selectFoodItem(product, mealId, bi) {
+  var n = product.nutriments || {};
+  var nutrients = {
+    calories: Math.round(n['energy-kcal_100g'] || n['energy-kcal'] || 0),
+    protein:  Math.round((n['proteins_100g']||0)*10)/10,
+    carbs:    Math.round((n['carbohydrates_100g']||0)*10)/10,
+    fat:      Math.round((n['fat_100g']||0)*10)/10,
+    fibre:    Math.round((n['fiber_100g']||n['fibre_100g']||0)*10)/10,
+    sugar:    Math.round((n['sugars_100g']||0)*10)/10,
+    sodium:   Math.round((n['sodium_100g']||0)*1000),
+    calcium:  Math.round((n['calcium_100g']||0)*1000),
+    iron:     Math.round((n['iron_100g']||0)*1000*10)/10,
+    vitc:     Math.round((n['vitamin-c_100g']||0)*1000*10)/10
+  };
+  var meals = loadMeals();
+  var meal = meals.find(function(x){return x.id===mealId;}); if(!meal) return;
+  if(!meal.itemNutrients) meal.itemNutrients={};
+  meal.itemNutrients[product.product_name.toLowerCase().trim()] = nutrients;
+  if(!meal.items) meal.items=[];
+  meal.items[bi] = product.product_name;
+  var mn = calcMealNutrients(meal); meal.cals=mn.calories; meal.protein=mn.protein;
+  saveMeals(meals); closeAcDropdown(); renderMealsSection();
+}
 function renderMealsSection() {
-  var el=document.getElementById('mealsSection'); if(!el) return;
-  var meals=loadMeals();
-  var totalCals=meals.reduce(function(s,m){return s+(m.cals||0);},0);
-  var totalProt=meals.reduce(function(s,m){return s+(m.protein||0);},0);
-  var html='<div class="meals-header">'
-    +'<div class="meals-title">Daily Diet</div>'
-    +'<div style="font-size:12px;font-weight:700;color:var(--text);">'+totalCals.toLocaleString()+' kcal &nbsp;<span style="color:var(--t3);">·</span>&nbsp; '+totalProt+'g protein</div>'
-    +'</div>';
+  var el = document.getElementById('mealsSection'); if(!el) return;
+  var meals = loadMeals();
+  var daily = calcDailyNutrients();
+  var targets = getNutrientTargets();
+  var calPct = Math.min(100, Math.round((daily.calories/targets.calories.optimal)*100));
+  var protPct = Math.min(100, Math.round((daily.protein/targets.protein.optimal)*100));
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">'
+    +'<div class="macro-card" onclick="editMacroTarget('calories')">'
+    +'<div class="macro-lbl">CALORIES</div>'
+    +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.calories)+'</span><span class="macro-val-unit"> / '+targets.calories.optimal+' kcal</span></div>'
+    +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+calPct+'%;background:'+(calPct>105?'var(--red)':'var(--grad)')+'"></div></div>'
+    +'</div>'
+    +'<div class="macro-card" onclick="editMacroTarget('protein')">'
+    +'<div class="macro-lbl">PROTEIN</div>'
+    +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.protein)+'</span><span class="macro-val-unit">g / '+targets.protein.optimal+'g</span></div>'
+    +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+protPct+'%;"></div></div>'
+    +'</div></div>'
+    +'<div class="meals-header"><div class="meals-title">Daily Diet</div></div>';
   meals.forEach(function(meal) {
-    var items = meal.items && meal.items.length ? meal.items : [''];
+    var mealNut = calcMealNutrients(meal);
+    var items = (meal.items && meal.items.length) ? meal.items : [''];
     var bullets = items.map(function(item, bi) {
+      var inputId = 'food-inp-'+meal.id+'-'+bi;
+      var hasNut = meal.itemNutrients && meal.itemNutrients[(item||'').toLowerCase().trim()];
       return '<div class="meal-bullet-row">'
         +'<span class="meal-bullet-dash">—</span>'
-        +'<input class="meal-bullet-input" type="text" placeholder="Add a food item..." value="'+item.replace(/"/g,'&quot;')+'"'
-        +' onblur="saveMealItem('+meal.id+','+bi+',this.value)"'
-        +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();addMealItem('+meal.id+');}if(event.key===\'Backspace\'&&this.value===\'\'){event.preventDefault();delMealItem('+meal.id+','+bi+');}" />'
+        +'<div class="food-ac-wrap" style="flex:1;">'
+        +'<input class="meal-bullet-input" id="'+inputId+'" type="text" placeholder="Search food..." value="'+(item||'').replace(/"/g,'&quot;')+'"'
+        +' oninput="foodSearch(this.value,'+meal.id+','+bi+')"'
+        +' onblur="setTimeout(closeAcDropdown,200);saveMealItem('+meal.id+','+bi+',this.value)"'
+        +' onkeydown="if(event.key==='Enter'){event.preventDefault();addMealItem('+meal.id+');}if(event.key==='Backspace'&&this.value===''){event.preventDefault();delMealItem('+meal.id+','+bi+');}" /></div>'
+        +(hasNut ? '<span style="font-size:10px;color:var(--y);margin-left:4px;flex-shrink:0;">✓</span>' : '')
         +'<button class="meal-bullet-del" onclick="delMealItem('+meal.id+','+bi+')">✕</button>'
         +'</div>';
     }).join('');
-    html+='<div class="meal-row">'
-      +'<div class="meal-row-head">'
-      +'<div class="meal-row-info">'
+    html += '<div class="meal-row"><div class="meal-row-head"><div class="meal-row-info">'
       +'<input class="meal-name-input" value="'+meal.name+'" placeholder="Meal name" onblur="saveMealName('+meal.id+',this.value)"/>'
       +'<div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 0 6px;"></div>'
       +bullets
       +'<button class="meal-bullet-add" onclick="addMealItem('+meal.id+')">+ add item</button>'
       +'</div>'
       +'<div class="meal-macros">'
-      +'<span class="meal-macro-pill" onclick="openMacroEdit('+meal.id+')">'+meal.cals+' kcal</span>'
-      +'<span class="meal-macro-pill" onclick="openMacroEdit('+meal.id+')">'+meal.protein+'g</span>'
+      +'<span class="meal-macro-pill">'+Math.round(mealNut.calories)+' kcal</span>'
+      +'<span class="meal-macro-pill">'+Math.round(mealNut.protein)+'g</span>'
       +'</div>'
       +'<button class="meal-del-btn" onclick="deleteMeal('+meal.id+')">✕</button>'
-      +'</div>'
+      +'</div></div>';
+  });
+  html += '<button class="meal-add-btn" onclick="addMeal()">+ Add meal</button>';
+  el.innerHTML = html;
+  renderNutrientPanel();
+}
+function renderNutrientPanel() {
+  var wrap = document.getElementById('nutrientPanel'); if(!wrap) return;
+  var daily = calcDailyNutrients();
+  var targets = getNutrientTargets();
+  var keys = ['calories','protein','carbs','fat','fibre','sugar','sodium','calcium','iron','vitc'];
+  var html = '<div class="nutrient-panel-title">Daily Nutrients</div>';
+  keys.forEach(function(k) {
+    var t = targets[k]; var val = Math.round(daily[k]*10)/10;
+    var pct = Math.min(100, Math.round((val/t.optimal)*100));
+    var over = t.over_is_bad && val > t.optimal;
+    var color = over ? 'var(--red)' : pct >= 80 ? 'var(--grn)' : pct >= 40 ? 'var(--y)' : '#60a5fa';
+    html += '<div class="nutrient-row">'
+      +'<div class="nutrient-name">'+t.name+'</div>'
+      +'<div class="nutrient-bar-wrap"><div class="nutrient-bar-fill" style="width:'+pct+'%;background:'+color+';"></div></div>'
+      +'<div class="nutrient-vals"><span>'+val+'</span> / '+t.optimal+' '+t.unit+'</div>'
       +'</div>';
   });
-  html+='<button class="meal-add-btn" onclick="addMeal()">+ Add meal</button>';
-  el.innerHTML=html;
+  wrap.innerHTML = html;
 }
 function saveMealName(id, val) {
   var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
@@ -1010,65 +1139,50 @@ function saveMealItem(id, bi, val) {
 function addMealItem(id) {
   var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
   if(!m.items) m.items=[];
-  m.items.push('New item');
-  saveMeals(meals);
-  renderMealsSection();
+  m.items.push('');
+  saveMeals(meals); renderMealsSection();
   setTimeout(function(){
-    var all=document.querySelectorAll('.meal-bullet-input');
-    // find inputs for this meal
-    var mealInputs=[];
+    var rows=[];
     document.querySelectorAll('.meal-row').forEach(function(row,ri){
-      if(meals[ri] && meals[ri].id===id) {
-        mealInputs=Array.from(row.querySelectorAll('.meal-bullet-input'));
-      }
+      if(meals[ri]&&meals[ri].id===id) rows=Array.from(row.querySelectorAll('.meal-bullet-input'));
     });
-    if(mealInputs.length){ mealInputs[mealInputs.length-1].focus(); mealInputs[mealInputs.length-1].select(); }
-  }, 50);
+    if(rows.length) rows[rows.length-1].focus();
+  },50);
 }
 function delMealItem(id, bi) {
   var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
   if(!m.items) return;
+  var removedKey=(m.items[bi]||'').toLowerCase().trim();
   m.items.splice(bi,1);
-  saveMeals(meals);
-  renderMealsSection();
+  if(m.itemNutrients&&removedKey) delete m.itemNutrients[removedKey];
+  saveMeals(meals); renderMealsSection();
 }
 function deleteMeal(id) {
-  var meals=loadMeals().filter(function(m){return m.id!==id;});
-  saveMeals(meals); renderMealsSection();
+  saveMeals(loadMeals().filter(function(m){return m.id!==id;})); renderMealsSection();
 }
 function addMeal() {
   var meals=loadMeals();
-  var newId=Date.now();
-  meals.push({id:newId, name:'New meal', items:[], cals:0, protein:0});
+  meals.push({id:Date.now(),name:'New meal',items:[],itemNutrients:{},cals:0,protein:0});
   saveMeals(meals); renderMealsSection();
-  setTimeout(function(){
-    var inputs=document.querySelectorAll('.meal-name-input');
-    if(inputs.length) inputs[inputs.length-1].focus();
-  },50);
+  setTimeout(function(){ var i=document.querySelectorAll('.meal-name-input'); if(i.length) i[i.length-1].focus(); },50);
 }
-function openMacroEdit(id) {
-  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
-  var popup=document.createElement('div');
-  popup.className='macro-edit-popup'; popup.id='macroEditPopup';
-  popup.innerHTML='<div class="macro-edit-box">'
-    +'<div class="macro-edit-box-title">'+m.name+' macros</div>'
-    +'<div class="macro-edit-field"><label>Calories</label><input id="mep-cals" type="number" value="'+m.cals+'" /></div>'
-    +'<div class="macro-edit-field"><label>Protein (g)</label><input id="mep-prot" type="number" value="'+m.protein+'" /></div>'
-    +'<div class="macro-edit-actions">'
-    +'<button class="macro-edit-save" onclick="saveMacroEditPopup('+id+')">Save</button>'
-    +'<button class="macro-edit-cancel" onclick="closeMacroEdit()">Cancel</button>'
-    +'</div></div>';
+function editMacroTarget(key) {
+  var t=getNutrientTargets()[key];
+  var popup=document.createElement('div'); popup.className='macro-edit-popup'; popup.id='macroEditPopup';
+  popup.innerHTML='<div class="macro-edit-box"><div class="macro-edit-box-title">Edit '+t.name+' target</div>'
+    +'<div class="macro-edit-field"><label>'+t.name+' ('+t.unit+')</label><input id="met-val" type="number" value="'+t.optimal+'" /></div>'
+    +'<div class="macro-edit-actions"><button class="macro-edit-save" onclick="saveMacroTarget(''+key+'')">Save</button>'
+    +'<button class="macro-edit-cancel" onclick="closeMacroEdit()">Cancel</button></div></div>';
   document.body.appendChild(popup);
-  popup.addEventListener('click', function(e){ if(e.target===popup) closeMacroEdit(); });
+  popup.addEventListener('click',function(e){if(e.target===popup)closeMacroEdit();});
+}
+function saveMacroTarget(key) {
+  var val=parseInt(document.getElementById('met-val').value);
+  if(!isNaN(val)&&val>0){ var c=load('ascend_nutrient_targets',{}); c[key]=val; save('ascend_nutrient_targets',c); }
+  closeMacroEdit(); renderMealsSection();
 }
 function closeMacroEdit() { var p=document.getElementById('macroEditPopup'); if(p) p.remove(); }
-function saveMacroEditPopup(id) {
-  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
-  var c=parseInt(document.getElementById('mep-cals').value);
-  var p=parseInt(document.getElementById('mep-prot').value);
-  if(!isNaN(c)) m.cals=c; if(!isNaN(p)) m.protein=p;
-  saveMeals(meals); closeMacroEdit(); renderMealsSection(); renderMacros();
-}
+function openMacroEdit(id) { editMacroTarget('calories'); }
 
 // ─── WORKOUTS ───
 function loadWorkouts() { return load('ascend_workouts', DEFAULT_WORKOUTS); }
