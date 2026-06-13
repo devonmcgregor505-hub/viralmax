@@ -1324,72 +1324,98 @@ function openMacroEdit(id) { editMacroTarget('calories'); }
 // ─── WORKOUTS ───
 function loadWorkouts() { return load('ascend_workouts', DEFAULT_WORKOUTS); }
 function saveWorkouts(w) { save('ascend_workouts', w); syncSection('workouts', w); }
+var DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+var DAY_VALS  = [1,2,3,4,5,6,0];
+
+function getTodayWorkout(workouts) {
+  var todayJs = new Date().getDay();
+  return workouts.find(function(d){ return (d.scheduledDays||[]).indexOf(todayJs) !== -1; });
+}
+
 function renderTrainingSection() {
-  var el=document.getElementById('trainingSection'); if(!el) return;
-  var workouts=loadWorkouts();
-  var html='';
-  workouts.forEach(function(day) {
-    html+='<div class="workout-day">'
-      +'<div class="workout-day-head" onclick="toggleWorkoutDay(\''+day.id+'\')">'
-      +'<span class="workout-day-label">'+day.label+'</span>'
+  var el = document.getElementById('trainingSection'); if(!el) return;
+  var workouts = loadWorkouts();
+  var todayWorkout = getTodayWorkout(workouts);
+  if (todayWorkout && !todayWorkout.open) {
+    workouts.forEach(function(d){ d.open = false; });
+    todayWorkout.open = true;
+    saveWorkouts(workouts);
+  }
+  var sorted = workouts.slice().sort(function(a,b){
+    var aT = todayWorkout && a.id===todayWorkout.id ? -1 : 0;
+    var bT = todayWorkout && b.id===todayWorkout.id ? 1 : 0;
+    return aT+bT;
+  });
+  var html = '';
+  if (!todayWorkout) {
+    html += '<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;padding:20px 18px;margin-bottom:12px;display:flex;align-items:center;gap:14px;">'
+      +'<div style="font-size:24px;">😴</div>'
+      +'<div><div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;">Rest Day</div>'
+      +'<div style="font-size:12px;color:var(--t3);">No workout scheduled today. Tap the day pills on each workout to assign days.</div></div>'
+      +'</div>';
+  }
+  sorted.forEach(function(day) {
+    var isToday = todayWorkout && day.id===todayWorkout.id;
+    var scheduledDays = day.scheduledDays || [];
+    var dayPills = DAY_NAMES.map(function(dn,i){
+      var val = DAY_VALS[i];
+      var active = scheduledDays.indexOf(val)!==-1 ? ' active' : '';
+      return '<span class="workout-day-pill'+active+'" onclick="event.stopPropagation();toggleScheduleDay(''+day.id+'','+val+')">'+dn+'</span>';
+    }).join('');
+    html += '<div class="workout-day'+(isToday?' today':'')+'">'
+      +'<div class="workout-day-head" onclick="toggleWorkoutDay(''+day.id+'')">'
+      +'<div style="flex:1;min-width:0;">'
+      +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
       +'<span class="workout-day-name">'+day.name+'</span>'
       +'<span class="workout-day-tag wtag-'+day.tag+'">'+day.tag.toUpperCase()+'</span>'
+      +(isToday?'<span class="today-badge">TODAY</span>':'')
+      +'</div>'
+      +'<div class="workout-day-days">'+dayPills+'</div>'
+      +'</div>'
       +'<span class="workout-day-arrow'+(day.open?' open':'')+'">▼</span>'
       +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:4px 8px;margin-left:4px;" onclick="event.stopPropagation();deleteWorkoutDay(this.dataset.id)" data-id="'+day.id+'">✕</button>'
       +'</div>';
-    if(day.open) {
-      html+='<div class="workout-exercises">';
-      if(day.exercises.length === 0) {
-        html+='<div class="empty-state" style="padding:24px 16px;">'
-          +'<div class="empty-icon" style="font-size:22px;margin-bottom:8px;">🏋️</div>'
-          +'<div class="empty-title" style="font-size:13px;">No exercises yet</div>'
-          +'<div class="empty-sub" style="font-size:12px;">Tap &ldquo;+ Add exercise&rdquo; below to build this day.</div>'
-          +'</div>';
+    if (day.open) {
+      html += '<div class="workout-exercises">';
+      if (day.exercises.length === 0) {
+        html += '<div class="empty-state" style="padding:24px 16px;"><div class="empty-icon" style="font-size:22px;margin-bottom:8px;">🏋️</div><div class="empty-title" style="font-size:13px;">No exercises yet</div><div class="empty-sub" style="font-size:12px;">Tap &ldquo;+ Add exercise&rdquo; below to build this day.</div></div>';
       }
       day.exercises.forEach(function(ex,ei) {
-        var pct=ex.goal ? Math.min(100,Math.round((ex.weight/ex.goal)*100)) : 0;
-        var barColor=pct>=100?'#22c55e':pct>=60?'var(--y)':'#60a5fa';
-        html+='<div class="exercise-row">'
+        var pct = ex.goal ? Math.min(100,Math.round((ex.weight/ex.goal)*100)) : 0;
+        var barColor = pct>=100?'#22c55e':pct>=60?'var(--y)':'#60a5fa';
+        html += '<div class="exercise-row">'
           +'<div style="flex:1;min-width:0;">'
-          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:100%;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
-          +(ex.goal?'<div style="display:flex;align-items:center;gap:6px;margin-top:5px;">'
-            +'<div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;">'
-            +'<div style="width:'+pct+'%;height:100%;background:'+barColor+';border-radius:2px;transition:width .3s;"></div></div>'
-            +'<span style="font-size:10px;color:var(--t3);white-space:nowrap;">'+ex.weight+'→'+ex.goal+'kg</span>'
-            +'</div>':'')
+          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:100%;" onblur="updateExercise(''+day.id+'','+ei+','name',this.value)"/>'
+          +(ex.goal?'<div style="display:flex;align-items:center;gap:6px;margin-top:5px;"><div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;"><div style="width:'+pct+'%;height:100%;background:'+barColor+';border-radius:2px;transition:width .3s;"></div></div><span style="font-size:10px;color:var(--t3);white-space:nowrap;">'+ex.weight+' → '+ex.goal+'kg</span></div>':'')
           +'</div>'
-          +'<div class="exercise-weight">'
-          +'<span class="exercise-weight-label">Now</span>'
-          +'<input class="exercise-weight-input" type="number" value="'+ex.weight+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',+this.value)"/>'
-          +'<span class="exercise-weight-unit">kg</span>'
-          +'</div>'
-          +'<div class="exercise-weight" style="margin-left:4px;">'
-          +'<span class="exercise-weight-label">Goal</span>'
-          +'<input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+(ex.goal||0)+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',+this.value)"/>'
-          +'<span class="exercise-weight-unit">kg</span>'
-          +'</div>'
-          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
+          +'<div class="exercise-weight"><span class="exercise-weight-label">Now</span><input class="exercise-weight-input" type="number" value="'+ex.weight+'" onblur="updateExercise(''+day.id+'','+ei+','weight',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
+          +'<div class="exercise-weight" style="margin-left:4px;"><span class="exercise-weight-label">Goal</span><input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+(ex.goal||0)+'" onblur="updateExercise(''+day.id+'','+ei+','goal',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
+          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--t4)'" onclick="deleteExercise(''+day.id+'','+ei+')">✕</button>'
           +'</div>';
       });
-      html+='<button class="workout-add-btn" onclick="addExercise(\''+day.id+'\')">+ Add exercise</button></div>';
+      html += '<button class="workout-add-btn" onclick="addExercise(''+day.id+'')">+ Add exercise</button></div>';
     }
-    html+='</div>';
+    html += '</div>';
   });
-  html+='<button class="workout-add-btn" style="margin-top:10px;" onclick="addWorkoutDay()">+ Add day</button>';
-  el.innerHTML=html;
+  html += '<button class="workout-add-btn" style="margin-top:10px;" onclick="addWorkoutDay()">+ Add day</button>';
+  el.innerHTML = html;
 }
-function addWorkoutDay(){
-  var w=loadWorkouts();
-  var labels=['A','B','C','D','E','F','G'];
-  var newId='day_'+Date.now();
-  var label=labels[w.length]||String(w.length+1);
-  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:false,exercises:[]});
+function toggleScheduleDay(dayId, dayVal) {
+  var w = loadWorkouts(); var day = w.find(function(d){return d.id===dayId;}); if(!day) return;
+  if (!day.scheduledDays) day.scheduledDays = [];
+  var idx = day.scheduledDays.indexOf(dayVal);
+  if (idx===-1) day.scheduledDays.push(dayVal); else day.scheduledDays.splice(idx,1);
   saveWorkouts(w); renderTrainingSection();
 }
-function deleteWorkoutDay(id){
+function addWorkoutDay() {
+  var w = loadWorkouts(); var labels=['A','B','C','D','E','F','G'];
+  var newId='day_'+Date.now(); var label=labels[w.length]||String(w.length+1);
+  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:false,exercises:[],scheduledDays:[]});
+  saveWorkouts(w); renderTrainingSection();
+}
+function deleteWorkoutDay(id) {
   if(!confirm('Remove this day?')) return;
-  var w=loadWorkouts().filter(function(d){return d.id!==id;});
-  saveWorkouts(w); renderTrainingSection();
+  saveWorkouts(loadWorkouts().filter(function(d){return d.id!==id;})); renderTrainingSection();
 }
 function toggleWorkoutDay(id) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===id;}); if(!day) return;
