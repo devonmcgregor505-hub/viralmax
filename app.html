@@ -1360,10 +1360,10 @@ function renderTrainingSection() {
     var dayPills = DAY_NAMES.map(function(dn,i){
       var val = DAY_VALS[i];
       var active = scheduledDays.indexOf(val)!==-1 ? ' active' : '';
-      return '<span class="workout-day-pill'+active+'" onclick="event.stopPropagation();toggleScheduleDay(''+day.id+'','+val+')">'+dn+'</span>';
+      return '<span class="workout-day-pill'+active+'" onclick="event.stopPropagation();toggleScheduleDay(\''+day.id+'\','+val+')">'  +dn+'</span>';
     }).join('');
     html += '<div class="workout-day'+(isToday?' today':'')+'">'
-      +'<div class="workout-day-head" onclick="toggleWorkoutDay(''+day.id+'')">'
+      +'<div class="workout-day-head" onclick="toggleWorkoutDay(\''+day.id+'\')">'
       +'<div style="flex:1;min-width:0;">'
       +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
       +'<span class="workout-day-name">'+day.name+'</span>'
@@ -1385,15 +1385,15 @@ function renderTrainingSection() {
         var barColor = pct>=100?'#22c55e':pct>=60?'var(--y)':'#60a5fa';
         html += '<div class="exercise-row">'
           +'<div style="flex:1;min-width:0;">'
-          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:100%;" onblur="updateExercise(''+day.id+'','+ei+','name',this.value)"/>'
+          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:100%;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
           +(ex.goal?'<div style="display:flex;align-items:center;gap:6px;margin-top:5px;"><div style="flex:1;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;"><div style="width:'+pct+'%;height:100%;background:'+barColor+';border-radius:2px;transition:width .3s;"></div></div><span style="font-size:10px;color:var(--t3);white-space:nowrap;">'+ex.weight+' → '+ex.goal+'kg</span></div>':'')
           +'</div>'
-          +'<div class="exercise-weight"><span class="exercise-weight-label">Now</span><input class="exercise-weight-input" type="number" value="'+ex.weight+'" onblur="updateExercise(''+day.id+'','+ei+','weight',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
-          +'<div class="exercise-weight" style="margin-left:4px;"><span class="exercise-weight-label">Goal</span><input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+(ex.goal||0)+'" onblur="updateExercise(''+day.id+'','+ei+','goal',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
-          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--t4)'" onclick="deleteExercise(''+day.id+'','+ei+')">✕</button>'
+          +'<div class="exercise-weight"><span class="exercise-weight-label">Now</span><input class="exercise-weight-input" type="number" value="'+ex.weight+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
+          +'<div class="exercise-weight" style="margin-left:4px;"><span class="exercise-weight-label">Goal</span><input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+(ex.goal||0)+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
+          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
           +'</div>';
       });
-      html += '<button class="workout-add-btn" onclick="addExercise(''+day.id+'')">+ Add exercise</button></div>';
+      html += '<button class="workout-add-btn" onclick="addExercise(\''+day.id+'\')">' + '+ Add exercise</button></div>';
     }
     html += '</div>';
   });
