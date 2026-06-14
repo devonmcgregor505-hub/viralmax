@@ -1836,6 +1836,8 @@ function renderCheckinSlots() {
     +'</div>'
     ;
 }
+var _activeCheckinSlot=0;
+function triggerCheckinPhoto(i) { _activeCheckinSlot=i; document.getElementById('checkinFileInput').click(); }
 function removeCheckinPhoto(e,i) { e.stopPropagation(); _checkinPhotos[i]=null; renderCheckinSlots(); }
 function handleCheckinFile(e) {
   var file=e.target.files[0]; if(!file) return;
