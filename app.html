@@ -1834,7 +1834,7 @@ function renderCheckinSlots() {
         +'</div>';
     }).join('')
     +'</div>'
-    +'<input type="file" id="checkinFileInput" accept="image/*" style="display:none" onchange="handleCheckinFile(event)">';
+    ;
 }
 function removeCheckinPhoto(e,i) { e.stopPropagation(); _checkinPhotos[i]=null; renderCheckinSlots(); }
 function handleCheckinFile(e) {
