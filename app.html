@@ -1836,11 +1836,7 @@ function renderCheckinSlots() {
     }).join('')
     +'</div>'
     +'<input type="file" id="checkinFileInput" accept="image/*" style="display:none" onchange="handleCheckinFile(event)">';
-}).join('')
-    +'</div>'
-    +'<input type="file" id="checkinFileInput" accept="image/*" style="display:none" onchange="handleCheckinFile(event)">';
 }
-function triggerCheckinPhoto(i) { _activeCheckinSlot=i; document.getElementById('checkinFileInput').click(); }
 function removeCheckinPhoto(e,i) { e.stopPropagation(); _checkinPhotos[i]=null; renderCheckinSlots(); }
 function handleCheckinFile(e) {
   var file=e.target.files[0]; if(!file) return;
