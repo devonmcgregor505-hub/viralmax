@@ -1822,14 +1822,21 @@ function closeCheckinUpload() { var m=document.getElementById('checkinModal'); i
 function renderCheckinSlots() {
   var el=document.getElementById('checkinSlots'); if(!el) return;
   var labels=['Face Front','Face Side','Body Front','Body Side'];
+  var silhouettes=['/public/silhouette-face-front.jpg','/public/silhouette-face-side.jpg','/public/silhouette-body-front.jpg','/public/silhouette-body-side.jpg'];
   el.innerHTML='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
     +_checkinPhotos.map(function(p,i){
-      return '<div class="upload-slot'+(p?' filled':'')+'" onclick="triggerCheckinPhoto('+i+')">'
-        +(p?'<img src="'+p+'" /><button class="upload-slot-remove" onclick="removeCheckinPhoto(event,'+i+')">✕</button>':'')
-        +'<div class="upload-slot-icon">📷</div>'
+      return '<div class="upload-slot'+(p?' filled':'')+'" onclick="triggerCheckinPhoto('+i+')" style="position:relative;overflow:hidden;aspect-ratio:3/4;">'
+        +'<img src="'+(p||silhouettes[i])+'" style="width:100%;height:100%;object-fit:cover;'+(p?'':'opacity:0.3;')+';position:absolute;inset:0;" />'
+        +(p?'<button class="upload-slot-remove" onclick="removeCheckinPhoto(event,'+i+')">&#x2715;</button>':'')
+        +'<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;padding-bottom:8px;">'
+        +(p?'':'<div style="font-size:18px;margin-bottom:4px;">📷</div>')
         +'<div class="upload-slot-label">'+labels[i]+'</div>'
+        +'</div>'
         +'</div>';
     }).join('')
+    +'</div>'
+    +'<input type="file" id="checkinFileInput" accept="image/*" style="display:none" onchange="handleCheckinFile(event)">';
+}).join('')
     +'</div>'
     +'<input type="file" id="checkinFileInput" accept="image/*" style="display:none" onchange="handleCheckinFile(event)">';
 }
