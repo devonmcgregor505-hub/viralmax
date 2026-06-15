@@ -1344,6 +1344,7 @@ function progressOverload() {
         day.exercises.forEach(function(ex) {
           var curr = ex.weight || 0;
           var prev = ex.previous || 0;
+          if (curr === prev) return;
           var inc = curr > prev ? (curr - prev) : 2.5;
           ex.previous = curr;
           ex.weight = Math.round((curr + inc) * 10) / 10;
