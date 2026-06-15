@@ -1340,7 +1340,7 @@ function progressOverload() {
     if (scheduled.indexOf(todayJs) !== -1) {
       var lastShifted = day.lastShifted || '';
       var today = new Date().toISOString().slice(0,10);
-      if (lastShifted !== today) {
+      if (true) { // TEMP: always shift for testing
         day.exercises.forEach(function(ex) {
           var curr = ex.weight || 0;
           var prev = ex.previous || 0;
