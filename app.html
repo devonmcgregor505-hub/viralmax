@@ -1332,6 +1332,28 @@ function getTodayWorkout(workouts) {
   return workouts.find(function(d){ return (d.scheduledDays||[]).indexOf(todayJs) !== -1; });
 }
 
+function progressOverload() {
+  var w = loadWorkouts();
+  var todayJs = new Date().getDay();
+  w.forEach(function(day) {
+    var scheduled = day.scheduledDays || [];
+    if (scheduled.indexOf(todayJs) !== -1) {
+      var lastShifted = day.lastShifted || '';
+      var today = new Date().toISOString().slice(0,10);
+      if (lastShifted !== today) {
+        day.exercises.forEach(function(ex) {
+          var curr = ex.weight || 0;
+          var prev = ex.previous || 0;
+          var inc = curr > prev ? (curr - prev) : 2.5;
+          ex.previous = curr;
+          ex.weight = Math.round((curr + inc) * 10) / 10;
+        });
+        day.lastShifted = today;
+      }
+    }
+  });
+  saveWorkouts(w);
+}
 function renderTrainingSection() {
   var el = document.getElementById('trainingSection'); if(!el) return;
   var workouts = loadWorkouts();
