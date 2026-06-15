@@ -1425,13 +1425,25 @@ function updateExercise(dayId,ei,field,val) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
   day.exercises[ei][field]=val; saveWorkouts(w);
 }
+function logSet(dayId,ei) {
+  var wInput=document.getElementById('log_w_'+dayId+'_'+ei);
+  var rInput=document.getElementById('log_r_'+dayId+'_'+ei);
+  var kg=parseFloat(wInput?wInput.value:0); var reps=parseInt(rInput?rInput.value:0);
+  if(!kg||!reps){alert('Enter weight and reps first.');return;}
+  var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
+  var ex=day.exercises[ei]; if(!ex) return;
+  if(!ex.history) ex.history=[];
+  ex.history.push({date:new Date().toISOString().slice(0,10),weight:kg,reps:reps});
+  ex.weight=kg;
+  saveWorkouts(w); renderTrainingSection();
+}
 function deleteExercise(dayId,ei) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
   day.exercises.splice(ei,1); saveWorkouts(w); renderTrainingSection();
 }
 function addExercise(dayId) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
-  day.exercises.push({name:'New exercise',weight:0,goal:0}); saveWorkouts(w); renderTrainingSection();
+  day.exercises.push({name:'New exercise',reps:'8-12',weight:0,history:[]}); saveWorkouts(w); renderTrainingSection();
   setTimeout(function(){ var inputs=document.querySelectorAll('.exercise-name'); if(inputs.length) inputs[inputs.length-1].focus(); },50);
 }
 
