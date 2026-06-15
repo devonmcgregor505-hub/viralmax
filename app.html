@@ -1355,6 +1355,7 @@ function progressOverload() {
   saveWorkouts(w);
 }
 function renderTrainingSection() {
+  progressOverload();
   var el = document.getElementById('trainingSection'); if(!el) return;
   var workouts = loadWorkouts();
   var todayWorkout = getTodayWorkout(workouts);
