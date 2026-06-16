@@ -1964,7 +1964,7 @@ function renderProgressPhotos() {
     var sc=ci.scores;
     var scoresHtml='';
     if(sc){
-      var infoBtn=function(note,label){return note?'<button onclick="showScoreInfo(this)" data-label="'+label+'" data-note="'+note.replace(/"/g,\'&quot;\')+'" style="position:absolute;top:8px;right:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:50%;width:20px;height:20px;color:var(--t2);font-size:10px;font-weight:800;cursor:pointer;">i</button>':'';};
+      var infoBtn=function(note,label){return note?'<button onclick="showScoreInfo(this)" data-label="'+label+'" data-note="'+note.replace(/"/g,'&quot;')+'" style="position:absolute;top:8px;right:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:50%;width:20px;height:20px;color:var(--t2);font-size:10px;font-weight:800;cursor:pointer;">i</button>':'';};
       scoresHtml='<div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;">'
         +'<div style="flex:1;min-width:120px;background:var(--bg-panel);border:1px solid var(--border-y);border-radius:12px;padding:14px 16px;text-align:center;position:relative;">'
         +infoBtn(sc.faceNote,'Face')
