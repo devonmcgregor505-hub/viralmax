@@ -1969,19 +1969,19 @@ function renderProgressPhotos() {
         +'<div style="flex:1;min-width:120px;background:var(--bg-panel);border:1px solid var(--border-y);border-radius:12px;padding:14px 16px;text-align:center;position:relative;">'
         +infoBtn(sc.faceNote,'Face')
         +'<div style="font-size:9px;font-weight:800;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;margin-bottom:6px;">Face</div>'
-        +'<div style="'+bebasStyle+'">'+sc.face+'</div>'
+        +'<div style="'+bebasStyle+'">'+( Math.round(sc.face*10)/10)+'</div>'
         +'<div style="font-size:10px;color:var(--t3);margin-top:2px;">/10</div>'
         +'</div>'
         +'<div style="flex:1;min-width:120px;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-align:center;position:relative;">'
         +infoBtn(sc.harmonyNote,'Harmony')
         +'<div style="font-size:9px;font-weight:800;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;margin-bottom:6px;">Harmony</div>'
-        +'<div style="'+bebasStyle+'">'+sc.harmony+'</div>'
+        +'<div style="'+bebasStyle+'">'+( Math.round(sc.harmony*10)/10)+'</div>'
         +'<div style="font-size:10px;color:var(--t3);margin-top:2px;">%</div>'
         +'</div>'
         +'<div style="flex:1;min-width:120px;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-align:center;position:relative;">'
         +infoBtn(sc.physiqueNote,'Physique')
         +'<div style="font-size:9px;font-weight:800;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;margin-bottom:6px;">Physique</div>'
-        +'<div style="'+bebasStyle+'">'+sc.physique+'</div>'
+        +'<div style="'+bebasStyle+'">'+( Math.round(sc.physique*10)/10)+'</div>'
         +'<div style="font-size:10px;color:var(--t3);margin-top:2px;">/10</div>'
         +'</div>'
         +'</div>';
@@ -2010,7 +2010,7 @@ async function analyseCheckin(id) {
     var mime=p.indexOf('png')!==-1?'image/png':'image/jpeg';
     return {type:'image',source:{type:'base64',media_type:mime,data:b64}};
   });
-  var prompt='You are an objective appearance analyst. Analyse these photos and return ONLY valid JSON, no markdown, no explanation:\n{"face":<1-10>,"faceNote":"<one sentence>","harmony":<1-100>,"harmonyNote":"<one sentence>","physique":<1-10>,"physiqueNote":"<one sentence>"}\nBe honest. Face: structure symmetry jawline eyes skin. Harmony: how features work together. Physique: muscle development body fat proportions.';
+  var prompt='You are a brutally honest appearance analyst using looksmaxxing standards. 5 is average, 6-7 is genuinely good looking, 8+ is model tier, 9+ is exceptional. Most people score 4-6. Do not be encouraging. Be harsh and accurate.\n\nReturn ONLY valid JSON, no markdown:\n{"face":<decimal e.g. 6.3>,"faceNote":"<3-5 sentences: list specific flaws to fix — jawline, chin projection, eye area, canthal tilt, skin quality, blackheads, facial fat, symmetry issues, eyebrow shape/thickness, nose. Be specific not generic>","harmony":<decimal e.g. 58.4>,"harmonyNote":"<3-5 sentences: identify specific proportion issues — forehead to midface to lower third ratios, eye spacing, nose width vs mouth width, chin to jaw ratio. Be specific>","physique":<decimal e.g. 5.8>,"physiqueNote":"<3-5 sentences: estimate body fat %, identify weak muscle groups, note proportions — shoulder to waist ratio, chest development, arm size, overall stage of development. Be specific>"}\n\nUse one decimal place. Be brutally accurate not kind.';
   content.push({type:'text',text:prompt});
   try {
     var userId=localStorage.getItem('ascend_user_id')||'';
