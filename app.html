@@ -286,7 +286,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* ─── TRAINING ─── */
 .workout-day{background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:border-color .18s;}
 .workout-day:hover{border-color:rgba(255,255,255,0.08);}
-.workout-day-head{display:flex;flex-wrap:nowrap;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;transition:background .15s;width:100%;box-sizing:border-box;}
+.workout-day-head{display:flex;align-items:center;gap:12px;padding:14px 18px 14px 18px;cursor:pointer;transition:background .15s;width:100%;box-sizing:border-box;}
 .workout-day-head:hover{background:rgba(255,255,255,0.02);}
 .workout-day-label{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);min-width:28px;}
 .workout-day-name{font-size:15px;font-weight:800;color:var(--text);flex:1;}
@@ -1418,8 +1418,8 @@ function renderTrainingSection() {
       +'</div>'
       +'<div class="workout-day-days">'+dayPills+'</div>'
       +'</div>'
-      +'<span class="workout-day-arrow'+(day.open?' open':'')+'" style="align-self:center;">▼</span>'
-      +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:4px 8px;margin-left:4px;align-self:center;" onclick="event.stopPropagation();deleteWorkoutDay(this.dataset.id)" data-id="'+day.id+'">✕</button>'
+      +'<span class="workout-day-arrow'+(day.open?' open':'')+'" style="align-self:center;flex-shrink:0;">▼</span>'
+      +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:4px 8px;margin-left:4px;align-self:center;flex-shrink:0;" onclick="event.stopPropagation();deleteWorkoutDay(this.dataset.id)" data-id="'+day.id+'">✕</button>'
       +'</div>';
     if (day.open) {
       html += '<div class="workout-exercises">';
@@ -1474,7 +1474,7 @@ function addWorkoutDay() {
   var labels=['A','B','C','D','E','F','G'];
   var newId='day_'+Date.now();
   var label=labels[w.length]||String(w.length+1);
-  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:false,exercises:[],scheduledDays:[]});
+  w.push({id:newId,label:label,name:'Day '+label,open:false,exercises:[],scheduledDays:[]});
   saveWorkouts(w); renderTrainingSection();
 
 }
