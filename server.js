@@ -132,6 +132,8 @@ app.post('/api/chat', async (req, res) => {
     res.json({ reply, content: [{ type: 'text', text: reply }] });
   } catch(err) {
     console.error('[api/chat] error:', err.message);
+    console.error('[api/chat] stack:', err.stack);
+    if(err.response) console.error('[api/chat] api response:', JSON.stringify(err.response.data));
     res.status(500).json({ error: err.message });
   }
 });
