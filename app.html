@@ -1476,10 +1476,7 @@ function addWorkoutDay() {
   var label=labels[w.length]||String(w.length+1);
   w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:false,exercises:[],scheduledDays:[]});
   saveWorkouts(w); renderTrainingSection();
-  setTimeout(function(){
-    var names=document.querySelectorAll('.workout-day-name');
-    if(names.length) names[names.length-1].focus();
-  },50);
+
 }
 function updateExercise(dayId,ei,field,val) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
