@@ -2001,7 +2001,11 @@ async function analyseCheckin(id) {
   if(btn){btn.disabled=true;btn.textContent='Analysing...';}
   var photos=(ci.photos||[]).filter(Boolean);
   if(photos.length<2){alert('Need at least 2 photos.');if(btn){btn.disabled=false;btn.innerHTML='⚡ Analyse';}return;}
-  var content=photos.map(function(p){return {type:'image',source:{type:'base64',media_type:'image/jpeg',data:p.split(',')[1]}};});
+  var content=photos.map(function(p){
+    var b64=p.indexOf(',')!==-1?p.split(',')[1]:p;
+    var mime=p.indexOf('png')!==-1?'image/png':'image/jpeg';
+    return {type:'image',source:{type:'base64',media_type:mime,data:b64}};
+  });
   var prompt='You are an objective appearance analyst. Analyse these photos and return ONLY valid JSON, no markdown, no explanation:\n{"face":<1-10>,"faceNote":"<one sentence>","harmony":<1-100>,"harmonyNote":"<one sentence>","physique":<1-10>,"physiqueNote":"<one sentence>"}\nBe honest. Face: structure symmetry jawline eyes skin. Harmony: how features work together. Physique: muscle development body fat proportions.';
   content.push({type:'text',text:prompt});
   try {
