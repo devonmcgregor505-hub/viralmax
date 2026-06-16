@@ -1534,11 +1534,11 @@ function renderLMG() {
   }
   el.innerHTML=goals.map(function(g,gi) {
     return '<div class="lmg-item" draggable="true" data-id="'+g.id+'" ondragstart="lmgDragStart(event,'+gi+')" ondragover="lmgDragOver(event,'+gi+')" ondrop="lmgDrop(event,'+gi+')" ondragleave="lmgDragLeave(event)">'
-      +'<div class="lmg-item-head">'
+      +'<div class="lmg-item-head" onclick="toggleLMGDetail('+g.id+')">'
       +'<div class="lmg-check'+(g.done?" done":"")+'" onclick="toggleLMGoal('+g.id+')"></div>'
-      +'<span class="lmg-item-text'+(g.done?" done":"")+'" contenteditable="true" onblur="saveLMGText('+g.id+',this.innerText)" onclick="event.stopPropagation()">'+g.text+'</span>'
+      +'<span class="lmg-item-text'+(g.done?" done":"")+'" contenteditable="false" onblur="this.contentEditable=\'false\';saveLMGText('+g.id+',this.innerText)" ondblclick="event.stopPropagation();this.contentEditable=\'true\';this.focus()" onclick="event.stopPropagation()">'+g.text+'</span>'
       +'<div class="lmg-item-actions">'
-      +'<button class="lmg-expand-btn" onclick="toggleLMGDetail('+g.id+')">&#9660;</button>'
+      +
       +'<button class="lmg-del" onclick="deleteLMGoal('+g.id+')">✕</button>'
       +'</div>'
       +'</div>'
