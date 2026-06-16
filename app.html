@@ -1474,7 +1474,7 @@ function addWorkoutDay() {
   var labels=['A','B','C','D','E','F','G'];
   var newId='day_'+Date.now();
   var label=labels[w.length]||String(w.length+1);
-  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:true,exercises:[],scheduledDays:[]});
+  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:false,exercises:[],scheduledDays:[]});
   saveWorkouts(w); renderTrainingSection();
   setTimeout(function(){
     var names=document.querySelectorAll('.workout-day-name');
