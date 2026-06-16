@@ -1411,10 +1411,10 @@ function renderTrainingSection() {
     }).join('');
     html += '<div class="workout-day'+(isToday?' today':'')+'">'
       +'<div class="workout-day-head" onclick="toggleWorkoutDay(\''+day.id+'\')">'
-      +'<div style="padding-right:160px;">'
+      +'<div style="padding-right:60px;">'
       +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
       +'<span class="workout-day-name">'+day.name+'</span>'
-      +(isToday?'<span class="today-badge">TODAY</span>':'')
+      +(isToday?'<span class="today-badge" style="position:absolute;top:12px;right:112px;">TODAY</span>':'')
       +'</div>'
       +'<div class="workout-day-days">'+dayPills+'</div>'
       +'</div>'
