@@ -2230,6 +2230,9 @@ function syncSection(section,data) {
 }
 async function loadFromCloud() {
   var userId=localStorage.getItem('ascend_user_id'); if(!userId) return;
+  // Skip if user is actively typing in any input or textarea
+  var active=document.activeElement;
+  if(active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA'||active.contentEditable==='true')) return;
   try{
     var res=await fetch('/api/data/load',{headers:{'x-user-id':userId}});
     var json=await res.json();
