@@ -1340,7 +1340,7 @@ function progressOverload() {
     if (scheduled.indexOf(todayJs) !== -1) {
       var lastShifted = day.lastShifted || '';
       var today = new Date().toISOString().slice(0,10);
-      if (true) { // TEMP: always shift for testing
+      if (lastShifted !== today) {
         day.exercises.forEach(function(ex) {
           var curr = ex.weight || 0;
           var prev = ex.previous || 0;
@@ -1430,9 +1430,8 @@ function toggleScheduleDay(dayId, dayVal) {
   var w = loadWorkouts(); var day = w.find(function(d){return d.id===dayId;}); if(!day) return;
   if (!day.scheduledDays) day.scheduledDays = [];
   var idx = day.scheduledDays.indexOf(dayVal);
-  var w = loadWorkouts(); var labels=['A','B','C','D','E','F','G'];
-  var newId='day_'+Date.now(); var label=labels[w.length]||String(w.length+1);
-  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:false,exercises:[],scheduledDays:[]});
+  if (idx === -1) day.scheduledDays.push(dayVal);
+  else day.scheduledDays.splice(idx, 1);
   saveWorkouts(w); renderTrainingSection();
 }
 function deleteWorkoutDay(id) {
@@ -1453,7 +1452,7 @@ function deleteExercise(dayId,ei) {
 }
 function addExercise(dayId) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
-  day.exercises.push({name:'New exercise',weight:0,goal:0}); saveWorkouts(w); renderTrainingSection();
+  day.exercises.push({name:'New exercise',weight:0,previous:0,reps:10,sets:0,history:[]}); saveWorkouts(w); renderTrainingSection();
   setTimeout(function(){ var inputs=document.querySelectorAll('.exercise-name'); if(inputs.length) inputs[inputs.length-1].focus(); },50);
 }
 
