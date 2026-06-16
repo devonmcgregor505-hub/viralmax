@@ -1410,7 +1410,7 @@ function renderTrainingSection() {
         html += '<div class="exercise-row">'
           +'<div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;">'
           +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);flex:1;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
-          +'<input type="number" value="'+(ex.reps||10)+'" style="width:44px;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-family:\"Bebas Neue\",sans-serif;font-size:18px;padding:4px 8px;outline:none;text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',+this.value)" title="Reps"/>'
+          +'<input type="number" value="'+(ex.reps||10)+'" style="width:44px;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-family:inherit;font-size:18px;padding:4px 8px;outline:none;text-align:center;letter-spacing:1px;" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',+this.value)" title="Reps"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;">reps</span>'
           +'</div>'
           +'<div class="exercise-weight"><span class="exercise-weight-label">Previous</span><input class="exercise-weight-input" style="border-color:rgba(255,255,255,0.1);color:var(--t2);" type="number" value="'+prev+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'previous\',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
