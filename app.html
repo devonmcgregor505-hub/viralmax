@@ -2272,10 +2272,14 @@ setInterval(function(){
     renderChecklist();
     updateDayBadge();
   }
-  loadFromCloud().then(function(){
-    renderMacros(); renderMealsSection(); renderTrainingSection();
-    renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
-  });
+  var active=document.activeElement;
+  var typing=active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA'||active.contentEditable==='true');
+  if(!typing){
+    loadFromCloud().then(function(){
+      renderMacros(); renderMealsSection(); renderTrainingSection();
+      renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
+    });
+  }
 }, 30000);
 
 // ─── CHECKLIST SERVER SYNC ───
