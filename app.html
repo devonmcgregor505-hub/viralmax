@@ -1532,12 +1532,13 @@ function renderLMG() {
   var html="";
   goals.forEach(function(g,gi){
     var chk='<div class="lmg-check'+(g.done?" done":"")+'" onclick="event.stopPropagation();toggleLMGoal('+g.id+')"></div>';
-    var txt='<span class="lmg-item-text'+(g.done?" done":"")+'" contenteditable="false" onclick="event.stopPropagation()" ondblclick="event.stopPropagation();this.contentEditable=\'true\';this.focus()" onblur="this.contentEditable=\'false\';saveLMGText('+g.id+',this.innerText)">'+g.text+'</span>';
-    var arrow='<span style="font-size:10px;color:var(--t3);margin-left:auto;padding-left:8px;flex-shrink:0;transition:transform .2s;" id="lmg-arrow-'+g.id+'">▼</span>';
+    var txt='<span class="lmg-item-text'+(g.done?" done":"")+'" id="lmg-txt-'+g.id+'">'+g.text+'</span>';
+    var edit='<button style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:6px;color:var(--t2);font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer;font-family:inherit;margin-left:auto;flex-shrink:0;" onclick="event.stopPropagation();openLMGEdit('+g.id+')">Edit</button>';
+    var arrow='<span style="font-size:10px;color:var(--t3);padding-left:8px;flex-shrink:0;transition:transform .2s;" id="lmg-arrow-'+g.id+'">▼</span>';
     var del='<button class="lmg-del" onclick="event.stopPropagation();deleteLMGoal('+g.id+')">✕</button>';
     var notes='<div class="lmg-detail" id="lmg-detail-'+g.id+'"><textarea class="lmg-detail-notes" rows="3" placeholder="Notes, steps, methods..." onblur="saveLMGNotes('+g.id+',this.value)">'+( g.notes||"")+'</textarea></div>';
     html+='<div class="lmg-item" draggable="true" data-id="'+g.id+'" ondragstart="lmgDragStart(event,'+gi+')" ondragover="lmgDragOver(event,'+gi+')" ondrop="lmgDrop(event,'+gi+')" ondragleave="lmgDragLeave(event)">';
-    html+='<div class="lmg-item-head" onclick="toggleLMGDetail('+g.id+')">'+chk+txt+arrow+del+'</div>';
+    html+='<div class="lmg-item-head" onclick="toggleLMGDetail('+g.id+')">'+chk+txt+edit+arrow+del+'</div>';
     html+=notes+'</div>';
   });
   el.innerHTML=html;
@@ -1567,6 +1568,11 @@ function updateLMGProgress(id,val){
   var pct=document.querySelector("#lmg-detail-"+id+" ~ .lmg-item-head .lmg-progress-pct"); 
   var head=document.querySelector("[data-id=\""+id+"\"] .lmg-progress-pct"); if(head) head.textContent=val+"%";
   var label=document.querySelector("#lmg-detail-"+id+' div[style*="Progress"]'); if(label) label.textContent="Progress: "+val+"%";
+}
+function openLMGEdit(id){
+  var g=loadLMG(); var goal=g.find(function(x){return x.id===id;}); if(!goal) return;
+  var newText=prompt("Edit goal:",goal.text);
+  if(newText&&newText.trim()){goal.text=newText.trim();saveLMG(g);renderLMG();}
 }
 function saveLMGText(id,val){
   var g=loadLMG(); var goal=g.find(function(x){return x.id===id;}); if(!goal) return;
