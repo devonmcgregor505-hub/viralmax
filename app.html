@@ -2009,8 +2009,8 @@ async function analyseCheckin(id) {
     var res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json','x-user-id':userId},body:JSON.stringify({messages:[{role:'user',content:content}],max_tokens:400,profile:{}})});
     var json=await res.json();
     var text=(json.content&&json.content[0])?json.content[0].text:(json.reply||'');
-    text=text.replace(/[\u0060]{3}json|[\u0060]{3}/g,'').trim();
-    var scores=JSON.parse(text);
+    text=text.replace(/[\u0060]{3}json|[\u0060]{3}/g,'').trim(); console.log('Claude raw response:',text);
+    var jsonMatch=text.match(/\{[\s\S]*\}/); if(!jsonMatch) throw new Error("No JSON found in: "+text); var scores=JSON.parse(jsonMatch[0]);
     ci.scores=scores;
     save('ascend_checkins',checkins);
     syncSection('checkins',checkins);
