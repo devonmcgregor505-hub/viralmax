@@ -861,8 +861,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
         </div>
         <div class="lmg-wrap">
           <div class="lmg-header" onclick="toggleLMG()">
-            <span class="lmg-title">✦ Looksmax Goals</span>
-            <span class="lmg-arrow" id="lmgArrow">▼</span>
+            <div style="flex:1;min-width:0;"><span class="lmg-title">✦ Looksmax Goals</span><div style="display:flex;align-items:center;gap:8px;margin-top:6px;"><div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;"><div id="lmgOverallFill" style="height:100%;background:var(--grad);border-radius:4px;width:0%;transition:width .4s;"></div></div><span id="lmgOverallPct" style="font-size:10px;font-weight:700;color:var(--t3);flex-shrink:0;">0%</span></div></div><span class="lmg-arrow" id="lmgArrow">▼</span>
           </div>
           <div class="lmg-body" id="lmgBody" style="display:none;">
             <div id="lmgList"></div>
