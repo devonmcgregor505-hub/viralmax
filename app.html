@@ -1524,39 +1524,26 @@ function toggleLMG() {
 function renderLMG() {
   var el=document.getElementById("lmgList"); if(!el) return;
   var goals=loadLMG();
+  var done=goals.filter(function(g){return g.done;}).length;
+  var pct=goals.length?Math.round((done/goals.length)*100):0;
+  var hfill=document.getElementById("lmgOverallFill"); if(hfill) hfill.style.width=pct+"%";
+  var hpct=document.getElementById("lmgOverallPct"); if(hpct) hpct.textContent=pct+"%";
   if(!goals.length) {
     el.innerHTML='<div class="empty-state" style="padding:24px 16px;"><div class="empty-icon" style="font-size:22px;margin-bottom:8px;">✦</div><div class="empty-title" style="font-size:13px;">No goals added yet</div><div class="empty-sub" style="font-size:12px;">Add looksmax goals — jawline, skin, hair, posture — and track your progress here.</div></div>';
     return;
   }
   el.innerHTML=goals.map(function(g,gi) {
-    var pct=g.progress||0;
-    var tag=g.tag||"other";
-    var tagPicker=["skin","hair","physique","posture","teeth","jaw","other"].map(function(t){
-      return '<span class="lmg-tag-opt lmg-tag-'+t+(tag===t?" active":"")+'" onclick="setLMGTag('+g.id+',\''+t+'\')">'+t+'</span>';
-    }).join("");
     return '<div class="lmg-item" draggable="true" data-id="'+g.id+'" ondragstart="lmgDragStart(event,'+gi+')" ondragover="lmgDragOver(event,'+gi+')" ondrop="lmgDrop(event,'+gi+')" ondragleave="lmgDragLeave(event)">'
       +'<div class="lmg-item-head">'
       +'<div class="lmg-check'+(g.done?" done":"")+'" onclick="toggleLMGoal('+g.id+')"></div>'
-      +'<div class="lmg-item-main">'
-      +'<div class="lmg-item-top">'
       +'<span class="lmg-item-text'+(g.done?" done":"")+'" contenteditable="true" onblur="saveLMGText('+g.id+',this.innerText)" onclick="event.stopPropagation()">'+g.text+'</span>'
-      +'<span class="lmg-tag lmg-tag-'+tag+'">'+tag+'</span>'
-      +'</div>'
-      +'<div class="lmg-progress-row">'
-      +'<div class="lmg-progress-bar"><div class="lmg-progress-fill" style="width:'+pct+'%"></div></div>'
-      +'<span class="lmg-progress-pct">'+pct+'%</span>'
-      +'</div>'
-      +'</div>'
       +'<div class="lmg-item-actions">'
       +'<button class="lmg-expand-btn" onclick="toggleLMGDetail('+g.id+')">&#9660;</button>'
       +'<button class="lmg-del" onclick="deleteLMGoal('+g.id+')">✕</button>'
       +'</div>'
       +'</div>'
       +'<div class="lmg-detail" id="lmg-detail-'+g.id+'">'
-      +'<div class="lmg-tag-picker">'+tagPicker+'</div>'
-      +'<div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Progress: '+pct+'%</div>'
-      +'<input type="range" class="lmg-slider" min="0" max="100" value="'+pct+'" oninput="updateLMGProgress('+g.id+',+this.value)" />'
-      +'<textarea class="lmg-detail-notes" rows="3" placeholder="Notes, steps, methods..." onblur="saveLMGNotes('+g.id+',this.value)">'+( g.notes||"")+'</textarea>'
+      +'<textarea class="lmg-detail-notes" rows="3" placeholder="Notes, steps, methods..." onblur="saveLMGNotes('+g.id+',this.value)">'+(g.notes||"")+'</textarea>'
       +'</div>'
       +'</div>';
   }).join("");
