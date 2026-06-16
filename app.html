@@ -1414,7 +1414,7 @@ function renderTrainingSection() {
       +'<div style="flex:1;min-width:0;">'
       +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
       +'<span class="workout-day-name">'+day.name+'</span>'
-      ''
+      +'<span class="workout-day-tag wtag-'+day.tag+'">'+day.tag.toUpperCase()+'</span>'
       +(isToday?'<span class="today-badge">TODAY</span>':'')
       +'</div>'
       +'<div class="workout-day-days">'+dayPills+'</div>'
