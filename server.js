@@ -94,7 +94,7 @@ app.get('/admin',    (req, res) => res.sendFile(path.join(__dirname, 'admin.html
 async function callClaude(messages, systemPrompt = '', maxTokens = 1024) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error('ANTHROPIC_API_KEY not set in .env');
-  const body = { model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages };
+  const body = { model: 'claude-sonnet-4-6', max_tokens: maxTokens, messages };
   if (systemPrompt) body.system = systemPrompt;
   const res = await axios.post('https://api.anthropic.com/v1/messages', body, {
     headers: {
