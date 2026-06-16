@@ -1465,6 +1465,18 @@ function toggleWorkoutDay(id) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===id;}); if(!day) return;
   day.open=!day.open; saveWorkouts(w); renderTrainingSection();
 }
+function addWorkoutDay() {
+  var w=loadWorkouts();
+  var labels=['A','B','C','D','E','F','G'];
+  var newId='day_'+Date.now();
+  var label=labels[w.length]||String(w.length+1);
+  w.push({id:newId,label:label,name:'Day '+label,tag:'push',open:true,exercises:[],scheduledDays:[]});
+  saveWorkouts(w); renderTrainingSection();
+  setTimeout(function(){
+    var names=document.querySelectorAll('.workout-day-name');
+    if(names.length) names[names.length-1].focus();
+  },50);
+}
 function updateExercise(dayId,ei,field,val) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===dayId;}); if(!day) return;
   day.exercises[ei][field]=val; saveWorkouts(w);
