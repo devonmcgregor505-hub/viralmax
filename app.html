@@ -1408,11 +1408,12 @@ function renderTrainingSection() {
         var prev = ex.previous || 0;
         var curr = ex.weight || 0;
         html += '<div class="exercise-row">'
-          +'<div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;">'
-          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);flex:1;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
-          +'<input type="number" value="'+(ex.sets||10)+'" style="width:52px;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-family:inherit;font-size:14px;font-weight:700;padding:6px 8px;outline:none;text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',+this.value)" title="Reps"/>'
-          +'<span style="font-size:10px;color:var(--t3);font-weight:700;">reps</span>'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-right:12px;">'
+          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:160px;min-width:80px;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
+          +'<input type="number" value="'+(ex.sets||10)+'" style="width:52px;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-family:inherit;font-size:14px;font-weight:700;padding:6px 8px;outline:none;text-align:center;flex-shrink:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',+this.value)" title="Reps"/>'
+          +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">reps</span>'
           +'</div>'
+          +'<div style="flex:1;"></div>'
           +'<div class="exercise-weight"><span class="exercise-weight-label">Previous</span><input class="exercise-weight-input" style="border-color:rgba(255,255,255,0.1);color:var(--t2);" type="number" value="'+prev+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'previous\',+this.value)"/></div>'
           +'<div class="exercise-weight" style="margin-left:4px;"><span class="exercise-weight-label">Now</span><input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+curr+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',+this.value)"/></div>'
           +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
