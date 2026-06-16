@@ -1417,7 +1417,6 @@ function renderTrainingSection() {
           +'<div class="exercise-weight" style="margin-left:4px;"><span class="exercise-weight-label">Now</span><input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+curr+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
           +'<div class="exercise-weight" style="margin-left:4px;"><span class="exercise-weight-label">Goal</span><input class="exercise-weight-input" type="number" value="'+(ex.sets||0)+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',+this.value)"/></div>'
           +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
-          +'</div>';
       });
   });
   html += '<button class="workout-add-btn" style="margin-top:10px;" onclick="addWorkoutDay()">+ Add day</button>';
