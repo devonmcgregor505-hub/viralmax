@@ -1533,10 +1533,11 @@ function renderLMG() {
   goals.forEach(function(g,gi){
     var chk='<div class="lmg-check'+(g.done?" done":"")+'" onclick="event.stopPropagation();toggleLMGoal('+g.id+')"></div>';
     var txt='<span class="lmg-item-text'+(g.done?" done":"")+'" contenteditable="false" onclick="event.stopPropagation()" ondblclick="event.stopPropagation();this.contentEditable=\'true\';this.focus()" onblur="this.contentEditable=\'false\';saveLMGText('+g.id+',this.innerText)">'+g.text+'</span>';
+    var arrow='<span style="font-size:10px;color:var(--t3);margin-left:auto;padding-left:8px;flex-shrink:0;transition:transform .2s;" id="lmg-arrow-'+g.id+'">▼</span>';
     var del='<button class="lmg-del" onclick="event.stopPropagation();deleteLMGoal('+g.id+')">✕</button>';
     var notes='<div class="lmg-detail" id="lmg-detail-'+g.id+'"><textarea class="lmg-detail-notes" rows="3" placeholder="Notes, steps, methods..." onblur="saveLMGNotes('+g.id+',this.value)">'+( g.notes||"")+'</textarea></div>';
     html+='<div class="lmg-item" draggable="true" data-id="'+g.id+'" ondragstart="lmgDragStart(event,'+gi+')" ondragover="lmgDragOver(event,'+gi+')" ondrop="lmgDrop(event,'+gi+')" ondragleave="lmgDragLeave(event)">';
-    html+='<div class="lmg-item-head" onclick="toggleLMGDetail('+g.id+')">'+chk+txt+del+'</div>';
+    html+='<div class="lmg-item-head" onclick="toggleLMGDetail('+g.id+')">'+chk+txt+arrow+del+'</div>';
     html+=notes+'</div>';
   });
   el.innerHTML=html;
@@ -1551,6 +1552,8 @@ function initLMGDrag(){ document.querySelectorAll(".lmg-item").forEach(function(
 function toggleLMGDetail(id){
   var d=document.getElementById("lmg-detail-"+id); if(!d) return;
   d.classList.toggle("open");
+  var arr=document.getElementById("lmg-arrow-"+id);
+  if(arr) arr.style.transform=d.classList.contains("open")?"rotate(180deg)":"";
 }
 function setLMGTag(id,tag){
   var g=loadLMG(); var goal=g.find(function(x){return x.id===id;}); if(!goal) return;
