@@ -1464,6 +1464,11 @@ function toggleWorkoutDay(id) {
   var w=loadWorkouts(); var day=w.find(function(d){return d.id===id;}); if(!day) return;
   day.open=!day.open; saveWorkouts(w); renderTrainingSection();
 }
+function updateWorkoutDayName(id,val) {
+  var w=loadWorkouts(); var day=w.find(function(d){return d.id===id;}); if(!day) return;
+  day.name=val.trim()||day.name; saveWorkouts(w);
+}
+
 function addWorkoutDay() {
   var w=loadWorkouts();
   var labels=['A','B','C','D','E','F','G'];
