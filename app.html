@@ -1408,9 +1408,9 @@ function renderTrainingSection() {
         var prev = ex.previous || 0;
         var curr = ex.weight || 0;
         html += '<div class="exercise-row">'
-          +'<div style="display:flex;align-items:center;gap:8px;margin-right:12px;">'
-          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:160px;min-width:80px;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
-          +'<input type="text" value="'+(ex.reps||'8-12')+'" size="'+((ex.reps||'8-12').length||4)+'" class="exercise-weight-input" style="width:auto;border-color:var(--border-y);color:var(--y);" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)" title="Reps"/>'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-right:12px;width:280px;flex-shrink:0;">'
+          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
+          +'<input type="text" value="'+(ex.reps||'8-12')+'" size="'+((ex.reps||'8-12').length||4)+'" class="exercise-weight-input" style="width:auto;flex-shrink:0;border-color:var(--border-y);color:var(--y);" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">reps</span>'
           +'</div>'
           +'<div style="flex:1;"></div>'
