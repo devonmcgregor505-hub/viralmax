@@ -1408,11 +1408,11 @@ function renderTrainingSection() {
         var prev = ex.previous || 0;
         var curr = ex.weight || 0;
         html += '<div class="exercise-row">'
-          +'<div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;">'
-          +'<input type="number" value="'+(ex.sets||3)+'" style="width:32px;background:var(--yd);border:1px solid var(--border-y);border-radius:6px;color:var(--y);font-family:\"Bebas Neue\",sans-serif;font-size:16px;padding:2px 4px;outline:none;text-align:center;flex-shrink:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',+this.value)" title="Sets"/>'
-          +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">sets</span>'
+        html += '<div class="exercise-row">'
+          +'<div style="flex:1;min-width:0;">'
           +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:100%;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
           +'</div>'
+          +'<div class="exercise-weight" style="margin-right:4px;"><span class="exercise-weight-label">Reps</span><input class="exercise-weight-input" type="number" value="'+(ex.sets||3)+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',+this.value)"/></div>'
           +'<div class="exercise-weight"><span class="exercise-weight-label">Previous</span><input class="exercise-weight-input" style="border-color:rgba(255,255,255,0.1);color:var(--t2);" type="number" value="'+prev+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'previous\',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
           +'<div class="exercise-weight" style="margin-left:4px;"><span class="exercise-weight-label">Now</span><input class="exercise-weight-input" style="border-color:rgba(34,197,94,0.25);color:#22c55e;" type="number" value="'+curr+'" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',+this.value)"/><span class="exercise-weight-unit">kg</span></div>'
           +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
