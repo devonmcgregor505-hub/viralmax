@@ -631,50 +631,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <div class="popup-title">Settings</div>
     <div class="popup-sub">Personalise your Ascend experience</div>
     <div class="settings-group">
-      <div class="settings-label">Timezone</div>
-      <select class="settings-select" id="settingTimezone" onchange="saveSetting('timezone',this.value)">
-        <option value="auto">Auto-detect</option>
-        <option value="Pacific/Auckland">New Zealand (Auckland)</option>
-        <option value="Pacific/Chatham">New Zealand (Chatham)</option>
-        <option value="Australia/Sydney">Australia (Sydney)</option>
-        <option value="Australia/Melbourne">Australia (Melbourne)</option>
-        <option value="Australia/Perth">Australia (Perth)</option>
-        <option value="Asia/Tokyo">Japan (Tokyo)</option>
-        <option value="Asia/Singapore">Singapore</option>
-        <option value="Europe/London">UK (London)</option>
-        <option value="Europe/Paris">Europe (Paris)</option>
-        <option value="America/New_York">US (New York)</option>
-        <option value="America/Los_Angeles">US (Los Angeles)</option>
-        <option value="America/Chicago">US (Chicago)</option>
-      </select>
+      <div class="settings-label">Name</div>
+      <input class="settings-input" type="text" id="settingName" onchange="saveSetting('name',this.value)" placeholder="Your name"/>
     </div>
     <div class="settings-group">
-      <div class="settings-label">Wake time</div>
-      <input class="settings-input" type="time" id="settingWakeTime" onchange="saveSetting('wakeTime',this.value)" value="07:00"/>
-      <div class="settings-hint">Used to time your morning routine</div>
-    </div>
-    <div class="settings-group">
-      <div class="settings-label">Sleep time</div>
-      <input class="settings-input" type="time" id="settingSleepTime" onchange="saveSetting('sleepTime',this.value)" value="22:30"/>
-      <div class="settings-hint">Used to time your night routine</div>
+      <div class="settings-label">Current time</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <input class="settings-input" type="time" id="settingCurrentTime" style="flex:1;" onchange="saveSetting('timeOffset', new Date('1970-01-01T'+this.value).getTime() - new Date('1970-01-01T'+new Date().toTimeString().slice(0,5)).getTime())"/>
+        <div id="settingLiveTime" style="font-size:22px;font-weight:800;font-family:'Bebas Neue',sans-serif;color:var(--y);min-width:80px;"></div>
+      </div>
+      <div class="settings-hint">Set your current local time if auto-detection is off</div>
     </div>
     <div class="settings-group">
       <div class="settings-label">Midday switch time</div>
       <input class="settings-input" type="time" id="settingMidday" onchange="saveSetting('middayTime',this.value)" value="12:00"/>
       <div class="settings-hint">When checklist switches from morning to night view</div>
-    </div>
-    <div class="settings-group">
-      <div class="settings-label">Name</div>
-      <input class="settings-input" type="text" id="settingName" onchange="saveSetting('name',this.value)" placeholder="Your name"/>
-    </div>
-    <div class="settings-group">
-      <div class="settings-label">Daily reminder</div>
-      <select class="settings-select" id="settingReminder" onchange="saveSetting('reminder',this.value)">
-        <option value="off">Off</option>
-        <option value="morning">Morning only</option>
-        <option value="night">Night only</option>
-        <option value="both">Morning and night</option>
-      </select>
     </div>
     <div class="settings-group">
       <div class="settings-label">Account</div>
@@ -1629,19 +1600,33 @@ function saveSetting(key,val) {
 function loadSettings() { return load('ascend_settings',{}); }
 function applySettings() {
   var s=loadSettings();
-  var tz=document.getElementById('settingTimezone'); if(tz) tz.value=s.timezone||'auto';
   var wt=document.getElementById('settingWakeTime'); if(wt) wt.value=s.wakeTime||'07:00';
   var st=document.getElementById('settingSleepTime'); if(st) st.value=s.sleepTime||'22:30';
   var md=document.getElementById('settingMidday'); if(md) md.value=s.middayTime||'12:00';
   var nm=document.getElementById('settingName'); if(nm) nm.value=s.name||'';
   var rm=document.getElementById('settingReminder'); if(rm) rm.value=s.reminder||'off';
 }
+var _settingsClockInterval=null;
 function openSettings() {
   document.getElementById('avatarDropdown').classList.remove('open');
   document.getElementById('settingsPopup').style.display='flex';
   applySettings();
+  var s=loadSettings();
+  var offset=s.timeOffset||0;
+  function updateSettingsClock(){
+    var now=new Date(Date.now()+offset);
+    var h=now.getHours(),m=now.getMinutes();
+    var ampm=h>=12?'PM':'AM';
+    var h12=h%12||12;
+    var el=document.getElementById('settingLiveTime');
+    if(el) el.textContent=(h12<10?'0':'')+h12+':'+(m<10?'0':'')+m+' '+ampm;
+    var ti=document.getElementById('settingCurrentTime');
+    if(ti&&document.activeElement!==ti) ti.value=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+  }
+  updateSettingsClock();
+  _settingsClockInterval=setInterval(updateSettingsClock,1000);
 }
-function closeSettings() { document.getElementById('settingsPopup').style.display='none'; }
+function closeSettings() { document.getElementById('settingsPopup').style.display='none'; if(_settingsClockInterval){clearInterval(_settingsClockInterval);_settingsClockInterval=null;} }
 
 // ─── CHECKLIST ───
 function todayKey() {
