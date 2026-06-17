@@ -1656,8 +1656,8 @@ function openSettings() {
     var h12=h%12||12;
     var el=document.getElementById('settingLiveTime');
     if(el) el.textContent=(h12<10?'0':'')+h12+':'+(m<10?'0':'')+m+' '+ampm;
-    var ti=document.getElementById('settingCurrentTime');
-    if(ti&&document.activeElement!==ti) ti.value=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+
+
   }
   updateSettingsClock();
   _settingsClockInterval=setInterval(updateSettingsClock,1000);
