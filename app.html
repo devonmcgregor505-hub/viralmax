@@ -636,16 +636,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <div class="settings-group">
       <div class="settings-label">Current time</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <select class="settings-select" id="settingDayOfWeek" style="flex:0 0 auto;width:130px;" onchange="applyManualTime()">
-          <option value="-1">Day (auto)</option>
-          <option value="0">Sunday</option>
-          <option value="1">Monday</option>
-          <option value="2">Tuesday</option>
-          <option value="3">Wednesday</option>
-          <option value="4">Thursday</option>
-          <option value="5">Friday</option>
-          <option value="6">Saturday</option>
-        </select>
+        <input class="settings-input" type="date" id="settingDayOfWeek" style="flex:0 0 auto;width:150px;margin:0;" onchange="applyManualTime()"/>
         <input class="settings-input" type="time" id="settingCurrentTime" style="flex:1;margin:0;" oninput="applyManualTime()"/>
         <button class="settings-btn" style="flex:0 0 auto;margin:0;white-space:nowrap;" onclick="autoDetectTime()">Auto detect</button>
       </div>
@@ -1599,33 +1590,38 @@ function addLMGoal() {
 }
 
 // ─── SETTINGS ───
+function getEffectiveDate() {
+  var s = loadSettings();
+  return new Date(Date.now() + (s.timeOffset||0));
+}
 function applyManualTime() {
   var timeEl = document.getElementById('settingCurrentTime');
-  var dayEl = document.getElementById('settingDayOfWeek');
+  var dateEl = document.getElementById('settingDayOfWeek');
   if (!timeEl || !timeEl.value) return;
   var parts = timeEl.value.split(':');
   var now = new Date();
-  var target = new Date();
-  target.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
-  var dayOverride = parseInt(dayEl.value);
-  if (dayOverride >= 0) {
-    var diff = dayOverride - now.getDay();
-    target.setDate(target.getDate() + diff);
-    saveSetting('dayOverride', dayOverride);
+  var target;
+  if (dateEl && dateEl.value) {
+    var dparts = dateEl.value.split('-');
+    target = new Date(parseInt(dparts[0]), parseInt(dparts[1])-1, parseInt(dparts[2]), parseInt(parts[0]), parseInt(parts[1]), 0, 0);
   } else {
-    saveSetting('dayOverride', -1);
+    target = new Date();
+    target.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
   }
   saveSetting('timeOffset', target.getTime() - now.getTime());
+  renderChecklist();
+  updateDayBadge();
 }
 function autoDetectTime() {
   saveSetting('timeOffset', 0);
-  saveSetting('dayOverride', -1);
   var now = new Date();
   var h = now.getHours(), m = now.getMinutes();
   var el = document.getElementById('settingCurrentTime');
   if (el) el.value = (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
-  var dayEl = document.getElementById('settingDayOfWeek');
-  if (dayEl) dayEl.value = '-1';
+  var dateEl = document.getElementById('settingDayOfWeek');
+  if (dateEl) dateEl.value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  renderChecklist();
+  updateDayBadge();
 }
 function saveSetting(key,val) {
   var s=load('ascend_settings',{});
@@ -1641,16 +1637,19 @@ function applySettings() {
   var md=document.getElementById('settingMidday'); if(md) md.value=s.middayTime||'12:00';
   var nm=document.getElementById('settingName'); if(nm) nm.value=s.name||'';
   var rm=document.getElementById('settingReminder'); if(rm) rm.value=s.reminder||'off';
+  var eff=getEffectiveDate();
+  var dateEl=document.getElementById('settingDayOfWeek');
+  if(dateEl) dateEl.value=eff.getFullYear()+'-'+String(eff.getMonth()+1).padStart(2,'0')+'-'+String(eff.getDate()).padStart(2,'0');
+  var timeEl=document.getElementById('settingCurrentTime');
+  if(timeEl) timeEl.value=(eff.getHours()<10?'0':'')+eff.getHours()+':'+(eff.getMinutes()<10?'0':'')+eff.getMinutes();
 }
 var _settingsClockInterval=null;
 function openSettings() {
   document.getElementById('avatarDropdown').classList.remove('open');
   document.getElementById('settingsPopup').style.display='flex';
   applySettings();
-  var s=loadSettings();
-  var offset=s.timeOffset||0;
   function updateSettingsClock(){
-    var now=new Date(Date.now()+offset);
+    var now=getEffectiveDate();
     var h=now.getHours(),m=now.getMinutes();
     var ampm=h>=12?'PM':'AM';
     var h12=h%12||12;
@@ -1679,9 +1678,10 @@ function renderChecklist() {
   var el=document.getElementById('bigChecklist'); if(!el) return;
   var s=loadSettings();
   var middayHour=parseInt((s.middayTime||'12:00').split(':')[0]);
-  var nowHour=new Date().getHours();
+  var effNow=getEffectiveDate();
+  var nowHour=effNow.getHours();
   var dayPlans=load('ascend_day_plans',null);
-  var todayIdx=new Date().getDay()-1<0?6:new Date().getDay()-1;
+  var todayIdx=effNow.getDay()-1<0?6:effNow.getDay()-1;
   var morning, night, dayTasks;
   if(dayPlans && dayPlans[todayIdx]) {
     morning=dayPlans[todayIdx].morning||MORNING;
@@ -2322,7 +2322,7 @@ function closeSidebar() {
 // ─── DAY BADGE ───
 var _days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function updateDayBadge() {
-  var el=document.getElementById('dayBadge'); if(el) el.textContent=_days[new Date().getDay()];
+  var el=document.getElementById('dayBadge'); if(el) el.textContent=_days[getEffectiveDate().getDay()];
 }
 
 // ─── SYNC ───
