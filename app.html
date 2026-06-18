@@ -1801,7 +1801,32 @@ function maybeSaveScore() {
   var existing=history.find(function(h){return h.date===dk;});
   if(existing) existing.score=pct; else history.unshift({date:dk,score:pct});
   save('ascend_score_history',history.slice(0,90));
+  saveScoreToServer(dk,pct,total);
   updateStreakBadge();
+}
+function saveScoreToServer(date,score,total) {
+  var userId=localStorage.getItem('ascend_user_id'); if(!userId) return;
+  fetch('/api/scores/save',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-user-id':userId},
+    body:JSON.stringify({date:date,score:score,total_items:total})
+  }).catch(function(){});
+}
+async function loadScoreHistoryFromCloud() {
+  var userId=localStorage.getItem('ascend_user_id'); if(!userId) return;
+  try {
+    var res=await fetch('/api/scores/history',{headers:{'x-user-id':userId}});
+    var json=await res.json();
+    var cloud=json.scores||[]; if(!cloud.length) return;
+    var local=load('ascend_score_history',[]); if(!Array.isArray(local)) local=[];
+    var map={};
+    local.forEach(function(h){map[h.date]=h.score;});
+    cloud.forEach(function(h){map[h.date]=h.score;});
+    var merged=Object.keys(map).map(function(d){return {date:d,score:map[d]};});
+    merged.sort(function(a,b){return a.date<b.date?1:-1;});
+    save('ascend_score_history',merged.slice(0,90));
+    updateStreakBadge();
+  } catch(e) {}
 }
 
 // ─── CALENDAR ───
@@ -1810,6 +1835,7 @@ function openCalendar() {
   var now=new Date(); _calYear=now.getFullYear(); _calMonth=now.getMonth();
   document.getElementById('calendarPopup').style.display='flex';
   renderCalendar();
+  loadScoreHistoryFromCloud().then(renderCalendar);
 }
 function closeCalendar() { document.getElementById('calendarPopup').style.display='none'; }
 function calNav(dir) { _calMonth+=dir; if(_calMonth>11){_calMonth=0;_calYear++;}if(_calMonth<0){_calMonth=11;_calYear--;} renderCalendar(); }
@@ -2357,6 +2383,7 @@ async function loadFromCloud() {
         save('ascend_checked_today',d.checklist.checked||[]);
         save('ascend_checked_date',todayStr);
         renderChecklist();
+        maybeSaveScore();
       }
     }
   }catch(e){}
@@ -2382,6 +2409,7 @@ setInterval(function(){
       renderMacros(); renderMealsSection(); renderTrainingSection();
       renderWeightCards(); renderProgressPhotos(); renderLMG(); renderNotifBadge();
     });
+    loadScoreHistoryFromCloud();
   }
 }, 30000);
 
@@ -3194,7 +3222,7 @@ function bootApp(){
   // Check onboarding immediately — before cloud load so flag isn't lost
   checkOnboarding();
   // Load from cloud first, then render everything
-  loadFromCloud().then(function(){
+  Promise.all([loadFromCloud(), loadScoreHistoryFromCloud()]).then(function(){
     renderChecklist();
     renderMacros();
     renderMealsSection();
