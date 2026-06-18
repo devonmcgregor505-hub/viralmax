@@ -513,18 +513,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .ai-thinking span:nth-child(3){animation-delay:.3s;}
 
 /* ─── MOBILE ─── */
-.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;transition:background .15s;margin-left:auto;}
-.hamburger:hover{background:rgba(255,255,255,0.06);}
-.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
-.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:150;backdrop-filter:blur(3px);}
 .bottom-nav{display:none;}
 
 @media(max-width:600px){
   html,body{overflow:hidden;height:100%;height:100dvh;}
   .app-body{flex-direction:column-reverse;}
-  .sidebar{display:flex!important;position:fixed;left:-220px;top:0;bottom:0;z-index:200;width:220px;transition:left .25s cubic-bezier(.4,0,.2,1);}
-  .sidebar.open{left:0;box-shadow:4px 0 32px rgba(0,0,0,0.5);}
-  .sidebar-backdrop.open{display:block;}
+  .sidebar{display:none!important;}
   .main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
   .main-content{flex:1;overflow-y:auto;padding:14px 14px 80px;}
   .topbar{padding:0 12px;height:52px;gap:4px;}
@@ -533,7 +527,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   .streak-badge{padding:5px 8px;font-size:11px;gap:3px;}
   .notif-btn{width:30px;height:30px;}
   .topbar-avatar{width:30px;height:30px;font-size:10px;}
-  .hamburger{display:flex;}
   .topbar-right{margin-left:0;}
   .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:62px;background:rgba(8,8,16,0.97);border-top:1px solid var(--border);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:100;padding:0 4px;padding-bottom:env(safe-area-inset-bottom);}
   .bottom-nav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,150,0,0.15),rgba(255,204,0,0.2),rgba(255,150,0,0.15),transparent);}
@@ -695,9 +688,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     </div>
     <div class="topbar-logo-text">ASCEND</div>
   </a>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
-    <span></span><span></span><span></span>
-  </button>
   <div class="topbar-right">
     <div class="tb-badge tb-badge-day" id="dayBadge" onclick="openDayPlanner()" style="cursor:pointer">Mon</div>
     <div class="tb-badge tb-badge-score" onclick="showPage('checklist',null);updateBottomNav('checklist')" style="cursor:pointer;" id="scoreBadge">0%</div>
@@ -765,8 +755,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     Progress
   </button>
 </nav>
-
-<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
 <!-- APP BODY -->
 <div class="app-body">
@@ -2306,7 +2294,6 @@ function showPage(name,linkEl) {
   if(name==='nutrition'){renderMacros();renderMealsSection();}
   if(name==='training'){renderTrainingSection();renderWeightCards();}
   if(name==='progress'){renderLMG();renderProgressPhotos();}
-  closeSidebar();
 }
 function toggleDropdown() { document.getElementById('avatarDropdown').classList.toggle('open'); }
 document.addEventListener('click',function(e){
@@ -2323,15 +2310,6 @@ function signOut() {
 function openPricing() { document.getElementById('avatarDropdown').classList.remove('open'); window.location.href='/checkout'; }
 function updateBottomNav(name) {
   document.querySelectorAll('.bottom-nav-item').forEach(function(b){b.classList.toggle('active',b.id==='bnav-'+name);});
-}
-function toggleSidebar() {
-  var sb=document.querySelector('.sidebar'); var bd=document.getElementById('sidebarBackdrop');
-  var isOpen=sb.classList.contains('open');
-  sb.classList.toggle('open',!isOpen); bd.classList.toggle('open',!isOpen);
-}
-function closeSidebar() {
-  document.querySelector('.sidebar')?.classList.remove('open');
-  document.getElementById('sidebarBackdrop')?.classList.remove('open');
 }
 
 // ─── DAY BADGE ───
