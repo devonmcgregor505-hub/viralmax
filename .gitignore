@@ -6,3 +6,4 @@ outputs/
 cache/
 *.log
 cookies.txt
+__pycache__/
