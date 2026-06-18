@@ -1828,6 +1828,23 @@ async function loadScoreHistoryFromCloud() {
     updateStreakBadge();
   } catch(e) {}
 }
+// One-time per-device push of pre-existing local-only history, so days completed
+// before cloud sync existed aren't stuck showing on only the device that earned them.
+function backfillScoreHistoryToCloud() {
+  var userId=localStorage.getItem('ascend_user_id'); if(!userId) return Promise.resolve();
+  if(localStorage.getItem('ascend_score_backfilled')) return Promise.resolve();
+  var history=load('ascend_score_history',[]); if(!Array.isArray(history)) history=[];
+  if(!history.length) { localStorage.setItem('ascend_score_backfilled','1'); return Promise.resolve(); }
+  return Promise.all(history.map(function(h){
+    return fetch('/api/scores/save',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-user-id':userId},
+      body:JSON.stringify({date:h.date,score:h.score})
+    }).catch(function(){});
+  })).then(function(){
+    localStorage.setItem('ascend_score_backfilled','1');
+  });
+}
 
 // ─── CALENDAR ───
 var _calYear, _calMonth;
@@ -3222,7 +3239,7 @@ function bootApp(){
   // Check onboarding immediately — before cloud load so flag isn't lost
   checkOnboarding();
   // Load from cloud first, then render everything
-  Promise.all([loadFromCloud(), loadScoreHistoryFromCloud()]).then(function(){
+  Promise.all([loadFromCloud(), backfillScoreHistoryToCloud().then(loadScoreHistoryFromCloud)]).then(function(){
     renderChecklist();
     renderMacros();
     renderMealsSection();
