@@ -1918,7 +1918,7 @@ function renderDayPlannerTabs() {
   }).join('');
 }
 function switchPlanDay(i) { _activePlanDay=i; renderDayPlannerTabs(); renderDayPlanner(); }
-function renderDayPlanner() {
+function renderDayPlanner(focusSec,focusBi,focusIi) {
   var el=document.getElementById('dayPlannerContent'); if(!el) return;
   var plan=loadDayPlans()[_activePlanDay];
   var html='';
@@ -1927,9 +1927,17 @@ function renderDayPlanner() {
     html+='<div class="dp-section">'+labels[sec]+'</div>';
     var blocks=plan[sec]||[];
     blocks.forEach(function(block,bi) {
-      html+='<div class="dp-block">'
+      var bid='dp_'+sec+'_'+bi;
+      html+='<div class="dp-block" id="'+bid+'">'
         +'<div class="dp-block-head">'
-        +'<input class="dp-block-title" value="'+block.title+'" onblur="dpSaveTitle(\''+sec+'\','+bi+',this.value)"/>'
+        +'<input class="dp-block-title" id="dpt_'+sec+'_'+bi+'" value="'+block.title.replace(/"/g,'&quot;')+'"'
+        +' oninput="dpSaveTitle(\''+sec+'\','+bi+',this.value)"'
+        +' onkeydown="dpTitleKey(event,\''+sec+'\','+bi+')"'
+        +'/>'
+        +'<input class="dp-block-time" type="time" value="'+(block.time||'')+'"'
+        +' oninput="dpSaveTime(\''+sec+'\','+bi+',this.value)"'
+        +' style="width:90px;flex-shrink:0;background:transparent;border:none;border-bottom:1px solid var(--t4);outline:none;color:var(--t2);font-family:inherit;font-size:12px;padding:2px 4px;"'
+        +'/>'
         +'<div class="dp-block-reorder">'
         +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',-1)"'+(bi===0?' disabled':'')+'>↑</button>'
         +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',1)"'+(bi===blocks.length-1?' disabled':'')+'>↓</button>'
@@ -1939,17 +1947,55 @@ function renderDayPlanner() {
       (block.items||[]).forEach(function(item,ii) {
         html+='<div class="dp-step-row">'
           +'<span class="dp-step-dash">—</span>'
-          +'<input class="dp-step-input" value="'+item+'" onblur="dpSaveItem(\''+sec+'\','+bi+','+ii+',this.value)"/>'
+          +'<input class="dp-step-input" id="dpi_'+sec+'_'+bi+'_'+ii+'" value="'+item.replace(/"/g,'&quot;')+'"'
+          +' oninput="dpSaveItem(\''+sec+'\','+bi+','+ii+',this.value)"'
+          +' onkeydown="dpStepKey(event,\''+sec+'\','+bi+','+ii+')"'
+          +'/>'
           +'<button class="dp-del-step" onclick="dpDelItem(\''+sec+'\','+bi+','+ii+')">✕</button>'
           +'</div>';
       });
-      html+='<button class="dp-add-step" onclick="dpAddItem(\''+sec+'\','+bi+')">+ add step</button>'
+      html+='<button class="dp-add-step" onclick="dpAddItem(\''+sec+'\','+bi+',true)">+ add step</button>'
         +'</div>';
     });
     html+='<button class="dp-add-block" onclick="dpAddBlock(\''+sec+'\')">+ Add block</button>';
   });
   html+='<button class="dp-copy-btn" onclick="copyDayToAll()">Set for all days</button>';
   el.innerHTML=html;
+  if(focusSec!==undefined){
+    var focusEl;
+    if(focusIi==='title') focusEl=document.getElementById('dpt_'+focusSec+'_'+focusBi);
+    else if(focusIi!==undefined) focusEl=document.getElementById('dpi_'+focusSec+'_'+focusBi+'_'+focusIi);
+    if(focusEl){focusEl.focus();var l=focusEl.value.length;focusEl.setSelectionRange(l,l);}
+  }
+}
+function dpTitleKey(e,sec,bi) {
+  if(e.key==='Enter') {
+    e.preventDefault();
+    var plan=loadDayPlans();
+    var block=plan[_activePlanDay][sec][bi];
+    if(!block.items) block.items=[];
+    if(block.items.length===0){block.items.push('');saveDayPlans();renderDayPlanner(sec,bi,0);}
+    else { var el=document.getElementById('dpi_'+sec+'_'+bi+'_0'); if(el) el.focus(); }
+  }
+}
+function dpStepKey(e,sec,bi,ii) {
+  if(e.key==='Enter') {
+    e.preventDefault();
+    var plan=loadDayPlans();
+    var block=plan[_activePlanDay][sec][bi];
+    block.items.splice(ii+1,0,'');
+    saveDayPlans();
+    renderDayPlanner(sec,bi,ii+1);
+  } else if(e.key==='Backspace' && e.target.value==='') {
+    e.preventDefault();
+    var plan=loadDayPlans();
+    plan[_activePlanDay][sec][bi].items.splice(ii,1);
+    saveDayPlans();
+    renderDayPlanner(sec,bi,ii>0?ii-1:'title');
+  }
+}
+function dpSaveTime(sec,bi,val) {
+  loadDayPlans()[_activePlanDay][sec][bi].time=val; saveDayPlans();
 }
 function dpSaveTitle(sec,bi,val) {
   loadDayPlans()[_activePlanDay][sec][bi].title=val; saveDayPlans();
@@ -1958,24 +2004,25 @@ function dpSaveItem(sec,bi,ii,val) {
   loadDayPlans()[_activePlanDay][sec][bi].items[ii]=val; saveDayPlans();
 }
 function dpAddBlock(sec) {
-  loadDayPlans()[_activePlanDay][sec].push({title:'New block',items:[]}); saveDayPlans(); renderDayPlanner();
+  var plan=loadDayPlans(); var bi=plan[_activePlanDay][sec].length;
+  plan[_activePlanDay][sec].push({title:'',items:[]}); saveDayPlans(); renderDayPlanner(sec,bi,'title');
 }
 function dpDelBlock(sec,bi) {
   loadDayPlans()[_activePlanDay][sec].splice(bi,1); saveDayPlans(); renderDayPlanner();
 }
-function dpAddItem(sec,bi) {
-  var block=loadDayPlans()[_activePlanDay][sec][bi];
+function dpAddItem(sec,bi,focus) {
+  var plan=loadDayPlans(); var block=plan[_activePlanDay][sec][bi];
   if(!block.items) block.items=[];
-  block.items.push(''); saveDayPlans(); renderDayPlanner();
+  var ii=block.items.length; block.items.push(''); saveDayPlans(); renderDayPlanner(sec,bi,focus?ii:undefined);
 }
 function dpDelItem(sec,bi,ii) {
-  loadDayPlans()[_activePlanDay][sec][bi].items.splice(ii,1); saveDayPlans(); renderDayPlanner();
+  loadDayPlans()[_activePlanDay][sec][bi].items.splice(ii,1); saveDayPlans(); renderDayPlanner(sec,bi,ii>0?ii-1:'title');
 }
 function dpMove(sec,bi,dir) {
   var arr=loadDayPlans()[_activePlanDay][sec];
   var newIdx=bi+dir; if(newIdx<0||newIdx>=arr.length) return;
   var tmp=arr[bi]; arr[bi]=arr[newIdx]; arr[newIdx]=tmp;
-  saveDayPlans(); renderDayPlanner();
+  saveDayPlans(); renderDayPlanner(sec,newIdx,'title');
 }
 function copyDayToAll() {
   var current=JSON.parse(JSON.stringify(loadDayPlans()[_activePlanDay]));
