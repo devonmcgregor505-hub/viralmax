@@ -1711,14 +1711,14 @@ function renderChecklist() {
   allItems.forEach(function(x,i) {
     if(x.type==='section') {
       var secItems=sectionItems[x.key];
-      var doneCount=secItems.filter(function(idx){return checked.has(idx);}).length;
+      var doneCount=secItems.filter(function(idx){var it=allItems[idx];return it&&checked.has(it.section+':'+it.title);}).length;
       var allDone=secItems.length>0&&doneCount===secItems.length;
       html+='<div class="cl-section-header cl-section-'+x.key+'">'
         +'<div class="cl-section-label">'+x.label+'<span class="count">'+doneCount+'/'+secItems.length+'</span></div>'
         +'<button class="cl-tick-all'+(allDone?' done':'')+'" onclick="tickAllSection(\''+x.key+'\',event)">'+(allDone?'Untick all':'Tick all')+'</button>'
         +'</div>';
     } else {
-      var done=checked.has(i);
+      var done=allItems[i]&&checked.has(allItems[i].section+':'+allItems[i].title);
       html+='<div class="check-item" onclick="toggleCheck('+i+')">'
         +'<div class="check-box'+(done?' done':'')+'"></div>'
         +'<div class="check-text">'
@@ -1744,7 +1744,10 @@ function renderChecklist() {
   updateStreakBadge();
 }
 function toggleCheck(i) {
-  if(checked.has(i)) checked.delete(i); else checked.add(i);
+  var allItems=window._allChecklistItems||[];
+  var item=allItems[i]; if(!item) return;
+  var key=item.section+':'+item.title;
+  if(checked.has(key)) checked.delete(key); else checked.add(key);
   saveChecked();
   renderChecklist();
   maybeSaveScore();
@@ -1758,8 +1761,8 @@ function tickAllSection(key,e) {
     if(allItems[i].type==='section'){inSec=(allItems[i].key===key);continue;}
     if(inSec) indices.push(i);
   }
-  var allDone=indices.length>0&&indices.every(function(i){return checked.has(i);});
-  indices.forEach(function(i){allDone?checked.delete(i):checked.add(i);});
+  var allDone=indices.length>0&&indices.every(function(i){var it=allItems[i];return it&&checked.has(it.section+':'+it.title);});
+  indices.forEach(function(i){var it=allItems[i];if(!it)return;var key=it.section+':'+it.title;allDone?checked.delete(key):checked.add(key);});
   saveChecked();
   renderChecklist();
   maybeSaveScore();
@@ -1768,7 +1771,7 @@ function updateScoreBadge() {
   var allItems=window._allChecklistItems||[];
   var taskItems=allItems.filter(function(x){return x.type==='item';});
   var total=taskItems.length;
-  var done=allItems.reduce(function(c,x,i){return x.type==='item'&&checked.has(i)?c+1:c;},0);
+  var done=allItems.reduce(function(c,x){return x.type==='item'&&checked.has(x.section+':'+x.title)?c+1:c;},0);
   var pct=total>0?Math.round((done/total)*100):0;
   var badge=document.getElementById('scoreBadge'); if(badge) badge.textContent=pct+'%';
 }
@@ -1794,7 +1797,7 @@ function maybeSaveScore() {
   var allItems=window._allChecklistItems||[];
   var taskItems=allItems.filter(function(x){return x.type==='item';});
   var total=taskItems.length;
-  var done=allItems.reduce(function(c,x,i){return x.type==='item'&&checked.has(i)?c+1:c;},0);
+  var done=allItems.reduce(function(c,x){return x.type==='item'&&checked.has(x.section+':'+x.title)?c+1:c;},0);
   var pct=total>0?Math.round((done/total)*100):0;
   var history=load('ascend_score_history',[]); if(!Array.isArray(history)) history=[];
   var dk=todayKey();
