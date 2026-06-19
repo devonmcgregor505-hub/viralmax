@@ -669,7 +669,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     <div class="popup-title">Day Planner</div>
     <div class="popup-sub">Edit each day's routine — changes show on your checklist</div>
     <div class="day-tabs" id="dayPlannerTabs"></div>
-    <div id="dayPlannerContent"></div>
+    <div id="dayPlannerContent" style="padding-bottom:60px;"></div>
+    <div style="position:sticky;bottom:0;background:var(--bg-panel);padding:12px 0 0;border-top:1px solid var(--border);margin-top:8px;">
+      <button class="dp-copy-btn" onclick="copyDayToAll()">Set for all days</button>
+    </div>
   </div>
 </div>
 
@@ -1959,7 +1962,6 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
     });
     html+='<button class="dp-add-block" onclick="dpAddBlock(\''+sec+'\')">+ Add block</button>';
   });
-  html+='<button class="dp-copy-btn" onclick="copyDayToAll()">Set for all days</button>';
   el.innerHTML=html;
   if(focusSec!==undefined){
     var focusEl;
