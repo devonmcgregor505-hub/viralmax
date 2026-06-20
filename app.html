@@ -1937,8 +1937,6 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
         +' oninput="dpSaveTitle(\''+sec+'\','+bi+',this.value)"'
         +' onkeydown="dpTitleKey(event,\''+sec+'\','+bi+')"'
         +'/>'
-        +'<input class="dp-block-time" type="time" value="'+(block.time||'')+'"'
-        +' oninput="dpSaveTime(\''+sec+'\','+bi+',this.value)"'
         +' style="width:90px;flex-shrink:0;background:transparent;border:none;border-bottom:1px solid var(--t4);outline:none;color:var(--t2);font-family:inherit;font-size:12px;padding:2px 4px;"'
         +'/>'
         +'<div class="dp-block-reorder">'
@@ -1996,7 +1994,6 @@ function dpStepKey(e,sec,bi,ii) {
     renderDayPlanner(sec,bi,ii>0?ii-1:'title');
   }
 }
-function dpSaveTime(sec,bi,val) {
   loadDayPlans()[_activePlanDay][sec][bi].time=val; saveDayPlans();
 }
 function dpSaveTitle(sec,bi,val) {
