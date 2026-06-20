@@ -1480,7 +1480,7 @@ function editWeight(key) {
   var bw=loadBodyWeight(); var cur=bw[key]; var isGoal=key==='goal';
   card.innerHTML='<div class="macro-lbl"'+(isGoal?' style="color:#22c55e;"':'')+'>'+key.toUpperCase()+'</div>'
     +'<div style="display:flex;align-items:baseline;gap:3px;justify-content:center;">'
-    +'<input class="macro-inline-input" id="winp-'+key+'" type="number" value="'+cur+'"'+(isGoal?' style="color:#22c55e;"':'')+'/>'
+    +'<input class="macro-inline-input" id="winp-'+key+'" type="number" value="'+cur+'"'+(isGoal?' style="color:#22c55e;"':'')
     +'<span class="macro-val-unit"'+(isGoal?' style="color:#22c55e;"':'')+'>kg</span></div>';
   card.onclick=null;
   var inp=document.getElementById('winp-'+key); inp.focus(); inp.select();
@@ -1936,9 +1936,7 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
         +'<input class="dp-block-title" id="dpt_'+sec+'_'+bi+'" value="'+block.title.replace(/"/g,'&quot;')+'"'
         +' oninput="dpSaveTitle(\''+sec+'\','+bi+',this.value)"'
         +' onkeydown="dpTitleKey(event,\''+sec+'\','+bi+')"'
-        +'/>'
-        +' style="width:90px;flex-shrink:0;background:transparent;border:none;border-bottom:1px solid var(--t4);outline:none;color:var(--t2);font-family:inherit;font-size:12px;padding:2px 4px;"'
-        +'/>'
+
         +'<div class="dp-block-reorder">'
         +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',-1)"'+(bi===0?' disabled':'')+'>↑</button>'
         +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',1)"'+(bi===blocks.length-1?' disabled':'')+'>↓</button>'
@@ -1951,7 +1949,6 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
           +'<input class="dp-step-input" id="dpi_'+sec+'_'+bi+'_'+ii+'" value="'+item.replace(/"/g,'&quot;')+'"'
           +' oninput="dpSaveItem(\''+sec+'\','+bi+','+ii+',this.value)"'
           +' onkeydown="dpStepKey(event,\''+sec+'\','+bi+','+ii+')"'
-          +'/>'
           +'<button class="dp-del-step" onclick="dpDelItem(\''+sec+'\','+bi+','+ii+')">✕</button>'
           +'</div>';
       });
