@@ -1936,6 +1936,7 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
         +'<input class="dp-block-title" id="dpt_'+sec+'_'+bi+'" value="'+block.title.replace(/"/g,'&quot;')+'"'
         +' oninput="dpSaveTitle(\''+sec+'\','+bi+',this.value)"'
         +' onkeydown="dpTitleKey(event,\''+sec+'\','+bi+')"'
+        +'/>'
 
         +'<div class="dp-block-reorder">'
         +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',-1)"'+(bi===0?' disabled':'')+'>↑</button>'
@@ -1949,6 +1950,7 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
           +'<input class="dp-step-input" id="dpi_'+sec+'_'+bi+'_'+ii+'" value="'+item.replace(/"/g,'&quot;')+'"'
           +' oninput="dpSaveItem(\''+sec+'\','+bi+','+ii+',this.value)"'
           +' onkeydown="dpStepKey(event,\''+sec+'\','+bi+','+ii+')"'
+          +'/>'
           +'<button class="dp-del-step" onclick="dpDelItem(\''+sec+'\','+bi+','+ii+')">✕</button>'
           +'</div>';
       });
