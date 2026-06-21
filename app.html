@@ -1948,6 +1948,9 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
         +'<div style="position:relative;display:inline-block;">'
         +'<button class="dp-del-block" style="font-size:16px;letter-spacing:1px;padding:2px 8px;" onclick="event.stopPropagation();dpToggleMenu(\'dp-menu-'+sec+'_'+bi+'\')">⋯</button>'
         +'<div id="dp-menu-'+sec+'_'+bi+'" style="display:none;position:absolute;right:0;top:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;min-width:160px;z-index:99;padding:4px;">'
+        +'<button onclick="event.stopPropagation();dpCopyBlock(\''+sec+'\','+bi+');dpToggleMenu(\'dp-menu-'+sec+'_'+bi+'\')" style="width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:inherit;font-size:12px;padding:8px 12px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'none\'">Copy block</button>'
+        +'<button onclick="event.stopPropagation();dpPasteBlock(\''+sec+'\','+bi+');dpToggleMenu(\'dp-menu-'+sec+'_'+bi+'\')" style="width:100%;text-align:left;background:none;border:none;color:var(--t2);font-family:inherit;font-size:12px;padding:8px 12px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'none\'">Paste block</button>'
+        +'<div style="border-top:1px solid var(--border);margin:4px 0;"></div>'
         +'<button onclick="event.stopPropagation();copyBlockToAll(\''+sec+'\','+bi+');dpToggleMenu(\'dp-menu-'+sec+'_'+bi+'\')" style="width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:inherit;font-size:12px;padding:8px 12px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'none\'">Update for all days</button>'
         +'</div>'
         +'</div>'
@@ -2028,6 +2031,18 @@ function dpMove(sec,bi,dir) {
   var newIdx=bi+dir; if(newIdx<0||newIdx>=arr.length) return;
   var tmp=arr[bi]; arr[bi]=arr[newIdx]; arr[newIdx]=tmp;
   saveDayPlans(); renderDayPlanner(sec,newIdx,'title');
+}
+var _copiedBlock=null;
+function dpCopyBlock(sec,bi) {
+  var plans=loadDayPlans();
+  _copiedBlock=JSON.parse(JSON.stringify(plans[_activePlanDay][sec][bi]));
+  alert('Block copied!');
+}
+function dpPasteBlock(sec,bi) {
+  if(!_copiedBlock){alert('Nothing copied yet');return;}
+  var plans=loadDayPlans();
+  plans[_activePlanDay][sec].splice(bi+1,0,JSON.parse(JSON.stringify(_copiedBlock)));
+  _dayPlans=plans; saveDayPlans(); renderDayPlanner();
 }
 function dpToggleMenu(id) {
   var el=document.getElementById(id); if(!el) return;
