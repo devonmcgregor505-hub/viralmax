@@ -664,13 +664,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 <!-- DAY PLANNER POPUP -->
 <div class="popup-overlay" id="dayPlannerPopup" style="display:none" onclick="if(event.target===this)closeDayPlanner()">
-  <div class="popup-box" style="max-width:600px;">
-    <button class="popup-close" onclick="closeDayPlanner()">✕</button>
-    <div class="popup-title">Day Planner</div>
-    <div class="popup-sub">Edit each day's routine — changes show on your checklist</div>
-    <div class="day-tabs" id="dayPlannerTabs"></div>
-    <div id="dayPlannerContent" style="padding-bottom:60px;"></div>
-    <div style="position:sticky;bottom:0;background:var(--bg-panel);padding:12px 0 0;border-top:1px solid var(--border);margin-top:8px;">
+  <div class="popup-box" style="max-width:600px;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+    <div style="padding:28px 28px 0;flex-shrink:0;">
+      <button class="popup-close" onclick="closeDayPlanner()">✕</button>
+      <div class="popup-title">Day Planner</div>
+    </div>
+    <div style="padding:12px 28px;flex-shrink:0;position:sticky;top:0;background:var(--bg-panel);z-index:10;border-bottom:1px solid var(--border);">
+      <div class="day-tabs" id="dayPlannerTabs" style="margin-bottom:0;"></div>
+    </div>
+    <div id="dayPlannerContent" style="padding:18px 28px 80px;overflow-y:auto;flex:1;"></div>
+    <div style="position:sticky;bottom:0;background:var(--bg-panel);padding:12px 28px;border-top:1px solid var(--border);flex-shrink:0;">
       <button class="dp-copy-btn" onclick="copyDayToAll()">Set for all days</button>
     </div>
   </div>
