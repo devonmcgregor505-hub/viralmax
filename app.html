@@ -2041,7 +2041,7 @@ function dpCopyBlock(sec,bi) {
 function dpPasteBlock(sec,bi) {
   if(!_copiedBlock){alert('Nothing copied yet');return;}
   var plans=loadDayPlans();
-  plans[_activePlanDay][sec].splice(bi+1,0,JSON.parse(JSON.stringify(_copiedBlock)));
+  plans[_activePlanDay][sec][bi]=JSON.parse(JSON.stringify(_copiedBlock));
   _dayPlans=plans; saveDayPlans(); renderDayPlanner();
 }
 function dpToggleMenu(id) {
