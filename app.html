@@ -1942,6 +1942,12 @@ function renderDayPlanner(focusSec,focusBi,focusIi) {
         +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',-1)"'+(bi===0?' disabled':'')+'>↑</button>'
         +'<button class="dp-reorder-btn" onclick="dpMove(\''+sec+'\','+bi+',1)"'+(bi===blocks.length-1?' disabled':'')+'>↓</button>'
         +'</div>'
+        +'<div style="position:relative;display:inline-block;">'
+        +'<button class="dp-del-block" style="font-size:16px;letter-spacing:1px;padding:2px 8px;" onclick="event.stopPropagation();dpToggleMenu(\'dp-menu-'+sec+'_'+bi+'\')">⋯</button>'
+        +'<div id="dp-menu-'+sec+'_'+bi+'" style="display:none;position:absolute;right:0;top:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;min-width:160px;z-index:99;padding:4px;">'
+        +'<button onclick="event.stopPropagation();copyBlockToAll(\''+sec+'\','+bi+');dpToggleMenu(\'dp-menu-'+sec+'_'+bi+'\')" style="width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:inherit;font-size:12px;padding:8px 12px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'none\'">Update for all days</button>'
+        +'</div>'
+        +'</div>'
         +'<button class="dp-del-block" onclick="dpDelBlock(\''+sec+'\','+bi+')">✕</button>'
         +'</div>';
       (block.items||[]).forEach(function(item,ii) {
@@ -2019,6 +2025,27 @@ function dpMove(sec,bi,dir) {
   var newIdx=bi+dir; if(newIdx<0||newIdx>=arr.length) return;
   var tmp=arr[bi]; arr[bi]=arr[newIdx]; arr[newIdx]=tmp;
   saveDayPlans(); renderDayPlanner(sec,newIdx,'title');
+}
+function dpToggleMenu(id) {
+  var el=document.getElementById(id); if(!el) return;
+  var shown=el.style.display==='block';
+  document.querySelectorAll('[id^="dp-menu-"]').forEach(function(m){m.style.display='none';});
+  if(!shown) el.style.display='block';
+  if(!shown){function outsideClick(e){if(!el.contains(e.target)){el.style.display='none';document.removeEventListener('click',outsideClick);}}
+  setTimeout(function(){document.addEventListener('click',outsideClick);},0);}
+}
+function copyBlockToAll(sec,bi) {
+  var plans=loadDayPlans();
+  var block=JSON.parse(JSON.stringify(plans[_activePlanDay][sec][bi]));
+  plans.forEach(function(day,di){
+    if(di===_activePlanDay) return;
+    if(!day[sec]) day[sec]=[];
+    var existing=day[sec].findIndex(function(b){return b.title===block.title;});
+    if(existing>=0) day[sec][existing]=JSON.parse(JSON.stringify(block));
+    else day[sec].push(JSON.parse(JSON.stringify(block)));
+  });
+  _dayPlans=plans; saveDayPlans();
+  alert('"'+block.title+'" updated for all days');
 }
 function copyDayToAll() {
   var current=JSON.parse(JSON.stringify(loadDayPlans()[_activePlanDay]));
