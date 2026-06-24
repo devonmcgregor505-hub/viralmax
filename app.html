@@ -921,7 +921,7 @@ function loadMealTemplate() { return load('ascend_meal_template', []); }
 function saveMealTemplate(items) { save('ascend_meal_template', items); syncSection('meal_template', items); }
 function loadFoodLog() {
   var all = load('ascend_food_log', {});
-  var today = new Date().toISOString().slice(0,10);
+  var _d=new Date(); var today=_d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');
   // Keep only today — wipe everything else
   if (!all[today]) all = {};
   all[today] = all[today] || [];
@@ -940,19 +940,19 @@ function scheduleMidnightReset() {
 function saveFoodLog(all) { save('ascend_food_log', all); syncSection('food_log', all); }
 function getTodayLog() {
   var all = loadFoodLog();
-  var today = new Date().toISOString().slice(0,10);
+  var _d=new Date(); var today=_d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');
   return all[today] || [];
 }
 function addFoodEntry(entry) {
   var all = loadFoodLog();
-  var today = new Date().toISOString().slice(0,10);
+  var _d=new Date(); var today=_d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');
   if (!all[today]) all[today] = [];
   all[today].push(entry);
   saveFoodLog(all);
 }
 function deleteFoodEntry(idx) {
   var all = loadFoodLog();
-  var today = new Date().toISOString().slice(0,10);
+  var _d=new Date(); var today=_d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');
   if (all[today]) all[today].splice(idx, 1);
   saveFoodLog(all);
   renderMealsSection();
@@ -1623,7 +1623,7 @@ function progressOverload() {
     var scheduled = day.scheduledDays || [];
     if (scheduled.indexOf(todayJs) !== -1) {
       var lastShifted = day.lastShifted || '';
-      var today = new Date().toISOString().slice(0,10);
+      var _d=new Date(); var today=_d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');
       if (lastShifted !== today) {
         day.exercises.forEach(function(ex) {
           var curr = ex.weight || 0;
