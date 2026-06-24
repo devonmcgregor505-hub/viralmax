@@ -1263,7 +1263,7 @@ function openManageStaples() {
       +'<button onclick="addStaple()" style="background:var(--grad);border:none;border-radius:8px;color:#000;font-weight:700;font-size:12px;padding:6px;cursor:pointer;">Add</button>'
       +'</div>'
       +'<div style="font-size:10px;color:var(--t3);margin-top:4px;">Per 100g (or per unit for eggs)</div>'
-      +'<button onclick="document.getElementById('manageStaplesPopup').remove()" style="margin-top:14px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t3);font-family:Bebas Neue,sans-serif;font-size:15px;padding:9px;cursor:pointer;">Done</button>'
+      +'<button onclick="document.getElementById(\'manageStaplesPopup\').remove()" style="margin-top:14px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t3);font-family:Bebas Neue,sans-serif;font-size:15px;padding:9px;cursor:pointer;">Done</button>'
       +'</div>';
   }
   render();
@@ -1278,14 +1278,14 @@ function addStaple() {
   var staples = loadStaples();
   staples.push({id:'custom_'+Date.now(), name:name, cal:cal, pro:pro, fat:0});
   saveStaples(staples);
-  document.getElementById('manageStaplesPopup').remove();
+  document.getElementById(\'manageStaplesPopup\').remove();
   openManageStaples();
 }
 function deleteStaple(i) {
   var staples = loadStaples();
   staples.splice(i,1);
   saveStaples(staples);
-  document.getElementById('manageStaplesPopup').remove();
+  document.getElementById(\'manageStaplesPopup\').remove();
   openManageStaples();
 }
 function openAddFoodPopup() {
