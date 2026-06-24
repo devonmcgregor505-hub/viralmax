@@ -245,29 +245,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .macro-val-unit{font-size:13px;color:var(--t2);font-weight:600;margin-left:2px;position:relative;z-index:1;}
 .macro-inline-input{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--y);background:transparent;border:none;border-bottom:2px solid var(--y);outline:none;width:90px;padding:0;}
 
-.meals-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.meals-title{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);}
 .meal-row{background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;transition:all .18s;}
 .meal-row:hover{border-color:rgba(255,255,255,0.09);}
-.meal-row-head{display:flex;align-items:center;gap:10px;}
-.meal-row-emoji{font-size:18px;flex-shrink:0;}
-.meal-row-info{flex:1;min-width:0;}
-.meal-name-input{font-size:14px;font-weight:700;color:var(--text);background:transparent;border:none;outline:none;font-family:inherit;width:100%;padding:0;}
-.meal-name-input::placeholder{color:var(--t3);}
-.meal-bullet-row{display:flex;align-items:center;gap:6px;padding:2px 0;}
-.meal-bullet-dash{color:#7070a0;font-size:11px;flex-shrink:0;}
-.meal-bullet-input{flex:1;font-size:12.5px;color:#b0b0d8;background:transparent;border:none;border-bottom:1px solid transparent;outline:none;font-family:inherit;min-width:0;padding:1px 2px;transition:border-color .15s;}
-.meal-bullet-input:focus{border-bottom-color:var(--t3);color:var(--text);}
-.meal-bullet-del{background:none;border:none;color:var(--t4);font-size:10px;cursor:pointer;padding:1px 4px;opacity:0;transition:opacity .15s;}
-.meal-bullet-row:hover .meal-bullet-del{opacity:1;}
-.meal-bullet-del:hover{color:var(--red);}
-.meal-bullet-add{background:none;border:none;color:var(--t4);font-size:11px;cursor:pointer;font-family:inherit;padding:3px 0 0 16px;transition:color .15s;}
-.meal-bullet-add:hover{color:var(--y);}
-.meal-macros{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-.meal-macro-pill{background:var(--yd);border:1px solid var(--border-y);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;color:var(--y);cursor:pointer;transition:all .18s;}
-.meal-macro-pill:hover{background:rgba(255,150,0,0.14);box-shadow:0 0 8px rgba(255,130,0,0.2);}
-.meal-del-btn{background:none;border:none;color:var(--t4);font-size:13px;cursor:pointer;padding:2px 6px;border-radius:6px;transition:color .15s;}
-.meal-del-btn:hover{color:var(--red);}
 .meal-add-btn{width:100%;padding:11px;background:transparent;border:1px dashed rgba(255,255,255,0.08);border-radius:12px;color:var(--t2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:4px;}
 .meal-add-btn:hover{border-color:var(--y);color:var(--y);background:var(--yd);}
 
@@ -382,13 +361,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .upload-slot-remove{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.8);border:none;color:#fff;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;}
 .upload-slot.filled .upload-slot-remove{display:flex;}
 
-/* ─── FOOD AUTOCOMPLETE ─── */
-.food-ac-wrap{position:relative;}
-.food-ac-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--border-y);border-radius:10px;z-index:200;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
-.food-ac-item{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);}
-.food-ac-item:hover{background:var(--yd);color:var(--y);}
-.food-ac-item:last-child{border-bottom:none;}
-.food-ac-meta{font-size:10px;color:var(--t3);margin-top:1px;}
 /* ─── MACRO PROGRESS ─── */
 .macro-progress-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:6px;overflow:hidden;}
 .macro-progress-fill{height:100%;border-radius:2px;background:var(--grad);transition:width .3s;}
@@ -863,11 +835,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 // ─── DATA DEFAULTS ───
 const MORNING = [];
 const NIGHT = [];
-const DEFAULT_MEALS = [
-  {id:1, name:'Breakfast', items:[], itemNutrients:{}, cals:0, protein:0},
-  {id:2, name:'Lunch',     items:[], itemNutrients:{}, cals:0, protein:0},
-  {id:3, name:'Dinner',    items:[], itemNutrients:{}, cals:0, protein:0},
-];
 const DEFAULT_MACROS = {calories:2000, protein:150};
 const DEFAULT_WORKOUTS = [
   {id:'a', label:'A', name:'Day A', tag:'push', open:false, exercises:[]},
@@ -931,19 +898,6 @@ function editMacro(key) {
   inp.addEventListener('keydown', function(e){ if(e.key==='Enter') inp.blur(); if(e.key==='Escape') renderMacros(); });
 }
 
-// ─── MEALS ───
-function loadMeals() {
-  var meals = load('ascend_meals', DEFAULT_MEALS);
-  // migrate old desc string format
-  meals.forEach(function(m) {
-    if (!m.items) {
-      m.items = m.desc ? m.desc.split('\n').filter(function(s){return s.trim();}) : [];
-      delete m.desc;
-    }
-  });
-  return meals;
-}
-function saveMeals(m) { save('ascend_meals', m); syncSection('meals', m); }
 // ─── NUTRIENT TARGETS ───
 function getNutrientTargets() {
   var custom = load('ascend_nutrient_targets', {});
@@ -953,238 +907,6 @@ function getNutrientTargets() {
     protein:  { name:'Protein',  unit:'g',    optimal: custom.protein  || (age < 25 ? 180  : 160)  }
   };
 }
-function calcMealNutrients(meal) {
-  var nut = {calories:0, protein:0};
-  var stored = meal.itemNutrients || {};
-  (meal.items||[]).forEach(function(item) {
-    var key = (item||'').toLowerCase().trim();
-    if (stored[key]) { nut.calories += stored[key].calories || 0; nut.protein += stored[key].protein || 0; }
-  });
-  if (nut.calories === 0 && meal.cals) nut.calories = meal.cals;
-  if (nut.protein === 0 && meal.protein) nut.protein = meal.protein;
-  return nut;
-}
-function calcDailyNutrients() {
-  var total = {calories:0, protein:0};
-  loadMeals().forEach(function(meal) {
-    var n = calcMealNutrients(meal);
-    total.calories += n.calories || 0;
-    total.protein  += n.protein  || 0;
-  });
-  return total;
-}
-var _acTimer = null;
-// ─── LOCAL FOOD DATABASE ───
-var FOOD_DB = [
-  // Beef
-  {n:'Rump steak',cal:187,pro:22},
-  {n:'Chuck steak',cal:185,pro:21},
-  {n:'Ribeye steak',cal:271,pro:20},
-  {n:'Beef mince',cal:196,pro:19},
-  {n:'Sirloin steak',cal:193,pro:22},
-  {n:'Beef liver',cal:135,pro:21},
-  {n:'Beef brisket',cal:218,pro:20},
-  // Chicken
-  {n:'Chicken breast',cal:120,pro:23},
-  {n:'Chicken thigh',cal:177,pro:20},
-  {n:'Chicken mince',cal:170,pro:29},
-  // Pork
-  {n:'Pork belly',cal:518,pro:9},
-  {n:'Pork mince',cal:263,pro:18},
-  {n:'Bacon',cal:541,pro:37},
-  // Fish
-  {n:'Salmon',cal:208,pro:20},
-  {n:'Tuna',cal:116,pro:26},
-  {n:'Sardines',cal:208,pro:25},
-  {n:'Cod',cal:82,pro:18},
-  // Eggs & Dairy
-  {n:'Egg',cal:155,pro:13},
-  {n:'Egg white',cal:52,pro:11},
-  {n:'Whole milk',cal:61,pro:3},
-  {n:'Greek yoghurt',cal:97,pro:9},
-  {n:'Cheddar cheese',cal:403,pro:25},
-  {n:'Cottage cheese',cal:98,pro:11},
-  {n:'Butter',cal:717,pro:1},
-  {n:'Tallow',cal:902,pro:0},
-  {n:'Whey protein',cal:400,pro:80},
-  // Carbs & Grains
-  {n:'White rice cooked',cal:130,pro:3},
-  {n:'Brown rice cooked',cal:123,pro:3},
-  {n:'Oats',cal:389,pro:17},
-  {n:'White bread',cal:265,pro:9},
-  {n:'Sourdough bread',cal:274,pro:9},
-  {n:'Pasta cooked',cal:158,pro:6},
-  {n:'Potato',cal:77,pro:2},
-  {n:'Sweet potato',cal:86,pro:2},
-  // Fruits & Veg
-  {n:'Banana',cal:89,pro:1},
-  {n:'Apple',cal:52,pro:0},
-  {n:'Orange',cal:47,pro:1},
-  {n:'Blueberries',cal:57,pro:1},
-  {n:'Broccoli',cal:34,pro:3},
-  {n:'Spinach',cal:23,pro:3},
-  {n:'Avocado',cal:160,pro:2},
-  {n:'Mixed vegetables',cal:65,pro:3},
-  // Nuts & Oils
-  {n:'Almonds',cal:579,pro:21},
-  {n:'Olive oil',cal:884,pro:0},
-  {n:'Coconut oil',cal:862,pro:0},
-  // Other
-  {n:'Honey',cal:304,pro:0},
-  {n:'Protein bar',cal:350,pro:25}
-];
-
-// Keys map to nutrient object
-function dbToNutrients(entry, grams) {
-  var scale = grams / 100;
-  return {
-    calories: Math.round(entry.cal * scale),
-    protein:  Math.round(entry.pro * scale * 10) / 10
-  };
-}
-
-function foodDbSearch(query) {
-  if (!query || query.length < 2) return [];
-  var q = query.toLowerCase();
-  return FOOD_DB.filter(function(f) {
-    return f.n.toLowerCase().indexOf(q) !== -1;
-  }).slice(0, 6);
-}
-
-function parseGrams(query, foodName) {
-  // Extract grams from strings like "300g cooked rice" or "2x eggs"
-  var gMatch = query.match(/(\d+)\s*g\b/i);
-  if (gMatch) return parseInt(gMatch[1]);
-  var xMatch = query.match(/(\d+)\s*x/i);
-  if (xMatch) {
-    // per-item weight for common foods
-    var perItem = {egg:60, banana:120, apple:150, orange:130};
-    var key = foodName.toLowerCase().split(' ')[0];
-    return parseInt(xMatch[1]) * (perItem[key] || 100);
-  }
-  return 100; // default 100g
-}
-
-function foodSearch(query, mealId, bi) {
-  if (!query || query.length < 2) { closeFoodDropdown(); return; }
-  var results = foodDbSearch(query);
-  showFoodDropdown(results, query, mealId, bi);
-}
-
-function showFoodDropdown(results, query, mealId, bi) {
-  closeFoodDropdown();
-  var inputEl = document.getElementById('food-inp-'+mealId+'-'+bi);
-  if (!inputEl) return;
-  var wrap = inputEl.closest('.food-ac-wrap'); if (!wrap) return;
-  var dd = document.createElement('div');
-  dd.className = 'food-ac-dropdown'; dd.id = 'foodAcDd';
-  if (results.length === 0) {
-    var empty = document.createElement('div');
-    empty.className = 'food-ac-item';
-    empty.innerHTML = '<div style="color:var(--t3);">No match — press Enter to save manually</div>';
-    dd.appendChild(empty);
-  }
-  results.forEach(function(f) {
-    var grams = parseGrams(query, f.n);
-    var nut = dbToNutrients(f, grams);
-    var el = document.createElement('div');
-    el.className = 'food-ac-item';
-    el.innerHTML = '<div>'+f.n+'</div><div class="food-ac-meta">'+nut.calories+' kcal · '+nut.protein+'g protein per '+grams+'g</div>';
-    el.onmousedown = function(e) {
-      e.preventDefault();
-      applyFoodItem(f, query, mealId, bi);
-    };
-    dd.appendChild(el);
-  });
-  wrap.appendChild(dd);
-}
-
-function closeFoodDropdown() { var d=document.getElementById('foodAcDd'); if(d) d.remove(); }
-// keep old name working
-function closeAcDropdown() { closeFoodDropdown(); }
-
-// Foods measured by count not grams
-var COUNTABLE_FOODS = ['egg','banana','apple','orange','sardine'];
-function isCountable(name) {
-  var n = (name||'').toLowerCase();
-  return COUNTABLE_FOODS.some(function(c){ return n.indexOf(c) !== -1; });
-}
-function getDefaultAmount(name) { return isCountable(name) ? 1 : 100; }
-function getUnit(name) { return isCountable(name) ? 'x' : 'g'; }
-function amountToGrams(name, amount) {
-  if (!isCountable(name)) return amount;
-  var perItem = {egg:60,banana:120,apple:150,orange:130,sardine:50};
-  var key = Object.keys(perItem).find(function(k){ return (name||'').toLowerCase().indexOf(k)!==-1; });
-  return amount * (perItem[key] || 100);
-}
-
-function applyFoodItem(dbEntry, query, mealId, bi) {
-  var amount = getDefaultAmount(dbEntry.n);
-  var grams = amountToGrams(dbEntry.n, amount);
-  var nutrients = dbToNutrients(dbEntry, grams);
-  nutrients._dbKey = dbEntry.n;
-  nutrients._amount = amount;
-  var meals = loadMeals();
-  var meal = meals.find(function(x){return x.id===mealId;}); if(!meal) return;
-  if(!meal.itemNutrients) meal.itemNutrients={};
-  var key = dbEntry.n.toLowerCase().trim();
-  meal.itemNutrients[key] = nutrients;
-  if(!meal.items) meal.items=[];
-  meal.items[bi] = dbEntry.n;
-  var mn = calcMealNutrients(meal); meal.cals=mn.calories; meal.protein=mn.protein;
-  saveMeals(meals); closeFoodDropdown(); renderMealsSection();
-}
-
-var _amountTimers = {};
-function updateFoodAmount(mealId, bi, amount) {
-  var tk = mealId+'_'+bi;
-  clearTimeout(_amountTimers[tk]);
-  _amountTimers[tk] = setTimeout(function() {
-    amount = parseFloat(amount) || 0;
-    if (amount <= 0) return;
-    var meals = loadMeals();
-    var meal = meals.find(function(x){return x.id===mealId;}); if(!meal) return;
-    var itemName = (meal.items||[])[bi] || '';
-    var key = itemName.toLowerCase().trim();
-    var stored = meal.itemNutrients && meal.itemNutrients[key];
-    var dbKey = stored && stored._dbKey ? stored._dbKey : itemName;
-    var dbEntry = FOOD_DB.find(function(f){ return f.n.toLowerCase()===dbKey.toLowerCase(); });
-    if (!dbEntry) {
-      // try partial match
-      dbEntry = FOOD_DB.find(function(f){ return itemName.toLowerCase().indexOf(f.n.toLowerCase().split(' ')[0])!==-1; });
-    }
-    if (!dbEntry) return;
-    var grams = amountToGrams(stored._dbKey, amount);
-    var nutrients = dbToNutrients(dbEntry, grams);
-    nutrients._dbKey = stored._dbKey;
-    nutrients._amount = amount;
-    meal.itemNutrients[key] = nutrients;
-    var mn = calcMealNutrients(meal);
-    meal.cals = mn.calories; meal.protein = mn.protein;
-    saveMeals(meals);
-      var daily = calcDailyNutrients();
-    var targets = getNutrientTargets();
-    var calPct = Math.min(100,Math.round((daily.calories/targets.calories.optimal)*100));
-    var protPct = Math.min(100,Math.round((daily.protein/targets.protein.optimal)*100));
-    var cards = document.querySelectorAll('#mealsSection .macro-val');
-    if(cards[0]) cards[0].textContent = Math.round(daily.calories);
-    if(cards[1]) cards[1].textContent = Math.round(daily.protein);
-    var bars = document.querySelectorAll('#mealsSection .macro-progress-fill');
-    if(bars[0]){bars[0].style.width=calPct+'%';bars[0].style.background=calPct>105?'var(--red)':'var(--grad)';}
-    if(bars[1]) bars[1].style.width=protPct+'%';
-    var mealRows = document.querySelectorAll('.meal-row');
-    var allMeals = loadMeals();
-    var mIdx = -1;
-    for(var i=0;i<allMeals.length;i++){if(allMeals[i].id===mealId){mIdx=i;break;}}
-    if(mIdx>=0 && mealRows[mIdx]){
-      var mNut = calcMealNutrients(allMeals[mIdx]);
-      var pills = mealRows[mIdx].querySelectorAll('.meal-macro-pill');
-      if(pills[0]) pills[0].textContent = Math.round(mNut.calories)+' kcal';
-      if(pills[1]) pills[1].textContent = Math.round(mNut.protein)+'g';
-    }
-  }, 600);
-}
-
 
 // ─── FOOD LOG ───
 var DEFAULT_STAPLES = [
@@ -1243,59 +965,135 @@ function calcTodayNutrients() {
 
 
 
-var _usdaTimer = null;
-function usdaSearch(query) {
-  var drop = document.getElementById('usdaDrop');
+// ─── WHOLE FOODS DATABASE (built in, no API) ───
+var WHOLE_FOOD_DB = [
+  // Beef
+  {n:'Beef mince',cal:196,pro:19},
+  {n:'Rump steak',cal:187,pro:22},
+  {n:'Sirloin steak',cal:193,pro:22},
+  {n:'Ribeye steak',cal:271,pro:20},
+  {n:'T-bone steak',cal:202,pro:21},
+  {n:'Eye fillet steak',cal:184,pro:23},
+  {n:'Chuck steak',cal:185,pro:21},
+  {n:'Beef brisket',cal:218,pro:20},
+  {n:'Beef short ribs',cal:295,pro:18},
+  {n:'Beef liver',cal:135,pro:21},
+  // Chicken
+  {n:'Chicken breast',cal:120,pro:23},
+  {n:'Chicken thigh',cal:177,pro:20},
+  {n:'Chicken drumstick',cal:172,pro:24},
+  {n:'Chicken wing',cal:203,pro:19},
+  {n:'Chicken mince',cal:143,pro:19},
+  {n:'Whole chicken',cal:239,pro:27},
+  // Pork
+  {n:'Pork chop',cal:231,pro:25},
+  {n:'Pork loin',cal:147,pro:26},
+  {n:'Pork belly',cal:518,pro:9},
+  {n:'Pork mince',cal:263,pro:18},
+  {n:'Bacon',cal:541,pro:37},
+  {n:'Ham',cal:145,pro:21},
+  // Lamb
+  {n:'Lamb chop',cal:294,pro:25},
+  {n:'Lamb leg',cal:217,pro:25},
+  {n:'Lamb shoulder',cal:294,pro:21},
+  {n:'Lamb mince',cal:282,pro:18},
+  // Fish & seafood
+  {n:'Salmon',cal:208,pro:20},
+  {n:'Tuna',cal:116,pro:26},
+  {n:'Cod',cal:82,pro:18},
+  {n:'Snapper',cal:100,pro:21},
+  {n:'Sardines',cal:208,pro:25},
+  {n:'Prawns',cal:99,pro:24},
+  {n:'Mussels',cal:86,pro:12},
+  // Eggs & dairy
+  {n:'Egg',cal:155,pro:13},
+  {n:'Egg white',cal:52,pro:11},
+  {n:'Whole milk',cal:61,pro:3},
+  {n:'Skim milk',cal:34,pro:3},
+  {n:'Greek yoghurt',cal:97,pro:9},
+  {n:'Natural yoghurt',cal:61,pro:4},
+  {n:'Cheddar cheese',cal:403,pro:25},
+  {n:'Cottage cheese',cal:98,pro:11},
+  {n:'Butter',cal:717,pro:1},
+  // Grains & starches
+  {n:'White rice (cooked)',cal:130,pro:3},
+  {n:'Brown rice (cooked)',cal:123,pro:3},
+  {n:'Oats',cal:389,pro:17},
+  {n:'Quinoa (cooked)',cal:120,pro:4},
+  {n:'Potato',cal:77,pro:2},
+  {n:'Sweet potato',cal:86,pro:2},
+  {n:'Pasta (cooked)',cal:158,pro:6},
+  // Legumes & nuts
+  {n:'Lentils (cooked)',cal:116,pro:9},
+  {n:'Chickpeas (cooked)',cal:164,pro:9},
+  {n:'Black beans (cooked)',cal:132,pro:9},
+  {n:'Almonds',cal:579,pro:21},
+  {n:'Peanuts',cal:567,pro:26},
+  {n:'Walnuts',cal:654,pro:15},
+  // Fruit
+  {n:'Banana',cal:89,pro:1},
+  {n:'Apple',cal:52,pro:0},
+  {n:'Orange',cal:47,pro:1},
+  {n:'Blueberries',cal:57,pro:1},
+  {n:'Strawberries',cal:32,pro:1},
+  {n:'Grapes',cal:69,pro:1},
+  {n:'Mango',cal:60,pro:1},
+  {n:'Avocado',cal:160,pro:2},
+  // Vegetables
+  {n:'Broccoli',cal:34,pro:3},
+  {n:'Spinach',cal:23,pro:3},
+  {n:'Carrot',cal:41,pro:1},
+  {n:'Cucumber',cal:15,pro:1},
+  {n:'Tomato',cal:18,pro:1},
+  {n:'Capsicum',cal:31,pro:1},
+  {n:'Mushroom',cal:22,pro:3},
+  {n:'Onion',cal:40,pro:1},
+  {n:'Pumpkin',cal:26,pro:1},
+  // Oils & fats
+  {n:'Olive oil',cal:884,pro:0},
+  {n:'Coconut oil',cal:862,pro:0},
+  {n:'Tallow',cal:902,pro:0},
+  // Other
+  {n:'Honey',cal:304,pro:0}
+];
+function wholeFoodSearch(query) {
+  var drop = document.getElementById('foodDrop');
   if (drop) drop.remove();
   if (!query || query.length < 2) return;
-  clearTimeout(_usdaTimer);
-  _usdaTimer = setTimeout(function() {
-    var url = 'https://api.nal.usda.gov/fdc/v1/foods/search?query='+encodeURIComponent(query)+'&pageSize=6&api_key=DEMO_KEY&dataType=SR%20Legacy,Foundation';
-    fetch(url).then(function(r){return r.json();}).then(function(data){
-      var inp = document.getElementById('afFoodName');
-      if (!inp) return;
-      var ex = document.getElementById('usdaDrop'); if(ex) ex.remove();
-      if (!data.foods || !data.foods.length) return;
-      var wrap = inp.parentElement;
-      wrap.style.position = 'relative';
-      var dd = document.createElement('div');
-      dd.id = 'usdaDrop';
-      dd.style.cssText = 'position:absolute;left:0;right:0;top:100%;background:#13131f;border:1px solid var(--border);border-radius:10px;z-index:1100;max-height:220px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.5);';
-      data.foods.forEach(function(f) {
-        var nuts = f.foodNutrients || [];
-        var cal=0,pro=0,carb=0;
-        nuts.forEach(function(n){
-          if(n.nutrientId===1008) cal=Math.round(n.value||0);
-          if(n.nutrientId===1003) pro=Math.round((n.value||0)*10)/10;
-          if(n.nutrientId===1005) carb=Math.round((n.value||0)*10)/10;
-        });
-        if(!cal) return;
-        var item = document.createElement('div');
-        item.style.cssText = 'padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);';
-        item.innerHTML = '<div style="font-size:12px;color:var(--text);font-weight:600;">'+f.description+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">'+cal+' kcal · '+pro+'g pro · '+carb+'g carbs</div>';
-        item.addEventListener('mousedown', function() {
-          var ni=document.getElementById('afFoodName');
-          var ci=document.getElementById('afCal');
-          var pi=document.getElementById('afPro');
-          var ai=document.getElementById('afAmount');
-          if(ni) ni.value = f.description;
-          var amt = parseFloat(ai ? ai.value : 100) || 100;
-          if(ci) ci.value = Math.round(cal * amt / 100);
-          if(pi) pi.value = Math.round(pro * amt / 100 * 10) / 10;
-          if(ai) ai.oninput = function() {
-            var a = parseFloat(this.value)||0;
-            if(ci) ci.value = Math.round(cal*a/100);
-            if(pi) pi.value = Math.round(pro*a/100*10)/10;
-          };
-          var d=document.getElementById('usdaDrop'); if(d) d.remove();
-        });
-        item.addEventListener('mouseover',function(){this.style.background='rgba(255,255,255,0.04)';});
-        item.addEventListener('mouseout',function(){this.style.background='';});
-        dd.appendChild(item);
-      });
-      if(dd.children.length) wrap.appendChild(dd);
-    }).catch(function(){});
-  }, 350);
+  var q = query.toLowerCase();
+  var results = WHOLE_FOOD_DB.filter(function(f){ return f.n.toLowerCase().indexOf(q) !== -1; }).slice(0, 8);
+  var inp = document.getElementById('afFoodName');
+  if (!inp || !results.length) return;
+  var wrap = inp.parentElement;
+  wrap.style.position = 'relative';
+  var dd = document.createElement('div');
+  dd.id = 'foodDrop';
+  dd.style.cssText = 'position:absolute;left:0;right:0;top:100%;background:#13131f;border:1px solid var(--border);border-radius:10px;z-index:1100;max-height:220px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.5);';
+  results.forEach(function(f) {
+    var item = document.createElement('div');
+    item.style.cssText = 'padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);';
+    item.innerHTML = '<div style="font-size:12px;color:var(--text);font-weight:600;">'+f.n+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">'+f.cal+' kcal · '+f.pro+'g pro per 100g</div>';
+    item.addEventListener('mousedown', function() {
+      var ni=document.getElementById('afFoodName');
+      var ci=document.getElementById('afCal');
+      var pi=document.getElementById('afPro');
+      var ai=document.getElementById('afAmount');
+      if(ni) ni.value = f.n;
+      var amt = parseFloat(ai ? ai.value : 100) || 100;
+      if(ci) ci.value = Math.round(f.cal * amt / 100);
+      if(pi) pi.value = Math.round(f.pro * amt / 100 * 10) / 10;
+      if(ai) ai.oninput = function() {
+        var a = parseFloat(this.value)||0;
+        if(ci) ci.value = Math.round(f.cal*a/100);
+        if(pi) pi.value = Math.round(f.pro*a/100*10)/10;
+      };
+      var d=document.getElementById('foodDrop'); if(d) d.remove();
+    });
+    item.addEventListener('mouseover',function(){this.style.background='rgba(255,255,255,0.04)';});
+    item.addEventListener('mouseout',function(){this.style.background='';});
+    dd.appendChild(item);
+  });
+  wrap.appendChild(dd);
 }
 
 function openManageStaples() {
@@ -1363,7 +1161,7 @@ function openAddFoodPopup() {
     +'</div></div>'
     +'<div style="height:1px;background:var(--border);margin:12px 0;"></div>'
     +'<div style="margin-bottom:10px;">'
-    +'<input id="afFoodName" type="text" placeholder="Food name..." autocomplete="off" oninput="usdaSearch(this.value)" style="width:100%;background:var(--input-bg,#1a1a2e);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;" />'
+    +'<input id="afFoodName" type="text" placeholder="Food name..." autocomplete="off" oninput="wholeFoodSearch(this.value)" style="width:100%;background:var(--input-bg,#1a1a2e);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;" />'
     +'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">'
     +'<div><div style="font-size:10px;color:var(--t3);margin-bottom:4px;">AMOUNT (g)</div>'
@@ -1448,52 +1246,6 @@ function renderMealsSection() {
   el.innerHTML = html;
 }
 
-function saveMealName(id, val) {
-  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
-  m.name=val.trim()||m.name; saveMeals(meals);
-}
-function saveMealItem(id, bi, val) {
-  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
-  if(!m.items) m.items=[];
-  var trimmed = val.trim();
-  // Don't overwrite if nutrients already stored for the current item name
-  var currentKey = (m.items[bi]||'').toLowerCase().trim();
-  var hasStored = m.itemNutrients && m.itemNutrients[currentKey] && m.itemNutrients[currentKey]._dbKey;
-  if (hasStored && trimmed && trimmed.toLowerCase() !== currentKey) return;
-  m.items[bi]=trimmed;
-  m.items=m.items.filter(function(s){return s;});
-  saveMeals(meals);
-}
-function addMealItem(id) {
-  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
-  if(!m.items) m.items=[];
-  m.items.push('');
-  saveMeals(meals); renderMealsSection();
-  setTimeout(function(){
-    var rows=[];
-    document.querySelectorAll('.meal-row').forEach(function(row,ri){
-      if(meals[ri]&&meals[ri].id===id) rows=Array.from(row.querySelectorAll('.meal-bullet-input'));
-    });
-    if(rows.length) rows[rows.length-1].focus();
-  },50);
-}
-function delMealItem(id, bi) {
-  var meals=loadMeals(); var m=meals.find(function(x){return x.id===id;}); if(!m) return;
-  if(!m.items) return;
-  var removedKey=(m.items[bi]||'').toLowerCase().trim();
-  m.items.splice(bi,1);
-  if(m.itemNutrients&&removedKey) delete m.itemNutrients[removedKey];
-  saveMeals(meals); renderMealsSection();
-}
-function deleteMeal(id) {
-  saveMeals(loadMeals().filter(function(m){return m.id!==id;})); renderMealsSection();
-}
-function addMeal() {
-  var meals=loadMeals();
-  meals.push({id:Date.now(),name:'New meal',items:[],itemNutrients:{},cals:0,protein:0});
-  saveMeals(meals); renderMealsSection();
-  setTimeout(function(){ var i=document.querySelectorAll('.meal-name-input'); if(i.length) i[i.length-1].focus(); },50);
-}
 function editMacroTarget(key) {
   var t=getNutrientTargets()[key];
   var popup=document.createElement('div'); popup.className='macro-edit-popup'; popup.id='macroEditPopup';
@@ -3474,31 +3226,6 @@ function obLaunch() {
   if (avatarEl && s.name) avatarEl.textContent = s.name[0].toUpperCase();
 }
 
-// ─── MEAL DATA CLEANUP ───
-function cleanMealData() {
-  var meals = loadMeals();
-  var changed = false;
-  meals.forEach(function(meal) {
-    if (!meal.itemNutrients) return;
-    Object.keys(meal.itemNutrients).forEach(function(k) {
-      if (!meal.itemNutrients[k]._dbKey) {
-        delete meal.itemNutrients[k];
-        changed = true;
-      }
-    });
-    // Remove items that have no matching nutrient entry
-    if (meal.items) {
-      meal.items = meal.items.filter(function(item) {
-        var key = (item||'').toLowerCase().trim();
-        return key && meal.itemNutrients[key];
-      });
-    }
-    // Recalc meal totals
-    var mn = calcMealNutrients(meal);
-    meal.cals = mn.calories; meal.protein = mn.protein;
-  });
-  if (changed) { saveMeals(meals); }
-}
 // ─── BOOT ───
 window.addEventListener('DOMContentLoaded', function(){
   // Auth guard — redirect to home if not signed in
