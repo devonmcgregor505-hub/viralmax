@@ -1187,7 +1187,7 @@ function openManageStaples() {
       +'</div>'
       +'<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;margin-bottom:12px;">Per 100g</div>'
       +'<button onclick="addStaple()" style="width:100%;background:linear-gradient(90deg,#f59e0b,#eab308);border:none;border-radius:10px;color:#000;font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;margin-bottom:8px;">Add Staple</button>'
-      +'<button onclick="document.getElementById(\'manageStaplesPopup\').remove()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.4);font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Done</button>';
+      +'<button onclick="document.getElementById(\'manageStaplesPopup\').remove();openAddFoodPopup();" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.4);font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Done</button>';
     popup.appendChild(box);
     box.addEventListener('click', function(e){ e.stopPropagation(); });
   }
