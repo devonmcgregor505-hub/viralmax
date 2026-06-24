@@ -1302,64 +1302,41 @@ function confirmAddFood() {
 }
 function renderMealsSection() {
   var el = document.getElementById('mealsSection'); if(!el) return;
-  var meals = loadMeals();
-  var daily = calcDailyNutrients();
+  var log = getTodayLog();
+  var daily = calcTodayNutrients();
   var targets = getNutrientTargets();
   var calPct = Math.min(100, Math.round((daily.calories/targets.calories.optimal)*100));
   var protPct = Math.min(100, Math.round((daily.protein/targets.protein.optimal)*100));
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">'
-    +'<div class="macro-card" onclick="editMacroTarget(\'calories\')">'
+  var calColor = calPct > 110 ? 'var(--red)' : calPct > 88 ? '#f97316' : 'var(--grad)';
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">'
+    +'<div class="macro-card" onclick="editMacroTarget('calories')" style="cursor:pointer;">'
     +'<div class="macro-lbl">CALORIES</div>'
     +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.calories)+'</span><span class="macro-val-unit"> / '+targets.calories.optimal+' kcal</span></div>'
-    +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+calPct+'%;background:'+(calPct>105?'var(--red)':'var(--grad)')+'"></div></div>'
+    +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+calPct+'%;background:'+calColor+'"></div></div>'
     +'</div>'
-    +'<div class="macro-card" onclick="editMacroTarget(\'protein\')">'
+    +'<div class="macro-card" onclick="editMacroTarget('protein')" style="cursor:pointer;">'
     +'<div class="macro-lbl">PROTEIN</div>'
     +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.protein)+'</span><span class="macro-val-unit">g / '+targets.protein.optimal+'g</span></div>'
     +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+protPct+'%;"></div></div>'
     +'</div></div>'
-    +'<div class="meals-header"><div class="meals-title">Daily Diet</div></div>';
-  meals.forEach(function(meal) {
-    var mealNut = calcMealNutrients(meal);
-    var items = (meal.items && meal.items.length) ? meal.items : [''];
-    var bullets = items.map(function(item, bi) {
-      var inputId = 'food-inp-'+meal.id+'-'+bi;
-      var hasNut = meal.itemNutrients && meal.itemNutrients[(item||'').toLowerCase().trim()];
-      var storedNut = hasNut ? meal.itemNutrients[(item||'').toLowerCase().trim()] : null;
-      var itemAmount = storedNut && storedNut._amount != null ? storedNut._amount : '';
-      var itemUnit = storedNut && storedNut._dbKey ? getUnit(storedNut._dbKey) : 'g';
-      var amountInput = hasNut
-        ? '<input type="number" min="0" step="'+(itemUnit==='x'?'1':'10')+'" value="'+itemAmount+'"'
-          +' oninput="updateFoodAmount('+meal.id+','+bi+',this.value)"'
-          +' style="width:'+(itemUnit==='x'?'44px':'54px')+';background:var(--yd);border:1px solid var(--border-y);border-radius:6px;color:var(--y);font-family:Bebas Neue,sans-serif;font-size:15px;padding:2px 4px;outline:none;text-align:center;" />'
-          +'<span style="font-size:10px;color:var(--t3);margin-left:2px;">'+itemUnit+'</span>'
-        : '';
-      return '<div class="meal-bullet-row">'
-        +'<span class="meal-bullet-dash">—</span>'
-        +'<div class="food-ac-wrap" style="flex:1;">'
-        +'<input class="meal-bullet-input" id="'+inputId+'" type="text" placeholder="Search food..." value="'+((item||'').replace(/&/g,"&amp;").replace(/"/g,"&quot;"))+'"'
-        +' oninput="foodSearch(this.value,'+meal.id+','+bi+')"'
-        +' onblur="setTimeout(closeFoodDropdown,200);saveMealItem('+meal.id+','+bi+',this.value)"'
-        +' onkeydown="if(event.key==String.fromCharCode(13)){event.preventDefault();addMealItem('+meal.id+');}if(event.key==String.fromCharCode(8)&&!this.value){event.preventDefault();delMealItem('+meal.id+','+bi+');}" /></div>'
-        +amountInput
-        +(hasNut ? '<span style="font-size:10px;color:var(--y);margin-left:4px;flex-shrink:0;" title="Nutrients loaded">✓</span>' : '')
-        +'<button class="meal-bullet-del" onclick="delMealItem('+meal.id+','+bi+')">✕</button>'
+    +'<div class="meal-row" style="padding:0;">';
+  if (log.length === 0) {
+    html += '<div style="text-align:center;padding:28px 0;color:var(--t3);font-size:13px;">Nothing logged yet — tap below to add food.</div>';
+  } else {
+    log.forEach(function(entry, idx) {
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);">'
+        +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:13px;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+entry.name+'</div>'
+        +'<div style="font-size:11px;color:var(--t3);margin-top:1px;">'+entry.amount+'g &nbsp;&middot;&nbsp; '+entry.time+'</div>'
+        +'</div>'
+        +'<span style="font-size:12px;font-weight:700;color:var(--y);background:var(--yd);border:1px solid var(--border-y);border-radius:8px;padding:3px 8px;white-space:nowrap;">'+Math.round(entry.calories)+' kcal</span>'
+        +'<span style="font-size:12px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:3px 8px;white-space:nowrap;">'+entry.protein+'g</span>'
+        +'<button onclick="deleteFoodEntry('+idx+')" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:0 2px;opacity:0.5;">&#x2715;</button>'
         +'</div>';
-    }).join('');
-    html += '<div class="meal-row"><div class="meal-row-head"><div class="meal-row-info">'
-      +'<input class="meal-name-input" value="'+meal.name+'" placeholder="Meal name" onblur="saveMealName('+meal.id+',this.value)"/>'
-      +'<div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 0 6px;"></div>'
-      +bullets
-      +'<button class="meal-bullet-add" onclick="addMealItem('+meal.id+')">+ add item</button>'
-      +'</div>'
-      +'<div class="meal-macros">'
-      +'<span class="meal-macro-pill">'+Math.round(mealNut.calories)+' kcal</span>'
-      +'<span class="meal-macro-pill">'+Math.round(mealNut.protein)+'g</span>'
-      +'</div>'
-      +'<button class="meal-del-btn" onclick="deleteMeal('+meal.id+')">✕</button>'
-      +'</div></div>';
-  });
-  html += '<button class="meal-add-btn" onclick="addMeal()">+ Add meal</button>';
+    });
+  }
+  html += '</div>'
+    +'<button class="meal-add-btn" onclick="openAddFoodPopup()" style="margin-top:10px;">+ Add Food</button>';
   el.innerHTML = html;
 }
 
