@@ -1174,6 +1174,16 @@ function wholeFoodSearch(query) {
   wrap.appendChild(dd);
 }
 
+function stapleIsQty(s) {
+  if (s.unit === 'x') return true;
+  if (s.unit === 'g') return false;
+  var dbMatch = WHOLE_FOOD_DB.filter(function(f){ return f.n.toLowerCase() === s.name.toLowerCase(); })[0];
+  return !!(dbMatch && dbMatch.qty);
+}
+function stapleDefaultAmt(s) {
+  if (s.amt) return s.amt;
+  return stapleIsQty(s) ? 1 : 100;
+}
 function openManageStaples() {
   var existing = document.getElementById('manageStaplesPopup');
   if (existing) existing.remove();
@@ -1186,10 +1196,23 @@ function openManageStaples() {
     var box = document.createElement('div');
     box.style.cssText = 'background:#13131f;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:360px;max-width:95vw;max-height:85vh;overflow-y:auto;';
     var rows = staples.map(function(s,i){
-      return '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06);">'
+      var isQty = stapleIsQty(s);
+      var defAmt = stapleDefaultAmt(s);
+      var activeBg = 'rgba(234,179,8,0.18)', activeColor = '#eab308', inactiveColor = 'rgba(255,255,255,0.4)';
+      return '<div style="display:flex;flex-direction:column;gap:7px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06);">'
+        +'<div style="display:flex;align-items:center;gap:8px;">'
         +'<div style="flex:1;font-size:13px;color:#fff;font-weight:600;">'+s.name+'</div>'
         +'<div style="font-size:11px;color:rgba(255,255,255,0.4);">'+s.cal+'kcal &middot; '+s.pro+'g</div>'
         +'<button onclick="deleteStaple('+i+')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:20px;cursor:pointer;padding:0 4px;">&times;</button>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;">'
+        +'<div style="display:flex;background:rgba(255,255,255,0.06);border-radius:7px;padding:2px;">'
+        +'<button onclick="setStapleUnit('+i+',\'g\')" style="border:none;border-radius:5px;font-size:10px;font-weight:700;padding:4px 8px;cursor:pointer;background:'+(!isQty?activeBg:'transparent')+';color:'+(!isQty?activeColor:inactiveColor)+';">GRAMS</button>'
+        +'<button onclick="setStapleUnit('+i+',\'x\')" style="border:none;border-radius:5px;font-size:10px;font-weight:700;padding:4px 8px;cursor:pointer;background:'+(isQty?activeBg:'transparent')+';color:'+(isQty?activeColor:inactiveColor)+';">QTY</button>'
+        +'</div>'
+        +'<input type="number" min="0" value="'+defAmt+'" onchange="setStapleAmt('+i+',this.value)" style="width:54px;background:#1e1e30;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;font-size:11px;padding:4px 6px;outline:none;text-align:center;"/>'
+        +'<span style="font-size:10px;color:rgba(255,255,255,0.3);">default'+(isQty?' qty':' g')+'</span>'
+        +'</div>'
         +'</div>';
     }).join('');
     box.innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#fff;margin-bottom:16px;">Manage Staples</div>'
@@ -1199,7 +1222,15 @@ function openManageStaples() {
       +'<input id="msCal" type="number" placeholder="kcal" style="flex:1;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:8px;color:#eab308;font-size:12px;padding:7px 6px;outline:none;text-align:center;min-width:0;"/>'
       +'<input id="msPro" type="number" placeholder="pro" style="flex:1;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;color:#22c55e;font-size:12px;padding:7px 6px;outline:none;text-align:center;min-width:0;"/>'
       +'</div>'
-      +'<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;margin-bottom:12px;">Per 100g</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-top:8px;">'
+      +'<div style="display:flex;background:rgba(255,255,255,0.06);border-radius:7px;padding:2px;">'
+      +'<button type="button" id="msUnitGBtn" onclick="msSetUnit(\'g\')" style="border:none;border-radius:5px;font-size:10px;font-weight:700;padding:5px 9px;cursor:pointer;background:rgba(234,179,8,0.18);color:#eab308;">GRAMS</button>'
+      +'<button type="button" id="msUnitXBtn" onclick="msSetUnit(\'x\')" style="border:none;border-radius:5px;font-size:10px;font-weight:700;padding:5px 9px;cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);">QTY</button>'
+      +'</div>'
+      +'<input id="msAmt" type="number" min="0" value="100" style="flex:1;min-width:0;background:#1e1e30;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;padding:6px 8px;outline:none;text-align:center;box-sizing:border-box;"/>'
+      +'</div>'
+      +'<input type="hidden" id="msUnit" value="g"/>'
+      +'<div id="msPerLbl" style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;margin-bottom:12px;">Per 100g &middot; default amount when added</div>'
       +'<button onclick="addStaple()" style="width:100%;background:linear-gradient(90deg,#f59e0b,#eab308);border:none;border-radius:10px;color:#000;font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;margin-bottom:8px;">Add Staple</button>'
       +'<button onclick="document.getElementById(\'manageStaplesPopup\').remove();openAddFoodPopup();" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.4);font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Done</button>';
     popup.appendChild(box);
@@ -1208,6 +1239,36 @@ function openManageStaples() {
   rebuild();
   document.body.appendChild(popup);
   popup.addEventListener('click', function(){ popup.remove(); });
+}
+function msSetUnit(unit) {
+  var h = document.getElementById('msUnit'); if (h) h.value = unit;
+  var amtInput = document.getElementById('msAmt');
+  if (amtInput) amtInput.value = unit === 'x' ? 1 : 100;
+  var gBtn = document.getElementById('msUnitGBtn'), xBtn = document.getElementById('msUnitXBtn');
+  var activeBg = 'rgba(234,179,8,0.18)', activeColor = '#eab308', inactiveColor = 'rgba(255,255,255,0.4)';
+  if (gBtn) { gBtn.style.background = unit === 'g' ? activeBg : 'transparent'; gBtn.style.color = unit === 'g' ? activeColor : inactiveColor; }
+  if (xBtn) { xBtn.style.background = unit === 'x' ? activeBg : 'transparent'; xBtn.style.color = unit === 'x' ? activeColor : inactiveColor; }
+  var lbl = document.getElementById('msPerLbl');
+  if (lbl) lbl.textContent = unit === 'x' ? 'Per item · default qty when added' : 'Per 100g · default grams when added';
+}
+function setStapleUnit(i, unit) {
+  var s = loadStaples();
+  if (!s[i]) return;
+  var wasQty = stapleIsQty(s[i]);
+  s[i].unit = unit;
+  var nowQty = unit === 'x';
+  if (wasQty !== nowQty) s[i].amt = nowQty ? 1 : 100;
+  saveStaples(s);
+  document.getElementById('manageStaplesPopup').remove(); openManageStaples();
+}
+function setStapleAmt(i, val) {
+  var s = loadStaples();
+  if (!s[i]) return;
+  var a = parseFloat(val);
+  if (!a || a <= 0) a = stapleIsQty(s[i]) ? 1 : 100;
+  s[i].amt = a;
+  saveStaples(s);
+  document.getElementById('manageStaplesPopup').remove(); openManageStaples();
 }
 function msSearchFood(query) {
   var existing = document.getElementById('msDrop');
@@ -1231,6 +1292,7 @@ function msSearchFood(query) {
       var pi = document.getElementById('msPro');
       if (ci) ci.value = f.cal;
       if (pi) pi.value = f.pro;
+      msSetUnit(f.qty ? 'x' : 'g');
       var d = document.getElementById('msDrop'); if (d) d.remove();
     });
     item.addEventListener('mouseover', function(){ this.style.background='rgba(255,255,255,0.05)'; });
@@ -1244,8 +1306,10 @@ function addStaple() {
   var n=(document.getElementById('msName').value||'').trim();
   var c=parseFloat(document.getElementById('msCal').value)||0;
   var p=parseFloat(document.getElementById('msPro').value)||0;
+  var unit=document.getElementById('msUnit').value||'g';
+  var amt=parseFloat(document.getElementById('msAmt').value)||(unit==='x'?1:100);
   if(!n) return;
-  var s=loadStaples(); s.push({id:'c'+Date.now(),name:n,cal:c,pro:p,fat:0}); saveStaples(s);
+  var s=loadStaples(); s.push({id:'c'+Date.now(),name:n,cal:c,pro:p,fat:0,unit:unit,amt:amt}); saveStaples(s);
   document.getElementById('manageStaplesPopup').remove(); openManageStaples();
 }
 function deleteStaple(i) {
@@ -1266,7 +1330,7 @@ function openAddFoodPopup() {
     +staples.map(function(s,i){
       return '<button onclick="selectStaple('+i+')" style="background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;">'+s.name+'</button>';
     }).join('')
-    +'<button onclick="openManageStaples()" style="margin-top:8px;background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;padding:0;text-decoration:underline;">+ manage staples</button>'
+    +'<button onclick="document.getElementById(\'addFoodPopup\').remove();openManageStaples();" style="margin-top:8px;background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;padding:0;text-decoration:underline;">+ manage staples</button>'
     +'</div></div>'
     +'<div style="height:1px;background:var(--border);margin:12px 0;"></div>'
     +'<div style="margin-bottom:10px;">'
@@ -1291,33 +1355,21 @@ function openAddFoodPopup() {
 function selectStaple(i) {
   var s = loadStaples()[i];
   if (!s) return;
-  // check if this food exists in DB to get qty flag
-  var dbMatch = WHOLE_FOOD_DB.filter(function(f){ return f.n.toLowerCase() === s.name.toLowerCase(); })[0];
-  var isQty = (dbMatch && dbMatch.qty) || s.unit === 'x';
+  var isQty = stapleIsQty(s);
+  var baseAmt = isQty ? 1 : 100;
+  var defAmt = stapleDefaultAmt(s);
   var al = document.getElementById('afAmountLbl');
   var ai = document.getElementById('afAmount');
   document.getElementById('afFoodName').value = s.name;
-  if (isQty) {
-    if (al) al.textContent = 'QTY';
-    if (ai) ai.value = 1;
-    document.getElementById('afCal').value = Math.round(s.cal);
-    document.getElementById('afPro').value = Math.round(s.pro * 10) / 10;
-    if (ai) ai.oninput = function() {
-      var a = parseFloat(this.value) || 0;
-      document.getElementById('afCal').value = Math.round(s.cal * a);
-      document.getElementById('afPro').value = Math.round(s.pro * a * 10) / 10;
-    };
-  } else {
-    if (al) al.textContent = 'AMOUNT (g)';
-    if (ai) ai.value = 100;
-    document.getElementById('afCal').value = Math.round(s.cal);
-    document.getElementById('afPro').value = Math.round(s.pro * 10) / 10;
-    if (ai) ai.oninput = function() {
-      var a = parseFloat(this.value) || 0;
-      document.getElementById('afCal').value = Math.round(s.cal * a / 100);
-      document.getElementById('afPro').value = Math.round(s.pro * a / 100 * 10) / 10;
-    };
-  }
+  if (al) al.textContent = isQty ? 'QTY' : 'AMOUNT (g)';
+  if (ai) ai.value = defAmt;
+  document.getElementById('afCal').value = Math.round(s.cal * defAmt / baseAmt);
+  document.getElementById('afPro').value = Math.round(s.pro * defAmt / baseAmt * 10) / 10;
+  if (ai) ai.oninput = function() {
+    var a = parseFloat(this.value) || 0;
+    document.getElementById('afCal').value = Math.round(s.cal * a / baseAmt);
+    document.getElementById('afPro').value = Math.round(s.pro * a / baseAmt * 10) / 10;
+  };
 }
 function confirmAddFood() {
   var name = (document.getElementById('afFoodName').value || '').trim();
