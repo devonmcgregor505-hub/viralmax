@@ -1402,7 +1402,7 @@ function saveMacroTarget(key) {
   closeMacroEdit(); renderMealsSection();
 }
 function closeMacroEdit() { var p=document.getElementById('macroEditPopup'); if(p) p.remove(); }
-function openMacroEdit(id) { editMacroTarget(\'calories\'); }
+function openMacroEdit(id) { editMacroTarget('calories'); }
 
 // ─── WORKOUTS ───
 function loadWorkouts() { return load('ascend_workouts', DEFAULT_WORKOUTS); }
