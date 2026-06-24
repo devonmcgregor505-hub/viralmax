@@ -1309,12 +1309,12 @@ function renderMealsSection() {
   var protPct = Math.min(100, Math.round((daily.protein/targets.protein.optimal)*100));
   var calColor = calPct > 110 ? 'var(--red)' : calPct > 88 ? '#f97316' : 'var(--grad)';
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">'
-    +'<div class="macro-card" onclick="editMacroTarget('calories')" style="cursor:pointer;">'
+    +'<div class="macro-card" onclick="editMacroTarget(\'calories\')" style="cursor:pointer;">'
     +'<div class="macro-lbl">CALORIES</div>'
     +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.calories)+'</span><span class="macro-val-unit"> / '+targets.calories.optimal+' kcal</span></div>'
     +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+calPct+'%;background:'+calColor+'"></div></div>'
     +'</div>'
-    +'<div class="macro-card" onclick="editMacroTarget('protein')" style="cursor:pointer;">'
+    +'<div class="macro-card" onclick="editMacroTarget(\'protein\')" style="cursor:pointer;">'
     +'<div class="macro-lbl">PROTEIN</div>'
     +'<div><span class="macro-val" style="font-size:22px;">'+Math.round(daily.protein)+'</span><span class="macro-val-unit">g / '+targets.protein.optimal+'g</span></div>'
     +'<div class="macro-progress-bar"><div class="macro-progress-fill" style="width:'+protPct+'%;"></div></div>'
@@ -1402,7 +1402,7 @@ function saveMacroTarget(key) {
   closeMacroEdit(); renderMealsSection();
 }
 function closeMacroEdit() { var p=document.getElementById('macroEditPopup'); if(p) p.remove(); }
-function openMacroEdit(id) { editMacroTarget('calories'); }
+function openMacroEdit(id) { editMacroTarget(\'calories\'); }
 
 // ─── WORKOUTS ───
 function loadWorkouts() { return load('ascend_workouts', DEFAULT_WORKOUTS); }
