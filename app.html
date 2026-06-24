@@ -1288,6 +1288,61 @@ function deleteStaple(i) {
   document.getElementById('manageStaplesPopup').remove();
   openManageStaples();
 }
+var _usdaTimer = null;
+function usdaSearch(query) {
+  var drop = document.getElementById('usdaDrop');
+  if (drop) drop.remove();
+  if (!query || query.length < 2) return;
+  clearTimeout(_usdaTimer);
+  _usdaTimer = setTimeout(function() {
+    var url = 'https://api.nal.usda.gov/fdc/v1/foods/search?query='+encodeURIComponent(query)+'&pageSize=6&api_key=DEMO_KEY&dataType=SR%20Legacy,Foundation';
+    fetch(url).then(function(r){return r.json();}).then(function(data){
+      var inp = document.getElementById('afFoodName');
+      if (!inp) return;
+      var ex = document.getElementById('usdaDrop'); if(ex) ex.remove();
+      if (!data.foods || !data.foods.length) return;
+      var wrap = inp.parentElement;
+      wrap.style.position = 'relative';
+      var dd = document.createElement('div');
+      dd.id = 'usdaDrop';
+      dd.style.cssText = 'position:absolute;left:0;right:0;top:100%;background:#13131f;border:1px solid var(--border);border-radius:10px;z-index:1100;max-height:220px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.5);';
+      data.foods.forEach(function(f) {
+        var nuts = f.foodNutrients || [];
+        var cal=0,pro=0,carb=0;
+        nuts.forEach(function(n){
+          if(n.nutrientId===1008) cal=Math.round(n.value||0);
+          if(n.nutrientId===1003) pro=Math.round((n.value||0)*10)/10;
+          if(n.nutrientId===1005) carb=Math.round((n.value||0)*10)/10;
+        });
+        if(!cal) return;
+        var item = document.createElement('div');
+        item.style.cssText = 'padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);';
+        item.innerHTML = '<div style="font-size:12px;color:var(--text);font-weight:600;">'+f.description+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">'+cal+' kcal · '+pro+'g pro · '+carb+'g carbs</div>';
+        item.addEventListener('mousedown', function() {
+          var ni=document.getElementById('afFoodName');
+          var ci=document.getElementById('afCal');
+          var pi=document.getElementById('afPro');
+          var ai=document.getElementById('afAmount');
+          if(ni) ni.value = f.description;
+          var amt = parseFloat(ai ? ai.value : 100) || 100;
+          if(ci) ci.value = Math.round(cal * amt / 100);
+          if(pi) pi.value = Math.round(pro * amt / 100 * 10) / 10;
+          if(ai) ai.oninput = function() {
+            var a = parseFloat(this.value)||0;
+            if(ci) ci.value = Math.round(cal*a/100);
+            if(pi) pi.value = Math.round(pro*a/100*10)/10;
+          };
+          var d=document.getElementById('usdaDrop'); if(d) d.remove();
+        });
+        item.addEventListener('mouseover',function(){this.style.background='rgba(255,255,255,0.04)';});
+        item.addEventListener('mouseout',function(){this.style.background='';});
+        dd.appendChild(item);
+      });
+      if(dd.children.length) wrap.appendChild(dd);
+    }).catch(function(){});
+  }, 350);
+}
+
 function openAddFoodPopup() {
   var staples = loadStaples();
   var popup = document.createElement('div');
@@ -1305,7 +1360,7 @@ function openAddFoodPopup() {
     +'</div></div>'
     +'<div style="height:1px;background:var(--border);margin:12px 0;"></div>'
     +'<div style="margin-bottom:10px;">'
-    +'<input id="afFoodName" type="text" placeholder="Food name..." style="width:100%;background:var(--input-bg,#1a1a2e);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;" />'
+    +'<input id="afFoodName" type="text" placeholder="Food name..." autocomplete="off" oninput="usdaSearch(this.value)" style="width:100%;background:var(--input-bg,#1a1a2e);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;" />'
     +'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">'
     +'<div><div style="font-size:10px;color:var(--t3);margin-bottom:4px;">AMOUNT (g)</div>'
