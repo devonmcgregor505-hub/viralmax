@@ -1181,7 +1181,7 @@ function openManageStaples() {
     box.innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#fff;margin-bottom:16px;">Manage Staples</div>'
       + rows
       +'<div style="margin-top:14px;display:flex;gap:6px;">'
-      +'<input id="msName" type="text" placeholder="Name" style="flex:2;background:#1e1e30;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;padding:7px 9px;outline:none;min-width:0;"/>'
+      +'<div style="flex:2;position:relative;min-width:0;"><input id="msName" type="text" placeholder="Food name..." autocomplete="off" oninput="msSearchFood(this.value)" style="width:100%;background:#1e1e30;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;padding:7px 9px;outline:none;box-sizing:border-box;"/></div>'
       +'<input id="msCal" type="number" placeholder="kcal" style="flex:1;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:8px;color:#eab308;font-size:12px;padding:7px 6px;outline:none;text-align:center;min-width:0;"/>'
       +'<input id="msPro" type="number" placeholder="pro" style="flex:1;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;color:#22c55e;font-size:12px;padding:7px 6px;outline:none;text-align:center;min-width:0;"/>'
       +'</div>'
@@ -1195,6 +1195,37 @@ function openManageStaples() {
   document.body.appendChild(popup);
   popup.addEventListener('click', function(){ popup.remove(); });
 }
+function msSearchFood(query) {
+  var existing = document.getElementById('msDrop');
+  if (existing) existing.remove();
+  if (!query || query.length < 2) return;
+  var q = query.toLowerCase();
+  var results = WHOLE_FOOD_DB.filter(function(f){ return f.n.toLowerCase().indexOf(q) !== -1; }).slice(0, 8);
+  var inp = document.getElementById('msName');
+  if (!inp || !results.length) return;
+  var wrap = inp.parentElement;
+  var dd = document.createElement('div');
+  dd.id = 'msDrop';
+  dd.style.cssText = 'position:absolute;left:0;right:0;top:100%;background:#13131f;border:1px solid rgba(255,255,255,0.12);border-radius:10px;z-index:1200;max-height:200px;overflow-y:auto;margin-top:3px;box-shadow:0 8px 24px rgba(0,0,0,0.6);';
+  results.forEach(function(f) {
+    var item = document.createElement('div');
+    item.style.cssText = 'padding:8px 11px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);';
+    item.innerHTML = '<div style="font-size:12px;color:#fff;font-weight:600;">'+f.n+'</div><div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;">'+f.cal+' kcal · '+f.pro+'g pro per 100g</div>';
+    item.addEventListener('mousedown', function() {
+      document.getElementById('msName').value = f.n;
+      var ci = document.getElementById('msCal');
+      var pi = document.getElementById('msPro');
+      if (ci) ci.value = f.cal;
+      if (pi) pi.value = f.pro;
+      var d = document.getElementById('msDrop'); if (d) d.remove();
+    });
+    item.addEventListener('mouseover', function(){ this.style.background='rgba(255,255,255,0.05)'; });
+    item.addEventListener('mouseout', function(){ this.style.background=''; });
+    dd.appendChild(item);
+  });
+  wrap.appendChild(dd);
+}
+
 function addStaple() {
   var n=(document.getElementById('msName').value||'').trim();
   var c=parseFloat(document.getElementById('msCal').value)||0;
