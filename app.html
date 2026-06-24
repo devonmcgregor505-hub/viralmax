@@ -1406,7 +1406,7 @@ function renderTrainingSection() {
           +'</div>'
           +'<div style="flex:1;"></div>'
           +'<div class="exercise-weight" style="width:120px;justify-content:flex-end;"><span class="exercise-weight-label">Starter</span><input class="exercise-weight-input" type="text" value="'+prev+'" size="'+(String(prev).length||1)+'" style="width:auto;border-color:var(--border-y);color:var(--y);" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'previous\',parseFloat(this.value)||0)"/></div>'
-          +'<div class="exercise-weight" style="width:100px;justify-content:flex-end;"><span class="exercise-weight-label">Progress</span><input class="exercise-weight-input" type="text" value="'+curr+'" size="'+(String(curr).length||1)+'" style="width:auto;border-color:rgba(34,197,94,0.25);color:#22c55e;" readonly/></div>'
+          +'<div class="exercise-weight" style="width:100px;justify-content:flex-end;"><span class="exercise-weight-label">Progress</span><input class="exercise-weight-input" type="text" value="'+curr+'" size="'+(String(curr).length||1)+'" style="width:auto;border-color:rgba(34,197,94,0.25);color:#22c55e;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',parseFloat(this.value)||0)"/></div>'
           +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
           +'</div>';
       });
