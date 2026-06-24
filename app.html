@@ -1291,18 +1291,33 @@ function openAddFoodPopup() {
 function selectStaple(i) {
   var s = loadStaples()[i];
   if (!s) return;
+  // check if this food exists in DB to get qty flag
+  var dbMatch = WHOLE_FOOD_DB.filter(function(f){ return f.n.toLowerCase() === s.name.toLowerCase(); })[0];
+  var isQty = (dbMatch && dbMatch.qty) || s.unit === 'x';
+  var al = document.getElementById('afAmountLbl');
+  var ai = document.getElementById('afAmount');
   document.getElementById('afFoodName').value = s.name;
-  var amt = parseFloat(document.getElementById('afAmount').value) || 100;
-  var mul = s.unit === 'x' ? amt : amt / 100;
-  document.getElementById('afCal').value = Math.round(s.cal * mul);
-  document.getElementById('afPro').value = Math.round(s.pro * mul * 10) / 10;
-  // recalc on amount change
-  document.getElementById('afAmount').oninput = function() {
-    var a = parseFloat(this.value) || 0;
-    var m = s.unit === 'x' ? a : a / 100;
-    document.getElementById('afCal').value = Math.round(s.cal * m);
-    document.getElementById('afPro').value = Math.round(s.pro * m * 10) / 10;
-  };
+  if (isQty) {
+    if (al) al.textContent = 'QTY';
+    if (ai) ai.value = 1;
+    document.getElementById('afCal').value = Math.round(s.cal);
+    document.getElementById('afPro').value = Math.round(s.pro * 10) / 10;
+    if (ai) ai.oninput = function() {
+      var a = parseFloat(this.value) || 0;
+      document.getElementById('afCal').value = Math.round(s.cal * a);
+      document.getElementById('afPro').value = Math.round(s.pro * a * 10) / 10;
+    };
+  } else {
+    if (al) al.textContent = 'AMOUNT (g)';
+    if (ai) ai.value = 100;
+    document.getElementById('afCal').value = Math.round(s.cal);
+    document.getElementById('afPro').value = Math.round(s.pro * 10) / 10;
+    if (ai) ai.oninput = function() {
+      var a = parseFloat(this.value) || 0;
+      document.getElementById('afCal').value = Math.round(s.cal * a / 100);
+      document.getElementById('afPro').value = Math.round(s.pro * a / 100 * 10) / 10;
+    };
+  }
 }
 function confirmAddFood() {
   var name = (document.getElementById('afFoodName').value || '').trim();
