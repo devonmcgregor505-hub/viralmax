@@ -1255,7 +1255,7 @@ function openAddFoodPopup() {
     +'</div>'
     +'<div style="display:flex;gap:8px;">'
     +'<button onclick="confirmAddFood()" style="flex:1;background:var(--grad);border:none;border-radius:10px;color:#000;font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Log It</button>'
-    +'<button onclick="document.getElementById('addFoodPopup').remove()" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t3);font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Cancel</button>'
+    +'<button onclick="document.getElementById(\'addFoodPopup\').remove()" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t3);font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Cancel</button>'
     +'</div></div>';
   document.body.appendChild(popup);
   popup.addEventListener('click', function(e){ if(e.target===popup) popup.remove(); });
