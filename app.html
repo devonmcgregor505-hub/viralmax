@@ -2795,6 +2795,9 @@ async function loadFromCloud() {
     if(d.settings)   save('ascend_settings',d.settings);
     if(d.checkins)   save('ascend_checkins',d.checkins);
     if(d.reminders)  save(REMINDERS_KEY,d.reminders);
+    if(d.food_log)   save('ascend_food_log',d.food_log);
+    if(d.staples && d.staples.length) save('ascend_staples',d.staples);
+    if(d.nutrient_targets) save('ascend_nutrient_targets',d.nutrient_targets);
     if(d.checklist && d.checklist.date){
       var dk=new Date(); var todayStr=dk.getFullYear()+'-'+String(dk.getMonth()+1).padStart(2,'0')+'-'+String(dk.getDate()).padStart(2,'0');
       if(d.checklist.date===todayStr){
