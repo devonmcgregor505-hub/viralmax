@@ -1278,14 +1278,14 @@ function addStaple() {
   var staples = loadStaples();
   staples.push({id:'custom_'+Date.now(), name:name, cal:cal, pro:pro, fat:0});
   saveStaples(staples);
-  document.getElementById(\'manageStaplesPopup\').remove();
+  document.getElementById('manageStaplesPopup').remove();
   openManageStaples();
 }
 function deleteStaple(i) {
   var staples = loadStaples();
   staples.splice(i,1);
   saveStaples(staples);
-  document.getElementById(\'manageStaplesPopup\').remove();
+  document.getElementById('manageStaplesPopup').remove();
   openManageStaples();
 }
 function openAddFoodPopup() {
