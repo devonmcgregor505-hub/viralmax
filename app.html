@@ -1198,8 +1198,20 @@ function saveStaples(s) { save('ascend_staples', s); }
 function loadFoodLog() {
   var all = load('ascend_food_log', {});
   var today = new Date().toISOString().slice(0,10);
-  if (!all[today]) all[today] = [];
+  // Keep only today — wipe everything else
+  if (!all[today]) all = {};
+  all[today] = all[today] || [];
+  save('ascend_food_log', all);
   return all;
+}
+function scheduleMidnightReset() {
+  var now = new Date();
+  var msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 5) - now;
+  setTimeout(function() {
+    save('ascend_food_log', {});
+    renderMealsSection();
+    scheduleMidnightReset();
+  }, msUntilMidnight);
 }
 function saveFoodLog(all) { save('ascend_food_log', all); syncSection('food_log', all); }
 function getTodayLog() {
