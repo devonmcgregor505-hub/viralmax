@@ -2722,7 +2722,21 @@ function showPage(name,linkEl) {
     });
   }
   localStorage.setItem('ascend_page',name);
-  if(name==='nutrition'){renderMacros();renderMealsSection();}
+  if(name==='nutrition'){
+    renderMacros(); renderMealsSection();
+    // Pull latest food log from Supabase so all devices stay in sync
+    var uid = localStorage.getItem('ascend_user_id');
+    if(uid && window._sb) {
+      window._sb.from('user_data').select('food_log,staples,nutrient_targets').eq('user_id',uid).single().then(function(res){
+        if(res.data) {
+          if(res.data.food_log) { save('ascend_food_log', res.data.food_log); }
+          if(res.data.staples && res.data.staples.length) { save('ascend_staples', res.data.staples); }
+          if(res.data.nutrient_targets) { save('ascend_nutrient_targets', res.data.nutrient_targets); }
+          renderMacros(); renderMealsSection();
+        }
+      });
+    }
+  }
   if(name==='training'){renderTrainingSection();renderWeightCards();}
   if(name==='progress'){renderLMG();renderProgressPhotos();}
 }
