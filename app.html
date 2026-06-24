@@ -918,7 +918,7 @@ var DEFAULT_STAPLES = [
 function loadStaples() { return load('ascend_staples', DEFAULT_STAPLES); }
 function saveStaples(s) { save('ascend_staples', s); syncSection('staples', s); }
 function loadMealTemplate() { return load('ascend_meal_template', []); }
-function saveMealTemplate(items) { save('ascend_meal_template', items); }
+function saveMealTemplate(items) { save('ascend_meal_template', items); syncSection('meal_template', items); }
 function loadFoodLog() {
   var all = load('ascend_food_log', {});
   var today = new Date().toISOString().slice(0,10);
@@ -2727,11 +2727,12 @@ function showPage(name,linkEl) {
     // Pull latest food log from Supabase so all devices stay in sync
     var uid = localStorage.getItem('ascend_user_id');
     if(uid && window._sb) {
-      window._sb.from('user_data').select('food_log,staples,nutrient_targets').eq('user_id',uid).single().then(function(res){
+      window._sb.from('user_data').select('food_log,staples,nutrient_targets,meal_template').eq('user_id',uid).single().then(function(res){
         if(res.data) {
           if(res.data.food_log) { save('ascend_food_log', res.data.food_log); }
           if(res.data.staples && res.data.staples.length) { save('ascend_staples', res.data.staples); }
           if(res.data.nutrient_targets) { save('ascend_nutrient_targets', res.data.nutrient_targets); }
+          if(res.data.meal_template) { save('ascend_meal_template', res.data.meal_template); }
           renderMacros(); renderMealsSection();
         }
       });
@@ -2798,6 +2799,7 @@ async function loadFromCloud() {
     if(d.food_log)   save('ascend_food_log',d.food_log);
     if(d.staples && d.staples.length) save('ascend_staples',d.staples);
     if(d.nutrient_targets) save('ascend_nutrient_targets',d.nutrient_targets);
+    if(d.meal_template) save('ascend_meal_template',d.meal_template);
     if(d.checklist && d.checklist.date){
       var dk=new Date(); var todayStr=dk.getFullYear()+'-'+String(dk.getMonth()+1).padStart(2,'0')+'-'+String(dk.getDate()).padStart(2,'0');
       if(d.checklist.date===todayStr){
