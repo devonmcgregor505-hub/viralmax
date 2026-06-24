@@ -916,7 +916,7 @@ var DEFAULT_STAPLES = [
   {id:'tallow',name:'Tallow',cal:902,pro:0,fat:100}
 ];
 function loadStaples() { return load('ascend_staples', DEFAULT_STAPLES); }
-function saveStaples(s) { save('ascend_staples', s); }
+function saveStaples(s) { save('ascend_staples', s); syncSection('staples', s); }
 function loadMealTemplate() { return load('ascend_meal_template', []); }
 function saveMealTemplate(items) { save('ascend_meal_template', items); }
 function loadFoodLog() {
@@ -1599,7 +1599,7 @@ function editMacroTarget(key) {
 }
 function saveMacroTarget(key) {
   var val=parseInt(document.getElementById('met-val').value);
-  if(!isNaN(val)&&val>0){ var c=load('ascend_nutrient_targets',{}); c[key]=val; save('ascend_nutrient_targets',c); }
+  if(!isNaN(val)&&val>0){ var c=load('ascend_nutrient_targets',{}); c[key]=val; save('ascend_nutrient_targets',c); syncSection('nutrient_targets',c); }
   closeMacroEdit(); renderMealsSection();
 }
 function closeMacroEdit() { var p=document.getElementById('macroEditPopup'); if(p) p.remove(); }
@@ -3537,6 +3537,12 @@ function obApplyAndFinish(data) {
     }
     // Bodyweight
     if (data.bodyweight) { save('ascend_bodyweight', data.bodyweight); syncSection('bodyweight', data.bodyweight); }
+    // Food log
+    if (data.food_log) { save('ascend_food_log', data.food_log); }
+    // Staples
+    if (data.staples && data.staples.length) { save('ascend_staples', data.staples); }
+    // Nutrient targets
+    if (data.nutrient_targets) { save('ascend_nutrient_targets', data.nutrient_targets); }
   }
 
   // Completion screen
