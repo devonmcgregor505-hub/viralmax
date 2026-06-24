@@ -1034,9 +1034,9 @@ var WHOLE_FOOD_DB = [
   {n:'Scallops',cal:88,pro:17},
   {n:'Squid',cal:92,pro:16},
   // ── Eggs & dairy ──
-  {n:'Whole egg',cal:155,pro:13},
-  {n:'Egg white',cal:52,pro:11},
-  {n:'Egg yolk',cal:322,pro:16},
+  {n:'Whole egg',cal:72,pro:6,qty:true},
+  {n:'Egg white',cal:17,pro:4,qty:true},
+  {n:'Egg yolk',cal:55,pro:3,qty:true},
   {n:'Whole milk',cal:61,pro:3},
   {n:'Skim milk',cal:34,pro:3},
   {n:'Greek yoghurt (full fat)',cal:97,pro:9},
@@ -1078,18 +1078,18 @@ var WHOLE_FOOD_DB = [
   {n:'Sunflower seeds',cal:584,pro:21},
   {n:'Chia seeds',cal:486,pro:17},
   // ── Fruit ──
-  {n:'Banana',cal:89,pro:1},
-  {n:'Apple',cal:52,pro:0},
-  {n:'Orange',cal:47,pro:1},
+  {n:'Banana',cal:105,pro:1,qty:true},
+  {n:'Apple',cal:95,pro:0,qty:true},
+  {n:'Orange',cal:62,pro:1,qty:true},
   {n:'Blueberries',cal:57,pro:1},
   {n:'Strawberries',cal:32,pro:1},
   {n:'Grapes',cal:69,pro:1},
-  {n:'Mango',cal:60,pro:1},
-  {n:'Avocado',cal:160,pro:2},
-  {n:'Kiwifruit',cal:61,pro:1},
+  {n:'Mango',cal:202,pro:3,qty:true},
+  {n:'Avocado',cal:240,pro:3,qty:true},
+  {n:'Kiwifruit',cal:42,pro:1,qty:true},
   {n:'Watermelon',cal:30,pro:1},
   {n:'Pineapple',cal:50,pro:1},
-  {n:'Dates',cal:282,pro:2},
+  {n:'Dates',cal:20,pro:0,qty:true},
   // ── Vegetables ──
   {n:'Broccoli',cal:34,pro:3},
   {n:'Spinach',cal:23,pro:3},
@@ -1142,15 +1142,29 @@ function wholeFoodSearch(query) {
       var ci=document.getElementById('afCal');
       var pi=document.getElementById('afPro');
       var ai=document.getElementById('afAmount');
+      var al=document.getElementById('afAmountLbl');
       if(ni) ni.value = f.n;
-      var amt = parseFloat(ai ? ai.value : 100) || 100;
-      if(ci) ci.value = Math.round(f.cal * amt / 100);
-      if(pi) pi.value = Math.round(f.pro * amt / 100 * 10) / 10;
-      if(ai) ai.oninput = function() {
-        var a = parseFloat(this.value)||0;
-        if(ci) ci.value = Math.round(f.cal*a/100);
-        if(pi) pi.value = Math.round(f.pro*a/100*10)/10;
-      };
+      if(f.qty) {
+        if(al) al.textContent = 'QTY';
+        if(ai) ai.value = 1;
+        if(ci) ci.value = Math.round(f.cal * 1);
+        if(pi) pi.value = Math.round(f.pro * 1 * 10) / 10;
+        if(ai) ai.oninput = function() {
+          var a = parseFloat(this.value)||0;
+          if(ci) ci.value = Math.round(f.cal*a);
+          if(pi) pi.value = Math.round(f.pro*a*10)/10;
+        };
+      } else {
+        if(al) al.textContent = 'AMOUNT (g)';
+        if(ai) ai.value = 100;
+        if(ci) ci.value = Math.round(f.cal * 100 / 100);
+        if(pi) pi.value = Math.round(f.pro * 100 / 100 * 10) / 10;
+        if(ai) ai.oninput = function() {
+          var a = parseFloat(this.value)||0;
+          if(ci) ci.value = Math.round(f.cal*a/100);
+          if(pi) pi.value = Math.round(f.pro*a/100*10)/10;
+        };
+      }
       var d=document.getElementById('foodDrop'); if(d) d.remove();
     });
     item.addEventListener('mouseover',function(){this.style.background='rgba(255,255,255,0.04)';});
@@ -1256,10 +1270,10 @@ function openAddFoodPopup() {
     +'</div></div>'
     +'<div style="height:1px;background:var(--border);margin:12px 0;"></div>'
     +'<div style="margin-bottom:10px;">'
-    +'<input id="afFoodName" type="text" placeholder="Food name..." autocomplete="off" oninput="wholeFoodSearch(this.value)" style="width:100%;background:var(--input-bg,#1a1a2e);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;" />'
+    +'<input id="afFoodName" type="text" placeholder="Food" readonly style="width:100%;background:var(--input-bg,#1a1a2e);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;cursor:default;" />'
     +'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">'
-    +'<div><div style="font-size:10px;color:var(--t3);margin-bottom:4px;">AMOUNT (g)</div>'
+    +'<div><div id="afAmountLbl" style="font-size:10px;color:var(--t3);margin-bottom:4px;">AMOUNT (g)</div>'
     +'<input id="afAmount" type="number" min="0" value="100" style="width:100%;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-size:14px;font-weight:700;padding:6px 8px;outline:none;box-sizing:border-box;text-align:center;" /></div>'
     +'<div><div style="font-size:10px;color:var(--t3);margin-bottom:4px;">KCAL</div>'
     +'<input id="afCal" type="number" min="0" value="0" style="width:100%;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-size:14px;font-weight:700;padding:6px 8px;outline:none;box-sizing:border-box;text-align:center;" /></div>'
