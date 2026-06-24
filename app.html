@@ -1240,54 +1240,9 @@ function calcTodayNutrients() {
   return {calories:cal, protein:pro};
 }
 
-function openManageStaples() {
-  var staples = loadStaples();
-  var popup = document.createElement('div');
-  popup.id = 'manageStaplesPopup';
-  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1001;display:flex;align-items:center;justify-content:center;';
-  function render() {
-    staples = loadStaples();
-    popup.innerHTML = '<div style="background:#13131f;border:1px solid var(--border);border-radius:16px;padding:24px;width:340px;max-width:95vw;">'
-      +'<div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:var(--text);margin-bottom:14px;">Manage Staples</div>'
-      +staples.map(function(s,i){
-        return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
-          +'<div style="flex:1;font-size:13px;color:var(--text);">'+s.name+'</div>'
-          +'<div style="font-size:11px;color:var(--t3);">'+s.cal+'kcal &middot; '+s.pro+'g pro</div>'
-          +'<button onclick="deleteStaple('+i+')" style="background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;opacity:0.5;">✕</button>'
-          +'</div>';
-      }).join('')
-      +'<div style="margin-top:14px;display:grid;grid-template-columns:1fr 80px 70px 70px;gap:6px;align-items:center;">'
-      +'<input id="msName" type="text" placeholder="Food name" style="background:#1e1e30;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:6px 8px;outline:none;" />'
-      +'<input id="msCal" type="number" placeholder="kcal" style="background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-size:12px;padding:6px 8px;outline:none;text-align:center;" />'
-      +'<input id="msPro" type="number" placeholder="pro g" style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:8px;color:#22c55e;font-size:12px;padding:6px 8px;outline:none;text-align:center;" />'
-      +'<button onclick="addStaple()" style="background:var(--grad);border:none;border-radius:8px;color:#000;font-weight:700;font-size:12px;padding:6px;cursor:pointer;">Add</button>'
-      +'</div>'
-      +'<div style="font-size:10px;color:var(--t3);margin-top:4px;">Per 100g (or per unit for eggs)</div>'
-      +'<button onclick="document.getElementById(\'manageStaplesPopup\').remove()" style="margin-top:14px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t3);font-family:Bebas Neue,sans-serif;font-size:15px;padding:9px;cursor:pointer;">Done</button>'
-      +'</div>';
-  }
-  render();
-  document.body.appendChild(popup);
-  popup.addEventListener('click', function(e){ if(e.target===popup) popup.remove(); });
-}
-function addStaple() {
-  var name = (document.getElementById('msName').value||'').trim();
-  var cal = parseFloat(document.getElementById('msCal').value)||0;
-  var pro = parseFloat(document.getElementById('msPro').value)||0;
-  if (!name) return;
-  var staples = loadStaples();
-  staples.push({id:'custom_'+Date.now(), name:name, cal:cal, pro:pro, fat:0});
-  saveStaples(staples);
-  document.getElementById('manageStaplesPopup').remove();
-  openManageStaples();
-}
-function deleteStaple(i) {
-  var staples = loadStaples();
-  staples.splice(i,1);
-  saveStaples(staples);
-  document.getElementById('manageStaplesPopup').remove();
-  openManageStaples();
-}
+
+
+
 var _usdaTimer = null;
 function usdaSearch(query) {
   var drop = document.getElementById('usdaDrop');
@@ -1341,6 +1296,54 @@ function usdaSearch(query) {
       if(dd.children.length) wrap.appendChild(dd);
     }).catch(function(){});
   }, 350);
+}
+
+function openManageStaples() {
+  var existing = document.getElementById('manageStaplesPopup');
+  if (existing) existing.remove();
+  var popup = document.createElement('div');
+  popup.id = 'manageStaplesPopup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1002;display:flex;align-items:center;justify-content:center;';
+  function rebuild() {
+    var staples = loadStaples();
+    popup.innerHTML = '';
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#13131f;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:360px;max-width:95vw;max-height:85vh;overflow-y:auto;';
+    var rows = staples.map(function(s,i){
+      return '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06);">'
+        +'<div style="flex:1;font-size:13px;color:#fff;font-weight:600;">'+s.name+'</div>'
+        +'<div style="font-size:11px;color:rgba(255,255,255,0.4);">'+s.cal+'kcal &middot; '+s.pro+'g</div>'
+        +'<button onclick="deleteStaple('+i+')" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:20px;cursor:pointer;padding:0 4px;">&times;</button>'
+        +'</div>';
+    }).join('');
+    box.innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:#fff;margin-bottom:16px;">Manage Staples</div>'
+      + rows
+      +'<div style="margin-top:14px;display:flex;gap:6px;">'
+      +'<input id="msName" type="text" placeholder="Name" style="flex:2;background:#1e1e30;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;padding:7px 9px;outline:none;min-width:0;"/>'
+      +'<input id="msCal" type="number" placeholder="kcal" style="flex:1;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:8px;color:#eab308;font-size:12px;padding:7px 6px;outline:none;text-align:center;min-width:0;"/>'
+      +'<input id="msPro" type="number" placeholder="pro" style="flex:1;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;color:#22c55e;font-size:12px;padding:7px 6px;outline:none;text-align:center;min-width:0;"/>'
+      +'</div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px;margin-bottom:12px;">Per 100g</div>'
+      +'<button onclick="addStaple()" style="width:100%;background:linear-gradient(90deg,#f59e0b,#eab308);border:none;border-radius:10px;color:#000;font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;margin-bottom:8px;">Add Staple</button>'
+      +'<button onclick="document.getElementById(\'manageStaplesPopup\').remove()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.4);font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Done</button>';
+    popup.appendChild(box);
+    box.addEventListener('click', function(e){ e.stopPropagation(); });
+  }
+  rebuild();
+  document.body.appendChild(popup);
+  popup.addEventListener('click', function(){ popup.remove(); });
+}
+function addStaple() {
+  var n=(document.getElementById('msName').value||'').trim();
+  var c=parseFloat(document.getElementById('msCal').value)||0;
+  var p=parseFloat(document.getElementById('msPro').value)||0;
+  if(!n) return;
+  var s=loadStaples(); s.push({id:'c'+Date.now(),name:n,cal:c,pro:p,fat:0}); saveStaples(s);
+  document.getElementById('manageStaplesPopup').remove(); openManageStaples();
+}
+function deleteStaple(i) {
+  var s=loadStaples(); s.splice(i,1); saveStaples(s);
+  document.getElementById('manageStaplesPopup').remove(); openManageStaples();
 }
 
 function openAddFoodPopup() {
