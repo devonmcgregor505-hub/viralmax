@@ -1185,6 +1185,109 @@ function updateFoodAmount(mealId, bi, amount) {
   }, 600);
 }
 
+
+// ─── FOOD LOG ───
+var DEFAULT_STAPLES = [
+  {id:'chuck',name:'Chuck steak',cal:250,pro:22,fat:18},
+  {id:'egg',name:'Egg',cal:155,pro:13,fat:11,unit:'x'},
+  {id:'rice',name:'White rice cooked',cal:130,pro:2.7,fat:0.3},
+  {id:'tallow',name:'Tallow',cal:902,pro:0,fat:100}
+];
+function loadStaples() { return load('ascend_staples', DEFAULT_STAPLES); }
+function saveStaples(s) { save('ascend_staples', s); }
+function loadFoodLog() {
+  var all = load('ascend_food_log', {});
+  var today = new Date().toISOString().slice(0,10);
+  if (!all[today]) all[today] = [];
+  return all;
+}
+function saveFoodLog(all) { save('ascend_food_log', all); syncSection('food_log', all); }
+function getTodayLog() {
+  var all = loadFoodLog();
+  var today = new Date().toISOString().slice(0,10);
+  return all[today] || [];
+}
+function addFoodEntry(entry) {
+  var all = loadFoodLog();
+  var today = new Date().toISOString().slice(0,10);
+  if (!all[today]) all[today] = [];
+  all[today].push(entry);
+  saveFoodLog(all);
+}
+function deleteFoodEntry(idx) {
+  var all = loadFoodLog();
+  var today = new Date().toISOString().slice(0,10);
+  if (all[today]) all[today].splice(idx, 1);
+  saveFoodLog(all);
+  renderMealsSection();
+}
+function calcTodayNutrients() {
+  var log = getTodayLog();
+  var cal = 0, pro = 0;
+  log.forEach(function(e){ cal += e.calories||0; pro += e.protein||0; });
+  return {calories:cal, protein:pro};
+}
+function openAddFoodPopup() {
+  var staples = loadStaples();
+  var popup = document.createElement('div');
+  popup.id = 'addFoodPopup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;';
+  popup.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:340px;max-width:95vw;">'
+    +'<div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--text);margin-bottom:16px;">Add Food</div>'
+    +'<div style="margin-bottom:12px;">'
+    +'<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Your Staples</div>'
+    +'<div id="staplesList" style="display:flex;flex-wrap:wrap;gap:6px;">'
+    +staples.map(function(s,i){
+      return '<button onclick="selectStaple('+i+')" style="background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;">'+s.name+'</button>';
+    }).join('')
+    +'</div></div>'
+    +'<div style="height:1px;background:var(--border);margin:12px 0;"></div>'
+    +'<div style="margin-bottom:10px;">'
+    +'<input id="afFoodName" type="text" placeholder="Food name..." style="width:100%;background:var(--input-bg,#1a1a2e);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;box-sizing:border-box;" />'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">'
+    +'<div><div style="font-size:10px;color:var(--t3);margin-bottom:4px;">AMOUNT (g)</div>'
+    +'<input id="afAmount" type="number" min="0" value="100" style="width:100%;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-size:14px;font-weight:700;padding:6px 8px;outline:none;box-sizing:border-box;text-align:center;" /></div>'
+    +'<div><div style="font-size:10px;color:var(--t3);margin-bottom:4px;">KCAL</div>'
+    +'<input id="afCal" type="number" min="0" value="0" style="width:100%;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-size:14px;font-weight:700;padding:6px 8px;outline:none;box-sizing:border-box;text-align:center;" /></div>'
+    +'<div><div style="font-size:10px;color:rgba(34,197,94,0.8);margin-bottom:4px;">PROTEIN (g)</div>'
+    +'<input id="afPro" type="number" min="0" value="0" style="width:100%;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:8px;color:#22c55e;font-size:14px;font-weight:700;padding:6px 8px;outline:none;box-sizing:border-box;text-align:center;" /></div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;">'
+    +'<button onclick="confirmAddFood()" style="flex:1;background:var(--grad);border:none;border-radius:10px;color:#000;font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Log It</button>'
+    +'<button onclick="document.getElementById('addFoodPopup').remove()" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t3);font-family:Bebas Neue,sans-serif;font-size:16px;padding:10px;cursor:pointer;">Cancel</button>'
+    +'</div></div>';
+  document.body.appendChild(popup);
+  popup.addEventListener('click', function(e){ if(e.target===popup) popup.remove(); });
+  document.getElementById('afFoodName').focus();
+}
+function selectStaple(i) {
+  var s = loadStaples()[i];
+  if (!s) return;
+  document.getElementById('afFoodName').value = s.name;
+  var amt = parseFloat(document.getElementById('afAmount').value) || 100;
+  var mul = s.unit === 'x' ? amt : amt / 100;
+  document.getElementById('afCal').value = Math.round(s.cal * mul);
+  document.getElementById('afPro').value = Math.round(s.pro * mul * 10) / 10;
+  // recalc on amount change
+  document.getElementById('afAmount').oninput = function() {
+    var a = parseFloat(this.value) || 0;
+    var m = s.unit === 'x' ? a : a / 100;
+    document.getElementById('afCal').value = Math.round(s.cal * m);
+    document.getElementById('afPro').value = Math.round(s.pro * m * 10) / 10;
+  };
+}
+function confirmAddFood() {
+  var name = (document.getElementById('afFoodName').value || '').trim();
+  if (!name) { document.getElementById('afFoodName').focus(); return; }
+  var cal = parseFloat(document.getElementById('afCal').value) || 0;
+  var pro = parseFloat(document.getElementById('afPro').value) || 0;
+  var amt = parseFloat(document.getElementById('afAmount').value) || 0;
+  var time = new Date().toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit'});
+  addFoodEntry({name:name, calories:cal, protein:pro, amount:amt, time:time});
+  document.getElementById('addFoodPopup').remove();
+  renderMealsSection();
+}
 function renderMealsSection() {
   var el = document.getElementById('mealsSection'); if(!el) return;
   var meals = loadMeals();
