@@ -1735,12 +1735,14 @@ function renderTrainingSection() {
         var b2 = setsHit>=2?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
         var b3 = setsHit>=3?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
         html += '<div class="exercise-row">'
-          +'<div class="ex-row-info">'
+          +'<div class="ex-row-info" style="flex-direction:column;align-items:flex-start;gap:4px;">'
           +'<input class="exercise-name ex-name-input" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);min-width:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
+          +'<div style="display:flex;align-items:center;gap:6px;">'
           +'<input type="text" value="'+(ex.reps||'8-12')+'" class="exercise-weight-input ex-reps-input" style="flex-shrink:0;border-color:var(--border-y);color:var(--y);" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">reps</span>'
           +'<input type="number" min="1" value="'+(ex.sets||3)+'" class="exercise-weight-input ex-sets-input" style="flex-shrink:0;border-color:var(--border-y);color:var(--y);text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',parseInt(this.value)||3)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">sets</span>'
+          +'</div>'
           +'</div>'
           +'<div class="ex-row-actions">'
           +(_trainingInfoVisible ? '<span class="ex-goal-inc">'
