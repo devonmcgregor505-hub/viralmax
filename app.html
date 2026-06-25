@@ -1702,13 +1702,14 @@ function renderTrainingSection() {
         var b2 = setsHit>=2?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
         var b3 = setsHit>=3?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
         html += '<div class="exercise-row" style="flex-wrap:wrap;">'
-          +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:180px;">'
+          +'<div style="display:flex;align-items:center;gap:8px;min-width:0;">'
           +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:160px;min-width:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
           +'<input type="text" value="'+(ex.reps||'8-12')+'" size="'+((ex.reps||'8-12').length||4)+'" class="exercise-weight-input" style="width:auto;flex-shrink:0;border-color:var(--border-y);color:var(--y);" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">reps</span>'
           +'<input type="number" min="1" value="'+(ex.sets||3)+'" class="exercise-weight-input" style="width:36px;flex-shrink:0;border-color:var(--border-y);color:var(--y);text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',parseInt(this.value)||3)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">sets</span>'
           +'</div>'
+          +'<div style="flex:1;"></div>'
           +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',1)" style="width:18px;height:18px;border-radius:4px;background:'+b1+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',2)" style="width:18px;height:18px;border-radius:4px;background:'+b2+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
