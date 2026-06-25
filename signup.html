@@ -14,8 +14,8 @@
   --y:#FFCC00;--y2:#FF9500;--text:#f4f4ff;--t2:#a0a0c8;--t3:#5a5a8a;
   --red:#ef4444;--grn:#22c55e;
 }
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(255,200,0,0.07) 0%,transparent 70%);pointer-events:none;}
 
 .wrap{width:100%;max-width:400px;padding:24px;}

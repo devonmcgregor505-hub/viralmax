@@ -279,7 +279,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .workout-day-arrow{font-size:11px;color:var(--t3);transition:transform .2s;}
 .workout-day-arrow.open{transform:rotate(180deg);}
 .workout-exercises{padding:0 18px 14px;}
-.exercise-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.exercise-row{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
 .exercise-row:last-child{border-bottom:none;}
 .exercise-name{font-size:14px;font-weight:600;color:var(--text);flex:1;}
 .exercise-weight{display:flex;align-items:center;gap:6px;}
@@ -287,6 +287,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .exercise-weight-input{width:auto;min-width:36px;background:var(--yd);border:1px solid var(--border-y);border-radius:8px;color:var(--y);font-family:'Bebas Neue',sans-serif;font-size:18px;padding:4px 6px;outline:none;text-align:center;letter-spacing:1px;transition:all .18s;}
 .exercise-weight-input:focus{border-color:var(--y);background:rgba(255,150,0,0.12);box-shadow:0 0 10px rgba(255,130,0,0.2);}
 .exercise-weight-unit{font-size:11px;color:var(--t2);font-weight:600;}
+.ex-row-info{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;}
+.ex-name-input{width:160px;}
+.ex-row-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.ex-reps-input{width:58px;}
+.ex-sets-input{width:36px;}
+.ex-weight-input{width:58px;}
+.ex-set-box{width:18px;height:18px;border-radius:4px;cursor:pointer;flex-shrink:0;}
+.ex-goal-inc{display:contents;}
+.ex-icon-btn{background:none;border:none;font-size:15px;cursor:pointer;padding:6px 7px;border-radius:6px;color:var(--t4);transition:color .15s,background .15s;line-height:1;flex-shrink:0;}
+.ex-icon-btn:hover{background:rgba(255,255,255,0.07);}
+.ex-del-btn{font-size:13px;}
+.ex-del-btn:hover{color:#ef4444;}
 .workout-add-btn{width:100%;padding:10px;background:transparent;border:1px dashed rgba(255,255,255,0.07);border-radius:10px;color:var(--t2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:10px;}
 .workout-add-btn:hover{border-color:var(--y);color:var(--y);background:var(--yd);}
 
@@ -513,11 +525,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   .macro-val{font-size:24px;}
   .check-item{padding:12px 12px;}
   .check-name{font-size:13px;}
-  .exercise-row{flex-wrap:nowrap;gap:6px;align-items:center;}
+  .exercise-row{gap:6px 10px;padding:10px 0;}
+  .ex-row-info{width:100%;}
+  .ex-row-actions{width:100%;flex-wrap:wrap;}
   .exercise-name{font-size:13px;min-width:0;flex:1;}
+  .ex-name-input{width:auto;flex:1 1 80px;font-size:13px;}
+  .ex-reps-input{width:42px;font-size:15px;padding:4px 3px;}
+  .ex-sets-input{width:30px;font-size:15px;padding:4px 3px;}
+  .ex-weight-input{width:50px;font-size:16px;padding:4px 3px;}
   .exercise-weight{gap:3px;}
   .exercise-weight-label{display:none;}
-  .exercise-weight-input{width:44px;font-size:16px;padding:3px 4px;}
+  .ex-set-box{width:22px;height:22px;}
+  .ex-icon-btn{padding:8px 9px;font-size:16px;}
+  .ex-goal-inc{display:flex;align-items:center;gap:6px;flex-basis:100%;margin-bottom:4px;}
   .exercise-weight-unit{font-size:10px;}
   .topbar{padding:0 10px;gap:4px;}
   .notif-dropdown{right:-8px;left:auto;width:280px;margin:0;}
@@ -526,6 +546,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   .popup-box{padding:20px 16px;border-radius:16px;}
   .day-tabs{gap:3px;}
   .day-tab{padding:5px 9px;font-size:11px;}
+  /* bigger touch targets for small icon buttons */
+  .lmg-del{padding:8px;font-size:13px;}
+  .dp-reorder-btn{width:30px;height:30px;}
+  .dp-del-block{padding:6px 10px;font-size:15px;}
+  .dp-del-step{padding:6px 8px;font-size:13px;}
+  .ri-del{padding:6px 8px;}
+  .notif-dismiss{padding:6px 8px;}
+  .cal-nav{width:36px;height:36px;}
+  .popup-close{width:32px;height:32px;}
+  .upload-slot-remove{width:24px;height:24px;font-size:11px;}
+  .ob-preview-remove{width:24px;height:24px;font-size:11px;}
+  .checkin-block-del{padding:6px 8px;font-size:14px;}
+  #trainingInfoBox{flex:1 1 100%;}
 }
 </style>
 </head>
@@ -600,10 +633,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
     </div>
     <div class="settings-group">
       <div class="settings-label">Current time</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <input class="settings-input" type="date" id="settingDayOfWeek" style="flex:0 0 auto;width:150px;margin:0;" onchange="applyManualTime()"/>
-        <input class="settings-input" type="time" id="settingCurrentTime" style="flex:1;margin:0;" oninput="applyManualTime()"/>
-        <button class="settings-btn" style="flex:0 0 auto;margin:0;white-space:nowrap;" onclick="autoDetectTime()">Auto detect</button>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <input class="settings-input" type="date" id="settingDayOfWeek" style="flex:1 1 130px;min-width:0;margin:0;" onchange="applyManualTime()"/>
+        <input class="settings-input" type="time" id="settingCurrentTime" style="flex:1 1 110px;min-width:0;margin:0;" oninput="applyManualTime()"/>
+        <button class="settings-btn" style="flex:1 1 auto;margin:0;white-space:nowrap;" onclick="autoDetectTime()">Auto detect</button>
       </div>
       <div id="settingLiveTime" style="font-size:28px;font-weight:800;font-family:'Bebas Neue',sans-serif;color:var(--y);"></div>
     </div>
@@ -783,8 +816,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
       <!-- TRAINING PAGE -->
       <div class="panel-page" id="page-training">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;">
-          <div style="display:flex;align-items:center;gap:10px;flex:1;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;flex-wrap:wrap;">
             <div class="section-title">Training</div>
             <button id="trainingInfoBtn" onclick="toggleTrainingInfo()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t2);font-size:11px;font-weight:700;padding:4px 10px;cursor:pointer;font-family:inherit;flex-shrink:0;">info</button>
             <div id="trainingInfoBox" style="display:none;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.6;flex:1;">To build muscle, you need to progressive overload. Set a rep and set range, hit it with your current weight, and do this 3 sessions in a row to automatically jump to the next weight. Each exercise has a custom increment (how much weight to add) and a goal weight to aim for.</div>
@@ -817,8 +850,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
           <div id="progressPhotosWrap"></div>
         </div>
         <!-- UPLOAD MODAL -->
-        <div id="checkinModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:998;backdrop-filter:blur(8px);">
-          <div style="background:var(--bg-card);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:28px;width:90%;max-width:480px;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.7);">
+        <div id="checkinModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:998;backdrop-filter:blur(8px);padding:16px;box-sizing:border-box;">
+          <div style="background:var(--bg-card);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:28px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.7);">
             <button onclick="closeCheckinUpload()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-size:13px;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">✕</button>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2.5px;margin-bottom:4px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">New Check-in</div>
             <div style="font-size:12px;color:var(--t2);margin-bottom:20px;">Upload up to 4 photos for this week</div>
@@ -902,7 +935,7 @@ function editMacro(key) {
 // ─── NUTRIENT TARGETS ───
 function getNutrientTargets() {
   var custom = load('ascend_nutrient_targets', {});
-  var age = parseInt(localStorage.getItem('ascend_ob_age') || '19') || 19;
+  var age = parseInt(load('ascend_settings',{}).age || localStorage.getItem('ascend_ob_age') || '19') || 19;
   return {
     calories: { name:'Calories', unit:'kcal', optimal: custom.calories || (age < 25 ? 2800 : 2500) },
     protein:  { name:'Protein',  unit:'g',    optimal: custom.protein  || (age < 25 ? 180  : 160)  }
@@ -1324,8 +1357,8 @@ function openAddFoodPopup() {
   var staples = loadStaples();
   var popup = document.createElement('div');
   popup.id = 'addFoodPopup';
-  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:flex;align-items:center;justify-content:center;';
-  popup.innerHTML = '<div style="background:#13131f;border:1px solid var(--border);border-radius:16px;padding:24px;width:340px;max-width:95vw;">'
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;';
+  popup.innerHTML = '<div style="background:#13131f;border:1px solid var(--border);border-radius:16px;padding:24px;width:340px;max-width:95vw;max-height:90vh;overflow-y:auto;">'
     +'<div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--text);margin-bottom:16px;">Add Food</div>'
     +'<div style="margin-bottom:12px;">'
     +'<div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Your Staples</div>'
@@ -1701,32 +1734,30 @@ function renderTrainingSection() {
         var b1 = setsHit>=1?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
         var b2 = setsHit>=2?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
         var b3 = setsHit>=3?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
-        html += '<div class="exercise-row" style="flex-wrap:wrap;">'
-          +'<div style="display:flex;align-items:center;gap:8px;min-width:0;">'
-          +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:160px;min-width:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
-          +'<div style="display:flex;flex-direction:column;gap:1px;flex-shrink:0;">'+'</div>'
-          +'<input type="text" value="'+(ex.reps||'8-12')+'" class="exercise-weight-input" style="width:58px;flex-shrink:0;border-color:var(--border-y);color:var(--y);" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
+        html += '<div class="exercise-row">'
+          +'<div class="ex-row-info">'
+          +'<input class="exercise-name ex-name-input" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);min-width:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
+          +'<input type="text" value="'+(ex.reps||'8-12')+'" class="exercise-weight-input ex-reps-input" style="flex-shrink:0;border-color:var(--border-y);color:var(--y);" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">reps</span>'
-          +'<input type="number" min="1" value="'+(ex.sets||3)+'" class="exercise-weight-input" style="width:36px;flex-shrink:0;border-color:var(--border-y);color:var(--y);text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',parseInt(this.value)||3)"/>'
+          +'<input type="number" min="1" value="'+(ex.sets||3)+'" class="exercise-weight-input ex-sets-input" style="flex-shrink:0;border-color:var(--border-y);color:var(--y);text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',parseInt(this.value)||3)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">sets</span>'
           +'</div>'
-          +'<div style="flex:1;"></div>'
-          +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'
-          +(_trainingInfoVisible ? '<span class="exercise-weight-label">goal</span>' : '')
-          +(_trainingInfoVisible ? '<input type="text" value="'+goal+'" size="'+((String(goal).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(244,114,182,0.35);color:#f472b6;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',parseFloat(this.value)||0)"/>' : '')
-          +(_trainingInfoVisible ? '<span class="exercise-weight-label">inc</span>' : '')
-          +(_trainingInfoVisible ? '<input type="text" value="'+increment+'" size="'+((String(increment).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(59,130,246,0.3);color:#60a5fa;margin-right:6px;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'increment\',parseFloat(this.value)||2.5)"/>' : '')
-          +'<div onclick="hitSet(\''+day.id+'\','+ei+',1)" style="width:18px;height:18px;border-radius:4px;background:'+b1+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
-          +'<div onclick="hitSet(\''+day.id+'\','+ei+',2)" style="width:18px;height:18px;border-radius:4px;background:'+b2+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
-          +'<div onclick="hitSet(\''+day.id+'\','+ei+',3)" style="width:18px;height:18px;border-radius:4px;background:'+b3+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
+          +'<div class="ex-row-actions">'
+          +(_trainingInfoVisible ? '<span class="ex-goal-inc">'
+            +'<span class="exercise-weight-label">goal</span>'
+            +'<input type="text" value="'+goal+'" size="'+((String(goal).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(244,114,182,0.35);color:#f472b6;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',parseFloat(this.value)||0)"/>'
+            +'<span class="exercise-weight-label">inc</span>'
+            +'<input type="text" value="'+increment+'" size="'+((String(increment).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(59,130,246,0.3);color:#60a5fa;margin-right:6px;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'increment\',parseFloat(this.value)||2.5)"/>'
+            +'</span>' : '')
+          +'<div onclick="hitSet(\''+day.id+'\','+ei+',1)" class="ex-set-box" style="background:'+b1+';border:1px solid rgba(255,255,255,0.3);"></div>'
+          +'<div onclick="hitSet(\''+day.id+'\','+ei+',2)" class="ex-set-box" style="background:'+b2+';border:1px solid rgba(255,255,255,0.3);"></div>'
+          +'<div onclick="hitSet(\''+day.id+'\','+ei+',3)" class="ex-set-box" style="background:'+b3+';border:1px solid rgba(255,255,255,0.3);"></div>'
           +'<span class="exercise-weight-label" style="margin-left:2px;">weight</span>'
-          +'<input class="exercise-weight-input" type="text" value="'+curr+'" style="width:58px;flex-shrink:0;border-color:'+wBorder+';color:'+wColor+';" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',parseFloat(this.value)||0)"/>'
-          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
-          +'<button onclick="moveExercise(\''+day.id+'\','+ei+',-1)" style="background:none;border:none;font-size:15px;cursor:pointer;padding:2px 5px;color:'+(ei===0?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.5)')+';'+(ei===0?'pointer-events:none;':'')+'">↑</button>'
-          +'<button onclick="moveExercise(\''+day.id+'\','+ei+',1)" style="background:none;border:none;font-size:15px;cursor:pointer;padding:2px 5px;color:'+(ei===day.exercises.length-1?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.5)')+';'+(ei===day.exercises.length-1?'pointer-events:none;':'')+'">↓</button>'
-          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
+          +'<input class="exercise-weight-input ex-weight-input" type="text" value="'+curr+'" style="flex-shrink:0;border-color:'+wBorder+';color:'+wColor+';" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',parseFloat(this.value)||0)"/>'
+          +'<button class="ex-icon-btn" onclick="moveExercise(\''+day.id+'\','+ei+',-1)" style="color:'+(ei===0?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.5)')+';'+(ei===0?'pointer-events:none;':'')+'">↑</button>'
+          +'<button class="ex-icon-btn" onclick="moveExercise(\''+day.id+'\','+ei+',1)" style="color:'+(ei===day.exercises.length-1?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.5)')+';'+(ei===day.exercises.length-1?'pointer-events:none;':'')+'">↓</button>'
+          +'<button class="ex-icon-btn ex-del-btn" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
           +'</div>'
-          
           +'</div>';
       });
 
@@ -2858,9 +2889,13 @@ async function loadFromCloud() {
   }catch(e){}
 }
 
-// ─── AUTO SYNC EVERY 30s ───
+// ─── AUTO SYNC EVERY 30s + ON FOCUS/VISIBILITY (catches changes made on other devices) ───
 var _lastKnownDate = todayKey();
-setInterval(function(){
+var _lastSyncAt = 0;
+function runCloudSync(force) {
+  var now = Date.now();
+  if (!force && now - _lastSyncAt < 5000) return; // throttle bursts of focus/visibility events
+  _lastSyncAt = now;
   // Check if day has changed — if so reset checklist
   var currentDate = todayKey();
   if (currentDate !== _lastKnownDate) {
@@ -2880,7 +2915,11 @@ setInterval(function(){
     });
     loadScoreHistoryFromCloud();
   }
-}, 30000);
+}
+setInterval(function(){ runCloudSync(false); }, 30000);
+// Re-sync immediately when the app regains focus/visibility — e.g. switching back from another device's session
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) runCloudSync(true); });
+window.addEventListener('focus', function(){ runCloudSync(true); });
 
 // ─── CHECKLIST SERVER SYNC ───
 async function saveChecklistToServer(date) {
@@ -3558,7 +3597,7 @@ function obApplyAndFinish(data) {
   s.name = _obData.name || s.name;
   s.wakeTime  = _obData.wake  || s.wakeTime  || '07:00';
   s.sleepTime = _obData.sleep || s.sleepTime || '22:30';
-  if (_obData.age) save('ascend_ob_age', _obData.age);
+  if (_obData.age) { s.age = _obData.age; save('ascend_ob_age', _obData.age); }
   save('ascend_settings', s); syncSection('settings', s);
 
   // Save photos as first progress check-in
@@ -3602,11 +3641,11 @@ function obApplyAndFinish(data) {
     // Bodyweight
     if (data.bodyweight) { save('ascend_bodyweight', data.bodyweight); syncSection('bodyweight', data.bodyweight); }
     // Food log
-    if (data.food_log) { save('ascend_food_log', data.food_log); }
+    if (data.food_log) { save('ascend_food_log', data.food_log); syncSection('food_log', data.food_log); }
     // Staples
-    if (data.staples && data.staples.length) { save('ascend_staples', data.staples); }
+    if (data.staples && data.staples.length) { save('ascend_staples', data.staples); syncSection('staples', data.staples); }
     // Nutrient targets
-    if (data.nutrient_targets) { save('ascend_nutrient_targets', data.nutrient_targets); }
+    if (data.nutrient_targets) { save('ascend_nutrient_targets', data.nutrient_targets); syncSection('nutrient_targets', data.nutrient_targets); }
   }
 
   // Completion screen
