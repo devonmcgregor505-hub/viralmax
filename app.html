@@ -1723,7 +1723,7 @@ function renderTrainingSection() {
           +'<input class="exercise-weight-input" type="text" value="'+curr+'" style="width:58px;flex-shrink:0;border-color:'+wBorder+';color:'+wColor+';" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',parseFloat(this.value)||0)"/>'
           +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onm'<button onclick="moveExercise(\''+day.id+'\','+ei+',-1)" style="background:none;border:none;font-size:15px;cursor:pointer;padding:2px 5px;color:'+(ei===0?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.5)')+';'+(ei===0?'pointer-events:none;':'')+'">↑</button>'
           +'<button onclick="moveExercise(\''+day.id+'\','+ei+',1)" style="background:none;border:none;font-size:15px;cursor:pointer;padding:2px 5px;color:'+(ei===day.exercises.length-1?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.5)')+';'+(ei===day.exercises.length-1?'pointer-events:none;':'')+'">↓</button>'
-          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" ouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
+          +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
           +'</div>'
           
           +'</div>';
