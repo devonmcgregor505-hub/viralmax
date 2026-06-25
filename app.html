@@ -2722,10 +2722,7 @@ function showPage(name,linkEl) {
     });
   }
   localStorage.setItem('ascend_page',name);
-  if(name==='nutrition'){
-    renderMacros(); renderMealsSection();
-    }
-  }
+  if(name==='nutrition'){renderMacros(); renderMealsSection();}
   if(name==='training'){renderTrainingSection();renderWeightCards();}
   if(name==='progress'){renderLMG();renderProgressPhotos();}
 }
