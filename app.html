@@ -1711,7 +1711,7 @@ function renderTrainingSection() {
       +'<span class="workout-day-name">'+day.name+'</span>'
       +(isToday?'<span class="today-badge" style="position:absolute;top:12px;right:112px;">TODAY</span>':'')
       +'</div>'
-      +'<div class="workout-day-days">'+dayPills+'</div>'
+      +(_trainingInfoVisible ? '<div class="workout-day-days">'+dayPills+'</div>' : '')
       +'</div>'
       +'<button style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:6px;color:var(--t2);font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer;font-family:inherit;position:absolute;top:12px;right:'+(isToday?'60':'60')+'px;" onclick="event.stopPropagation();renameWorkoutDay(\''+day.id+'\')">Edit</button>'
       +'<span class="workout-day-arrow'+(day.open?' open':'')+'" style="position:absolute;top:14px;right:36px;">▼</span>'
