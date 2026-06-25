@@ -1704,22 +1704,22 @@ function renderTrainingSection() {
         html += '<div class="exercise-row" style="flex-wrap:wrap;">'
           +'<div style="display:flex;align-items:center;gap:8px;min-width:0;">'
           +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);width:160px;min-width:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
-          +'<input type="text" value="'+(ex.reps||'8-12')+'" size="'+((ex.reps||'8-12').length||4)+'" class="exercise-weight-input" style="width:auto;flex-shrink:0;border-color:var(--border-y);color:var(--y);" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
+          +'<input type="text" value="'+(ex.reps||'8-12')+'" class="exercise-weight-input" style="width:58px;flex-shrink:0;border-color:var(--border-y);color:var(--y);" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">reps</span>'
           +'<input type="number" min="1" value="'+(ex.sets||3)+'" class="exercise-weight-input" style="width:36px;flex-shrink:0;border-color:var(--border-y);color:var(--y);text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',parseInt(this.value)||3)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">sets</span>'
           +'</div>'
           +'<div style="flex:1;"></div>'
           +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'
-          +(_trainingInfoVisible ? '<span style="font-size:10px;color:var(--t3);font-weight:700;">goal</span>' : '')
-          +(_trainingInfoVisible ? '<input type="number" min="0" value="'+goal+'" style="width:46px;background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.3);border-radius:6px;color:#f472b6;font-size:12px;font-weight:700;padding:3px 6px;outline:none;text-align:center;margin-right:6px;" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',parseFloat(this.value)||0)"/>' : '')
-          +(_trainingInfoVisible ? '<span style="font-size:10px;color:var(--t3);font-weight:700;">inc</span>' : '')
-          +(_trainingInfoVisible ? '<input type="number" min="0" step="0.5" value="'+increment+'" style="width:46px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3);border-radius:6px;color:#60a5fa;font-size:12px;font-weight:700;padding:3px 6px;outline:none;text-align:center;margin-right:10px;" onblur="updateExercise(\''+day.id+'\','+ei+',\'increment\',parseFloat(this.value)||2.5)"/>' : '')
+          +(_trainingInfoVisible ? '<span class="exercise-weight-label">goal</span>' : '')
+          +(_trainingInfoVisible ? '<input type="number" min="0" value="'+goal+'" size="'+((String(goal).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(244,114,182,0.35);color:#f472b6;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',parseFloat(this.value)||0)"/>' : '')
+          +(_trainingInfoVisible ? '<span class="exercise-weight-label">inc</span>' : '')
+          +(_trainingInfoVisible ? '<input type="number" min="0" step="0.5" value="'+increment+'" size="'+((String(increment).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(59,130,246,0.3);color:#60a5fa;margin-right:6px;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'increment\',parseFloat(this.value)||2.5)"/>' : '')
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',1)" style="width:18px;height:18px;border-radius:4px;background:'+b1+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',2)" style="width:18px;height:18px;border-radius:4px;background:'+b2+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',3)" style="width:18px;height:18px;border-radius:4px;background:'+b3+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
           +'<span class="exercise-weight-label" style="margin-left:2px;">weight</span>'
-          +'<input class="exercise-weight-input" type="text" value="'+curr+'" size="'+(String(curr).length||1)+'" style="width:auto;border-color:'+wBorder+';color:'+wColor+';" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',parseFloat(this.value)||0)"/>'
+          +'<input class="exercise-weight-input" type="text" value="'+curr+'" style="width:58px;flex-shrink:0;border-color:'+wBorder+';color:'+wColor+';" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',parseFloat(this.value)||0)"/>'
           +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
           +'</div>'
           
