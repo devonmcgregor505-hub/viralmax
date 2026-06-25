@@ -1712,9 +1712,9 @@ function renderTrainingSection() {
           +'<div style="flex:1;"></div>'
           +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'
           +(_trainingInfoVisible ? '<span class="exercise-weight-label">goal</span>' : '')
-          +(_trainingInfoVisible ? '<input type="number" min="0" value="'+goal+'" class="exercise-weight-input" style="width:54px;border-color:rgba(244,114,182,0.35);color:#f472b6;text-align:center;letter-spacing:0;padding-left:0;padding-right:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',parseFloat(this.value)||0)"/>' : '')
+          +(_trainingInfoVisible ? '<input type="text" value="'+goal+'" size="'+((String(goal).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(244,114,182,0.35);color:#f472b6;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'goal\',parseFloat(this.value)||0)"/>' : '')
           +(_trainingInfoVisible ? '<span class="exercise-weight-label">inc</span>' : '')
-          +(_trainingInfoVisible ? '<input type="number" min="0" step="0.5" value="'+increment+'" class="exercise-weight-input" style="width:54px;border-color:rgba(59,130,246,0.3);color:#60a5fa;margin-right:6px;text-align:center;letter-spacing:0;padding-left:0;padding-right:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'increment\',parseFloat(this.value)||2.5)"/>' : '')
+          +(_trainingInfoVisible ? '<input type="text" value="'+increment+'" size="'+((String(increment).length)||1)+'" class="exercise-weight-input" style="width:auto;border-color:rgba(59,130,246,0.3);color:#60a5fa;margin-right:6px;" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'increment\',parseFloat(this.value)||2.5)"/>' : '')
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',1)" style="width:18px;height:18px;border-radius:4px;background:'+b1+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',2)" style="width:18px;height:18px;border-radius:4px;background:'+b2+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
           +'<div onclick="hitSet(\''+day.id+'\','+ei+',3)" style="width:18px;height:18px;border-radius:4px;background:'+b3+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
