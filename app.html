@@ -785,7 +785,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <div class="panel-page" id="page-training">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;">
           <div style="display:flex;align-items:center;gap:10px;flex:1;">
-            <div class="section-title">Training</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="section-title">Training</div>
+              <button onclick="toggleTrainingInfo()" id="trnInfoBtn" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:50%;width:22px;height:22px;color:var(--t2);font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;font-family:inherit;">i</button>
+            </div>
+            <div id="trnInfoBox" style="display:none;margin-top:10px;font-size:12.5px;color:var(--t2);line-height:1.6;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 14px;max-width:520px;">To build muscle, you need to progressive overload. Set a rep and set range, hit it with your current weight, and do this 3 sessions in a row to automatically jump to the next weight. Each exercise has a custom increment (how much weight to add) and a goal weight to aim for.</div>
             <button id="trainingInfoBtn" onclick="toggleTrainingInfo()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t2);font-size:11px;font-weight:700;padding:4px 10px;cursor:pointer;font-family:inherit;flex-shrink:0;">info</button>
             <div id="trainingInfoBox" style="display:none;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.6;flex:1;">To grow muscles you must progressive overload. And to do that we must set a reps and sets range and hit this with the weight we have and we must do this 3 times in a row to jump up to the next weight. And below you can now see that you can set a goal and an increment for each exercise so once you hit the sets and rep range for that exercise the boxes will reset and the weight will go up by the increment. And you can set a custom goal to aim for.</div>
           </div>
@@ -1639,6 +1643,16 @@ function progressOverload() {
     }
   });
   saveWorkouts(w);
+}
+function toggleTrainingInfo() {
+  var box = document.getElementById('trnInfoBox');
+  var btn = document.getElementById('trnInfoBtn');
+  if (!box) return;
+  var visible = box.style.display !== 'none';
+  box.style.display = visible ? 'none' : 'block';
+  if (btn) btn.style.background = visible ? 'rgba(255,255,255,0.06)' : 'rgba(255,150,0,0.15)';
+  if (btn) btn.style.borderColor = visible ? 'rgba(255,255,255,0.1)' : 'rgba(255,150,0,0.3)';
+  if (btn) btn.style.color = visible ? 'var(--t2)' : 'var(--y)';
 }
 function renderTrainingSection() {
   progressOverload();
