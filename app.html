@@ -787,7 +787,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
           <div style="display:flex;align-items:center;gap:10px;flex:1;">
             <div class="section-title">Training</div>
             <button id="trainingInfoBtn" onclick="toggleTrainingInfo()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--t2);font-size:11px;font-weight:700;padding:4px 10px;cursor:pointer;font-family:inherit;flex-shrink:0;">info</button>
-            <div id="trainingInfoBox" style="display:none;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.6;flex:1;">To build muscle, you need to progressive overload. Set a rep and set range, hit it with your current weight, and do this 3 sessions in a row to automatically jump to the next weight. Each exercise has a custom increment (how much weight to add) and a goal weight to aim for.</div>
+            <div id="trainingInfoBox" style="display:none;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.6;flex:1;">To grow muscles you must progressive overload. And to do that we must set a reps and sets range and hit this with the weight we have and we must do this 3 times in a row to jump up to the next weight. And below you can now see that you can set a goal and an increment for each exercise so once you hit the sets and rep range for that exercise the boxes will reset and the weight will go up by the increment. And you can set a custom goal to aim for.</div>
           </div>
           <div id="weightCards" style="display:flex;gap:8px;flex-shrink:0;"></div>
         </div>
@@ -1694,26 +1694,25 @@ function renderTrainingSection() {
         var curr = ex.weight || 0;
         var goal = ex.goal || 0;
         var increment = ex.increment || 2.5;
-        var curr = ex.weight || 0;
         var setsHit = ex.setsHit || 0;
         var atGoal = goal > 0 && curr >= goal;
         var wColor = atGoal ? '#f472b6' : '#22c55e';
         var wBorder = atGoal ? 'rgba(244,114,182,0.35)' : 'rgba(34,197,94,0.25)';
-        var b1 = setsHit>=1?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.07)';
-        var b2 = setsHit>=2?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.07)';
-        var b3 = setsHit>=3?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.07)';
+        var b1 = setsHit>=1?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
+        var b2 = setsHit>=2?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
+        var b3 = setsHit>=3?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.16)';
         html += '<div class="exercise-row" style="flex-wrap:wrap;">'
           +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:180px;">'
           +'<input class="exercise-name" value="'+ex.name+'" style="background:transparent;border:none;outline:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0;" onblur="updateExercise(\''+day.id+'\','+ei+',\'name\',this.value)"/>'
-          +'<input type="text" value="'+(ex.reps||\'8-12\')+'" size="'+((ex.reps||\'8-12\').length||4)+'" class="exercise-weight-input" style="width:auto;flex-shrink:0;border-color:var(--border-y);color:var(--y);" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
+          +'<input type="text" value="'+(ex.reps||'8-12')+'" size="'+((ex.reps||'8-12').length||4)+'" class="exercise-weight-input" style="width:auto;flex-shrink:0;border-color:var(--border-y);color:var(--y);" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'reps\',this.value)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">reps</span>'
           +'<input type="number" min="1" value="'+(ex.sets||3)+'" class="exercise-weight-input" style="width:36px;flex-shrink:0;border-color:var(--border-y);color:var(--y);text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'sets\',parseInt(this.value)||3)"/>'
           +'<span style="font-size:10px;color:var(--t3);font-weight:700;flex-shrink:0;">sets</span>'
           +'</div>'
           +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'
-          +'<div onclick="hitSet(\''+day.id+'\','+ei+',1)" style="width:18px;height:18px;border-radius:4px;background:'+b1+';border:1px solid rgba(255,255,255,0.15);cursor:pointer;"></div>'
-          +'<div onclick="hitSet(\''+day.id+'\','+ei+',2)" style="width:18px;height:18px;border-radius:4px;background:'+b2+';border:1px solid rgba(255,255,255,0.15);cursor:pointer;"></div>'
-          +'<div onclick="hitSet(\''+day.id+'\','+ei+',3)" style="width:18px;height:18px;border-radius:4px;background:'+b3+';border:1px solid rgba(255,255,255,0.15);cursor:pointer;"></div>'
+          +'<div onclick="hitSet(\''+day.id+'\','+ei+',1)" style="width:18px;height:18px;border-radius:4px;background:'+b1+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
+          +'<div onclick="hitSet(\''+day.id+'\','+ei+',2)" style="width:18px;height:18px;border-radius:4px;background:'+b2+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
+          +'<div onclick="hitSet(\''+day.id+'\','+ei+',3)" style="width:18px;height:18px;border-radius:4px;background:'+b3+';border:1px solid rgba(255,255,255,0.3);cursor:pointer;"></div>'
           +'<span class="exercise-weight-label" style="margin-left:2px;">weight</span>'
           +'<input class="exercise-weight-input" type="text" value="'+curr+'" size="'+(String(curr).length||1)+'" style="width:auto;border-color:'+wBorder+';color:'+wColor+';" oninput="this.size=this.value.length||1" onblur="updateExercise(\''+day.id+'\','+ei+',\'weight\',parseFloat(this.value)||0)"/>'
           +'<button style="background:none;border:none;color:var(--t4);font-size:12px;cursor:pointer;padding:2px 6px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--t4)\'" onclick="deleteExercise(\''+day.id+'\','+ei+')">✕</button>'
@@ -1725,6 +1724,7 @@ function renderTrainingSection() {
             +'<input type="number" min="0" step="0.5" value="'+increment+'" style="width:54px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3);border-radius:6px;color:#60a5fa;font-size:12px;font-weight:700;padding:3px 6px;outline:none;text-align:center;" onblur="updateExercise(\''+day.id+'\','+ei+',\'increment\',parseFloat(this.value)||2.5)"/>'
             +'</div>' : '')
           +'</div>';
+      });
 
       html += '<button class="workout-add-btn" onclick="addExercise(\''+day.id+'\')">' + '+ Add exercise</button></div>';
     }
